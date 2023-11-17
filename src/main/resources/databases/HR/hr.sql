@@ -13,7 +13,7 @@ job_modified_date DATETIME
 
 
 CREATE TABLE hr.batch_employee_salary(
-besa_emp_entity_id INT IDENTITY,
+besa_emp_entity_id INT ,
 besa_created_date DATE ,
 ems_trasfer_Date DATETIME,
 besa_total_salary MONEY,
@@ -26,7 +26,7 @@ PRIMARY KEY (besa_emp_entity_id,besa_created_date)
 )
 
 CREATE TABLE hr.employees(
-emp_entityid INT  IDENTITY PRIMARY KEY,
+emp_entityid INT PRIMARY KEY,
 emp_name VARCHAR(85),
 emp_join_date DATETIME,
 emp_type VARCHAR(15),
@@ -44,7 +44,7 @@ FOREIGN KEY (emp_job_code) REFERENCES hr.job_type(job_code)
 
 
 CREATE TABLE hr.employee_are_workgroup (
-    eawag_id INT IDENTITY,
+    eawag_id INT,
     eawg_entityid INT,
     eawg_status VARCHAR(15),
     eawg_arwg_code VARCHAR(15),
@@ -57,7 +57,7 @@ CREATE TABLE hr.employee_are_workgroup (
 
 
 CREATE TABLE hr.employee_salary_detail(
-emsa_id INT IDENTITY,
+emsa_id INT,
 emsa_emp_entityid INT,
 emsa_create_date DATE,
 emsa_name VARCHAR(55),
@@ -67,7 +67,7 @@ FOREIGN KEY (emsa_emp_entityid) REFERENCES hr.employees(emp_entityid)
 )
 
 CREATE TABLE hr.template_salary(
-tesal_id INT IDENTITY,
+tesal_id INT PRIMARY KEY,
 tesal_name VARCHAR(55) UNIQUE,
 tesal_nominal MONEY,
 tesal_rate_min FLOAT,
