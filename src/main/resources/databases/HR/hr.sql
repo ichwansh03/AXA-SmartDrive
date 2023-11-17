@@ -67,7 +67,7 @@ FOREIGN KEY (emsa_emp_entityid) REFERENCES hr.employees(emp_entityid)
 )
 
 CREATE TABLE hr.template_salary(
-tesal_id INT IDENTITY(1,1),
+tesal_id INT IDENTITY,
 tesal_name VARCHAR(55) UNIQUE,
 tesal_nominal MONEY,
 tesal_rate_min FLOAT,
