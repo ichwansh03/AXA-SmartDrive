@@ -17,15 +17,40 @@
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
     * services
+<<<<<<< HEAD
+        * master
+        * users
+        * hr
+        * customers
+        * services
+        * partners
+        * payments
+    * controllers
+    * master
+        * users
+        * hr
+        * customers
+        * services
+        * partners
+        * payments
+    * dto
+    * master
+        * users
+        * hr
+        * customers
+        * services
+        * partners
+        * payments
+=======
       * master
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
     * controllers
@@ -33,7 +58,7 @@
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
     * dto
@@ -41,16 +66,17 @@
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
+>>>>>>> e97bb240cd77bb82a8182d1c63739489e12ce86b
   * resources
     * databases
       * master
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
       
