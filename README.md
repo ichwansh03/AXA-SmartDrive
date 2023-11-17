@@ -17,7 +17,7 @@
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
     * services
@@ -25,7 +25,7 @@
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
     * controllers
@@ -33,7 +33,7 @@
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
     * dto
@@ -41,7 +41,7 @@
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
   * resources
@@ -49,6 +49,6 @@
       * users
       * hr
       * customers
-      * services
+      * serviceOrders
       * partners
       * payments
