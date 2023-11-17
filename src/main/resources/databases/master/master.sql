@@ -87,7 +87,7 @@ CREATE TABLE mtr.template_insurance_premi (
     temi_rate_min FLOAT,
     temi_rate_max FLOAT,
     temi_nominal float,
-    temi_type VARCHAR(15) check(temi_type IN ("Category","Extend")),
+    temi_type VARCHAR(15) check(temi_type IN ('Category','Extend')),
     temi_zones_id INT,
     temi_inty_name VARCHAR(25),
     temi_cate_id INT,

@@ -72,9 +72,11 @@
 >>>>>>> e97bb240cd77bb82a8182d1c63739489e12ce86b
   * resources
     * databases
+      * master
       * users
       * hr
       * customers
       * serviceOrders
       * partners
       * payments
+      
