@@ -61,6 +61,5 @@ CREATE TABLE users.user_roles(
 	CONSTRAINT pk_usro PRIMARY KEY(usro_entityid,usro_role_name),
 	CONSTRAINT fk_entity_usro_users FOREIGN KEY(usro_entityid)
 		REFERENCES users.users(user_entityid),
-	CONSTRAINT fk_role_name FOREIGN KEY(usro_role_name)
-		REFERENCES users.roles(role_name)
+	FOREIGN KEY(usro_role_name) REFERENCES users.roles(role_name)
 )
