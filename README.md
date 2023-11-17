@@ -29,7 +29,7 @@
       * partners
       * payments
     * controllers
-    * master
+      * master
       * users
       * hr
       * customers
@@ -37,7 +37,7 @@
       * partners
       * payments
     * dto
-    * master
+      * master
       * users
       * hr
       * customers
@@ -46,9 +46,11 @@
       * payments
   * resources
     * databases
+      * master
       * users
       * hr
       * customers
       * services
       * partners
       * payments
+      
