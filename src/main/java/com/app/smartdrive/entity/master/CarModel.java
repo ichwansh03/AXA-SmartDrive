@@ -25,7 +25,7 @@ public class CarModel {
     private String carmCarbId;
 
     @ManyToOne
-    @JoinColumn(name = "carm_carb_id", insertable = false, updatable = false)
+    @JoinColumn(name = "carm_carb_id")
     private CarBrand carBrand;
 
     @OneToMany(mappedBy = "car_models", fetch = FetchType.LAZY)
