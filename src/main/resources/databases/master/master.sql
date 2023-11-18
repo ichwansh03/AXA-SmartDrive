@@ -1,3 +1,7 @@
+CREATE SCHEMA mtr AUTHORIZATION dbo;
+go
+
+
 CREATE TABLE mtr.category (
     cate_id INT IDENTITY(1,1) PRIMARY KEY,
     cate_name VARCHAR(55)
