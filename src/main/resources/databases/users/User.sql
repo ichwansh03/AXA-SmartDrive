@@ -28,6 +28,10 @@ CREATE TABLE users.user_phone(
 	usph_mime VARCHAR(512),
 	usph_status VARCHAR(15),
 	usph_modified_date DATETIME,
+	--Msg 1776, Level 16, State 0, Line 130
+	--There are no primary or candidate keys in the referenced table 'users.users' that match the referencing column list in the foreign key 'fk_entityid_phone'.
+	--Msg 1750, Level 16, State 1, Line 130
+	--Could not create constraint or index. See previous errors.
 	CONSTRAINT pk_entity_phone PRIMARY KEY(usph_entityid,usph_phone_number),
 	CONSTRAINT fk_entityid_phone FOREIGN KEY(usph_entityid)
 	REFERENCES users.users(user_entityid)
