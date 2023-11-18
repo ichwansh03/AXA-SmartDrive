@@ -7,10 +7,13 @@ CREATE TABLE customer.customer_request(
 	creq_type VARCHAR(15),
 	creq_modified_date DATETIME,
 	creq_cust_entityid int,
+	creq_agen_entityid int,
 	CONSTRAINT FK_CREQENTITY FOREIGN KEY(creq_cust_entityid)
 	REFERENCES users.users(user_entityid),
 	CONSTRAINT FK_CREQCUST_ENTITY FOREIGN KEY(creq_entityid)
-	REFERENCES users.business_entity(entityId)
+	REFERENCES users.business_entity(entityId),
+	CONSTRAINT FK_CREQAGEN FOREIGN KEY(creq_agen_entityid)
+	REFERENCES hr.employees(emp_entityid)
 )
 
 CREATE TABLE customer.customer_claim(
@@ -18,6 +21,7 @@ CREATE TABLE customer.customer_claim(
 	cucl_create_date DATETIME,
 	cucl_event_price money,
 	cucl_subtotal money,
+	cucl_reason VARCHAR(256),
 	CONSTRAINT FK_CUCLCREQ FOREIGN KEY(cucl_creq_entityid)
 	REFERENCES customer.customer_request(creq_entityid)
 )
