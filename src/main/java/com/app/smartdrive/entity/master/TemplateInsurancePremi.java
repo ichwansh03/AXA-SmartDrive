@@ -41,14 +41,14 @@ public class TemplateInsurancePremi {
     private int temiCateId;
 
     @ManyToOne
-    @JoinColumn(name = "temi_zones_id", updatable = false, nullable = false)
+    @JoinColumn(name = "temi_zones_id")
     private Zones zones;
 
     @ManyToOne
-    @JoinColumn(name = "temi_inty_name", updatable = false, nullable = false)
+    @JoinColumn(name = "temi_inty_name")
     private InsuranceType insuranceType;
 
     @ManyToOne
-    @JoinColumn(name = "temi_cate_id", updatable = false, nullable = false)
+    @JoinColumn(name = "temi_cate_id")
     private Category category;
 }
