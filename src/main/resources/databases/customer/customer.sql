@@ -1,5 +1,7 @@
 CREATE SCHEMA customer AUTHORIZATION dbo;
 
+go
+
 CREATE TABLE customer.customer_request(
 	creq_entityid int PRIMARY KEY,
 	creq_create_date DATETIME,
