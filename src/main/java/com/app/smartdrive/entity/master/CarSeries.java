@@ -22,7 +22,7 @@ public class CarSeries {
     @Column(name = "cars_passenger")
     private int carsPassenger;
 
-    @Column(name = "cars_carm_id")
+    @Column(name = "cars_carm_id", insertable = false, nullable = false)
     private int carsCarmId;
 
     @ManyToOne

@@ -21,7 +21,7 @@ public class CarModel {
     @Column(name = "carm_name", unique = true, nullable = false)
     private String carmName;
 
-    @Column(name = "carm_carb_id")
+    @Column(name = "carm_carb_id", insertable = false, nullable = false)
     private String carmCarbId;
 
     @ManyToOne

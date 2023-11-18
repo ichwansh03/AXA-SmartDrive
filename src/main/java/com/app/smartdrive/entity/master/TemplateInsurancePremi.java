@@ -31,13 +31,13 @@ public class TemplateInsurancePremi {
     @Column(name = "temi_type", columnDefinition = "CHECK (temi_type IN ('Category', 'Extend'))")
     private String temiType;
 
-    @Column(name = "temi_zones_id")
+    @Column(name = "temi_zones_id", insertable = false, nullable = false)
     private int temiZonesId;
 
-    @Column(name = "temi_inty_name")
+    @Column(name = "temi_inty_name", insertable = false, nullable = false)
     private String temiIntyId;
 
-    @Column(name = "temi_cate_id")
+    @Column(name = "temi_cate_id", insertable = false, nullable = false)
     private int temiCateId;
 
     @ManyToOne

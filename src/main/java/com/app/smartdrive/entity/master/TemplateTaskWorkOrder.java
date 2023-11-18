@@ -19,7 +19,7 @@ public class TemplateTaskWorkOrder {
     @Column(name = "tewo_name")
     private String tewoName;
 
-    @Column(name = "tewo_testa_id")
+    @Column(name = "tewo_testa_id", insertable = false, nullable = false)
     private int tewoTestaId;
 
     @ManyToOne
