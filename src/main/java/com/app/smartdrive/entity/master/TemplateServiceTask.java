@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "TemplateServiceTask", schema = "mtr")
+@Table(name = "template_service_task", schema = "mtr")
 public class TemplateServiceTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class TemplateServiceTask {
     @Column(name = "testa_name")
     private String testaName;
 
-    @Column(name = "testa_group")
+    @Column(name = "testa_group", insertable = false, nullable = false)
     private int testaGroup;
 
     @ManyToOne
