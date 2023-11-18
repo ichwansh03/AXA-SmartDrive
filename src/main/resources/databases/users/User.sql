@@ -7,7 +7,7 @@ CREATE TABLE users.business_entity(
 	)
 
 CREATE TABLE users.users(
-	user_entityid INT IDENTITY PRIMARY KEY,
+	user_entityid INT IDENTITY,
 	user_name VARCHAR(15) UNIQUE NOT NULL,
 	user_password VARCHAR(256),
 	user_full_name VARCHAR(85),

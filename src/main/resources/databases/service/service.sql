@@ -28,14 +28,13 @@ create table so.service_orders(
     serv_claim_startdate datetime,
     serv_claim_enddate datetime,
 	sero_serv_id integer,
-    sero_sero_id integer,
+    sero_sero_id varchar(25),
     sero_agent_entityid integer,
     sero_arwg_code varchar(15),
 	constraint pk_sero_id primary key(sero_id),
 	constraint fk_sero_serv_id foreign key (sero_serv_id) references so.services(serv_id),
 	constraint fk_sero_sero_id foreign key (sero_sero_id) references so.service_orders(sero_id),
-	constraint fk_sero_arwg_code foreign key (arwg_code) references mtr.area_workgroup(arwg_code),
-	--STILL ASKING!
+	constraint fk_sero_arwg_code foreign key (sero_arwg_code) references mtr.area_workgroup(arwg_code),
 	constraint fk_sero_agent_entityid foreign key (sero_agent_entityid) references hr.employees(emp_entityid)
 )
 
@@ -53,16 +52,16 @@ create table so.service_premi(
 create table so.service_premi_credit(
 	secr_id integer not null identity,
 	secr_serv_id integer,
-	secr_year varchar(4),
+	secr_year datetime,
 	secr_premi_debet money,
     secr_premi_credit money,
     secr_trx_date datetime,
     secr_duedate datetime,
 	secr_patr_trxno varchar(55),
-	constraint pk_secr primary key (secr_id, secr_serv_id, secr_year),
+	constraint pk_secr primary key (secr_id, secr_serv_id),
 	constraint fk_secr_serv_id foreign key (secr_serv_id) references so.services(serv_id),
-	--STILL ASKING!
-	constraint fk_secr_year foreign key (secr_year) references so.service_premi(semi_modified_date),
+	--BUGFIX
+	--constraint fk_secr_year foreign key (secr_year) references so.service_premi(semi_modified_date),
 	constraint fk_secr_patr_trxno foreign key (secr_patr_trxno) references payment.payment_transactions(patr_trxno)
 )
 
@@ -75,7 +74,7 @@ create table so.service_order_tasks(
     seot_actual_enddate datetime,
     seot_status varchar(15),
 	seot_arwg_code varchar(15),
-	seot_sero_id integer,
+	seot_sero_id varchar(25),
 	constraint pk_seot_id primary key (seot_id),
 	constraint fk_seot_arwg_code foreign key (seot_arwg_code) references mtr.area_workgroup(arwg_code),
 	constraint fk_seot_sero_id  foreign key (seot_sero_id) references so.service_orders(sero_id)
@@ -99,7 +98,7 @@ create table so.claim_asset_evidence(
     caev_url varchar(255),
     caev_note varchar(15),
 	caev_part_entityid integer,
-    caev_sero_id integer,
+    caev_sero_id varchar(25),
 	constraint pk_caev_id primary key (caev_id),
 	constraint fk_caev_part_entityid foreign key (caev_part_entityid) references partner.partners(part_entityid),
 	constraint fk_caev_sero_id foreign key (caev_sero_id) references so.service_orders(sero_id)
@@ -112,7 +111,7 @@ create table so.claim_asset_sparepart(
     casp_item_price money,
     casp_subtotal money,
 	casp_part_entityid integer,
-    casp_sero_id integer,
+    casp_sero_id varchar(25),
 	constraint pk_casp_id primary key (casp_id),
 	constraint fk_casp_part_entityid foreign key (casp_part_entityid) references partner.partners(part_entityid),
 	constraint fk_casp_sero_id foreign key (casp_sero_id) references so.service_orders(sero_id)
