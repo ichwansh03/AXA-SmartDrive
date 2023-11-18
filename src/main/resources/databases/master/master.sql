@@ -1,5 +1,5 @@
 CREATE SCHEMA mtr AUTHORIZATION dbo;
-go
+
 
 
 CREATE TABLE mtr.category (
