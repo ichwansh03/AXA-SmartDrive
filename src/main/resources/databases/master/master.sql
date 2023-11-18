@@ -1,4 +1,8 @@
+CREATE SCHEMA mtr AUTHORIZATION dbo;
+go
 
+
+CREATE SCHEMA mtr AUTHORIZATION dbo;
 
 
 
@@ -7,6 +11,7 @@ CREATE TABLE mtr.category (
     cate_id INT IDENTITY(1,1) PRIMARY KEY,
     cate_name VARCHAR(55)
 );
+--wkwkwk
 
 CREATE TABLE mtr.insurance_type (
     inty_name VARCHAR(25) PRIMARY KEY,
