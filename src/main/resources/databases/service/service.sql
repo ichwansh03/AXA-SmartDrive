@@ -61,9 +61,9 @@ create table so.service_premi_credit(
 	secr_patr_trxno varchar(55),
 	constraint pk_secr primary key (secr_id, secr_serv_id, secr_year),
 	constraint fk_secr_serv_id foreign key (secr_serv_id) references so.services(serv_id),
-	--STILL ASKING!
-	constraint fk_secr_year foreign key (secr_year) references so.service_premi(semi_modified_date),
-	constraint fk_secr_patr_trxno foreign key (secr_patr_trxno) references payment.payment_transactions(patr_trxno)
+	--BUGFIX
+	--constraint fk_secr_year foreign key (secr_year) references so.service_premi(semi_modified_date),
+	--constraint fk_secr_patr_trxno foreign key (secr_patr_trxno) references payment.payment_transactions(patr_trxno)
 )
 
 create table so.service_order_tasks(
