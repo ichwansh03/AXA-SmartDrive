@@ -1,7 +1,7 @@
 
 CREATE SCHEMA hr AUTHORIZATION dbo;
 
-go
+
 
 
 

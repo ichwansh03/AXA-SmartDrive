@@ -29,7 +29,7 @@ CREATE TABLE PAYMENT.fintech(
 );
 
 CREATE TABLE PAYMENT.user_accounts(
-	usac_id INT IDENTITY,
+	usac_id INT IDENTITY(1,1),
 	usac_accountno VARCHAR(30) UNIQUE,
 	usac_debet MONEY,
 	usac_credit MONEY,
