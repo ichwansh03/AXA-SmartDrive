@@ -4,8 +4,7 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 
-
-
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -89,4 +88,7 @@ public class Employees {
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private List<CustomerRequest> customerRequests;
 }

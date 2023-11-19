@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -46,8 +48,9 @@ public class CustomerInscDoc {
     @Column(name = "cadoc_filesize")
     private int cadocFilesize;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "cadoc_category", length = 15)
-    private String cadocCategory;
+    private EnumCustomer.CadocCategory cadocCategory;
 
     @Column(name = "cadoc_modified_date")
     private LocalDateTime cadocModifiedDate;
