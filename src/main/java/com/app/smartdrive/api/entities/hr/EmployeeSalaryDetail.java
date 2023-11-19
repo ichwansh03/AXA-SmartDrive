@@ -38,7 +38,7 @@ public class EmployeeSalaryDetail {
     private Long emsaEmpEntityid;
 
      @Id
-     @Column(name="emsa_created_date")
+     @Column(name="emsa_create_date")
      private Date emsaCreatedDate;
 
      @Column(name="emsa_name", length = 55)
