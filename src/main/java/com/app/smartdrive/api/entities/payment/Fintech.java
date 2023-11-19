@@ -1,6 +1,8 @@
-package com.app.smartdrive.entities.payment;
+package com.app.smartdrive.api.entities.payment;
 
 import java.util.List;
+
+import org.hibernate.engine.jdbc.Size;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,34 +14,32 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+
 @AllArgsConstructor
 @NoArgsConstructor
-@jakarta.persistence.Entity
-@Table(name = "banks", schema = "payment")
-public class Banks {
+@Entity
+@Table(name = "fintech", schema = "payment")
+public class Fintech {
     
     @Id
-    @Column(name = "bank_entityid")
-    private Long bank_entityid;
+    @Column(name = "fint_entityid")
+    private Long fint_entityid;
 
-    @Column(name = "bank_name",unique = true ,length = 5)
-    private String bank_name;
+    @Column(name = "fint_name", unique = true, length = 5)
+    private String fint_name;
 
-    @Column(name = "bank_desc", length = 55)
-    private String bank_desc;
-
+    @Column(name = "fint_desc", length = 55)
+    private String fint_desc;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bank_entityid", referencedColumnName = "entityid")
+    @JoinColumn(name = "fint_entityid", referencedColumnName = "entityid")
     Business_entity business_entity;
 
-    
-    @OneToMany(mappedBy = "banks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fintech", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<User_accounts> user_accounts;   
 
-    
+
 }

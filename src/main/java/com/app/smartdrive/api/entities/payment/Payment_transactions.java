@@ -1,9 +1,9 @@
-package com.app.smartdrive.entities.payment;
+package com.app.smartdrive.api.entities.payment;
 
 import java.util.Date;
 import java.util.List;
 
-import com.app.smartdrive.entities.Enumerated.EnumClassPayment;
+import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
