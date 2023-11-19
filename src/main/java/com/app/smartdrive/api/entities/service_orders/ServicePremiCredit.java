@@ -1,4 +1,4 @@
-package com.app.smartdrive.service_orders;
+package com.app.smartdrive.api.entities.service_orders;
 
 import com.app.smartdrive.api.entities.payment.Payment_transactions;
 import jakarta.persistence.*;
