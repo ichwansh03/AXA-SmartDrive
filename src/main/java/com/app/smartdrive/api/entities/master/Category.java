@@ -1,4 +1,4 @@
-package com.app.smartdrive.entity.master;
+package com.app.smartdrive.api.entities.master;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,16 +11,16 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "zones", schema = "mtr")
-public class Zones {
+@Table(name = "category", schema = "mtr")
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "zones_id", updatable = false, nullable = false)
-    private int zonesId;
+    @Column(name = "cate_id", updatable = false, nullable = false)
+    private int cateId;
 
-    @Column(name = "zones_name")
-    private String zonesName;
+    @Column(name = "cate_name")
+    private String cate_name;
 
-    @OneToMany(mappedBy = "zones", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<TemplateInsurancePremi> templateInsurancePremis;
 }

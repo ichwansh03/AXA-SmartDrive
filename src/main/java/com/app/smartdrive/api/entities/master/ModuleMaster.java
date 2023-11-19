@@ -1,4 +1,4 @@
-package com.app.smartdrive.entity.master;
+package com.app.smartdrive.api.entities.master;
 
 public enum ModuleMaster {
     CHECK("FEASIBILITY"),
