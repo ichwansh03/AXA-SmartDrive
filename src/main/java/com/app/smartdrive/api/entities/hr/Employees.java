@@ -56,7 +56,7 @@ public class Employees {
     @Enumerated(EnumType.STRING)
     private EnumClassHR.emp_graduate empGraduate;
 
-    @Column(name="emp_net_alary")
+    @Column(name="emp_net_salary")
     private Double empNetSalary;
 
     @Column(name="emp_account_number", length = 35)

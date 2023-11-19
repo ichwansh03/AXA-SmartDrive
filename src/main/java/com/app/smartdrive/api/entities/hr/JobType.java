@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name="jobtype",schema="hr")
+@Table(name="job_type",schema="hr")
 public class JobType {
     @Id
     @Column(name="job_code")

@@ -33,12 +33,12 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @IdClass(EmployeeAreaWorkgroupId.class)
-@Table(name="employee_area_workgroup",schema="hr")
+@Table(name="employee_are_workgroup",schema="hr")
 public class EmployeeAreaWorkgroup {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="eawg_id")
+    @Column(name="eawag_id")
     private Long eawgId;
     
     @Id

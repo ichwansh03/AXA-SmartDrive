@@ -24,19 +24,19 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-@Entity
 @IdClass(BatchEmployeeSalaryId.class)
+@Entity
 @Table(name="batch_employee_salary",schema="hr")
 public class BatchEmployeeSalary {
     @Id
-    @Column(name="besa_emp_entityid")
+    @Column(name="besa_emp_entity_id")
     private Long besaEmpEntityid;
 
     @Id
     @Column(name="besa_created_date")
-    private Long besaCreatedDate;
+    private LocalDateTime besaCreatedDate;
 
-    @Column(name="ems_trasfer_date")
+    @Column(name="ems_trasfer_Date")
     private LocalDateTime emsTrasferDate;
 
     @Column(name="besa_total_salary")
@@ -60,7 +60,7 @@ public class BatchEmployeeSalary {
 
     @ManyToOne
     @MapsId("besaEmpEntityid")
-    @JoinColumn(name = "besa_emp_entityid")
+    @JoinColumn(name = "besa_emp_entity_id")
     @JsonBackReference
     private Employees employees;
 
