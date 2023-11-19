@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.repository.users.BusinessEntityRepo;
+import com.app.smartdrive.api.repositories.users.BusinessEntityRepo;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 
 import lombok.RequiredArgsConstructor;

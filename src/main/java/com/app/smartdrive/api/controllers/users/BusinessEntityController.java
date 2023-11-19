@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.controller.users;
+package com.app.smartdrive.api.controllers.users;
 
 import java.util.List;
 

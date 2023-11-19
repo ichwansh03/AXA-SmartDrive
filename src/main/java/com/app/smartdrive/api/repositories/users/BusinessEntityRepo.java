@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.repository.users;
+package com.app.smartdrive.api.repositories.users;
 
 import org.springframework.stereotype.Repository;
 
