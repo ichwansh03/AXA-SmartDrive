@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.users;
 
+import com.app.smartdrive.api.entities.master.Cities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
@@ -37,7 +38,13 @@ public class UserAddress {
 
   @ManyToOne
   @MapsId("usdrEntityId")
-  @JoinColumn(name = "usdr_entity_id")
+  @JoinColumn(name = "usdr_entityid")
   @JsonBackReference
   User user;
+
+  @ManyToOne
+  @MapsId("usdrCityId")
+  @JoinColumn(name = "usdr_city_id")
+  @JsonBackReference
+  private Cities city;
 }
