@@ -28,6 +28,6 @@ public class TemplateServiceTask {
     @JoinColumn(name = "testa_group")
     private TemplateType templateType;
 
-    @OneToMany(mappedBy = "template_service_task", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "templateServiceTask", fetch = FetchType.LAZY)
     private List<TemplateTaskWorkOrder> templateTaskWorkOrder;
 }

@@ -25,6 +25,6 @@ public class TemplateType {
     @Enumerated(EnumType.STRING)
     private EnumModuleMaster.TetyGroup tetyGroup;
 
-    @OneToMany(mappedBy = "template_type", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "templateType", fetch = FetchType.LAZY)
     private List<TemplateServiceTask> templateServiceTasks;
 }
