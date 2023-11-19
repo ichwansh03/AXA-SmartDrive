@@ -2,6 +2,7 @@ package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
 
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 
@@ -55,9 +56,6 @@ public class CustomerRequest {
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
 
-    // kurang hr.employee --creqAgen
-
-
     @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private CustomerClaim customerClaim;
@@ -66,5 +64,8 @@ public class CustomerRequest {
     @PrimaryKeyJoinColumn
     private CustomerInscAssets customerInscAssets;
 
+    @ManyToOne
+    @JoinColumn(name = "creq_agen_entityid")
+    private Employees employee;
 
 }

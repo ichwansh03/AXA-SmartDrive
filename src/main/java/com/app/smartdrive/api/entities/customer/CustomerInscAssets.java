@@ -2,11 +2,16 @@ package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
 
+import com.app.smartdrive.api.entities.master.CarSeries;
+import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.master.InsuranceType;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -65,6 +70,19 @@ public class CustomerInscAssets {
     
     @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private CustomerInscExtend customerInscExtend;
+
+    @ManyToOne
+    @JoinColumn(name = "cias_cars_id")
+    private CarSeries carSeries;
+
+    @ManyToOne
+    @JoinColumn(name = "cias_inty_name")
+    private InsuranceType insuranceType;
+
+    @ManyToOne
+    @JoinColumn(name = "cias_city_id")
+    private Cities city;
+
 
 
 
