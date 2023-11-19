@@ -19,12 +19,11 @@ public class TemplateType {
     private int tetyId;
 
     @Column(name = "tety_name", unique = true)
-    private EnumModuleMaster tetyName;
+    private String tety_name;
 
     @Column(name = "tety_group", unique = true)
-    @Enumerated(EnumType.STRING)
-    private EnumModuleMaster.TetyGroup tetyGroup;
+    private String tety_group;
 
-    @OneToMany(mappedBy = "templateType", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "template_type", fetch = FetchType.LAZY)
     private List<TemplateServiceTask> templateServiceTasks;
 }

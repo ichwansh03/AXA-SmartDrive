@@ -23,6 +23,6 @@ public class TemplateTaskWorkOrder {
     private int tewoTestaId;
 
     @ManyToOne
-    @JoinColumn(name = "tewo_testa_id", insertable = false, updatable = false)
+    @JoinColumn(name = "tewo_testa_id")
     private TemplateServiceTask templateServiceTask;
 }

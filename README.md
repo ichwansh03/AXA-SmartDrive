@@ -1,17 +1,15 @@
+# Mini Project AXA-Smart Drive
 
-### Modules : [Schema] : [POC]
-* Master : mtr : Tengku
-* Users : users : Izhar
-* HR : hr : Bara
-* Customer : customer : Michel
-* Service : so : Ichwan
-* Partner : partners : Rahman
-* Payment : PAYMENT : Giri
+## Modules
+* Master :
+* Users
+* HR
+* Customer
+* Service
+* Partner
+* Payment
 
-### Link One-Drive
-SOP Project : [Mini Project](https://codedevid-my.sharepoint.com/personal/dian_code_id/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fdian%5Fcode%5Fid%2FDocuments%2FCodeidAcademy%2FJava%20FullStack%2FBatch27%2F04%2DMINI%20PROJECT)
-
-### Project Structure
+## Project Structure
 * java
   * com.app.smartdrive
     * entities
@@ -81,3 +79,4 @@ SOP Project : [Mini Project](https://codedevid-my.sharepoint.com/personal/dian_c
       * serviceOrders
       * partners
       * payments
+      

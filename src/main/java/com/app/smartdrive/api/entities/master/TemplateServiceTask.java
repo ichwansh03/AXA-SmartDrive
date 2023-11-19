@@ -21,13 +21,13 @@ public class TemplateServiceTask {
     @Column(name = "testa_name")
     private String testaName;
 
-    @Column(name = "testa_group")
+    @Column(name = "testa_group", insertable = false, nullable = false)
     private int testaGroup;
 
     @ManyToOne
-    @JoinColumn(name = "testa_group", insertable = false, updatable = false)
+    @JoinColumn(name = "testa_group")
     private TemplateType templateType;
 
-    @OneToMany(mappedBy = "templateServiceTask", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "template_service_task", fetch = FetchType.LAZY)
     private List<TemplateTaskWorkOrder> templateTaskWorkOrder;
 }

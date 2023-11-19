@@ -21,7 +21,7 @@ public class Provinsi {
     @Column(name = "prov_name", unique = true)
     private String provName;
 
-    @Column(name = "prov_zones_id")
+    @Column(name = "prov_zones_id", insertable = false, nullable = false)
     private int prov_zones_id;
 
     @OneToMany(mappedBy = "provinsi")
@@ -31,6 +31,6 @@ public class Provinsi {
     private List<RegionPlat> regionPlats;
 
     @ManyToOne
-    @JoinColumn(name = "prov_zones_id", insertable = false,updatable = false)
+    @JoinColumn(name = "prov_zones_id")
     private Zones zones;
 }

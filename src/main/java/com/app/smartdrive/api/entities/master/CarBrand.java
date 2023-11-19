@@ -1,4 +1,3 @@
-// carBrands
 package com.app.smartdrive.api.entities.master;
 
 import jakarta.persistence.*;
@@ -22,6 +21,6 @@ public class CarBrand {
     @Column(name = "cabr_name")
     private String cabrName;
 
-    @OneToMany(mappedBy = "carBrand", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "car_brands", fetch = FetchType.LAZY)
     private List<CarModel> carModels;
 }

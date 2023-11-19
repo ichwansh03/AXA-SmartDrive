@@ -21,6 +21,6 @@ public class InsuranceType {
     @Column(name = "inty_desc")
     private String intyDesc;
 
-    @OneToMany(mappedBy = "insuranceType", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "insurance_type", fetch = FetchType.LAZY)
     private List<TemplateInsurancePremi> templateInsurancePremis;
 }
