@@ -2,6 +2,8 @@ package com.app.smartdrive.api.entities.users;
 
 import java.time.LocalDateTime;
 
+import com.app.smartdrive.api.entities.payment.Banks;
+import com.app.smartdrive.api.entities.payment.Fintech;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -32,4 +34,15 @@ public class BusinessEntity {
   
   @OneToOne(mappedBy = "userEntityId",cascade = CascadeType.ALL)
   private User user;
+
+  
+  @OneToOne(mappedBy = "businessEntity", cascade = CascadeType.ALL)
+  @PrimaryKeyJoinColumn
+  @JsonManagedReference
+  private Banks banks;
+
+  @OneToOne(mappedBy = "businessEntity", cascade = CascadeType.ALL)
+  @PrimaryKeyJoinColumn
+  @JsonManagedReference
+  private Fintech fintech;
 }
