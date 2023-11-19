@@ -1,4 +1,4 @@
-package com.app.smartdrive.entities.payment;
+package com.app.smartdrive.api.entities.payment;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,7 +15,7 @@ import jakarta.persistence.GenerationType;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
 
-import com.app.smartdrive.entities.Enumerated.EnumClassPayment;
+import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;

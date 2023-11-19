@@ -1,4 +1,4 @@
-package com.app.smartdrive.entities.Enumerated;
+package com.app.smartdrive.api.entities.payment.Enumerated;
 
 
 public class EnumClassPayment {
