@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 public class Payment_transactions {
 
     @Id
-    @Column(name="patr_trxno", length = 55)
+    @Column(name="patr_trxno", length = 55, updatable = false, insertable = false)
     private String patr_trxno;
 
     @Column(name = "patr_created_on")
@@ -58,9 +58,6 @@ public class Payment_transactions {
 
     @Column(name = "patr_notes", length = 125)
     private String patr_notes;
-
-    @Column(name = "patr_trxno_ref", length = 55)
-    private String patr_trxno_ref;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patr_trxno")

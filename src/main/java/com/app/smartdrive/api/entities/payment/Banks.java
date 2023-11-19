@@ -2,6 +2,8 @@ package com.app.smartdrive.api.entities.payment;
 
 import java.util.List;
 
+import com.app.smartdrive.api.entities.users.BusinessEntity;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,7 +37,7 @@ public class Banks {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bank_entityid", referencedColumnName = "entityid")
-    Business_entity business_entity;
+    BusinessEntity businessEntity;
 
     
     @OneToMany(mappedBy = "banks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
