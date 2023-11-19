@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.service_orders;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -28,4 +29,11 @@ public class ServiceOrderWorkorder {
 
     @Column(name = "sowo_status")
     private String sowoStatus;
+
+    @Column(name = "sowo_seot_id")
+    private Long sowoSeotId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sowo_seot_id", referencedColumnName = "seot_id", insertable = false, updatable = false)
+    ServiceOrderTasks serviceOrderTasks;
 }

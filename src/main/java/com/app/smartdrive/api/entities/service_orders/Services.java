@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * <a href="https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables#multiple-entities">Mapping Entity JPA</a>
@@ -61,18 +62,19 @@ public class Services {
     @Column(name = "serv_creq_entityid")
     private Long servCreqEntityId;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services parentServices;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_cust_entityid", referencedColumnName = "user_entityid", insertable = false, updatable = false)
     User users;
 
-    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid",insertable = false, updatable = false)
     Customer customer;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "services", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    Set<ServiceOrders> serviceOrdersSet;
 }
