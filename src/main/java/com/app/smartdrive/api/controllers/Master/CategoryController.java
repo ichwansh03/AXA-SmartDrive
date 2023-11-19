@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/master/category")
 public class CategoryController {
     public ResponseEntity<?> getAllCategories() {
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok("a");
     }
 }
