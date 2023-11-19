@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.app.smartdrive.api.entities.users.UserAddress;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,4 +33,8 @@ public class Cities {
     @ManyToOne
     @JoinColumn(name = "city_prov_id", insertable = false, updatable = false)
     private Provinsi provinsi;
+
+    @OneToMany(mappedBy = "city")
+    @JsonManagedReference
+    private List<UserAddress> userAddresses;
 }

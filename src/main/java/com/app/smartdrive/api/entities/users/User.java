@@ -84,5 +84,5 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
-  private List<UserAddress> UserAddress;
+  private List<UserAddress> userAddress;
 }
