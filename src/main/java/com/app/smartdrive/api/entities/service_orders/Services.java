@@ -1,7 +1,8 @@
 package com.app.smartdrive.api.entities.service_orders;
 
 import com.app.smartdrive.api.entities.service_orders.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.entity.customer.Customer;
+import com.app.smartdrive.api.entities.users.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -52,13 +53,22 @@ public class Services {
 
     //this field is FK, references to servId
     @Column(name = "serv_serv_id")
+    @JoinColumn(name = "serv_id")
     private Long servServId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_entityid")
-    Users users;
+    @Column(name = "serv_cust_entityid")
+    private Long servCustEntityId;
 
+    @Column(name = "serv_creq_entityid")
+    private Long servCreqEntityId;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "user_entityid", insertable = false, updatable = false)
+    User users;
+
+    @JsonIgnore
     @OneToOne
-    @JoinColumn(name = "serv_creq_entityid")
+    @JoinColumn(name = "serv_creq_entityid", insertable = false, updatable = false)
     Customer customer;
 }
