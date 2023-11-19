@@ -1,12 +1,13 @@
 package com.app.smartdrive.api.entities.hr;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
+
 
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
@@ -14,6 +15,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
@@ -33,8 +35,6 @@ import lombok.NoArgsConstructor;
 public class Employees {
 
     @Id
-    @OneToOne
-    @MapsId
     @Column(name="emp_entityid")
     private Long empEntityid;
 
@@ -62,15 +62,21 @@ public class Employees {
     @Column(name="emp_account_number", length = 35)
     private String empAccountNumber;
 
+    @Column(name="emp_job_code", length = 15)
+    private String empJobCode;
+    
+
     @ManyToOne
-    @Column(name="emp_job_code")
-    private JobType jobTypeCode;
+    @MapsId("empJobCode")
+    @JoinColumn(name = "emp_job_code")
+    @JsonBackReference
+    private JobType jobType;
 
     @OneToOne
     @MapsId
     @JoinColumn(name = "emp_entityid")
     @JsonBackReference
-    private BusinessEntity userBusinessEntity;
+    private User user;
 
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn

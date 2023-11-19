@@ -2,7 +2,7 @@ package com.app.smartdrive.api.entities.hr;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
+
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -11,18 +11,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
+
 @NoArgsConstructor
 @Data
 @Entity
+@IdClass(BatchEmployeeSalaryId.class)
 @Table(name="batch_employee_salary",schema="hr")
 public class BatchEmployeeSalary {
     @Id
@@ -56,10 +59,10 @@ public class BatchEmployeeSalary {
     private LocalDateTime besaModifiedDate;
 
     @ManyToOne
-    @MapsId("besa_emp_entityid")
+    @MapsId("besaEmpEntityid")
     @JoinColumn(name = "besa_emp_entityid")
     @JsonBackReference
-    private Employees Employees;
+    private Employees employees;
 
     
 

@@ -90,7 +90,7 @@ public class User {
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
-  private List<Employees> employees;
+  private Employees employees;
 
 
 }
