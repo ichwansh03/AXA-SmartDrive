@@ -1,4 +1,4 @@
-package com.app.smartdrive.entity.customer;
+package com.app.smartdrive.entities.customer;
 
 public class Customer {
     private String name;
