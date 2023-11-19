@@ -15,9 +15,6 @@ public class RegionPlat {
     @Column(name = "regp_name", updatable = false, nullable = false)
     private String regp_name;
 
-    @Column(name = "regp_name")
-    private String regpName;
-
     @Column(name = "regp_prov_id")
     private int regp_prov_id;
 
