@@ -1,31 +1,40 @@
 package com.app.smartdrive.api.entities.users;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import com.app.smartdrive.api.entities.hr.Employees;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userBusinessEntity")
 @Entity
 @Data
 @Table(name = "users", schema = "users")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userBusinessEntity")
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+
   @Id
-  @OneToOne
-  @JoinColumn(name = "entityId")
-  private BusinessEntity userBusinessEntity;
+  @Column(name = "user_entityid")
+  private Long userEntityId;
 
   @Column(name = "user_name", nullable = false, length = 15)
   private String userName;
@@ -56,4 +65,32 @@ public class User {
 
   @Column(name = "user_modified_date")
   private LocalDateTime userModifiedDate;
+
+  @OneToOne
+  @MapsId
+  @JoinColumn(name = "user_entityid")
+  @JsonBackReference
+  private BusinessEntity userBusinessEntity;
+  
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @JsonManagedReference
+  @PrimaryKeyJoinColumn
+  private List<UserPhone> userPhone;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @PrimaryKeyJoinColumn
+  @JsonManagedReference
+  private List<UserRoles> userRoles;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @PrimaryKeyJoinColumn
+  @JsonManagedReference
+  private List<UserAddress> userAddress;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  @PrimaryKeyJoinColumn
+  @JsonManagedReference
+  private List<Employees> employees;
+
+
 }
