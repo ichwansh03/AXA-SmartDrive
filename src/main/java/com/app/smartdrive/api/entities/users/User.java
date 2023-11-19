@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.hr.Employees;
+import com.app.smartdrive.api.entities.payment.User_accounts;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -91,6 +92,11 @@ public class User {
   @PrimaryKeyJoinColumn
   @JsonManagedReference
   private Employees employees;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @PrimaryKeyJoinColumn
+  @JsonManagedReference
+  private List<User_accounts> user_accounts;
 
 
 }

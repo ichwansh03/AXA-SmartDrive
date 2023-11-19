@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.hibernate.engine.jdbc.Size;
 
+import com.app.smartdrive.api.entities.users.BusinessEntity;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,7 +38,7 @@ public class Fintech {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fint_entityid", referencedColumnName = "entityid")
-    Business_entity business_entity;
+    BusinessEntity businessEntity;
 
     @OneToMany(mappedBy = "fintech", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<User_accounts> user_accounts;   

@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
 
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
+import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -46,15 +47,6 @@ public class User_accounts {
     @Column(name = "usac_type", length = 15)
     private EnumClassPayment.EnumPaymentType enumPaymentType;
 
-    @Column(name = "usac_bank_entityid")
-    private Long usac_bank_entityid;
-
-    @Column(name = "usac_fint_entityid")
-    private Long usac_fint_entityid;
-
-    @Column(name = "usac_user_entityid")
-    private Long usac_user_entityid;
-
     // ----------------------------- //
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -68,7 +60,7 @@ public class User_accounts {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usac_user_entityid", referencedColumnName = "user_entityid")
-    Users users;
+    User user;
 
 
 
