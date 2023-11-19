@@ -18,10 +18,10 @@ public class RegionPlat {
     @Column(name = "regp_name")
     private String regpName;
 
-    @Column(name = "regp_prov_id", insertable = false, nullable = false)
+    @Column(name = "regp_prov_id")
     private int regp_prov_id;
 
     @ManyToOne
-    @JoinColumn(name = "regp_prov_id")
+    @JoinColumn(name = "regp_prov_id", insertable = false, updatable = false)
     private Provinsi provinsi;
 }

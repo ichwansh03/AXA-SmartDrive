@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.entities.master;
 
-public enum ModuleMaster {
+public enum EnumModuleMaster {
     CHECK("FEASIBILITY"),
     SERVICE("POLIS", "CLAIM"),
     ORDER("CREATE", "MODIFY"),
@@ -8,7 +8,7 @@ public enum ModuleMaster {
 
     private String[] descriptions;
 
-    ModuleMaster(String... descriptions) {
+    EnumModuleMaster(String... descriptions) {
         this.descriptions = descriptions;
     }
 

@@ -31,24 +31,24 @@ public class TemplateInsurancePremi {
     @Column(name = "temi_type", columnDefinition = "CHECK (temi_type IN ('Category', 'Extend'))")
     private String temiType;
 
-    @Column(name = "temi_zones_id", insertable = false, nullable = false)
+    @Column(name = "temi_zones_id", nullable = false)
     private int temiZonesId;
 
-    @Column(name = "temi_inty_name", insertable = false, nullable = false)
-    private String temiIntyId;
+    @Column(name = "temi_inty_name", nullable = false)
+    private String temiIntyName;
 
-    @Column(name = "temi_cate_id", insertable = false, nullable = false)
+    @Column(name = "temi_cate_id", nullable = false)
     private int temiCateId;
 
     @ManyToOne
-    @JoinColumn(name = "temi_zones_id")
+    @JoinColumn(name = "temi_zones_id", insertable = false, updatable = false)
     private Zones zones;
 
     @ManyToOne
-    @JoinColumn(name = "temi_inty_name")
+    @JoinColumn(name = "temi_inty_name", insertable = false, updatable = false)
     private InsuranceType insuranceType;
 
     @ManyToOne
-    @JoinColumn(name = "temi_cate_id")
+    @JoinColumn(name = "temi_cate_id", insertable = false, updatable = false)
     private Category category;
 }

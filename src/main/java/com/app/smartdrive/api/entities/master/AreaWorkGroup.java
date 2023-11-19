@@ -18,10 +18,10 @@ public class AreaWorkGroup {
     @Column(name = "arwg_desc")
     private String arwgDesc;
 
-    @Column(name = "arwg_city_id", insertable = false, nullable = false)
+    @Column(name = "arwg_city_id")
     private int arwgCityId;
 
     @ManyToOne
-    @JoinColumn(name = "arwg_city_id")
+    @JoinColumn(name = "arwg_city_id", insertable = false, updatable = false)
     private Cities cities;
 }

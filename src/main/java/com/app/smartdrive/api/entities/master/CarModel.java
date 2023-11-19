@@ -1,3 +1,4 @@
+// CarModel
 package com.app.smartdrive.api.entities.master;
 
 import jakarta.persistence.*;
@@ -21,13 +22,13 @@ public class CarModel {
     @Column(name = "carm_name", unique = true, nullable = false)
     private String carmName;
 
-    @Column(name = "carm_carb_id", insertable = false, nullable = false)
-    private String carmCarbId;
+    @Column(name = "carm_carb_id", nullable = false)
+    private int carmCarbId;
 
     @ManyToOne
-    @JoinColumn(name = "carm_carb_id")
+    @JoinColumn(name = "carm_carb_id", insertable = false, updatable = false)
     private CarBrand carBrand;
 
-    @OneToMany(mappedBy = "car_models", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "carModel", fetch = FetchType.LAZY)
     private List<CarSeries> carSeries;
 }
