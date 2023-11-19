@@ -2,22 +2,30 @@ package com.app.smartdrive.api.entities.hr;
 
 import java.util.Date;
 
-import org.springframework.data.annotation.Id;
 
-import jakarta.persistence.CascadeType;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
+
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
+
 @NoArgsConstructor
 @Data
 @Entity
+@IdClass(EmployeeSalaryDetailId.class)
 @Table(name="employee_salary_detail",schema="hr")
 public class EmployeeSalaryDetail {
     
@@ -26,9 +34,8 @@ public class EmployeeSalaryDetail {
     private Long emsaId;
 
     @Id
-    @OneToOne(mappedBy = "employees", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn(name="emp_entityid")
-    private Employees EmsaEmpEntityid;
+    @Column(name = "emsa_emp_entityid")
+    private Long emsaEmpEntityid;
 
      @Id
      @Column(name="emsa_created_date")
@@ -39,5 +46,11 @@ public class EmployeeSalaryDetail {
 
      @Column(name="emsa_subtotal")
      private Double emsaSubtotal;
+
+    @ManyToOne
+    @MapsId("emsaEmpEntityid")
+    @JoinColumn(name = "emsa_emp_entityid")
+    @JsonBackReference
+    private Employees employees;
 
 }
