@@ -4,12 +4,16 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +26,6 @@ import lombok.NoArgsConstructor;
 @Table(name="batch_employee_salary",schema="hr")
 public class BatchEmployeeSalary {
     @Id
-    @OneToOne(mappedBy = "employees", cascade = CascadeType.ALL)
     @Column(name="besa_emp_entityid")
     private Long besaEmpEntityid;
 
@@ -51,6 +54,12 @@ public class BatchEmployeeSalary {
 
     @Column(name="besa_modified_date")
     private LocalDateTime besaModifiedDate;
+
+    @ManyToOne
+    @MapsId("besa_emp_entityid")
+    @JoinColumn(name = "besa_emp_entityid")
+    @JsonBackReference
+    private Employees Employees;
 
     
 

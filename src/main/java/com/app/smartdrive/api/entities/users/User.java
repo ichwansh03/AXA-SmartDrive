@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.users;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -85,4 +86,11 @@ public class User {
   @PrimaryKeyJoinColumn
   @JsonManagedReference
   private List<UserAddress> userAddress;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  @PrimaryKeyJoinColumn
+  @JsonManagedReference
+  private List<Employees> employees;
+
+
 }

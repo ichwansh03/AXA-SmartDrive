@@ -5,14 +5,18 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 
-
+import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -38,7 +42,9 @@ public class EmployeeAreaWorkgroup {
     @PrimaryKeyJoinColumn(name="emp_entityid")
     private Employees EawgEmpEntityid;
 
-   
+    @ManyToOne
+    @Column(name = "eawg_arwg_code")
+    private AreaWorkGroup eawgArwgCode;
 
     @Column(name="eawg_modified_date")
     private LocalDateTime empGraduate;

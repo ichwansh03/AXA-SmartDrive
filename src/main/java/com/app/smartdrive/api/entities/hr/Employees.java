@@ -6,11 +6,15 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
+import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
@@ -27,8 +31,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name="employees",schema="hr")
 public class Employees {
-
-    //tinggal masukin dan hubungin sama user entity id
 
     @Id
     @OneToOne
@@ -64,15 +66,21 @@ public class Employees {
     @Column(name="emp_job_code")
     private JobType jobTypeCode;
 
-    @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private List<BatchEmployeeSalary> batchEmployeeSalary = new ArrayList<>();
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "emp_entityid")
+    @JsonBackReference
+    private BusinessEntity userBusinessEntity;
 
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    private List<EmployeeSalaryDetail> employeeSalaryDetails = new ArrayList<>();
+    private List<BatchEmployeeSalary> batchEmployeeSalary ;
 
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup = new ArrayList<>();
+    private List<EmployeeSalaryDetail> employeeSalaryDetails;
+
+    @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
 }
