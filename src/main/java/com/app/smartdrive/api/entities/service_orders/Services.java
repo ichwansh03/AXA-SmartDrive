@@ -53,7 +53,6 @@ public class Services {
 
     //this field is FK, references to servId
     @Column(name = "serv_serv_id")
-    @JoinColumn(name = "serv_id")
     private Long servServId;
 
     @Column(name = "serv_cust_entityid")
@@ -63,12 +62,17 @@ public class Services {
     private Long servCreqEntityId;
 
     @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "user_entityid", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "serv_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
+    Services parentServices;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "serv_cust_entityid", referencedColumnName = "user_entityid", insertable = false, updatable = false)
     User users;
 
     @JsonIgnore
-    @OneToOne
-    @JoinColumn(name = "serv_creq_entityid", insertable = false, updatable = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid",insertable = false, updatable = false)
     Customer customer;
 }
