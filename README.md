@@ -9,7 +9,7 @@
 * Payment : PAYMENT : Giri
 
 ### Link One-Drive
-SOP Project : [Mini Project](https://codedevid-my.sharepoint.com/personal/dian_code_id/_layouts/15/onedrive.aspx?ga=1&id=%2Fpersonal%2Fdian%5Fcode%5Fid%2FDocuments%2FCodeidAcademy%2FJava%20FullStack%2FBatch27%2F04%2DMINI%20PROJECT)
+SOP Project : [Mini Project](https://codedevid-my.sharepoint.com/:f:/g/personal/dian_code_id/EqJ6Vi_B2cNFllgpmYhC2PcBdZbHHTjTdn7OUFfvI0r5dQ?e=Bv8MeW)
 
 ### Project Structure
 * java
@@ -23,7 +23,6 @@ SOP Project : [Mini Project](https://codedevid-my.sharepoint.com/personal/dian_c
       * partners
       * payments
     * services
-<<<<<<< HEAD
         * master
         * users
         * hr
@@ -47,7 +46,6 @@ SOP Project : [Mini Project](https://codedevid-my.sharepoint.com/personal/dian_c
         * services
         * partners
         * payments
-=======
       * master
       * users
       * hr
@@ -71,7 +69,6 @@ SOP Project : [Mini Project](https://codedevid-my.sharepoint.com/personal/dian_c
       * serviceOrders
       * partners
       * payments
->>>>>>> e97bb240cd77bb82a8182d1c63739489e12ce86b
   * resources
     * databases
       * master
