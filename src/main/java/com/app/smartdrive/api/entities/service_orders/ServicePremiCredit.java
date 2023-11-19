@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.service_orders;
 
+import com.app.smartdrive.api.entities.payment.Payment_transactions;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,6 @@ public class ServicePremiCredit {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "secr_patr_trxno", referencedColumnName = "patr_trxno", insertable = false, updatable = false)
-    PaymentTransactions paymentTransactions;
+    Payment_transactions paymentTransactions;
 
 }
