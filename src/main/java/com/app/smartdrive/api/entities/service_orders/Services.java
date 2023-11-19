@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.service_orders;
 
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_orders.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -72,7 +73,7 @@ public class Services {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid",insertable = false, updatable = false)
-    Customer customer;
+    CustomerRequest customer;
 
     @JsonIgnore
     @OneToMany(mappedBy = "services", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

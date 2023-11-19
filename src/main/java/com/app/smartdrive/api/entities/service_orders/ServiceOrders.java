@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.service_orders;
 
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.service_orders.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;

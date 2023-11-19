@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.entities.service_orders;
 
-import com.app.smartdrive.api.entities.service_orders.enumerated.PaymentTransactions;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
