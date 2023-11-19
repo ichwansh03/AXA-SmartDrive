@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.users;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.payment.User_accounts;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -98,5 +99,6 @@ public class User {
   @JsonManagedReference
   private List<User_accounts> user_accounts;
 
-
+  @OneToMany(mappedBy = "customer")
+  List<CustomerRequest> customerRequest;
 }

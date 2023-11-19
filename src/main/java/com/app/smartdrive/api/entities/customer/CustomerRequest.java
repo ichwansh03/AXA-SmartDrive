@@ -9,6 +9,8 @@ import com.app.smartdrive.api.entities.users.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,11 +45,13 @@ public class CustomerRequest {
     @Column(name = "creq_create_date")
     private LocalDateTime creqCreateDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "creq_status", length = 15)
-    private String creqStatus;
+    private EnumCustomer.CreqStatus creqStatus;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "creq_type", length = 15)
-    private String creqType;
+    private EnumCustomer.CreqType creqType;
 
     @Column(name = "creq_modified_date")
     private LocalDateTime creqModifiedDate;
