@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.entities.service_orders.enumerated;
+package com.app.smartdrive.service_orders.enumerated;
 
 public class EnumModuleServiceOrders {
     public enum SeroStatus {

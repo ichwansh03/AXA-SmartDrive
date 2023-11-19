@@ -1,8 +1,6 @@
-package com.app.smartdrive.api.entities.service_orders;
+package com.app.smartdrive.service_orders;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
