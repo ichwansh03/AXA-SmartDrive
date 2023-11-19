@@ -1,0 +1,49 @@
+package com.app.smartdrive.api.entities.users;
+
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "user_roles", schema = "users")
+@Data
+@NoArgsConstructor
+@IdClass(UserRolesId.class)
+public class UserRoles {
+  @Id
+  @Column(name = "usro_entityid")
+  private Long usroEntityId;
+
+  @Id
+  @Column(name = "usro_role_name")
+  private String usroRoleName;
+
+  @Column(name = "usro_status")
+  private String usroStatus; //ACTIVE OR INACTIVE
+
+  @Column(name = "usro_modified_date")
+  private LocalDateTime usroModifiedDate;
+
+  @ManyToOne
+  @MapsId("usroEntityId")
+  @JoinColumn(name = "usro_entityid")
+  @JsonBackReference
+  private User user;
+
+  @ManyToOne
+  @MapsId("usroRoleName")
+  @JoinColumn(name = "usro_role_name")
+  @JsonBackReference
+  private Roles roles;
+}
