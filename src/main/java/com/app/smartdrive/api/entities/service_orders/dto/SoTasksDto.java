@@ -19,5 +19,5 @@ public class SoTasksDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private EnumModuleServiceOrders.SeotStatus status;
-    private Set<ServiceOrderWorkorder> serviceOrderWorkorderSet;
+    private ServiceOrderWorkorder serviceOrderWorkorder;
 }
