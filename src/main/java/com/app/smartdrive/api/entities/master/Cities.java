@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.users.UserAddress;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -37,4 +38,7 @@ public class Cities {
     @OneToMany(mappedBy = "city")
     @JsonManagedReference
     private List<UserAddress> userAddresses;
+
+    @OneToMany(mappedBy = "city")
+    private List<CustomerInscAssets> customerInscAssets;
 }

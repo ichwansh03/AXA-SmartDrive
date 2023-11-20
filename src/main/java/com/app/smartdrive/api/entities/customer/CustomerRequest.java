@@ -2,12 +2,15 @@ package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
 
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,11 +45,13 @@ public class CustomerRequest {
     @Column(name = "creq_create_date")
     private LocalDateTime creqCreateDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "creq_status", length = 15)
-    private String creqStatus;
+    private EnumCustomer.CreqStatus creqStatus;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "creq_type", length = 15)
-    private String creqType;
+    private EnumCustomer.CreqType creqType;
 
     @Column(name = "creq_modified_date")
     private LocalDateTime creqModifiedDate;
@@ -54,9 +59,6 @@ public class CustomerRequest {
     @ManyToOne
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
-
-    // kurang hr.employee --creqAgen
-
 
     @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
@@ -66,5 +68,8 @@ public class CustomerRequest {
     @PrimaryKeyJoinColumn
     private CustomerInscAssets customerInscAssets;
 
+    @ManyToOne
+    @JoinColumn(name = "creq_agen_entityid")
+    private Employees employee;
 
 }

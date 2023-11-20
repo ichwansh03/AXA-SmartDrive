@@ -4,8 +4,7 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 
-
-
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -56,7 +55,7 @@ public class Employees {
     @Enumerated(EnumType.STRING)
     private EnumClassHR.emp_graduate empGraduate;
 
-    @Column(name="emp_net_alary")
+    @Column(name="emp_net_salary")
     private Double empNetSalary;
 
     @Column(name="emp_account_number", length = 35)
@@ -89,4 +88,7 @@ public class Employees {
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private List<CustomerRequest> customerRequests;
 }

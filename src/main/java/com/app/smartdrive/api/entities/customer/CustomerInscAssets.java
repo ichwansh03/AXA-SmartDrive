@@ -2,11 +2,18 @@ package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
 
+import com.app.smartdrive.api.entities.master.CarSeries;
+import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.master.InsuranceType;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -50,21 +57,32 @@ public class CustomerInscAssets {
     @Column(name = "cias_total_premi")
     private Double ciasTotalPremi;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "cias_paid_type", length = 15)
-    private String ciasPaidType;
+    private EnumCustomer.CreqPaidType ciasPaidType;
 
     @Column(name = "cias_isNewChar", length = 1)
     private Character ciasIsNewChar;
 
-    // mtr.car_series fk :cias_cars_id
-    // mtr.insurance_type fk :cias_inty_name varchar(25)
-    // mtr.cities  fk:ias_city_id
 
     @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private CustomerInscDoc customerInscDoc;
     
     @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private CustomerInscExtend customerInscExtend;
+
+    @ManyToOne
+    @JoinColumn(name = "cias_cars_id")
+    private CarSeries carSeries;
+
+    @ManyToOne
+    @JoinColumn(name = "cias_inty_name")
+    private InsuranceType insuranceType;
+
+    @ManyToOne
+    @JoinColumn(name = "cias_city_id")
+    private Cities city;
+
 
 
 
