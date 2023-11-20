@@ -70,7 +70,7 @@ public class ServiceOrders {
     ServiceOrders parentServiceOrders;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "emp_entityid")
+    @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "emp_entityid", insertable = false, updatable = false)
     Employees employees;
 
     @ManyToOne(fetch = FetchType.LAZY)

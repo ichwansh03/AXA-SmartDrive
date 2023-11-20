@@ -53,7 +53,7 @@ public class ServiceOrderTasks {
     private String seotSeroId;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "seot_arwg_code", referencedColumnName = "arwg_code")
+    @JoinColumn(name = "seot_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     AreaWorkGroup areaWorkGroup;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -16,7 +16,7 @@ public class ServiceOrderWorkorder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sowo_id")
+    @Column(name = "sowo_id", insertable = false, updatable = false)
     private Long sowoId;
 
     @Column(name = "sowo_id")
