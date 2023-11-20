@@ -35,11 +35,11 @@ public class Services {
     //@Enumerated(EnumType.STRING)
     private String servType;
 
-    @Column(name = "serv_insuranceNo")
+    @Column(name = "serv_insuranceno")
     @Size(max = 12)
     private String servInsuranceNo;
 
-    @Column(name = "serv_vehicleNo")
+    @Column(name = "serv_vehicleno")
     @Size(max = 12)
     private String servVehicleNumber;
 
@@ -51,6 +51,7 @@ public class Services {
 
     @Column(name = "serv_status")
     @Size(max = 15)
+    @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.ServStatus servStatus;
 
     //this field is FK, references to servId
@@ -63,14 +64,17 @@ public class Services {
     @Column(name = "serv_creq_entityid")
     private Long servCreqEntityId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services parentServices;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_cust_entityid", referencedColumnName = "user_entityid", insertable = false, updatable = false)
     User users;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid",insertable = false, updatable = false)
     CustomerRequest customer;
