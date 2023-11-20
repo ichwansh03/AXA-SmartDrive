@@ -62,5 +62,5 @@ public class ServiceOrderTasks {
 
     @JsonIgnore
     @OneToMany(mappedBy = "serviceOrderTasks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    Set<ServiceOrderTasks> serviceOrderTasksSet;
+    Set<ServiceOrderWorkorder> serviceOrderWorkordersSet;
 }
