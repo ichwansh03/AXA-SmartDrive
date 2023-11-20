@@ -27,7 +27,7 @@ public class ServiceOrders {
 
     @Column(name = "sero_ordt_type")
     @Size(max = 15)
-    private String seroOrdtType;
+    private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
 
     @Column(name = "sero_status")
     @Size(max = 15)

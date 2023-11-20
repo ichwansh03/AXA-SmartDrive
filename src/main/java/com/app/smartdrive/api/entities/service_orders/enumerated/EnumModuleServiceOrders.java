@@ -22,6 +22,11 @@ public class EnumModuleServiceOrders {
         COMPLETED
     }
 
+    public enum ServStatus {
+        ACTIVE,
+        INACTIVE
+    }
+
     @RequiredArgsConstructor
     public enum ServType {
         OPEN("OPEN POLIS"),

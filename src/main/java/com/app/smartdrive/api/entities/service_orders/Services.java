@@ -51,7 +51,7 @@ public class Services {
 
     @Column(name = "serv_status")
     @Size(max = 15)
-    private String servStatus;
+    private EnumModuleServiceOrders.ServStatus servStatus;
 
     //this field is FK, references to servId
     @Column(name = "serv_serv_id")
