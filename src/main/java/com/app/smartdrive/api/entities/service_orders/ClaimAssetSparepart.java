@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.service_orders;
 
+import com.app.smartdrive.api.entities.partner.Partner;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -39,7 +40,7 @@ public class ClaimAssetSparepart {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "casp_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
-    Partners partners;
+    Partner partners;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "casp_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
