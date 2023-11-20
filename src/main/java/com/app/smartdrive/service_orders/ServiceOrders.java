@@ -1,8 +1,8 @@
-package com.app.smartdrive.api.entities.service_orders;
+package com.app.smartdrive.service_orders;
 
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
-import com.app.smartdrive.api.entities.service_orders.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.service_orders.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

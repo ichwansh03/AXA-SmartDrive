@@ -1,8 +1,8 @@
-package com.app.smartdrive.api.services.service_orders.implementation;
+package com.app.smartdrive.service_orders.implementation;
 
-import com.app.smartdrive.api.entities.service_orders.ServiceOrderWorkorder;
-import com.app.smartdrive.api.repositories.service_order.SoWorkorderRepository;
-import com.app.smartdrive.api.services.service_orders.SoWorkorderService;
+import com.app.smartdrive.service_orders.ServiceOrderWorkorder;
+import com.app.smartdrive.service_order.SoWorkorderRepository;
+import com.app.smartdrive.service_orders.SoWorkorderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,7 +1,7 @@
-package com.app.smartdrive.api.controllers.service_order;
+package com.app.smartdrive.service_order;
 
-import com.app.smartdrive.api.entities.service_orders.ServiceOrders;
-import com.app.smartdrive.api.services.service_orders.SoOrderService;
+import com.app.smartdrive.service_orders.ServiceOrders;
+import com.app.smartdrive.service_orders.SoOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

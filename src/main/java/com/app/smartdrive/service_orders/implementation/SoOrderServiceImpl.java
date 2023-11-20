@@ -1,14 +1,12 @@
-package com.app.smartdrive.api.services.service_orders.implementation;
+package com.app.smartdrive.service_orders.implementation;
 
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
-import com.app.smartdrive.api.entities.service_orders.ServiceOrders;
-import com.app.smartdrive.api.entities.service_orders.Services;
-import com.app.smartdrive.api.entities.service_orders.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.repositories.service_order.SoOrderRepository;
-import com.app.smartdrive.api.services.service_orders.SoOrderService;
+import com.app.smartdrive.service_orders.ServiceOrders;
+import com.app.smartdrive.service_orders.Services;
+import com.app.smartdrive.service_orders.SoOrderService;
+import com.app.smartdrive.service_orders.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.service_order.SoOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

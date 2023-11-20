@@ -1,6 +1,6 @@
-package com.app.smartdrive.api.services.service_orders;
+package com.app.smartdrive.service_orders;
 
-import com.app.smartdrive.api.entities.service_orders.ServiceOrders;
+import com.app.smartdrive.service_orders.ServiceOrders;
 
 import java.util.Optional;
 
