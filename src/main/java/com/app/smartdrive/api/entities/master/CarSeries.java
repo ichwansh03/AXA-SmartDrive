@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.master;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class CarSeries {
     @JoinColumn(name = "cars_carm_id", insertable = false, updatable = false)
     private CarModel carModel;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "carSeries", cascade = CascadeType.ALL)
     private List<CustomerInscAssets> customerInscAssets;
 }

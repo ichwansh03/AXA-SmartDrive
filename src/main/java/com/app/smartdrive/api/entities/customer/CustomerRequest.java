@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -37,6 +39,7 @@ public class CustomerRequest {
     @Column(name = "creq_entityid")
     private Long creqEntityId;
 
+    @JsonBackReference
     @OneToOne
     @MapsId
     @JoinColumn(name = "creq_entityid")
@@ -56,18 +59,23 @@ public class CustomerRequest {
     @Column(name = "creq_modified_date")
     private LocalDateTime creqModifiedDate;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
 
+    
+    @JsonManagedReference
     @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private CustomerClaim customerClaim;
 
+    @JsonManagedReference
     @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private CustomerInscAssets customerInscAssets;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "creq_agen_entityid")
     private Employees employee;

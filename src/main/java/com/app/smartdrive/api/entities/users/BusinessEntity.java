@@ -49,6 +49,7 @@ public class BusinessEntity {
   @JsonManagedReference
   private Fintech fintech;
 
+  @JsonManagedReference
   @OneToOne(mappedBy = "businessEntity",cascade = CascadeType.ALL)
   private CustomerRequest customerRequest;
 

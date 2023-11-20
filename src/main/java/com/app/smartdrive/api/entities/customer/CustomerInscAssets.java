@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -31,6 +33,7 @@ public class CustomerInscAssets {
     @Column(name = "cias_creq_entityid")
     private Long ciasCreqEntityid;
 
+    @JsonBackReference
     @OneToOne
     @MapsId
     @JoinColumn(name = "cias_creq_entityid")
@@ -61,24 +64,28 @@ public class CustomerInscAssets {
     @Column(name = "cias_paid_type", length = 15)
     private EnumCustomer.CreqPaidType ciasPaidType;
 
-    @Column(name = "cias_isNewChar", length = 1)
+    @Column(name = "ciasIsnewchar", length = 1)
     private Character ciasIsNewChar;
 
-
+    @JsonManagedReference
     @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private CustomerInscDoc customerInscDoc;
     
+    @JsonManagedReference
     @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private CustomerInscExtend customerInscExtend;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_cars_id")
     private CarSeries carSeries;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_inty_name")
     private InsuranceType insuranceType;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_city_id")
     private Cities city;
