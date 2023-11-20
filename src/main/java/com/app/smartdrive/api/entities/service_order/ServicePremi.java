@@ -1,4 +1,4 @@
-package com.app.smartdrive.service_orders;
+package com.app.smartdrive.api.entities.service_order;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

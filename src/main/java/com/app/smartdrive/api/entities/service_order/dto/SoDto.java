@@ -1,7 +1,7 @@
-package com.app.smartdrive.service_orders.dto;
+package com.app.smartdrive.api.entities.service_order.dto;
 
-import com.app.smartdrive.service_orders.ServiceOrderTasks;
-import com.app.smartdrive.service_orders.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
