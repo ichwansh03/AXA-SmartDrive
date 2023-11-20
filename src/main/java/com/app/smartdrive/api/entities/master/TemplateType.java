@@ -16,7 +16,7 @@ public class TemplateType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tety_id")
-    private int tetyId;
+    private Long tetyId;
 
     @Column(name = "tety_name", unique = true)
     private EnumModuleMaster tetyName;

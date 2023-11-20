@@ -14,7 +14,7 @@ public class CarSeries {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cars_id")
-    private int carsId;
+    private Long carsId;
 
     @Column(name = "cars_name", unique = true)
     private String carsName;
@@ -23,9 +23,9 @@ public class CarSeries {
     private int carsPassenger;
 
     @Column(name = "cars_carm_id", nullable = false)
-    private int carsCarmId;
+    private Long carsCarmId;
 
     @ManyToOne
-    @JoinColumn(name = "cars_carm_id", referencedColumnName = "carm_id", insertable = false, updatable = false)
+    @JoinColumn(name = "cars_carm_id", insertable = false, updatable = false)
     private CarModel carModel;
 }

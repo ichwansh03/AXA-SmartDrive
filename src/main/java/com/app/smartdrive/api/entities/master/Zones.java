@@ -16,7 +16,7 @@ public class Zones {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "zones_id", updatable = false, nullable = false)
-    private int zonesId;
+    private Long zonesId;
 
     @Column(name = "zones_name")
     private String zonesName;

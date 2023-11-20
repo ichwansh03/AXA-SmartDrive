@@ -16,13 +16,13 @@ public class Provinsi {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prov_id", updatable = false, nullable = false)
-    private int provId;
+    private Long provId;
 
     @Column(name = "prov_name", unique = true)
     private String provName;
 
     @Column(name = "prov_zones_id")
-    private int prov_zones_id;
+    private Long prov_zones_id;
 
     @OneToMany(mappedBy = "provinsi")
     private List<Cities> cities;
