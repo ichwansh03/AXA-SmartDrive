@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TewoRepository extends JpaRepository<TemplateTaskWorkOrder, Integer> {
+public interface TewoRepository extends JpaRepository<TemplateTaskWorkOrder, Long> {
 }
