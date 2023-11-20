@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.entities.users;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -50,7 +51,7 @@ public class BusinessEntity {
   private Fintech fintech;
 
   @JsonManagedReference
-  @OneToOne(mappedBy = "businessEntity",cascade = CascadeType.ALL)
-  private CustomerRequest customerRequest;
+  @OneToMany(mappedBy = "businessEntity",cascade = CascadeType.ALL)
+  private List<CustomerRequest> customerRequest;
 
 }

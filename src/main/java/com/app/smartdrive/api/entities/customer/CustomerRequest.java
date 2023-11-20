@@ -41,7 +41,7 @@ public class CustomerRequest {
     private Long creqEntityId;
 
     @JsonBackReference
-    @OneToOne
+    @ManyToOne
     @MapsId
     @JoinColumn(name = "creq_entityid")
     private BusinessEntity businessEntity;
