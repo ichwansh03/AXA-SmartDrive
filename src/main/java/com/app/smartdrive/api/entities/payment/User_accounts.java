@@ -22,8 +22,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -51,15 +53,18 @@ public class User_accounts {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usac_bank_entityid", referencedColumnName = "bank_entityid")
+    @JsonIgnore
     Banks banks;
 
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usac_fint_entityid", referencedColumnName = "fint_entityid")
+    @JsonIgnore
     Fintech fintech;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usac_user_entityid", referencedColumnName = "user_entityid")
+    @JsonIgnore
     User user;
 
 

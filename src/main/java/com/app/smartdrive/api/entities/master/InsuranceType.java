@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Data
@@ -26,6 +27,7 @@ public class InsuranceType {
     @OneToMany(mappedBy = "insuranceType", fetch = FetchType.LAZY)
     private List<TemplateInsurancePremi> templateInsurancePremis;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "insuranceType", cascade = CascadeType.ALL)
     private List<CustomerInscAssets> customerInscAssets;
 }

@@ -2,6 +2,8 @@ package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -34,6 +36,7 @@ public class CustomerInscDoc {
     @Column(name = "cadoc_creq_entityid")
     private Long cadocCreqEntityid;
 
+    @JsonBackReference
     @OneToOne
     @MapsId("cadocCreqEntityid")
     @JoinColumn(name = "cadoc_creq_entityid")

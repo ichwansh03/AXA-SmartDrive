@@ -39,6 +39,7 @@ public class Cities {
     @JsonManagedReference
     private List<UserAddress> userAddresses;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "city")
     private List<CustomerInscAssets> customerInscAssets;
 }

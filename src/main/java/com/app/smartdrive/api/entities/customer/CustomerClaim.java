@@ -2,6 +2,10 @@ package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -23,6 +27,7 @@ public class CustomerClaim {
     @Column(name = "cucl_creq_entityid")
     private Long  cuclCreqEntityid;
 
+    @JsonIgnore
     @OneToOne
     @MapsId
     @JoinColumn(name = "cucl_creq_entityid")
