@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.entities.customer;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +32,7 @@ public class CustomerInscExtend {
     @Column(name = "cuex_creq_entityid")
     private Long cuexCreqEntityid;
 
+    @JsonBackReference
     @OneToOne
     @MapsId("cuexCreqEntityid")
     @JoinColumn(name = "cuex_creq_entityid")
