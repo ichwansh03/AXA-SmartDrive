@@ -40,7 +40,7 @@ public class CustomerRequest {
     @OneToOne
     @MapsId
     @JoinColumn(name = "creq_entityid")
-    private BusinessEntity userBusinessEntity;
+    private BusinessEntity businessEntity;
         
     @Column(name = "creq_create_date")
     private LocalDateTime creqCreateDate;

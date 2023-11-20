@@ -22,11 +22,11 @@ public class CarModel {
     @Column(name = "carm_name", unique = true, nullable = false)
     private String carmName;
 
-    @Column(name = "carm_carb_id", nullable = false)
+    @Column(name = "carm_cabr_id", nullable = false)
     private Long carmCarbId;
 
     @ManyToOne
-    @JoinColumn(name = "carm_carb_id", insertable = false, updatable = false)
+    @JoinColumn(name = "carm_cabr_id", insertable = false, updatable = false)
     private CarBrand carBrand;
 
     @OneToMany(mappedBy = "carModel", fetch = FetchType.LAZY)
