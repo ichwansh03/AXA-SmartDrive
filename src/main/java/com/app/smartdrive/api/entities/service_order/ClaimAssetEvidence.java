@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.partner.Partner;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -44,10 +45,12 @@ public class ClaimAssetEvidence {
     @Size(max = 25)
     private String caevSeroId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caev_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
     Partner partners;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caev_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders caevServiceOrders;
