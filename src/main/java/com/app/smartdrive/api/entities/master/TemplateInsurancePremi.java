@@ -14,7 +14,7 @@ public class TemplateInsurancePremi {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "temi_id", updatable = false, nullable = false)
-    private int temiId;
+    private Long temiId;
 
     @Column(name = "temi_name")
     private String temiName;
@@ -32,13 +32,13 @@ public class TemplateInsurancePremi {
     private String temiType;
 
     @Column(name = "temi_zones_id", nullable = false)
-    private int temiZonesId;
+    private Long temiZonesId;
 
     @Column(name = "temi_inty_name", nullable = false)
     private String temiIntyName;
 
     @Column(name = "temi_cate_id", nullable = false)
-    private int temiCateId;
+    private Long temiCateId;
 
     @ManyToOne
     @JoinColumn(name = "temi_zones_id", insertable = false, updatable = false)

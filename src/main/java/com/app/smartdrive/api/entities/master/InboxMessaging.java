@@ -16,7 +16,7 @@ public class InboxMessaging {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ibme_id", updatable = false, nullable = false)
-    private int ibmeName;
+    private Long ibmeName;
 
     @Column(name = "ibme_date")
     private LocalDate ibmeDate;

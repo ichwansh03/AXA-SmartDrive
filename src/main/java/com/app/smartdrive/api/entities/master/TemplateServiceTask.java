@@ -16,13 +16,13 @@ public class TemplateServiceTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "testa_id", updatable = false, nullable = false)
-    private int testaId;
+    private Long testaId;
 
     @Column(name = "testa_name")
     private String testaName;
 
     @Column(name = "testa_group")
-    private int testaGroup;
+    private Long testaGroup;
 
     @ManyToOne
     @JoinColumn(name = "testa_group", insertable = false, updatable = false)

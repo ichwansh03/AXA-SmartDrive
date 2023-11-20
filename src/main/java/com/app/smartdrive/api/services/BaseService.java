@@ -7,6 +7,4 @@ public interface BaseService<T, ID> {
     List<T> getAll();
     T save(T entity);
     void deleteById(ID id);
-
-
 }

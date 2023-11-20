@@ -17,7 +17,7 @@ public class CarBrand {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cabr_id", updatable = false, nullable = false)
-    private int cabrID;
+    private Long cabrID;
 
     @Column(name = "cabr_name")
     private String cabrName;

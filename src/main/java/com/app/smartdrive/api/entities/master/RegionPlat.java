@@ -16,7 +16,7 @@ public class RegionPlat {
     private String regp_name;
 
     @Column(name = "regp_prov_id")
-    private int regp_prov_id;
+    private Long regp_prov_id;
 
     @ManyToOne
     @JoinColumn(name = "regp_prov_id", insertable = false, updatable = false)

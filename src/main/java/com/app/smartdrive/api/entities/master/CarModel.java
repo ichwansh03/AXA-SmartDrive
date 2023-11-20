@@ -17,16 +17,16 @@ public class CarModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "carm_id", updatable = false, nullable = false)
-    private int carmId;
+    private Long carmId;
 
     @Column(name = "carm_name", unique = true, nullable = false)
     private String carmName;
 
-    @Column(name = "carm_carb_id", nullable = false)
-    private int carmCarbId;
+    @Column(name = "carm_cabr_id", nullable = false)
+    private Long carmCarbId;
 
     @ManyToOne
-    @JoinColumn(name = "carm_carb_id", insertable = false, updatable = false)
+    @JoinColumn(name = "carm_cabr_id", insertable = false, updatable = false)
     private CarBrand carBrand;
 
     @OneToMany(mappedBy = "carModel", fetch = FetchType.LAZY)

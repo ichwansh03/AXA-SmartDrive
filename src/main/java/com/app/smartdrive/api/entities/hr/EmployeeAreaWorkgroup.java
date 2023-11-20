@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 @IdClass(EmployeeAreaWorkgroupId.class)
 @Table(name="employee_are_workgroup",schema="hr")
 public class EmployeeAreaWorkgroup {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="eawag_id")
@@ -66,6 +66,6 @@ public class EmployeeAreaWorkgroup {
     @JsonBackReference
     private Employees employees;
 
-    
-    
+
+
 }

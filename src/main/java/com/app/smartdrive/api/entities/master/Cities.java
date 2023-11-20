@@ -20,13 +20,13 @@ public class Cities {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "city_id", updatable = false, nullable = false)
-    private int cityId;
+    private Long cityId;
 
     @Column(name = "city_name", unique = true)
     private String cityName;
 
     @Column(name = "city_prov_id")
-    private int cityProvId;
+    private Long cityProvId;
 
     @OneToMany(mappedBy = "cities", fetch = FetchType.LAZY)
     private List<AreaWorkGroup> areaWorkGroups;
