@@ -27,6 +27,7 @@ public class ServiceOrders {
 
     @Column(name = "sero_ordt_type")
     @Size(max = 15)
+    @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
 
     @Column(name = "sero_status")
@@ -61,18 +62,22 @@ public class ServiceOrders {
     private String seroArwgCode;
 
     //add referenced column
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "sero_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false, unique = true)
     Services services;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders parentServiceOrders;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "emp_entityid", insertable = false, updatable = false)
     Employees employees;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     AreaWorkGroup areaWorkGroup;
