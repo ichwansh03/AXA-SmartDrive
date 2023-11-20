@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -23,4 +25,7 @@ public class InsuranceType {
 
     @OneToMany(mappedBy = "insuranceType", fetch = FetchType.LAZY)
     private List<TemplateInsurancePremi> templateInsurancePremis;
+
+    @OneToMany(mappedBy = "insuranceType", cascade = CascadeType.ALL)
+    private List<CustomerInscAssets> customerInscAssets;
 }

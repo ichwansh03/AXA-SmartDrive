@@ -1,5 +1,9 @@
 package com.app.smartdrive.api.entities.master;
 
+import java.util.List;
+
+import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,4 +32,7 @@ public class CarSeries {
     @ManyToOne
     @JoinColumn(name = "cars_carm_id", insertable = false, updatable = false)
     private CarModel carModel;
+
+    @OneToMany(mappedBy = "carSeries", cascade = CascadeType.ALL)
+    private List<CustomerInscAssets> customerInscAssets;
 }
