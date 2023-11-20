@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.entities.service_orders.enumerated;
 
+import lombok.RequiredArgsConstructor;
+
 public class EnumModuleServiceOrders {
     public enum SeroStatus {
         OPEN,
@@ -20,8 +22,13 @@ public class EnumModuleServiceOrders {
         COMPLETED
     }
 
+    @RequiredArgsConstructor
     public enum ServType {
-        POLIS,
-        CLAIM
+        OPEN("OPEN POLIS"),
+        CLAIM("CLAIM POLIS"),
+        CLOSE("CLOSE POLIS"),
+        FEASIBILITY("FEASIBILITY POLIS");
+
+        public final String label;
     }
 }
