@@ -1,6 +1,6 @@
-package com.app.smartdrive.service_order;
+package com.app.smartdrive.api.repositories.service_orders;
 
-import com.app.smartdrive.service_orders.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
