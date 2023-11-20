@@ -32,8 +32,8 @@ public class Services {
 
     @Column(name = "serv_type")
     @Size(max = 15)
-    @Enumerated(EnumType.STRING)
-    private EnumModuleServiceOrders.ServType servType;
+    //@Enumerated(EnumType.STRING)
+    private String servType;
 
     @Column(name = "serv_insuranceNo")
     @Size(max = 12)

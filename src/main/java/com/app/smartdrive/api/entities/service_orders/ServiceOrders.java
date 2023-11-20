@@ -74,7 +74,7 @@ public class ServiceOrders {
     Employees employees;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_awrg_code", referencedColumnName = "awrg_code", insertable = false, updatable = false)
+    @JoinColumn(name = "sero_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     AreaWorkGroup areaWorkGroup;
 
     @JsonIgnore
