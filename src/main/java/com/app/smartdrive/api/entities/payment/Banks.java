@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.payment;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,8 +17,10 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @jakarta.persistence.Entity
@@ -37,6 +40,7 @@ public class Banks {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bank_entityid", referencedColumnName = "entityid")
+    @JsonIgnore
     BusinessEntity businessEntity;
 
     
