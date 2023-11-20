@@ -99,7 +99,6 @@ public class User {
   @JsonManagedReference
   private List<User_accounts> user_accounts;
 
-  @JsonManagedReference
   @OneToMany(mappedBy = "customer")
   List<CustomerRequest> customerRequest;
 }
