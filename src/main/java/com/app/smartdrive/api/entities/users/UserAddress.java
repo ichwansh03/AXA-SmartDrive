@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.entities.users;
 
+import java.time.LocalDateTime;
+
 import com.app.smartdrive.api.entities.master.Cities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -31,6 +33,9 @@ public class UserAddress {
   
   @Column(name = "usdr_city_id")
   private Long usdrCityId;
+
+  @Column(name = "usdr_modified_date")
+  private LocalDateTime usdrModifiedDate;
 
   @ManyToOne
   @MapsId("usdrEntityId")
