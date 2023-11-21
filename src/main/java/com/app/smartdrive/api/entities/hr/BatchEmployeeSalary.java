@@ -2,39 +2,36 @@ package com.app.smartdrive.api.entities.hr;
 
 import java.time.LocalDateTime;
 
-
-
+import com.app.smartdrive.api.entities.hr.EnumClassHR.status;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
-@NoArgsConstructor
+
 @Data
-@IdClass(BatchEmployeeSalaryId.class)
 @Entity
 @Table(name="batch_employee_salary",schema="hr")
 public class BatchEmployeeSalary {
-    @Id
+
     @Column(name="besa_emp_entity_id")
     private Long besaEmpEntityid;
 
-    @Id
-    @Column(name="besa_created_date")
-    private LocalDateTime besaCreatedDate;
+    @EmbeddedId
+    private BatchEmployeeSalaryId batchEmployeeSalaryId;
 
     @Column(name="ems_trasfer_Date")
     private LocalDateTime emsTrasferDate;
@@ -63,6 +60,9 @@ public class BatchEmployeeSalary {
     @JoinColumn(name = "besa_emp_entity_id")
     @JsonBackReference
     private Employees employees;
+
+   
+
 
     
 
