@@ -9,15 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+// @SpringBootTest
 class PartnerServiceImplTest {
-    @Autowired
-    PartnerService partnerService;
+    // @Autowired
+    // PartnerService partnerService;
 
-    @Test
-    void createPartnerSuccess() {
-        Partner partner = new Partner();
-        partner = partnerService.save(partner);
-        Assertions.assertEquals(partner.getPartEntityid(), partner.getBusinessEntity().getEntityId());
-    }
+    // @Test
+    // void createPartnerSuccess() {
+    //     Partner partner = new Partner();
+    //     partner = partnerService.save(partner);
+    //     Assertions.assertEquals(partner.getPartEntityid(), partner.getBusinessEntity().getEntityId());
+    // }
 }

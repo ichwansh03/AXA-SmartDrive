@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.entities.payment;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.engine.jdbc.Size;
 
@@ -44,7 +45,11 @@ public class Fintech {
     BusinessEntity businessEntity;
 
     @OneToMany(mappedBy = "fintech", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<User_accounts> user_accounts;   
+    List<User_accounts> user_accounts;
+
+    public Optional<Fintech> stream() {
+        return null;
+    }   
 
 
 }
