@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.master;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class TemplateTaskWorkOrder {
     @Column(name = "tewo_testa_id", insertable = false, nullable = false)
     private Long tewoTestaId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "tewo_testa_id", insertable = false, updatable = false)
     private TemplateServiceTask templateServiceTask;

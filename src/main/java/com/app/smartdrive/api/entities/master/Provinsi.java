@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.master;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class Provinsi {
     @OneToMany(mappedBy = "provinsi")
     private List<RegionPlat> regionPlats;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "prov_zones_id", insertable = false,updatable = false)
     private Zones zones;

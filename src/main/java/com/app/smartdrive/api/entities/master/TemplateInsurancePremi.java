@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.master;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,14 +41,17 @@ public class TemplateInsurancePremi {
     @Column(name = "temi_cate_id", nullable = false)
     private Long temiCateId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "temi_zones_id", insertable = false, updatable = false)
     private Zones zones;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "temi_inty_name", insertable = false, updatable = false)
     private InsuranceType insuranceType;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "temi_cate_id", insertable = false, updatable = false)
     private Category category;

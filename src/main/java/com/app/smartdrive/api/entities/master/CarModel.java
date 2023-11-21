@@ -1,6 +1,7 @@
 // CarModel
 package com.app.smartdrive.api.entities.master;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class CarModel {
     @Column(name = "carm_cabr_id", nullable = false)
     private Long carmCarbId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "carm_cabr_id", insertable = false, updatable = false)
     private CarBrand carBrand;
