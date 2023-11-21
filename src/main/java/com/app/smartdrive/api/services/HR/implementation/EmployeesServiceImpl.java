@@ -14,6 +14,7 @@ import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.entities.users.UserPhone;
+import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.HR.JobTypeRepository;
 import com.app.smartdrive.api.repositories.master.AreaWorkGroupRepository;
@@ -61,17 +62,16 @@ public class EmployeesServiceImpl implements EmployeesService {
         user.setUserModifiedDate(LocalDateTime.now());
         user.setUserNationalId("idn");
 
-        // UserPhone userPhone = UserPhone.builder().usphEntityId(user.getUserEntityId())
-        //             .usphPhoneNumber(employeesDto.getEmpPhone())
-        //             .usphPhoneType("HP")
-        //             .usphModifiedDate(LocalDateTime.now())
-        //             .user(user).build();
-                                    
-        // userPhone.setUsphEntityId(user.getUserEntityId());
-        // userPhone.setUsphPhoneNumber(employeesDto.getEmpPhone());
-        // userPhone.setUsphPhoneType("HP");
-        // userPhone.setUsphModifiedDate(LocalDateTime.now());
-        // userPhone.setUser(user);        
+
+        
+        UserPhone userPhone = new UserPhone();   
+        UserPhoneId userPhoneId= new UserPhoneId();    
+        userPhoneId.setUsphEntityId(user.getUserEntityId());
+        userPhoneId.setUsphPhoneNumber(employeesDto.getEmpPhone());
+        userPhone.setUserPhoneId(userPhoneId);
+        userPhone.setUsphPhoneType("HP");
+        userPhone.setUsphModifiedDate(LocalDateTime.now());
+        userPhone.setUser(user);
 
         
         Cities empCityEntity = cityRepository.findByCityName(employeesDto.getEmpCity());
@@ -102,6 +102,11 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         return employeesRepository.save(employee);
     }
+
+    @Override
+    public List<Employees> getAllByEmployeeName(String employeeName) {
+        return employeesRepository.findAllByEmployeeName(employeeName);
+    }
     
     @Override
     public Employees getById(Long id) {
@@ -112,7 +117,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     @Override
     public List<Employees> getAll() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+        return employeesRepository.findAll();
     }
 
     @Override
@@ -122,9 +127,9 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long empEntityid) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+         employeesRepository.deleteById(empEntityid);
     }
     
 }
