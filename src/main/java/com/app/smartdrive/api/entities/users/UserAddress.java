@@ -4,6 +4,7 @@ import com.app.smartdrive.api.entities.master.Cities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -17,15 +18,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "user_address", schema = "users")
 @NoArgsConstructor
-@IdClass(UserAdressId.class)
 public class UserAddress {
-  @Id
-  @Column(name = "usdr_id")
-  private Long usdrId;
 
-  @Id
-  @Column(name = "usdr_entityid")
-  private Long usdrEntityId;
+  @EmbeddedId
+  UserAdressId userAdressId;
 
   @Column(name = "usdr_address1")
   private String usdrAddress1;
