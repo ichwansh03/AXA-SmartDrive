@@ -62,6 +62,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         user.setUserModifiedDate(LocalDateTime.now());
         user.setUserNationalId("idn");
 
+
         
         UserPhone userPhone = new UserPhone();   
         UserPhoneId userPhoneId= new UserPhoneId();    
@@ -76,12 +77,12 @@ public class EmployeesServiceImpl implements EmployeesService {
         Cities empCityEntity = cityRepository.findByCityName(employeesDto.getEmpCity());
 
 
-        UserAddress userAddress = new UserAddress();
-        userAddress.setUsdrEntityId(user.getUserEntityId());
-        userAddress.setUsdrAddress1(employeesDto.getEmpAddress());
-        userAddress.setUsdrAdress2(employeesDto.getEmpAddress2());
-        userAddress.setUser(user);
-        userAddress.setCity(empCityEntity);
+        // UserAddress userAddress = new UserAddress();
+        // userAddress.setUsdrEntityId(user.getUserEntityId());
+        // userAddress.setUsdrAddress1(employeesDto.getEmpAddress());
+        // userAddress.setUsdrAdress2(employeesDto.getEmpAddress2());
+        // userAddress.setUser(user);
+        // userAddress.setCity(empCityEntity);
 
 
         Employees employee = new Employees();
@@ -96,8 +97,8 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setEmpJobCode(employeesDto.getEmpRole());
 
         userRepository.save(user);
-        userPhoneRepository.save(userPhone);
-        userAddressRepository.save(userAddress);
+        // userPhoneRepository.save(userPhone);
+        // userAddressRepository.save(userAddress);
 
         return employeesRepository.save(employee);
     }
