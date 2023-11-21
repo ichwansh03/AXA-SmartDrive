@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.entities.master;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +20,7 @@ public class RegionPlat {
     @Column(name = "regp_prov_id")
     private Long regp_prov_id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "regp_prov_id", insertable = false, updatable = false)
     private Provinsi provinsi;

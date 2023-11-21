@@ -6,6 +6,7 @@ import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -20,9 +21,11 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -67,7 +70,7 @@ public class CustomerInscAssets {
     @Column(name = "ciasIsnewchar", length = 1)
     private Character ciasIsNewChar;
 
-    @JsonManagedReference
+    
     @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private CustomerInscDoc customerInscDoc;
     
@@ -75,17 +78,18 @@ public class CustomerInscAssets {
     @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private CustomerInscExtend customerInscExtend;
 
-    @JsonBackReference
+    
     @ManyToOne
     @JoinColumn(name = "cias_cars_id")
     private CarSeries carSeries;
 
-    @JsonBackReference
+
+    
     @ManyToOne
-    @JoinColumn(name = "cias_inty_name")
+    @JoinColumn(name = "cias_inty_name", referencedColumnName = "inty_name")
     private InsuranceType insuranceType;
 
-    @JsonBackReference
+    
     @ManyToOne
     @JoinColumn(name = "cias_city_id")
     private Cities city;

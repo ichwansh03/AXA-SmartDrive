@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.Employees;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
@@ -27,6 +29,7 @@ public class AreaWorkGroup {
     @Column(name = "arwg_city_id")
     private int arwgCityId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "arwg_city_id", insertable = false, updatable = false)
     private Cities cities;

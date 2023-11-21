@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.customer;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,9 +18,11 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,6 +30,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "customer_insc_doc", schema = "customer")
 @Entity
 public class CustomerInscDoc {
+    
     @Id
     @Column(name = "cadoc_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +40,7 @@ public class CustomerInscDoc {
     @Column(name = "cadoc_creq_entityid")
     private Long cadocCreqEntityid;
 
-    @JsonBackReference
+    @JsonIgnore
     @OneToOne
     @MapsId("cadocCreqEntityid")
     @JoinColumn(name = "cadoc_creq_entityid")

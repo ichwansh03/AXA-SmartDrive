@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
@@ -35,8 +36,8 @@ public class CustomerRequestServiceImpl {
         .businessEntity(existEntity)
         .customer(entityUser)
         .creqCreateDate(LocalDateTime.now())
-        .creqStatus(customerRequestDTO.getCreqStatus())
-        .creqType(customerRequestDTO.getCreqType())
+        .creqStatus(EnumCustomer.CreqStatus.OPEN)
+        .creqType(EnumCustomer.CreqType.POLIS)
         .build();
 
         return this.customerRequestRepository.save(newCustomer);

@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,6 +29,7 @@ public class CarModel {
     @Column(name = "carm_cabr_id", nullable = false)
     private Long carmCarbId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "carm_cabr_id", insertable = false, updatable = false)
     private CarBrand carBrand;

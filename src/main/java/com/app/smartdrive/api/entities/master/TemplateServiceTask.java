@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -24,6 +26,7 @@ public class TemplateServiceTask {
     @Column(name = "testa_group")
     private Long testaGroup;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "testa_group", insertable = false, updatable = false)
     private TemplateType templateType;
