@@ -1,12 +1,8 @@
 package com.app.smartdrive.api.services.service_order;
 
 import com.app.smartdrive.api.entities.service_order.Services;
+import com.app.smartdrive.api.services.BaseService;
 
-import java.util.Optional;
+public interface SoService extends BaseService<Services, Long> {
 
-public interface SoService {
-
-    Optional<Services> findServicesById(Long servId);
-
-    Services addServices(Services services);
 }

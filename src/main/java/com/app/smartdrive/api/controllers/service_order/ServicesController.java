@@ -1,66 +1,91 @@
 package com.app.smartdrive.api.controllers.service_order;
 
-import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.dto.SoDto;
-import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.entities.service_order.dto.SoTasksDto;
+import com.app.smartdrive.api.entities.service_order.dto.SoWorkorderDto;
 import com.app.smartdrive.api.services.service_order.SoOrderService;
+import com.app.smartdrive.api.services.service_order.SoService;
 import com.app.smartdrive.api.services.service_order.SoTasksService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/service")
 @RequiredArgsConstructor
 public class ServicesController {
 
+    private final SoService soService;
     private final SoOrderService soOrderService;
     private final SoTasksService soTasksService;
+
     @GetMapping("/search")
-    public ResponseEntity<?> getServiceOrderById(@RequestParam("seroid") String seroId){
-        Optional<ServiceOrders> soById = soOrderService.findBySeroId(seroId);
-        return new ResponseEntity<>(soById, HttpStatus.OK);
+    public ResponseEntity<?> getSearchById(@RequestParam("seroId") String seroId){
+
+        Services services = soService.getById(3L);
+        ServiceOrders serviceOrders = soOrderService.getById(seroId);
+        List<ServiceOrderTasks> seot = soTasksService.findAllBySeotSeroId(seroId);
+
+        List<SoTasksDto> soTasksDtos = seot.stream()
+                .map(task -> {
+                    List<SoWorkorderDto> workorderDtos = task.getServiceOrderWorkordersSet().stream()
+                            .map(workorder -> SoWorkorderDto.builder()
+                                    .sowoName(workorder.getSowoName())
+                                    .sowoStatus(workorder.getSowoStatus())
+                                    .build()).toList();
+
+                    return SoTasksDto.builder()
+                            .taskId(task.getSeotId())
+                            .taskName(task.getSeotName())
+                            .startDate(task.getSeotStartDate())
+                            .endDate(task.getSeotEndDate())
+                            .status(task.getSeotStatus())
+                            .serviceOrderWorkorder(workorderDtos).build();
+                }).toList();
+
+        SoDto soDto = SoDto.builder()
+                .seroId(seroId)
+                .servCreatedOn(services.getServCreatedOn())
+                .servType(services.getServType())
+                .servStatus(services.getServStatus())
+                .noPolis(services.getServInsuranceNo())
+                .customerName(services.getServCustEntityId())
+                .empName(serviceOrders.getSeroAgentEntityid())
+                .serviceOrderTasksList(soTasksDtos).build();
+
+        return new ResponseEntity<>(soDto, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addServiceOrderById(@Valid @RequestBody ServiceOrders serviceOrders){
+    @GetMapping("/serv")
+    public ResponseEntity<?> generateServices(@RequestParam("servId") Long servId){
 
-        Services services = new Services();
-        Employees employees = new Employees();
-        AreaWorkGroup areaWorkGroup = new AreaWorkGroup();
+        return new ResponseEntity<>(soService.getById(servId), HttpStatus.OK);
+    }
+
+    @GetMapping("/servorder")
+    public ResponseEntity<?> getServiceOrderById(@RequestParam("seroid") String seroId){
+        return new ResponseEntity<>(soOrderService.getById(seroId), HttpStatus.OK);
+    }
+
+    private String formatServiceOrderId(String servType, Long seroId, LocalDate createdAt){
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String seroIdPolis = "PL-"+String.format("%04d", serviceOrders.getSeroId())+services.getServCreatedOn().format(formatter);
-        String seroIdClaim = "CL-"+String.format("%04d", serviceOrders.getSeroId())+services.getServCreatedOn().format(formatter);
-        String seroIdTutup = "TP-"+String.format("%04d", serviceOrders.getSeroId())+services.getServCreatedOn().format(formatter);
+        String formatSeroId = String.format("%04d", seroId);
 
-        serviceOrders.setSeroId(seroIdPolis);
-        serviceOrders.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE);
-        serviceOrders.setSeroStatus(EnumModuleServiceOrders.SeroStatus.OPEN);
-        serviceOrders.setSeroReason("Test");
-        serviceOrders.setServClaimNo("oo");
-        serviceOrders.setServClaimStartdate(services.getServStartDate());
-        serviceOrders.setServClaimEnddate(services.getServEndDate());
-        serviceOrders.setSeroServId(services.getServId());
-        serviceOrders.setSeroSeroId(serviceOrders.getSeroId());
-        serviceOrders.setSeroAgentEntityid(employees.getEmpEntityid());
-        serviceOrders.setSeroArwgCode(areaWorkGroup.getArwgCode());
-
-        soOrderService.addSero(serviceOrders);
-
-        return new ResponseEntity<>(serviceOrders, HttpStatus.OK);
-    }
-
-    @GetMapping("/tasks")
-    public ResponseEntity<?> getSoTasks(){
-        return new ResponseEntity<>(soTasksService.findAllSoTasks(), HttpStatus.OK);
+        if (servType.equals("POLIS")){
+            return "PL"+formatSeroId+"-"+createdAt.format(formatter);
+        } else if (servType.equals("CLAIM")) {
+            return "CL"+formatSeroId+"-"+createdAt.format(formatter);
+        }
+        return "TP"+formatSeroId+"-"+createdAt.format(formatter);
     }
 }

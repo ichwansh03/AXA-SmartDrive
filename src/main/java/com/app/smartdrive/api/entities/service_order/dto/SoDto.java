@@ -3,31 +3,34 @@ package com.app.smartdrive.api.entities.service_order.dto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SoDto {
 
     //seroId
-    private String soName;
+    private String seroId;
     //servClaimDate
-    private LocalDate soCreatedOn;
+    private LocalDate servCreatedOn;
     //servType
-    private EnumModuleServiceOrders.ServType servType;
+    private String servType;
     //servStatus
-    private EnumModuleServiceOrders.SeroStatus seroStatus;
+    private EnumModuleServiceOrders.ServStatus servStatus;
     //servClaimNo
-    private String polisNumber;
+    private String noPolis;
     //customer
-    private String customerName;
+    private Long customerName;
     //seroAgentEntityId
-    private String financialAdvisor;
+    private Long empName;
     //service order task list
-    Set<ServiceOrderTasks> serviceOrderTasksSet;
+    List<SoTasksDto> serviceOrderTasksList;
 }
