@@ -25,12 +25,9 @@ public class CarbServiceImpl implements CarbService {
     }
 
     @Override
-    public CarBrandDto findCarBrandById(Long id) {
+    public CarBrand findCarBrandById(Long id) {
         CarBrand carBrand = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Car Brand ID : " + id + " Not Found !"));
-        return new CarBrandDto(
-                carBrand.getCabrID(),
-                carBrand.getCabrName()
-        );
+        return carBrand;
     }
 
     @Override

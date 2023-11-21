@@ -27,19 +27,9 @@ public class CarsController {
         return ResponseEntity.ok(carbService.findAllCarBrand());
     }
 
-    @GetMapping("/brands/{id}")
-    public ResponseEntity<?> findCarBrandById(@PathVariable Long id) {
-        return ResponseEntity.ok(carbService.findCarBrandById(id));
-    }
-
     @GetMapping("/models")
     public ResponseEntity<?> findAllCarModels() {
         return ResponseEntity.ok(carmService.findAllCarModel());
-    }
-
-    @GetMapping("/models/{id}")
-    public ResponseEntity<?> findCarModelById(@PathVariable Long id) {
-        return ResponseEntity.ok(carmService.findCarModelById(id));
     }
 
     @GetMapping("/series")
@@ -47,9 +37,37 @@ public class CarsController {
         return ResponseEntity.ok(carsService.findAllCarSeries());
     }
 
+    @GetMapping("/brands/{id}")
+    public ResponseEntity<?> findCarBrandById(@PathVariable Long id) {
+        CarBrand carBrand = carbService.findCarBrandById(id);
+        CarBrandDto carBrandDto = new CarBrandDto(
+                carBrand.getCabrID(),
+                carBrand.getCabrName()
+        );
+        return ResponseEntity.ok(carBrandDto);
+    }
+
+    @GetMapping("/models/{id}")
+    public ResponseEntity<?> findCarModelById(@PathVariable Long id) {
+        CarModel carModel = carmService.findCarModelById(id);
+        CarModelDto carModelDto = new CarModelDto(
+                carModel.getCarmId(),
+                carModel.getCarmName(),
+                carModel.getCarmCarbId()
+        );
+        return ResponseEntity.ok(carModelDto);
+    }
+
     @GetMapping("/series/{id}")
     public ResponseEntity<?> findCarSeriesById(@PathVariable Long id) {
-        return ResponseEntity.ok(carsService.findCarSeriesById(id));
+        CarSeries carSeries = carsService.findCarSeriesById(id);
+        CarSeriesDto carSeriesDto = new CarSeriesDto(
+                carSeries.getCarsId(),
+                carSeries.getCarsName(),
+                carSeries.getCarsPassenger(),
+                carSeries.getCarsCarmId()
+        );
+        return ResponseEntity.ok(carSeriesDto);
     }
 
     @PostMapping("/brands")
@@ -79,26 +97,24 @@ public class CarsController {
 
     @PutMapping("/brands/update")
     public ResponseEntity<?> updateBrandById(@Valid @RequestBody CarBrandDto carBrandDto) {
-        carbService.findCarBrandById(carBrandDto.getCabrID());
-        CarBrand carBrand = new CarBrand();
-        carBrand.setCabrID(carBrandDto.getCabrID());
+        CarBrand carBrand =  carbService.findCarBrandById(carBrandDto.getCabrID());
         carBrand.setCabrName(carBrandDto.getCabrName());
         return ResponseEntity.ok(carbService.createBrand(carBrand));
     }
+
     @PutMapping("/models/update")
     public ResponseEntity<?> updateModelById(@Valid @RequestBody CarModelDto carModelDto) {
-        carmService.findCarModelById(carModelDto.getCarmId());
-        CarModel carModel = new CarModel();
-        carModel.setCarmId(carModelDto.getCarmId());
+        CarModel carModel = carmService.findCarModelById(carModelDto.getCarmId());
         carModel.setCarmName(carModelDto.getCarmName());
+        carModel.setCarmCarbId(carModelDto.getCarmCarbId());
         return ResponseEntity.ok(carmService.createModel(carModel));
     }
+
     @PutMapping("/series/update")
     public ResponseEntity<?> updateSeriesById(@Valid @RequestBody CarSeriesDto carSeriesDto) {
-        carsService.findCarSeriesById(carSeriesDto.getCarsId());
-        CarSeries carSeries = new CarSeries();
-        carSeries.setCarsId(carSeries.getCarsId());
+        CarSeries carSeries = carsService.findCarSeriesById(carSeriesDto.getCarsId());
         carSeries.setCarsName(carSeries.getCarsName());
+        carSeries.setCarsCarmId(carSeries.getCarsCarmId());
         return ResponseEntity.ok(carsService.createSeries(carSeries));
     }
 }

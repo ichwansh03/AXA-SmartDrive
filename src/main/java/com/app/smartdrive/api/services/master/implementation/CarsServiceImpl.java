@@ -23,14 +23,9 @@ public class CarsServiceImpl implements CarsService {
         return carSeriesDtos;
     }
     @Override
-    public CarSeriesDto findCarSeriesById(Long id) {
+    public CarSeries findCarSeriesById(Long id) {
         CarSeries carSeries = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Car Series ID : " + id + " Not Found !"));
-        return new CarSeriesDto(
-                carSeries.getCarsId(),
-                carSeries.getCarsName(),
-                carSeries.getCarsPassenger(),
-                carSeries.getCarsCarmId()
-        );
+        return carSeries;
     }
 
     @Override

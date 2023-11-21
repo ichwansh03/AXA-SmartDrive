@@ -26,13 +26,9 @@ public class CarmServiceImpl implements CarmService {
     }
 
     @Override
-    public CarModelDto findCarModelById(Long id) {
+    public CarModel findCarModelById(Long id) {
         CarModel carModel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Car Model ID : " + id + " Not Found !"));
-        return new CarModelDto(
-                carModel.getCarmId(),
-                carModel.getCarmName(),
-                carModel.getCarmCarbId()
-        );
+        return carModel;
     }
 
     @Override

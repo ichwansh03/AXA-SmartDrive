@@ -10,5 +10,5 @@ public interface CarbService {
 
     CarBrand createBrand(CarBrand carBrand);
 
-    CarBrandDto findCarBrandById(Long id);
+    CarBrand findCarBrandById(Long id);
 }
