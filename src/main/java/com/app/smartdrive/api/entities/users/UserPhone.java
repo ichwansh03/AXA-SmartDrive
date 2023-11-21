@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -20,9 +21,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Builder
-@AllArgsConstructor
-@IdClass(UserPhoneId.class)
+@NoArgsConstructor
 @Table(name = "user_phone", schema = "users")
 public class UserPhone {
   
@@ -30,13 +29,8 @@ public class UserPhone {
   public UserPhone() {
     }
 
-  @Id
-  @Column(name = "usph_entityid")
-  private Long usphEntityId;
-
-  @Id
-  @Column(name = "usph_phone_number")
-  private String usphPhoneNumber;
+  @EmbeddedId
+  private UserPhoneId userPhoneId;
 
   @Column(name = "usph_phone_type")
   private String usphPhoneType; //just HP or HOME
