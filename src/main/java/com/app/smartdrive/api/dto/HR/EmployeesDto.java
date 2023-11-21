@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class EmployeesDto implements Serializable{
+    private Long usdrId;
     private String empName;
     private String empEmail;
     private String empPhone;
