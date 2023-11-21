@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.user.UserMapper;
-import com.app.smartdrive.api.repositories.users.UserRepo;
+import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
-  private final UserRepo userRepo;
+  private final UserRepository userRepo;
   @Override
   public UserDto getById(Long id) {
     // TODO Auto-generated method stub

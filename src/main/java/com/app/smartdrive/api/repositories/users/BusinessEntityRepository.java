@@ -7,6 +7,6 @@ import com.app.smartdrive.api.entities.users.BusinessEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository
-public interface BusinessEntityRepo extends JpaRepository<BusinessEntity,Long>{
+public interface BusinessEntityRepository extends JpaRepository<BusinessEntity,Long>{
   
 }
