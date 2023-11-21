@@ -6,12 +6,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -64,5 +67,5 @@ public class ServiceOrderTasks {
 
     @JsonIgnore
     @OneToMany(mappedBy = "serviceOrderTasks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    Set<ServiceOrderWorkorder> serviceOrderWorkordersSet;
+    List<ServiceOrderWorkorder> serviceOrderWorkordersSet;
 }

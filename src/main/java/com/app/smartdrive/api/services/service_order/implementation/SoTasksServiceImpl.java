@@ -15,7 +15,7 @@ public class SoTasksServiceImpl implements SoTasksService {
     private final SoTasksRepository soTasksRepository;
 
     @Override
-    public List<ServiceOrderTasks> findAllSoTasks() {
-        return soTasksRepository.findAll();
+    public List<ServiceOrderTasks> findAllBySeotSeroId(String seroId) {
+        return soTasksRepository.findAllBySeotSeroId(seroId);
     }
 }
