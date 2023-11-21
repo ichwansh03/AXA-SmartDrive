@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Embeddable
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserPhoneId implements Serializable{
   @Column(name = "usph_entityid", nullable = false)
   private Long usphEntityId;
