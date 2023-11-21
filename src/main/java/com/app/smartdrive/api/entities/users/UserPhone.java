@@ -24,10 +24,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "user_phone", schema = "users")
 public class UserPhone {
-  
-
-  public UserPhone() {
-    }
 
   @EmbeddedId
   private UserPhoneId userPhoneId;
