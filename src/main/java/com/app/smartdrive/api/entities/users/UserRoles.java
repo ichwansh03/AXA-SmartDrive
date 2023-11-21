@@ -3,7 +3,6 @@ package com.app.smartdrive.api.entities.users;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -36,5 +35,10 @@ public class UserRoles {
   @JoinColumn(name = "usro_entityid")
   @JsonBackReference
   private User user;
-  
+
+  @ManyToOne
+  @MapsId("usroRoleName")
+  @JoinColumn(name = "usro_role_name")
+  @JsonBackReference
+  private Roles roles;
 }

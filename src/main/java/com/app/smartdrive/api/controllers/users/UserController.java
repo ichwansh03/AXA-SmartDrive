@@ -5,13 +5,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.smartdrive.api.dto.user.CreateUserDto;
 import com.app.smartdrive.api.dto.user.UserDto;
+import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.UserAddress;
+import com.app.smartdrive.api.entities.users.UserAdressId;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
+import com.app.smartdrive.api.repositories.master.CityRepository;
+import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
@@ -38,6 +44,8 @@ public class UserController {
   private final BusinessEntityService businessEntityService;
   private final UserPhoneRepository userPhoneRepository;
   private final UserRoleRepository userRoleRepository;
+  private final RolesRepository rolesRepository;
+  private final CityRepository cityRepository;
 
   @GetMapping
   public List<UserDto> getAllUsers() {
@@ -51,46 +59,8 @@ public class UserController {
 
   @PostMapping
   public ResponseEntity<?> addUser(@ModelAttribute CreateUserDto userPost){
-    BusinessEntity businessEntity = new BusinessEntity();
-    businessEntity.setEntityModifiedDate(LocalDateTime.now());
-    Long businessEntityId = businessEntityService.save(businessEntity);
-
-    UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.CU);
-    
-    UserRoles userRoles = new UserRoles();
-    userRoles.setUserRolesId(userRolesId);
-    userRoles.setUsroStatus("ACTIVE");
-    userRoles.setUsroModifiedDate(LocalDateTime.now());
-
-    List<UserRoles> listRole = List.of(userRoles); 
-    
-    UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, userPost.getUserPhoneNumber());
-
-
-    UserPhone userPhone = new UserPhone();
-    userPhone.setUserPhoneId(userPhoneId);
-    userPhone.setUsphPhoneType("HP");
-        
-    List<UserPhone> listPhone = List.of(userPhone);
-    
-    User user = new User();
-    user.setUserBusinessEntity(businessEntity);
-    user.setUserEntityId(businessEntityId);
-    user.setUserName(userPost.getUserName());
-    user.setUserPassword(userPost.getUserPassword());
-    user.setUserFullName(userPost.getFullName());
-    user.setUserEmail(userPost.getEmail());
-    user.setUserBirthPlace(userPost.getBirthPlace());
-    user.setUserBirthDate(userPost.getUserBirthDate());
-    user.setUserNPWP(userPost.getUserNpwp());
-    user.setUserNationalId(userPost.getUserNationalId()+businessEntity.getEntityId());
-    user.setUserModifiedDate(LocalDateTime.now());
-    user.setUserPhone(listPhone);
-    user.setUserRoles(listRole);
-    userPhone.setUser(user);
-    userRoles.setUser(user);
-    User userSaver = userServiceImpl.save(user);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userSaver);
+    User userSaved = userServiceImpl.create(userPost);
+    return ResponseEntity.status(HttpStatus.CREATED).body(userSaved);
   }
   
 }
