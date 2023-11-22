@@ -3,13 +3,12 @@ package com.app.smartdrive.api.services.users.implementation;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.dto.user.CreateUserDto;
 import com.app.smartdrive.api.dto.user.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
-import com.app.smartdrive.api.entities.payment.User_accounts;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
@@ -23,6 +22,7 @@ import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
 import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
+import com.app.smartdrive.api.repositories.users.UserAddressRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
@@ -34,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
+  private final UserAddressRepository userAddressRepository;
   private final EntityManager entityManager;
   private final UserRepository userRepo;
   private final BusinessEntityService businessEntityService;
@@ -100,7 +100,16 @@ public class UserServiceImpl implements UserService {
 
     Cities city = cityRepository.findByCityName(userPost.getCity());
 
+    Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
+    Long lastIndexUsdr;
+    if(findTopByOrderByIdDesc.isPresent()){
+       lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
+    } else {
+      lastIndexUsdr = 1L;
+    }
+
     UserAdressId userAdressId = new UserAdressId();
+    userAdressId.setUsdrId(lastIndexUsdr+1);
     userAdressId.setUsdrEntityId(businessEntityId);
     UserAddress userAddress = new UserAddress();
     userAddress.setUsdrCityId(city.getCityId());
@@ -111,10 +120,6 @@ public class UserServiceImpl implements UserService {
     userAddress.setUsdrModifiedDate(LocalDateTime.now());
 
     List<UserAddress> listAddress = List.of(userAddress);
-
-
-    User_accounts user_accounts = new User_accounts();
-
 
     User user = new User();
     user.setUserBusinessEntity(businessEntity);
@@ -135,8 +140,7 @@ public class UserServiceImpl implements UserService {
     userPhone.setUser(user);
     userRoles.setUser(user);
     userAddress.setUser(user);
-    User userSaver = save(user);
-    return userSaver;
+    return save(user);
   }
 
   @Transactional
