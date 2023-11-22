@@ -32,12 +32,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupService {
     private final BusinessEntityService businessEntityService;
-    private ArwgRepository areaWorkGroupRepository;
 
-    private EmployeesRepository employeesRepository;
+    private final ArwgRepository areaWorkGroupRepository;
     
-    private final AreaWorkGroupRepository areaWorkGroupRepository;
-
     private final EmployeesRepository employeesRepository;
     
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
