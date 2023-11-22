@@ -1,10 +1,12 @@
 package com.app.smartdrive.api.entities.payment;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.engine.jdbc.Size;
 
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,9 +19,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -38,10 +41,15 @@ public class Fintech {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fint_entityid", referencedColumnName = "entityid")
+    @JsonIgnore
     BusinessEntity businessEntity;
 
     @OneToMany(mappedBy = "fintech", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<User_accounts> user_accounts;   
+    List<User_accounts> user_accounts;
+
+    public Optional<Fintech> stream() {
+        return null;
+    }   
 
 
 }

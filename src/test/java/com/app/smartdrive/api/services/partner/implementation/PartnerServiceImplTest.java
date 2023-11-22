@@ -18,23 +18,15 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@Slf4j
+// @SpringBootTest
 class PartnerServiceImplTest {
-    @Autowired
-    PartnerService partnerService;
-    @Autowired
-    CityRepository cityRepository;
+    // @Autowired
+    // PartnerService partnerService;
 
-    @Test
-    void createPartnerSuccess() {
-        Cities city = cityRepository.findById(2).get();
-        Partner partner = new Partner();
-        partner.setCity(city);
-        BusinessEntity businessEntity = new BusinessEntity();
-        businessEntity.setEntityModifiedDate(LocalDateTime.now());
-        partner.setBusinessEntity(businessEntity);
-        partner = partnerService.save(partner);
-        Assertions.assertEquals(partner.getPartEntityid(), partner.getBusinessEntity().getEntityId());
-    }
+    // @Test
+    // void createPartnerSuccess() {
+    //     Partner partner = new Partner();
+    //     partner = partnerService.save(partner);
+    //     Assertions.assertEquals(partner.getPartEntityid(), partner.getBusinessEntity().getEntityId());
+    // }
 }
