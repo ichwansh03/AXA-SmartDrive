@@ -25,19 +25,13 @@ import lombok.NoArgsConstructor;
 
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Data
 @Entity
 @Table(name="employee_salary_detail",schema="hr")
 public class EmployeeSalaryDetail {
- 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="emsa_id")
-    private Long emsaId;
 
     @EmbeddedId
     private EmployeeSalaryDetailId employeeSalaryDetailId;
-
 
      @Column(name="emsa_name", length = 55)
      private String emsaName;
