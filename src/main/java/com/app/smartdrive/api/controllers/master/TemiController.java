@@ -3,6 +3,7 @@ package com.app.smartdrive.api.controllers.master;
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TemiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +39,7 @@ public class TemiController implements BaseController<TemplateInsurancePremiDto,
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody TemplateInsurancePremiDto request) {
         TemplateInsurancePremi result = new TemplateInsurancePremi();
-        result = transactionMethod(result, request);
-
-        result = transactionMethod(result, request);
+        result = TransactionMapper.mapDtoToEntity(request,result);
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
 
@@ -48,7 +47,7 @@ public class TemiController implements BaseController<TemplateInsurancePremiDto,
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody TemplateInsurancePremiDto request) {
         TemplateInsurancePremi result = service.getById(request.getTemiId());
-        result = transactionMethod(result, request);
+        result = TransactionMapper.mapDtoToEntity(request,result);
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
 
@@ -56,16 +55,5 @@ public class TemiController implements BaseController<TemplateInsurancePremiDto,
     @DeleteMapping("/{id}")
     public ResponseEntity<?> destroyData(@PathVariable Long id) {
         return null;
-    }
-
-    public TemplateInsurancePremi transactionMethod(TemplateInsurancePremi result, TemplateInsurancePremiDto request) {
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.STRICT)
-                .setFieldMatchingEnabled(true)
-                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
-
-        modelMapper.map(request, result);
-        return result;
     }
 }
