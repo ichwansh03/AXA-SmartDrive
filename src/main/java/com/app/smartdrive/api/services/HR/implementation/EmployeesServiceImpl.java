@@ -71,12 +71,12 @@ public class EmployeesServiceImpl implements EmployeesService {
         user.setUserModifiedDate(LocalDateTime.now());
         user.setUserNationalId("idnn" + user.getUserEntityId());
     
-        UserRoles userRoles = new UserRoles();
-        UserRolesId userRolesId = new UserRolesId();
-        userRoles.setUserRolesId(userRolesId);
-        userRolesId.setUsroRoleName(EnumUsers.roleName.EM);
-        userRolesId.setUsroEntityId(user.getUserEntityId());
-        userRoles.setUsroModifiedDate(LocalDateTime.now());
+        // UserRoles userRoles = new UserRoles();
+        // UserRolesId userRolesId = new UserRolesId();
+        // userRoles.setUserRolesId(userRolesId);
+        // userRolesId.setUsroRoleName(EnumUsers.roleName.EM);
+        // userRolesId.setUsroEntityId(user.getUserEntityId());
+        // userRoles.setUsroModifiedDate(LocalDateTime.now());
     
         UserPhone userPhone = new UserPhone();
         UserPhoneId userPhoneId = new UserPhoneId();

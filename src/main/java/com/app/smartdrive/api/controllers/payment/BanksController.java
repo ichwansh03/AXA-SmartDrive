@@ -21,9 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.smartdrive.api.dto.payment.BanksDto;
 import com.app.smartdrive.api.entities.payment.Banks;
+import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.services.payment.implementation.BankServiceImpl;
-
+import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/payment")
 public class BanksController {
     private final BankServiceImpl service;
+    private final BusinessEntityImpl serviceBusiness;
 
     @GetMapping("/banks/all")
     public ResponseEntity<?> getAllBanks(){
@@ -70,10 +72,12 @@ public class BanksController {
     @RequestParam(name = "bankName" , required = true ) String bank_name,
     @RequestParam(name = "description", required = true) String bank_desc){
 
+        BusinessEntity businessEntity = new BusinessEntity();
+        Long businessEntityId = serviceBusiness.save(businessEntity);
         Banks banks = new Banks();
         banks.setBank_name(bank_name);
         banks.setBank_desc(bank_desc);
-        banks.setBank_entityid(Long.valueOf(2));
+        banks.setBank_entityid(businessEntityId);
         service.addBanks(banks);
         
         BanksDto banksDto = new BanksDto();
