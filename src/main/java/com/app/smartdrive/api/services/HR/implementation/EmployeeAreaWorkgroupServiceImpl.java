@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.master.Cities;
@@ -68,8 +69,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         employeesRepository.save(employee);
 
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
-        employeeAreaWorkgroup.setEawgId(businessEntityId + 2);
-        employeeAreaWorkgroup.setEawgEntityid(employee.getEmpEntityid());
         employeeAreaWorkgroup.setEawgArwgCode(employeeAreaWorkgroupDto.getWorkGroup());
 
         AreaWorkGroup areaWorkGroup = new AreaWorkGroup();
@@ -86,8 +85,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
                 employeeAreaWorkgroupDto.setZoneName(zonesName);
                 employeeAreaWorkgroupDto.setCityName(city.getCityName());
 
-                areaWorkGroup = areaWorkGroupRepository.findById(employeeAreaWorkgroupDto.getWorkGroup())
-                        .orElse(null);
+                areaWorkGroup = areaWorkGroupRepository.findById(employeeAreaWorkgroupDto.getWorkGroup()).orElse(null);
                 if (areaWorkGroup != null) {
                     employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
                     employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
