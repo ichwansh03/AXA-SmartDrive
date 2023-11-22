@@ -8,11 +8,8 @@ import java.io.Serializable;
 
 @Embeddable
 public class PartnerContactEntityId implements Serializable {
-    @ManyToOne
-    @JoinColumn(name = "paco_patrn_entityid", nullable = false, updatable = false)
-    private Partner partner;
-
-    @ManyToOne
-    @JoinColumn(name = "paco_user_entityid", nullable = false, updatable = false)
-    private User user;
+    @Column(name = "paco_patrn_entityid", nullable = false)
+    private Long partnerId;
+    @Column(name = "paco_user_entityid", nullable = false)
+    private Long userId;
 }

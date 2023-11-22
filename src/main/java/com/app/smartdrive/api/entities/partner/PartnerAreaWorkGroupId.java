@@ -7,14 +7,10 @@ import java.io.Serializable;
 
 @Embeddable
 public class PartnerAreaWorkGroupId implements Serializable {
-    @ManyToOne
-    @JoinColumn(name = "pawo_arwg_code")
-    private AreaWorkGroup areaWorkGroup;
-
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "pawo_patr_entityid", referencedColumnName = "paco_patrn_entityid"),
-            @JoinColumn(name = "pawo_user_entityid", referencedColumnName = "paco_user_entityid")
-    })
-    private PartnerContact partnerContact;
+    @Column(name = "pawo_arwg_code", nullable = false)
+    private String areaWorkGroup;
+    @Column(name = "pawo_patr_entityid", nullable = false)
+    private Long partnerId;
+    @Column(name = "pawo_user_entityid", nullable = false)
+    private Long userId;
 }
