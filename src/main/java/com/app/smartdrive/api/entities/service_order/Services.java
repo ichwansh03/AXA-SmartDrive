@@ -61,10 +61,10 @@ public class Services {
     private Long servServId;
 
     @Column(name = "serv_cust_entityid")
-    private Long servCustEntityId;
+    private Long servCustEntityid;
 
     @Column(name = "serv_creq_entityid")
-    private Long servCreqEntityId;
+    private Long servCreqEntityid;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -77,7 +77,7 @@ public class Services {
     User users;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid",insertable = false, updatable = false)
     CustomerRequest customer;
 
