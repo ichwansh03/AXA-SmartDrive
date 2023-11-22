@@ -7,5 +7,6 @@ import com.app.smartdrive.api.services.BaseService;
 
 public interface UserService extends BaseService<UserDto,Long>{
   public User save(User user);
+  public User save(CreateUserDto userPost, Long id);
   public User create(CreateUserDto userPost);
 }

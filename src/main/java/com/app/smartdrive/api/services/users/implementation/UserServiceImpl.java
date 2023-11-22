@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.CreateUserDto;
 import com.app.smartdrive.api.dto.user.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.payment.User_accounts;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
@@ -25,14 +26,14 @@ import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
-
+import com.app.smartdrive.api.utils.NullUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
   private final EntityManager entityManager;
   private final UserRepository userRepo;
@@ -72,13 +73,13 @@ public class UserServiceImpl implements UserService{
 
   @Override
   @Transactional
-  public User create(CreateUserDto userPost){
+  public User create(CreateUserDto userPost) {
     BusinessEntity businessEntity = new BusinessEntity();
     businessEntity.setEntityModifiedDate(LocalDateTime.now());
     Long businessEntityId = businessEntityService.save(businessEntity);
 
     UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.CU);
-    
+
     Roles roles = rolesRepository.findById(roleName.CU).get();
     UserRoles userRoles = new UserRoles();
     userRoles.setRoles(roles);
@@ -86,21 +87,20 @@ public class UserServiceImpl implements UserService{
     userRoles.setUsroStatus("ACTIVE");
     userRoles.setUsroModifiedDate(LocalDateTime.now());
 
-    List<UserRoles> listRole = List.of(userRoles); 
-    
+    List<UserRoles> listRole = List.of(userRoles);
+
     UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, userPost.getUserPhoneNumber());
 
 
     UserPhone userPhone = new UserPhone();
     userPhone.setUserPhoneId(userPhoneId);
     userPhone.setUsphPhoneType("HP");
-        
+
     List<UserPhone> listPhone = List.of(userPhone);
 
     Cities city = cityRepository.findByCityName(userPost.getCity());
 
     UserAdressId userAdressId = new UserAdressId();
-    userAdressId.setUsdrId(businessEntityId);
     userAdressId.setUsdrEntityId(businessEntityId);
     UserAddress userAddress = new UserAddress();
     userAddress.setUsdrCityId(city.getCityId());
@@ -112,6 +112,10 @@ public class UserServiceImpl implements UserService{
 
     List<UserAddress> listAddress = List.of(userAddress);
 
+
+    User_accounts user_accounts = new User_accounts();
+
+
     User user = new User();
     user.setUserBusinessEntity(businessEntity);
     user.setUserEntityId(businessEntityId);
@@ -122,7 +126,7 @@ public class UserServiceImpl implements UserService{
     user.setUserBirthPlace(userPost.getBirthPlace());
     user.setUserBirthDate(userPost.getUserBirthDate());
     user.setUserNPWP(userPost.getUserNpwp());
-    user.setUserNationalId(userPost.getUserNationalId()+businessEntity.getEntityId());
+    user.setUserNationalId(userPost.getUserNationalId() + businessEntity.getEntityId());
     user.setUserModifiedDate(LocalDateTime.now());
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
@@ -139,7 +143,23 @@ public class UserServiceImpl implements UserService{
   @Override
   public User save(User user) {
     entityManager.persist(user);
+    entityManager.flush();
     return user;
   }
-  
+
+  @Override
+  @Transactional
+  public User save(CreateUserDto userPost, Long id) {
+    User user = userRepo.findById(id).get();
+    NullUtils.updateIfChanged(user::setUserName, userPost.getUserName(), user::getUserName);
+    NullUtils.updateIfChanged(user::setUserFullName, userPost.getFullName(), user::getUserFullName);
+    NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
+    NullUtils.updateIfChanged(user::setUserBirthPlace, userPost.getBirthPlace(),
+        user::getUserBirthPlace);
+    NullUtils.updateIfChanged(user::setUserBirthDate, userPost.getUserBirthDate(),
+        user::getUserBirthDate);
+    User userSaved = save(user);
+    return userSaved;
+  }
+
 }
