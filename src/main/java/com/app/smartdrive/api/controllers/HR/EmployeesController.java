@@ -8,7 +8,9 @@ import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -20,6 +22,7 @@ import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +40,13 @@ public class EmployeesController {
             return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
         
     }
-   
 
+    @PutMapping("/update/{employeeId}")
+    public ResponseEntity<EmployeesDto> updateEmployee(
+            @PathVariable Long employeeId,
+            @RequestBody EmployeesDto updatedEmployeeDto) {
+        EmployeesDto updatedEmployee = employeesService.updateEmployee(employeeId, updatedEmployeeDto);
+        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+    }
     
 }

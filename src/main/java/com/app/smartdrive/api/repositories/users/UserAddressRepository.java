@@ -8,5 +8,6 @@ import com.app.smartdrive.api.entities.users.UserAdressId;
 
 @Repository
 public interface UserAddressRepository extends JpaRepository<UserAddress, UserAdressId> {
-    
+  
+    UserAddress findByUserUserEntityId(Long userEntityId);
 }

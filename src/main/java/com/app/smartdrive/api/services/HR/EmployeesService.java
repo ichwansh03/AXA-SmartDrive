@@ -11,6 +11,7 @@ import com.app.smartdrive.api.services.BaseService;
 
 public interface EmployeesService extends BaseService<Employees, Long>  {
  public EmployeesDto addEmployee(EmployeesDto employeesDto);
+ public EmployeesDto updateEmployee(Long employeeId, EmployeesDto updatedEmployeeDto);
  public List<EmployeesDto> getAllEmployeesDto();
  public List<Employees> getAllByEmployeeName(String employeeName);
 }
