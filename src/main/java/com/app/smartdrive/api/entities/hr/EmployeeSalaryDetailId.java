@@ -3,16 +3,23 @@ package com.app.smartdrive.api.entities.hr;
 import java.io.Serializable;
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Embeddable
 @Data
 public class EmployeeSalaryDetailId implements Serializable{
-    private Long emsaEmpEntityid;
+    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="emsa_id")
+    private Long emsaId;
+
+    @Column(name = "emsa_create_date")
     private Date emsaCreateDate;
 }

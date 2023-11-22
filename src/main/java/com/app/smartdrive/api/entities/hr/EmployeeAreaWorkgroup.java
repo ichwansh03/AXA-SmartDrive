@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,26 +23,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 
 import jakarta.persistence.Table;
-
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
-@IdClass(EmployeeAreaWorkgroupId.class)
 @Table(name="employee_are_workgroup",schema="hr")
 public class EmployeeAreaWorkgroup {
 
-    @Id
-    @Column(name="eawag_id")
-    private Long eawgId;
-    
-    @Id
-    @Column(name = "eawg_entityid")
-    private Long eawgEntityid;
+    @EmbeddedId
+    private EmployeeAreaWorkgroupId employeeAreaWorkgroupId;
 
     @Column(name="eawg_modified_date")
     private LocalDateTime eawgModifiedDate;
@@ -53,7 +48,7 @@ public class EmployeeAreaWorkgroup {
 
     @ManyToOne
     @MapsId
-    @JoinColumn(name = "eawg_arwg_code")
+    @JoinColumn(name = "eawg_arwg_code",insertable = false, updatable = false)
     @JsonBackReference
     private AreaWorkGroup areaWorkGroup;
 

@@ -17,19 +17,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
-
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
 @Table(name="batch_employee_salary",schema="hr")
 public class BatchEmployeeSalary {
-
-    @Column(name="besa_emp_entity_id")
-    private Long besaEmpEntityid;
-
+ 
     @EmbeddedId
     private BatchEmployeeSalaryId batchEmployeeSalaryId;
 
