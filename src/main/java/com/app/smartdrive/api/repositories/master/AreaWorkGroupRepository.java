@@ -6,5 +6,5 @@ import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.master.Cities;
 
 public interface AreaWorkGroupRepository extends JpaRepository<AreaWorkGroup, String>{
-    AreaWorkGroup findByCities(Cities cities);
+    AreaWorkGroup findByArwgCode(String arwgCode);
 }

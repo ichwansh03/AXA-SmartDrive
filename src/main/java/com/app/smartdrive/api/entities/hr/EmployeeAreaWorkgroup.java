@@ -36,7 +36,6 @@ import lombok.NoArgsConstructor;
 public class EmployeeAreaWorkgroup {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="eawag_id")
     private Long eawgId;
     
@@ -45,7 +44,7 @@ public class EmployeeAreaWorkgroup {
     private Long eawgEntityid;
 
     @Column(name="eawg_modified_date")
-    private LocalDateTime empGraduate;
+    private LocalDateTime eawgModifiedDate;
 
 
     @Column(name = "eawg_arwg_code",length=15)

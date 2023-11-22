@@ -72,9 +72,9 @@ public class Employees {
     @JsonBackReference
     private JobType jobType;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @MapsId
-    @JoinColumn(name = "emp_entityid")
+    @JoinColumn(name = "emp_entityid", referencedColumnName = "user_entityid")
     @JsonBackReference
     private User user;
 

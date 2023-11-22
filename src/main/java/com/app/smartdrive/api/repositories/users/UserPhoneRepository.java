@@ -7,4 +7,5 @@ import com.app.smartdrive.api.entities.users.UserPhoneId;
 
 public interface UserPhoneRepository extends JpaRepository<UserPhone, UserPhoneId>{
   
+    UserPhone findByUserUserEntityId(Long userEntityId);
 }

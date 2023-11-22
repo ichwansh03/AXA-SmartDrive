@@ -13,5 +13,7 @@ import com.app.smartdrive.api.entities.hr.Employees;
 public interface EmployeesRepository  extends JpaRepository<Employees, Long>{
     
     @Query("SELECT e FROM Employees e WHERE e.empName = :employeeName")
-    List<Employees> findAllByEmployeeName(@Param("employeeName") String employeeName);
+    List<Employees> findAllByEmpName(@Param("employeeName") String employeeName);
+
+    Employees findByEmpName(String empName);
 }
