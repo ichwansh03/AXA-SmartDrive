@@ -101,7 +101,6 @@ public class UserServiceImpl implements UserService {
     Cities city = cityRepository.findByCityName(userPost.getCity());
 
     UserAdressId userAdressId = new UserAdressId();
-    userAdressId.setUsdrId(businessEntityId);
     userAdressId.setUsdrEntityId(businessEntityId);
     UserAddress userAddress = new UserAddress();
     userAddress.setUsdrCityId(city.getCityId());
@@ -115,7 +114,7 @@ public class UserServiceImpl implements UserService {
 
 
     User_accounts user_accounts = new User_accounts();
-    
+
 
     User user = new User();
     user.setUserBusinessEntity(businessEntity);
