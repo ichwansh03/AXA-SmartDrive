@@ -7,8 +7,11 @@ import lombok.Data;
 @Data
 public class RegionPlatDto {
     @Size(max = 3, message = "Region Plat Name Length Exceeded !")
-    @NotBlank(message = "Region Plat Name Cannot Be Null")
-    private String regp_name;
+    @NotBlank(message = "Region Plat Name Cannot Be Null !")
+    private String regpName;
 
-    private Long regp_prov_id;
+    @Size(max = 35, message = "Region Plat Desc Length Exceeded !")
+    private String regpDesc;
+
+    private Long regpProvId;
 }
