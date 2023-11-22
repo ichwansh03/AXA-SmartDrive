@@ -6,7 +6,7 @@ import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
-import com.app.smartdrive.api.repositories.users.BusinessEntityRepo;
+import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.services.partner.PartnerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

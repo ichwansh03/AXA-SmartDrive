@@ -1,12 +1,11 @@
 package com.app.smartdrive.api.services.service_order;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
+import com.app.smartdrive.api.entities.service_order.dto.ServicesDto;
+import com.app.smartdrive.api.services.BaseService;
 
-import java.util.Optional;
 
-public interface SoOrderService {
+public interface SoOrderService extends BaseService<ServiceOrders, String> {
 
-    Optional<ServiceOrders> findBySeroId(String seroId);
-
-    ServiceOrders addSero(ServiceOrders serviceOrders);
+    ServicesDto findDtoById(String seroId);
 }

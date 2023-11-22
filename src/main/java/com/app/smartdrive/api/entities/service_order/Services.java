@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.util.Set;
 /**
  * <a href="https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables#multiple-entities">Mapping Entity JPA</a>
  */
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -50,7 +52,7 @@ public class Services {
     private LocalDate servEndDate;
 
     @Column(name = "serv_status")
-    @Size(max = 15)
+    //@Size(max = 15)
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.ServStatus servStatus;
 
@@ -59,10 +61,10 @@ public class Services {
     private Long servServId;
 
     @Column(name = "serv_cust_entityid")
-    private Long servCustEntityId;
+    private Long servCustEntityid;
 
     @Column(name = "serv_creq_entityid")
-    private Long servCreqEntityId;
+    private Long servCreqEntityid;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -75,7 +77,7 @@ public class Services {
     User users;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid",insertable = false, updatable = false)
     CustomerRequest customer;
 
