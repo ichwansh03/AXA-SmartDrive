@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -46,10 +48,10 @@ public class Services {
     private String servVehicleNumber;
 
     @Column(name = "serv_startdate")
-    private LocalDate servStartDate;
+    private LocalDateTime servStartDate;
 
     @Column(name = "serv_enddate")
-    private LocalDate servEndDate;
+    private LocalDateTime servEndDate;
 
     @Column(name = "serv_status")
     //@Size(max = 15)
@@ -82,6 +84,6 @@ public class Services {
     CustomerRequest customer;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "services", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "services", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<ServiceOrders> serviceOrdersSet;
 }

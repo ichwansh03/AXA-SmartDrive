@@ -1,10 +1,11 @@
 package com.app.smartdrive.api.controllers.service_order;
 
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
-import com.app.smartdrive.api.entities.service_order.dto.ServicesDto;
-import com.app.smartdrive.api.entities.service_order.dto.SoTasksDto;
-import com.app.smartdrive.api.entities.service_order.dto.SoWorkorderDto;
+import com.app.smartdrive.api.dto.service_order.ServicesDto;
+import com.app.smartdrive.api.dto.service_order.SoTasksDto;
+import com.app.smartdrive.api.dto.service_order.SoWorkorderDto;
 import com.app.smartdrive.api.services.service_order.SoOrderService;
 import com.app.smartdrive.api.services.service_order.SoService;
 import com.app.smartdrive.api.services.service_order.SoTasksService;
@@ -12,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -58,4 +61,15 @@ public class ServiceControllerAdapter {
                 .sowoStatus(sowo.getSowoStatus())
                 .build();
     }
+
+    public String formatServiceOrderId(EnumCustomer.CreqType servType, Long seroId, LocalDate createdAt){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String formatSeroId = String.format("%04d", seroId);
+
+        if (servType.equals("POLIS")) return "PL"+formatSeroId+"-"+createdAt.format(formatter);
+        else if (servType.equals("CLAIM")) return "CL"+formatSeroId+"-"+createdAt.format(formatter);
+
+        return "TP"+formatSeroId+"-"+createdAt.format(formatter);
+    }
+
 }

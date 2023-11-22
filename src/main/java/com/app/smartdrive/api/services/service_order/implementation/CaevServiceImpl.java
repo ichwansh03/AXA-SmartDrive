@@ -18,23 +18,8 @@ public class CaevServiceImpl implements CaevService {
     private final CaevRepository caevRepository;
 
     @Override
-    public ClaimAssetEvidence addFileClaim(MultipartFile file, ClaimAssetEvidence claimAssetEvidence) throws Exception {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-        try {
-            if (fileName.contains("..")){
-                throw new Exception("filename contains invalid path sequence "+fileName);
-            }
-            if (file.getBytes().length > (Math.pow(1024,2))){
-                throw new Exception("file size exceeds maximum limit");
-            }
-
-        } catch (MaxUploadSizeExceededException e){
-            throw new MaxUploadSizeExceededException(file.getSize());
-        } catch (Exception e){
-            throw new Exception("could not save file "+fileName);
-        }
-        return null;
+    public List<ClaimAssetEvidence> findAllByCaevSeroId(String seroId) {
+        return caevRepository.findAllByCaevSeroId(seroId);
     }
 
     @Override

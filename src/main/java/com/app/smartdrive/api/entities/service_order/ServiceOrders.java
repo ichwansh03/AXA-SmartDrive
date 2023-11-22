@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
@@ -45,10 +46,10 @@ public class ServiceOrders {
     private String servClaimNo;
 
     @Column(name = "serv_claim_startdate")
-    private LocalDate servClaimStartdate;
+    private LocalDateTime servClaimStartdate;
 
     @Column(name = "serv_claim_enddate")
-    private LocalDate servClaimEnddate;
+    private LocalDateTime servClaimEnddate;
 
     @Column(name = "sero_serv_id")
     private Long seroServId;
@@ -70,7 +71,7 @@ public class ServiceOrders {
     Services services;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "sero_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders parentServiceOrders;
 
@@ -85,14 +86,14 @@ public class ServiceOrders {
     AreaWorkGroup areaWorkGroup;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "serviceOrders", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<ServiceOrderTasks> serviceOrderTasksSet;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "caevServiceOrders", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<ClaimAssetEvidence> claimAssetEvidenceSet;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "caspServiceOrders", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<ClaimAssetSparepart> claimAssetSparepartSet;
 }

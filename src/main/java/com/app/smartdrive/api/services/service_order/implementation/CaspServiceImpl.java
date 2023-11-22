@@ -23,4 +23,9 @@ public class CaspServiceImpl implements CaspService {
     public List<ClaimAssetSparepart> findAllCasp() {
         return caspRepository.findAll();
     }
+
+    @Override
+    public List<ClaimAssetSparepart> findAllByCaspSeroId(String seroId) {
+        return caspRepository.findAllByCaspSeroId(seroId);
+    }
 }

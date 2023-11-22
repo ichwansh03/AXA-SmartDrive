@@ -1,42 +1,42 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
+import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.dto.ServicesDto;
+import com.app.smartdrive.api.dto.service_order.ServicesDto;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.services.service_order.SoOrderService;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class SoOrderServiceImpl implements SoOrderService {
 
     private final SoOrderRepository soRepository;
-
-    @Override
-    public ServiceOrders getById(String seroId) {
-        return soRepository.findById(seroId).get();
-    }
-
-    @Override
-    public List<ServiceOrders> getAll() {
-        return soRepository.findAll();
-    }
-
-    @Override
-    public ServiceOrders save(ServiceOrders entity) {
-        return soRepository.save(entity);
-    }
-
-    @Override
-    public void deleteById(String s) {
-
-    }
-
+    private final ArwgRepository arwgRepository;
     @Override
     public ServicesDto findDtoById(String seroId) {
         return soRepository.findByIdWithServicesAndServiceOrdersAndEmployeesAndUser(seroId);
+    }
+
+    @Override
+    public ServiceOrders addServiceOrders(ServiceOrders serviceOrders, String seroId) {
+        AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode("1");
+
+        serviceOrders = ServiceOrders.builder()
+                .seroSeroId(seroId)
+                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
+                .seroStatus(EnumModuleServiceOrders.SeroStatus.OPEN)
+                .seroReason("Reason")
+                .servClaimNo("Claim")
+                .servClaimStartdate(LocalDateTime.now())
+                .servClaimEnddate(LocalDateTime.now().plusDays(30))
+                .areaWorkGroup(areaWorkGroup).build();
+
+        return soRepository.save(serviceOrders);
     }
 }

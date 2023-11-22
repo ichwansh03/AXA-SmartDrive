@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "service_premi_credit")
+@Table(name = "service_premi_credit", schema = "so")
 public class ServicePremiCredit {
 
     @Id
@@ -56,5 +56,4 @@ public class ServicePremiCredit {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "secr_patr_trxno", referencedColumnName = "patr_trxno", insertable = false, updatable = false)
     PaymentTransactions paymentTransactions;
-
 }
