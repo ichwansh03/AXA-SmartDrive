@@ -6,8 +6,7 @@ import com.app.smartdrive.api.services.service_order.SoWorkorderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +15,7 @@ public class SoWorkorderImpl implements SoWorkorderService {
     private final SoWorkorderRepository soWorkorderRepository;
 
     @Override
-    public List<ServiceOrderWorkorder> findAllBySowoSeotId(Long seotId) {
+    public Stream<ServiceOrderWorkorder> findAllBySowoSeotId(Long seotId) {
         return soWorkorderRepository.findAllBySowoSeotId(seotId);
     }
 }

@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
+import com.app.smartdrive.api.entities.service_order.dto.ServicesDto;
 import com.app.smartdrive.api.services.service_order.SoOrderService;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,4 +35,8 @@ public class SoOrderServiceImpl implements SoOrderService {
 
     }
 
+    @Override
+    public ServicesDto findDtoById(String seroId) {
+        return soRepository.findByIdWithServicesAndServiceOrdersAndEmployeesAndUser(seroId);
+    }
 }
