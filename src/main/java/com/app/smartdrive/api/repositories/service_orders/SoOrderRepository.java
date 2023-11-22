@@ -1,18 +1,23 @@
 package com.app.smartdrive.api.repositories.service_orders;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
+import com.app.smartdrive.api.entities.service_order.dto.ServicesDto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface SoOrderRepository extends JpaRepository<ServiceOrders, String> {
 
-//    @Transactional
-//    @Modifying(clearAutomatically = true)
-//    @Query(value = "SELECT new com.app.smartdrive.api.entities.service_order.dto.SoDto(sero.sero_id, serv.serv_type, serv.serv_insuranceno, serv.serv_created_on, serv.serv_status, empl.emp_name, usr.user_name)" +
-//            " FROM so.service_orders sero JOIN so.services serv ON sero.sero_serv_id = serv.serv_id" +
-//            " JOIN hr.employees empl ON sero.sero_agent_entityid = empl.emp_entityid" +
-//            " JOIN users.users usr ON serv.serv_cust_entityid = usr.user_entityid" +
-//            " WHERE sero.sero_id = :seroid", nativeQuery = true)
-//    SoDto findSeroById(@Param("seroid") String seroid);
+    @Transactional
+    @Query("SELECT new com.app.smartdrive.api.entities.service_order.dto.ServicesDto(sero.seroId, serv.servType, " +
+            "serv.servInsuranceNo, serv.servCreatedOn, " +
+            "serv.servStatus, empl.empName, usr.userName) " +
+            "FROM ServiceOrders sero JOIN Services serv ON sero.seroServId = serv.servId " +
+            "JOIN Employees empl ON sero.seroAgentEntityid = empl.empEntityid " +
+            "JOIN User usr ON serv.servCustEntityid = usr.userEntityId " +
+            "WHERE sero.seroId = :seroId")
+    ServicesDto findByIdWithServicesAndServiceOrdersAndEmployeesAndUser(@Param("seroId") String seroId);
 }

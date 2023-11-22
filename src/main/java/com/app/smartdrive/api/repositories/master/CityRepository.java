@@ -7,7 +7,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+import java.util.Optional;
+
+
 public interface CityRepository extends JpaRepository<Cities, Long> {
     Cities findByCityName(String cityName);
 

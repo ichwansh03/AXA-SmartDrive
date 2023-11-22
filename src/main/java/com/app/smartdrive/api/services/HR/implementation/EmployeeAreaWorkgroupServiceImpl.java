@@ -3,7 +3,6 @@ package com.app.smartdrive.api.services.HR.implementation;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
@@ -17,7 +16,7 @@ import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
-import com.app.smartdrive.api.repositories.master.AreaWorkGroupRepository;
+import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.master.ProvRepository;
 import com.app.smartdrive.api.repositories.master.ZonesRepository;
@@ -33,6 +32,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupService {
     private final BusinessEntityService businessEntityService;
+    private ArwgRepository areaWorkGroupRepository;
+
+    private EmployeesRepository employeesRepository;
     
     private final AreaWorkGroupRepository areaWorkGroupRepository;
 

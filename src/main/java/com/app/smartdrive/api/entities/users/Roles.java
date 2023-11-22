@@ -15,10 +15,12 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "roles", schema = "users")
 public class Roles {
   @Id
@@ -29,7 +31,7 @@ public class Roles {
   @Column(name = "role_description", length = 35)
   private String roleDescription;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "roles", cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
   private List<UserRoles> userRoles;

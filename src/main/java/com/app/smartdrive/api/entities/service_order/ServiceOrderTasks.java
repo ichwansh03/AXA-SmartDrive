@@ -56,12 +56,12 @@ public class ServiceOrderTasks {
     private String seotSeroId;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     AreaWorkGroup areaWorkGroup;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders serviceOrders;
 

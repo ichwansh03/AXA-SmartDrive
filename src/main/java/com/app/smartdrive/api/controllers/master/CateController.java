@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
-public class CategoryController {
+public class CateController {
     private final CategoryServiceImpl service;
 
     @GetMapping

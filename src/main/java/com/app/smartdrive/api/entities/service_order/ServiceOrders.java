@@ -65,7 +65,7 @@ public class ServiceOrders {
 
     //add referenced column
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false, unique = true)
     Services services;
 

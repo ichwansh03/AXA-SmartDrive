@@ -3,7 +3,6 @@ package com.app.smartdrive.api.services.HR.implementation;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -12,19 +11,18 @@ import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.entities.users.EnumUsers;
-import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.entities.users.UserAdressId;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.entities.users.UserRoles;
+<<<<<<< HEAD
 import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
+=======
+>>>>>>> e65d790e31b2378e6bbe182fb21f670fbc29edd7
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
-import com.app.smartdrive.api.repositories.HR.JobTypeRepository;
-import com.app.smartdrive.api.repositories.master.AreaWorkGroupRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.repositories.users.UserAddressRepository;

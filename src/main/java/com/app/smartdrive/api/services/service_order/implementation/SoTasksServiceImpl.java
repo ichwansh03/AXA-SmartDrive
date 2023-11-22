@@ -6,7 +6,7 @@ import com.app.smartdrive.api.services.service_order.SoTasksService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +15,7 @@ public class SoTasksServiceImpl implements SoTasksService {
     private final SoTasksRepository soTasksRepository;
 
     @Override
-    public List<ServiceOrderTasks> findAllBySeotSeroId(String seroId) {
+    public Stream<ServiceOrderTasks> findAllBySeotSeroId(String seroId) {
         return soTasksRepository.findAllBySeotSeroId(seroId);
     }
 }

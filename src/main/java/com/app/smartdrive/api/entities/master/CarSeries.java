@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.master;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
@@ -30,11 +31,12 @@ public class CarSeries {
     @Column(name = "cars_carm_id", nullable = false)
     private Long carsCarmId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "cars_carm_id", insertable = false, updatable = false)
     private CarModel carModel;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "carSeries", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "carSeries", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CustomerInscAssets> customerInscAssets;
 }
