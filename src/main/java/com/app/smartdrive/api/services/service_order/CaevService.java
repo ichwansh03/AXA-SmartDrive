@@ -7,8 +7,7 @@ import java.util.List;
 
 public interface CaevService {
 
-    ClaimAssetEvidence addFileClaim(MultipartFile file, ClaimAssetEvidence claimAssetEvidence) throws Exception;
-
+    List<ClaimAssetEvidence> findAllByCaevSeroId(String seroId);
     ClaimAssetEvidence findById(Long caevId);
 
     List<ClaimAssetEvidence> findAllCaev();

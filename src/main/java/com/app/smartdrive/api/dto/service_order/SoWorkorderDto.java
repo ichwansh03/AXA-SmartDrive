@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.entities.service_order.dto;
+package com.app.smartdrive.api.dto.service_order;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

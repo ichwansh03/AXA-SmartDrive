@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -31,16 +32,16 @@ public class ServiceOrderTasks {
     private String seotName;
 
     @Column(name = "seot_startdate")
-    private LocalDate seotStartDate;
+    private LocalDateTime seotStartDate;
 
     @Column(name = "seot_enddate")
-    private LocalDate seotEndDate;
+    private LocalDateTime seotEndDate;
 
     @Column(name = "seot_actual_startdate")
-    private LocalDate seotActualStartdate;
+    private LocalDateTime seotActualStartdate;
 
     @Column(name = "seot_actual_enddate")
-    private LocalDate seotActualEnddate;
+    private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
     @Size(max = 15)
@@ -66,6 +67,6 @@ public class ServiceOrderTasks {
     ServiceOrders serviceOrders;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "serviceOrderTasks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "serviceOrderTasks", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     List<ServiceOrderWorkorder> serviceOrderWorkordersSet;
 }

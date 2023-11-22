@@ -9,4 +9,6 @@ public interface CaspService {
     ClaimAssetSparepart findCaspById(Long caspId);
 
     List<ClaimAssetSparepart> findAllCasp();
+
+    List<ClaimAssetSparepart> findAllByCaspSeroId(String seroId);
 }
