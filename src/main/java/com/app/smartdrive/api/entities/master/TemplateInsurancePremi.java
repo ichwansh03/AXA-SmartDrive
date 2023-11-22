@@ -29,7 +29,7 @@ public class TemplateInsurancePremi {
     @Column(name = "temi_nominal")
     private Double temiNominal;
 
-    @Column(name = "temi_type", columnDefinition = "CHECK (temi_type IN ('Category', 'Extend'))")
+    @Column(name = "temi_type")
     private String temiType;
 
     @Column(name = "temi_zones_id", nullable = false)
