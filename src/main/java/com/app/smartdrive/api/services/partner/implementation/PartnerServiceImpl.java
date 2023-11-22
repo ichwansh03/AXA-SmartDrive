@@ -59,7 +59,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     public Partner convertToEntity(PartnerRequest request) {
-        Cities city = cityRepository.findByCityNameIgnoreCase(request.getCity()).orElseThrow(()->new RuntimeException("city not found for name " + request.getCity()));
+        Cities city = cityRepository.findByCityName(request.getCity());
         Partner partner = new Partner();
         partner.setPartName(request.getName());
         partner.setPartAddress(request.getAddress());
