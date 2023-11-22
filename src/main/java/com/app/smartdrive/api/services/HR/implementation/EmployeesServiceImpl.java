@@ -17,11 +17,8 @@ import com.app.smartdrive.api.entities.users.UserAdressId;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.entities.users.UserRoles;
-<<<<<<< HEAD
 import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
-=======
->>>>>>> e65d790e31b2378e6bbe182fb21f670fbc29edd7
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
@@ -68,7 +65,8 @@ public class EmployeesServiceImpl implements EmployeesService {
         
         user.setUserBusinessEntity(businessEntity);
         user.setUserEntityId(businessEntityId);
-        user.setUserName(employeesDto.getEmpName());
+        user.setUserName(employeesDto.getEmpName()+businessEntityId);
+        user.setUserFullName(employeesDto.getEmpName());
         user.setUserEmail(employeesDto.getEmpEmail());
         user.setUserModifiedDate(LocalDateTime.now());
         user.setUserNationalId("idnn" + businessEntityId);
