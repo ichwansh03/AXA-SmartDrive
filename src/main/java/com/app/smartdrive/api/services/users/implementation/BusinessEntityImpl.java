@@ -27,7 +27,9 @@ public class BusinessEntityImpl implements BusinessEntityService{
   @Transactional
   public Long save(BusinessEntity businessEntity){
     entityManager.persist(businessEntity);
-    return businessEntity.getEntityId();
+    Long id = businessEntity.getEntityId();
+    entityManager.flush();
+    return id;
   }
   
 
