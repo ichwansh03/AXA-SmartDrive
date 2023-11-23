@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface SecrService {
 
-    List<ServicePremiCredit> findAllBySecrServId(Long servId);
+    //List<ServicePremiCredit> findAllBySecrServId(Long servId);
 }

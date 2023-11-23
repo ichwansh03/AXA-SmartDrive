@@ -14,8 +14,4 @@ public class SecrServiceImpl implements SecrService {
 
     private final SecrRepository secrRepository;
 
-    @Override
-    public List<ServicePremiCredit> findAllBySecrServId(Long servId) {
-        return secrRepository.findAllBySecrServId(servId);
-    }
 }
