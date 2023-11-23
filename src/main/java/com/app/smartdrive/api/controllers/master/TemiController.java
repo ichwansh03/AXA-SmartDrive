@@ -7,15 +7,9 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TemiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +26,9 @@ public class TemiController implements BaseController<TemplateInsurancePremiDto,
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+        TemplateInsurancePremi temi = service.getById(id);
+        TemplateInsurancePremiDto result = TransactionMapper.mapEntityToDto(temi, TemplateInsurancePremiDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
@@ -49,11 +45,5 @@ public class TemiController implements BaseController<TemplateInsurancePremiDto,
         TemplateInsurancePremi result = service.getById(request.getTemiId());
         result = TransactionMapper.mapDtoToEntity(request,result);
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
-    }
-
-    @Override
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> destroyData(@PathVariable Long id) {
-        return null;
     }
 }

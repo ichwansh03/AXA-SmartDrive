@@ -26,7 +26,9 @@ public class RegpController implements BaseController<RegionPlatDto, String> {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
-        return ResponseEntity.ok(service.getById(id));
+        RegionPlat regionPlat = service.getById(id);
+        RegionPlatDto result = TransactionMapper.mapEntityToDto(regionPlat, RegionPlatDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
@@ -43,11 +45,5 @@ public class RegpController implements BaseController<RegionPlatDto, String> {
         RegionPlat result = service.getById(request.getRegpName());
         result = TransactionMapper.mapDtoToEntity(request, result);
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
-    }
-
-    @Override
-    @DeleteMapping
-    public ResponseEntity<?> destroyData(@PathVariable String id) {
-        return null;
     }
 }

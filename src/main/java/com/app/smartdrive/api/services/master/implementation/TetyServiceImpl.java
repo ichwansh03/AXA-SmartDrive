@@ -28,9 +28,4 @@ public class TetyServiceImpl implements TetyService {
     public TemplateType save(TemplateType entity) {
         return repository.save(entity);
     }
-
-    @Override
-    public void deleteById(Long aLong) {
-
-    }
 }

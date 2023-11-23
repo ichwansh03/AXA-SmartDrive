@@ -16,7 +16,7 @@ public class ArwgServiceImpl implements ArwgService {
 
     @Override
     public AreaWorkGroup getById(String s) {
-        return repository.findById(s).orElseThrow(() -> new EntityNotFoundException("Category ID : " + s + " Not Found !"));
+        return repository.findById(s).orElseThrow(() -> new EntityNotFoundException("Area Workgroup ID : " + s + " Not Found !"));
     }
 
     @Override

@@ -28,9 +28,4 @@ public class TewoServiceImpl implements TewoService {
     public TemplateTaskWorkOrder save(TemplateTaskWorkOrder entity) {
         return repository.save(entity);
     }
-
-    @Override
-    public void deleteById(Long aLong) {
-
-    }
 }

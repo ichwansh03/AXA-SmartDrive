@@ -26,7 +26,9 @@ public class TestaController implements BaseController<TemplateServiceTaskDto, L
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+        TemplateServiceTask testa = service.getById(id);
+        TemplateServiceTaskDto result = TransactionMapper.mapEntityToDto(testa, TemplateServiceTaskDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
@@ -43,11 +45,5 @@ public class TestaController implements BaseController<TemplateServiceTaskDto, L
         TemplateServiceTask result = service.getById(request.getTestaId());
         result = TransactionMapper.mapDtoToEntity(request,result);
         return new ResponseEntity<>(service.save(result), HttpStatus.OK);
-    }
-
-    @Override
-    @DeleteMapping
-    public ResponseEntity<?> destroyData(@PathVariable Long aLong) {
-        return null;
     }
 }

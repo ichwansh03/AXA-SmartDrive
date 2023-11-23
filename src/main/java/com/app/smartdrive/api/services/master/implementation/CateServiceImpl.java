@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryServiceImpl implements CateService {
+public class CateServiceImpl implements CateService {
     private final CateRepository repository;
 
     @Override

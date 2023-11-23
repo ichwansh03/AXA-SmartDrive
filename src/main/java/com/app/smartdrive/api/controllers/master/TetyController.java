@@ -3,6 +3,7 @@ package com.app.smartdrive.api.controllers.master;
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.TemplateTypeDto;
 import com.app.smartdrive.api.entities.master.TemplateType;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TetyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,9 @@ public class TetyController implements BaseController<TemplateTypeDto, Long> {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+        TemplateType testy = service.getById(id);
+        TemplateTypeDto result = TransactionMapper.mapEntityToDto(testy, TemplateTypeDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
@@ -44,11 +47,5 @@ public class TetyController implements BaseController<TemplateTypeDto, Long> {
         result.setTetyGroup(String.valueOf(request.getTetyGroup()));
         result.setTetyName(String.valueOf(request.getTetyName()));
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
-    }
-
-    @Override
-    @DeleteMapping
-    public ResponseEntity<?> destroyData(@PathVariable Long aLong) {
-        return null;
     }
 }

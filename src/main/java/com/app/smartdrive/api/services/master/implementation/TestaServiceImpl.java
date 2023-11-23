@@ -28,9 +28,4 @@ public class TestaServiceImpl implements TestaService {
     public TemplateServiceTask save(TemplateServiceTask entity) {
         return repository.save(entity);
     }
-
-    @Override
-    public void deleteById(Long aLong) {
-
-    }
 }

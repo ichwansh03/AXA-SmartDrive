@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.entities.master;
+package com.app.smartdrive.api.entities.master.Enum;
 
 public enum EnumModuleMaster {
     CHECK,

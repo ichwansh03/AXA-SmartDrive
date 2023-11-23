@@ -28,9 +28,4 @@ public class RegpServiceImpl implements RegpService {
     public RegionPlat save(RegionPlat entity) {
         return repository.save(entity);
     }
-
-    @Override
-    public void deleteById(String s) {
-
-    }
 }

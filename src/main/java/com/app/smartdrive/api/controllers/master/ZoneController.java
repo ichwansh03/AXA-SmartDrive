@@ -2,7 +2,8 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.dto.master.ZonesDto;
 import com.app.smartdrive.api.entities.master.Zones;
-import com.app.smartdrive.api.services.master.implementation.ZoneServiceImpl;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.master.ZoneService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/zones")
 public class ZoneController {
-    private final ZoneServiceImpl service;
+    private final ZoneService service;
 
     @GetMapping
     public ResponseEntity<?> findAllZones() {
@@ -21,20 +22,22 @@ public class ZoneController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findZoneById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+        Zones zones = service.getById(id);
+        ZonesDto result = TransactionMapper.mapEntityToDto(zones, ZonesDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping
     public ResponseEntity<?> saveZone(@Valid @RequestBody ZonesDto request) {
-        Zones zones = new Zones();
-        zones.setZonesName(request.getZonesName());
-        return ResponseEntity.ok(service.save(zones));
+        Zones result = new Zones();
+        result = TransactionMapper.mapDtoToEntity(request, result);
+        return ResponseEntity.ok(service.save(result));
     }
 
     @PutMapping("/update")
     public ResponseEntity<?> updateZoneById(@Valid @RequestBody ZonesDto request) {
-        Zones zones = service.getById(request.getZonesId());
-        zones.setZonesName(request.getZonesName());
-        return ResponseEntity.ok(service.save(zones));
+        Zones result = service.getById(request.getZonesId());
+        result = TransactionMapper.mapDtoToEntity(request, result);
+        return ResponseEntity.ok(service.save(result));
     }
 }
