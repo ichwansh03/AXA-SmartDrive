@@ -1,6 +1,8 @@
 package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
@@ -18,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -70,13 +73,13 @@ public class CustomerInscAssets {
     @Column(name = "ciasIsnewchar", length = 1)
     private Character ciasIsNewChar;
 
-    
-    @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
-    private CustomerInscDoc customerInscDoc;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
+    private List<CustomerInscDoc> customerInscDoc = new ArrayList<>();
     
     @JsonManagedReference
-    @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
-    private CustomerInscExtend customerInscExtend;
+    @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
+    private List<CustomerInscExtend> customerInscExtend = new ArrayList<>();
 
     
     @ManyToOne
