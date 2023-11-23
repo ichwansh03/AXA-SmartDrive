@@ -9,17 +9,21 @@ import com.app.smartdrive.api.entities.payment.Fintech;
 import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.services.payment.FintechService;
 
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class FintechServiceImpl implements FintechService {
     private final FintechRepository fintechRepository;
-
+    private final EntityManager entityManager;
+    
+    @Transactional
     @Override
     public Fintech addFintech(Fintech fintech) {
-        // TODO Auto-generated method stub
-        return fintechRepository.save(fintech);
+        entityManager.persist(fintech);
+        return fintech;
     }
 
     @Override

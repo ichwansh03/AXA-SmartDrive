@@ -45,7 +45,7 @@ public class Fintech {
     BusinessEntity businessEntity;
 
     @OneToMany(mappedBy = "fintech", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<User_accounts> user_accounts;
+    List<UserAccounts> user_accounts;
 
     public Optional<Fintech> stream() {
         return null;

@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.payment;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -30,7 +31,6 @@ import lombok.NoArgsConstructor;
 public class Banks {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bank_entityid")
     private Long bank_entityid;
 
@@ -41,14 +41,15 @@ public class Banks {
     private String bank_desc;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bank_entityid", referencedColumnName = "entityid")
-    @JsonIgnore
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "bank_entityid")
+    @JsonBackReference
     BusinessEntity businessEntity;
 
     
     @OneToMany(mappedBy = "banks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<User_accounts> user_accounts;   
+    List<UserAccounts> user_accounts;   
 
     
 }

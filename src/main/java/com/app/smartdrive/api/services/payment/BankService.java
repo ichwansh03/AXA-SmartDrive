@@ -6,12 +6,13 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
+import com.app.smartdrive.api.dto.payment.BanksDto;
 import com.app.smartdrive.api.entities.payment.Banks;
 
 
 public interface BankService{
 
-    List<Banks> findAllBank();
+    List<BanksDto> findAllBank();
     Banks addBanks(Banks banks);
     void removeBankName(String bank_name);
     <T> T createBanks(T entity);
