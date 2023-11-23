@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.InsuranceTypeDto;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.IntyService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/inty")
+@Tag(name = "Master Module")
 public class IntyController implements BaseController<InsuranceTypeDto, String> {
     private final IntyService service;
 

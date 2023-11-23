@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.CarBrandDto;
 import com.app.smartdrive.api.entities.master.CarBrand;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.CarbService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/carb")
+@Tag(name = "Master Module")
 public class CarbController implements BaseController<CarBrandDto, Long> {
     private final CarbService service;
 

@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.CarSeriesDto;
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.CarsService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/car-series")
+@Tag(name = "Master Module")
 public class CarsController implements BaseController<CarSeriesDto, Long> {
     private final CarsService service;
 
