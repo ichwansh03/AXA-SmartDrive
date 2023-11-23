@@ -42,15 +42,8 @@ public class ServicesController {
 
     @GetMapping("/addserv")
     public ResponseEntity<?> addServices(){
-        CustomerRequest customerRequest = new CustomerRequest();
-        User user = new User();
         Services services = new Services();
         return new ResponseEntity<>(soService.addServices(services), HttpStatus.OK);
     }
 
-//    @GetMapping("/addsero")
-//    public ResponseEntity<?> addServiceOrders(){
-//
-//        return new ResponseEntity<>(soOrderService.addServiceOrders(), HttpStatus.OK);
-//    }
 }

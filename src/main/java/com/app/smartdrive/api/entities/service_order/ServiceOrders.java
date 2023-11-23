@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -23,21 +22,25 @@ import java.util.Set;
 @Table(name = "service_orders", schema = "so")
 public class ServiceOrders {
 
+    //format seroId (condition serv type)
     @Id
     @Column(name = "sero_id", unique = true)
     @Size(max = 25)
     private String seroId;
 
+    //Services.servType
     @Column(name = "sero_ordt_type")
     @Size(max = 15)
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
 
+    //CustomerRequest.creqStatus
     @Column(name = "sero_status")
     @Size(max = 15)
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroStatus seroStatus;
 
+    //CustomerClaim.cuclReason
     @Column(name = "sero_reason")
     private String seroReason;
 
@@ -51,27 +54,30 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
+    //Services.servId
     @Column(name = "sero_serv_id")
     private Long seroServId;
 
+    //ServiceOrders.seroId
     @Column(name = "sero_sero_id")
     private String seroSeroId;
 
+    //CustomerRequest.creqAgenEntityid
     @Column(name = "sero_agent_entityid")
     private Long seroAgentEntityid;
 
+    //AreaWorkGroup.arwgCode
     @Column(name = "sero_arwg_code")
     @Size(max = 15)
     private String seroArwgCode;
 
-    //add referenced column
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false, unique = true)
     Services services;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "sero_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders parentServiceOrders;
 

@@ -1,16 +1,13 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.service_order.SoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -18,6 +15,7 @@ import java.util.List;
 public class SoServiceImpl implements SoService {
 
     private final SoRepository soRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Services getById(Long aLong) {
@@ -42,21 +40,15 @@ public class SoServiceImpl implements SoService {
     @Override
     public Services addServices(Services services) {
 
+        services = new Services();
+        services.setServStatus(EnumModuleServiceOrders.ServStatus.ACTIVE);
+        //..more data
+        Services save = soRepository.save(services);
 
-        services = Services.builder()
-//                .servCreatedOn(customerRequest.getCreqCreateDate())
-//                .servType(customerRequest.getCreqType())
-                .servInsuranceNo("temp")
-                .servVehicleNumber("temp")
-                .servCreatedOn(LocalDate.now())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusDays(30))
-                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
-                .servServId(services.getServId())
-//                .servCustEntityid(user.getUserEntityId())
-//                .servCreqEntityid(customerRequest.getCreqEntityId())
-                .build();
+        Long userId = userRepository.findById(services.getServId()).get().getUserEntityId();
+        services.setServCustEntityid(userId);
+        soRepository.flush();
 
-        return soRepository.save(services);
+        return save;
     }
 }

@@ -6,4 +6,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SoRepository extends JpaRepository<Services, Long> {
+
+    /*
+     * get creq entity id
+     *
+     */
 }

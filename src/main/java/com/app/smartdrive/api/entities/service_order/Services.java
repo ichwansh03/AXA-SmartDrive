@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,9 +30,11 @@ public class Services {
     @Column(name = "serv_id", updatable = false, nullable = false)
     private Long servId;
 
+    //CustomerRequest.creqCreateDate
     @Column(name = "serv_created_on")
     private LocalDate servCreatedOn;
 
+    //CustomerRequest.creqType
     @Column(name = "serv_type")
     @Size(max = 15)
     //@Enumerated(EnumType.STRING)
@@ -43,16 +44,20 @@ public class Services {
     @Size(max = 12)
     private String servInsuranceNo;
 
+    //CustomerInscAssets.ciasPoliceNumber
     @Column(name = "serv_vehicleno")
     @Size(max = 12)
     private String servVehicleNumber;
 
+    //CustomerInscAssets.ciasStartDate
     @Column(name = "serv_startdate")
     private LocalDateTime servStartDate;
 
+    //CustomerInscAssets.ciasEndDate
     @Column(name = "serv_enddate")
     private LocalDateTime servEndDate;
 
+    //CustomerRequest.creqStatus
     @Column(name = "serv_status")
     //@Size(max = 15)
     @Enumerated(EnumType.STRING)
@@ -62,14 +67,16 @@ public class Services {
     @Column(name = "serv_serv_id")
     private Long servServId;
 
+    //User.userEntityid
     @Column(name = "serv_cust_entityid")
     private Long servCustEntityid;
 
+    //Customer.Request.creqEntityid
     @Column(name = "serv_creq_entityid")
     private Long servCreqEntityid;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "serv_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services parentServices;
 
