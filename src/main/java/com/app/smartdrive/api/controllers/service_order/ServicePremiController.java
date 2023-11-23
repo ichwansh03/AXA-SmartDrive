@@ -23,8 +23,4 @@ public class ServicePremiController {
         return new ResponseEntity<>(semiService.findAllBySemiServId(servId), HttpStatus.OK);
     }
 
-    @GetMapping("/secr")
-    public ResponseEntity<?> getSecrById(@RequestParam("servId") Long servId){
-        return new ResponseEntity<>(secrService.findAllBySecrServId(servId), HttpStatus.OK);
-    }
 }

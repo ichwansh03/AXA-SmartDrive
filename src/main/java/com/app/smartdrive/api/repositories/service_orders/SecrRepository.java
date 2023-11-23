@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface SecrRepository extends JpaRepository<ServicePremiCredit, Long> {
 
-    List<ServicePremiCredit> findAllBySecrServId(Long servId);
+    //List<ServicePremiCredit> findAllBySecrServId(Long servId);
 }
