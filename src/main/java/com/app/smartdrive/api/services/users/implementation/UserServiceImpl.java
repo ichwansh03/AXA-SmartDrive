@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.CreateUserDto;
 import com.app.smartdrive.api.dto.user.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.payment.Banks;
+import com.app.smartdrive.api.entities.payment.Fintech;
+import com.app.smartdrive.api.entities.payment.User_accounts;
+import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
@@ -21,6 +25,8 @@ import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
 import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
+import com.app.smartdrive.api.repositories.payment.BanksRepository;
+import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserAddressRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
@@ -28,6 +34,7 @@ import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
 import com.app.smartdrive.api.utils.NullUtils;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +47,8 @@ public class UserServiceImpl implements UserService {
   private final BusinessEntityService businessEntityService;
   private final RolesRepository rolesRepository;
   private final CityRepository cityRepository;
+  private final BanksRepository banksRepository;
+  private final FintechRepository fintechRepository;
 
   @Override
   public UserDto getById(Long id) {
@@ -102,14 +111,14 @@ public class UserServiceImpl implements UserService {
 
     Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
     Long lastIndexUsdr;
-    if(findTopByOrderByIdDesc.isPresent()){
-       lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
+    if (findTopByOrderByIdDesc.isPresent()) {
+      lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
     } else {
       lastIndexUsdr = 1L;
     }
 
     UserAdressId userAdressId = new UserAdressId();
-    userAdressId.setUsdrId(lastIndexUsdr+1);
+    userAdressId.setUsdrId(lastIndexUsdr + 1);
     userAdressId.setUsdrEntityId(businessEntityId);
     UserAddress userAddress = new UserAddress();
     userAddress.setUsdrCityId(city.getCityId());
@@ -120,6 +129,22 @@ public class UserServiceImpl implements UserService {
     userAddress.setUsdrModifiedDate(LocalDateTime.now());
 
     List<UserAddress> listAddress = List.of(userAddress);
+
+    User_accounts user_accounts = new User_accounts();
+    user_accounts.setUsac_accountno(userPost.getAccNumber());
+    if (userPost.getAccountType().equals("BANK")) {
+      user_accounts.setEnumPaymentType(EnumPaymentType.BANK);
+      Banks bank = banksRepository.findByBankNameOptional(userPost.getBank())
+          .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
+      user_accounts.setBanks(bank);
+    }
+    if (userPost.getAccountType().equals("FINTECH")) {
+      user_accounts.setEnumPaymentType(EnumPaymentType.FINTECH);
+      Fintech fintech = fintechRepository.findByFintNameOptional(userPost.getFintech())
+          .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
+      user_accounts.setFintech(fintech);
+    }
+    List<User_accounts> listUser_accounts = List.of(user_accounts);
 
     User user = new User();
     user.setUserBusinessEntity(businessEntity);
@@ -136,7 +161,9 @@ public class UserServiceImpl implements UserService {
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
     user.setUserAddress(listAddress);
+    user.setUser_accounts(listUser_accounts);
 
+    user_accounts.setUser(user);
     userPhone.setUser(user);
     userRoles.setUser(user);
     userAddress.setUser(user);
