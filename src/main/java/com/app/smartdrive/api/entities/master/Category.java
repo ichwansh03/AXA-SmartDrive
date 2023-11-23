@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.master;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,7 +23,6 @@ public class Category {
     @Column(name = "cate_name")
     private String cateName;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<TemplateInsurancePremi> templateInsurancePremis;
 }

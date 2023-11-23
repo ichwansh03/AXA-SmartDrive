@@ -61,7 +61,6 @@ public class CustomerRequest {
     @Column(name = "creq_modified_date")
     private LocalDateTime creqModifiedDate;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
