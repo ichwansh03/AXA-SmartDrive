@@ -95,6 +95,6 @@ public class Employees {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<CustomerRequest> customerRequests;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrders;
 }

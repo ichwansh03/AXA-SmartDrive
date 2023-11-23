@@ -92,10 +92,6 @@ public class ServiceOrders {
     @JoinColumn(name = "sero_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     AreaWorkGroup areaWorkGroup;
 
-    @ManyToOne
-    @JoinColumn(name = "sero_agent_entityid")
-    private Employees employee;
-
     @JsonIgnore
     @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ServiceOrderTasks> serviceOrderTasks;
