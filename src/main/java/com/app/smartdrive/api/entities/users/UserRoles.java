@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -19,15 +20,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_roles", schema = "users")
 @Data
 @NoArgsConstructor
-@IdClass(UserRolesId.class)
 public class UserRoles {
-  @Id
-  @Column(name = "usro_entityid")
-  private Long usroEntityId;
-
-  @Id
-  @Column(name = "usro_role_name")
-  private String usroRoleName;
+  @EmbeddedId
+  UserRolesId userRolesId;
 
   @Column(name = "usro_status")
   private String usroStatus; //ACTIVE OR INACTIVE

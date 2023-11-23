@@ -2,7 +2,6 @@ package com.app.smartdrive.api.entities.master;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +30,7 @@ public class TemplateInsurancePremi {
     @Column(name = "temi_nominal")
     private Double temiNominal;
 
-    @Column(name = "temi_type", columnDefinition = "CHECK (temi_type IN ('Category', 'Extend'))")
+    @Column(name = "temi_type")
     private String temiType;
 
     @Column(name = "temi_zones_id", nullable = false)

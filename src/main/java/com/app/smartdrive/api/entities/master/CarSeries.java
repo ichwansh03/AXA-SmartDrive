@@ -37,7 +37,7 @@ public class CarSeries {
     @JoinColumn(name = "cars_carm_id", insertable = false, updatable = false)
     private CarModel carModel;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "carSeries", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "carSeries", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CustomerInscAssets> customerInscAssets;
 }

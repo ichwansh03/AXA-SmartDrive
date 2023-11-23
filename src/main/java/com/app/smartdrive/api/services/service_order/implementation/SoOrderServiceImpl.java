@@ -1,53 +1,47 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
-import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.Services;
-import com.app.smartdrive.api.services.service_order.SoOrderService;
+import com.app.smartdrive.api.dto.service_order.ServicesDto;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.repositories.master.ArwgRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.repositories.users.UserRepository;
+import com.app.smartdrive.api.services.service_order.SoOrderService;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class SoOrderServiceImpl implements SoOrderService {
 
-    private final SoOrderRepository soRepository;
-
+    private final SoOrderRepository soOrderRepository;
+    private final UserRepository userRepository;
+    private final SoRepository soRepository;
+    private final ArwgRepository arwgRepository;
     @Override
-    public Optional<ServiceOrders> findBySeroId(String seroId) {
-        return soRepository.findById(seroId);
+    public ServicesDto findDtoById(String seroId) {
+        return soOrderRepository.findByIdServicesDto(seroId);
     }
 
     @Override
-    public ServiceOrders addSero(ServiceOrders serviceOrders) {
+    public ServiceOrders addServiceOrders(ServiceOrders serviceOrders, String seroId) {
+        //Services services = soRepository.findById()
+        AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode("1");
 
-        Services services = new Services();
-        Employees employees = new Employees();
-        AreaWorkGroup areaWorkGroup = new AreaWorkGroup();
+        serviceOrders = ServiceOrders.builder()
+                .seroSeroId(seroId)
+                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
+                .seroStatus(EnumModuleServiceOrders.SeroStatus.OPEN)
+                .seroReason("Reason")
+                .servClaimNo("Claim")
+                .servClaimStartdate(LocalDateTime.now())
+                .servClaimEnddate(LocalDateTime.now().plusDays(30))
+                .areaWorkGroup(areaWorkGroup).build();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String seroIdPolis = "PL-"+String.format("%04d", serviceOrders.getSeroId())+services.getServCreatedOn().format(formatter);
-        String seroIdClaim = "CL-"+String.format("%04d", serviceOrders.getSeroId())+services.getServCreatedOn().format(formatter);
-        String seroIdTutup = "TP-"+String.format("%04d", serviceOrders.getSeroId())+services.getServCreatedOn().format(formatter);
-
-        serviceOrders.setSeroId(seroIdPolis);
-        serviceOrders.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE);
-        serviceOrders.setSeroStatus(EnumModuleServiceOrders.SeroStatus.OPEN);
-        serviceOrders.setSeroReason("Test");
-        serviceOrders.setServClaimNo("oo");
-        serviceOrders.setServClaimStartdate(services.getServStartDate());
-        serviceOrders.setServClaimEnddate(services.getServEndDate());
-        serviceOrders.setSeroServId(services.getServId());
-        serviceOrders.setSeroSeroId(serviceOrders.getSeroId());
-        serviceOrders.setSeroAgentEntityid(employees.getEmpEntityid());
-        serviceOrders.setSeroArwgCode(areaWorkGroup.getArwgCode());
-
-        return serviceOrders;
+        return soOrderRepository.save(serviceOrders);
     }
 }

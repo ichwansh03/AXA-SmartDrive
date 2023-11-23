@@ -4,7 +4,8 @@ public class EnumUsers {
   public enum roleName{
     CU, //Customer
     EM, //Employee
-    PC //Potential Customer
+    PC, //Potential Customer
+    PR, //Partner
   }
 
   public enum usmiPaidType{

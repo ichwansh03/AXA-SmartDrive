@@ -1,12 +1,15 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.partner.Partner;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,10 +41,12 @@ public class ClaimAssetSparepart {
     @Column(name = "casp_sero_id")
     private String caspSeroId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "casp_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
-    Partner partners;
+    Partner caspPartners;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "casp_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders caspServiceOrders;

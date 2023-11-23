@@ -6,12 +6,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.List;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,16 +30,16 @@ public class ServiceOrderTasks {
     private String seotName;
 
     @Column(name = "seot_startdate")
-    private LocalDate seotStartDate;
+    private LocalDateTime seotStartDate;
 
     @Column(name = "seot_enddate")
-    private LocalDate seotEndDate;
+    private LocalDateTime seotEndDate;
 
     @Column(name = "seot_actual_startdate")
-    private LocalDate seotActualStartdate;
+    private LocalDateTime seotActualStartdate;
 
     @Column(name = "seot_actual_enddate")
-    private LocalDate seotActualEnddate;
+    private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
     @Size(max = 15)
@@ -52,15 +54,15 @@ public class ServiceOrderTasks {
     @Size(max = 25)
     private String seotSeroId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     AreaWorkGroup areaWorkGroup;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders serviceOrders;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "serviceOrderTasks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    Set<ServiceOrderWorkorder> serviceOrderWorkordersSet;
+    @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ServiceOrderWorkorder> serviceOrderWorkorders;
 }

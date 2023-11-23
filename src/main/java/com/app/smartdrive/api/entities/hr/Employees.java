@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -72,9 +73,9 @@ public class Employees {
     @JsonBackReference
     private JobType jobType;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @MapsId
-    @JoinColumn(name = "emp_entityid")
+    @JoinColumn(name = "emp_entityid", referencedColumnName = "user_entityid")
     @JsonBackReference
     private User user;
 
@@ -93,4 +94,7 @@ public class Employees {
     @JsonManagedReference
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<CustomerRequest> customerRequests;
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private List<ServiceOrders> serviceOrders;
 }

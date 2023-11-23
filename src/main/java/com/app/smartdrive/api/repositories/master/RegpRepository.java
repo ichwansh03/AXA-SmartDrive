@@ -4,6 +4,5 @@ import com.app.smartdrive.api.entities.master.RegionPlat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface RegpRepository extends JpaRepository<RegionPlat, String> {
 }

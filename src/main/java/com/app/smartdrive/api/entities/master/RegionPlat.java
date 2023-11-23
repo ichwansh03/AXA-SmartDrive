@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.entities.master;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,10 +14,13 @@ import lombok.NoArgsConstructor;
 public class RegionPlat {
     @Id
     @Column(name = "regp_name", updatable = false, nullable = false)
-    private String regp_name;
+    private String regpName;
+
+    @Column(name = "regp_desc")
+    private String regpDesc;
 
     @Column(name = "regp_prov_id")
-    private Long regp_prov_id;
+    private Long regpProvId;
 
     @JsonIgnore
     @ManyToOne

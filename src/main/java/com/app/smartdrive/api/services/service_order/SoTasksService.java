@@ -2,9 +2,9 @@ package com.app.smartdrive.api.services.service_order;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 public interface SoTasksService {
 
-    List<ServiceOrderTasks> findAllSoTasks();
+    Stream<ServiceOrderTasks> findAllBySeotSeroId(String seroId);
 }

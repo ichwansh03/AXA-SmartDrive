@@ -1,13 +1,16 @@
 package com.app.smartdrive.api.entities.service_order;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,7 +28,6 @@ public class ServicePremi {
     @Column(name = "semi_premi_credit")
     private Double semiPremiCredit;
 
-
     @Column(name = "semi_paid_type")
     @Size(max = 15)
     private String semiPaidType;
@@ -38,7 +40,8 @@ public class ServicePremi {
     @Column(name = "semi_modified_date")
     private LocalDate semiModifiedDate;
 
+    @JsonIgnore
     @ManyToOne
-    @PrimaryKeyJoinColumn(name = "semi_serv_id", referencedColumnName = "serv_id")
+    @JoinColumn(name = "semi_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services services;
 }
