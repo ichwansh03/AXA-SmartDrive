@@ -3,6 +3,8 @@ package com.app.smartdrive.api.entities.master;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -36,4 +38,10 @@ public class AreaWorkGroup {
     @PrimaryKeyJoinColumn
     @JsonManagedReference
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
+
+    @OneToMany(mappedBy = "areaWorkGroup")
+    private List<ServiceOrders> serviceOrders;
+
+    @OneToMany(mappedBy = "areaWorkGroup")
+    private List<ServiceOrderTasks> serviceOrderTasks;
 }

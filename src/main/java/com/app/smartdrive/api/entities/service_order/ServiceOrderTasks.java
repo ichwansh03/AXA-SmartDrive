@@ -10,10 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Builder
 @Data
@@ -56,17 +54,15 @@ public class ServiceOrderTasks {
     @Size(max = 25)
     private String seotSeroId;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     AreaWorkGroup areaWorkGroup;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders serviceOrders;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "serviceOrderTasks", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ServiceOrderWorkorder> serviceOrderWorkordersSet;
+    @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ServiceOrderWorkorder> serviceOrderWorkorders;
 }

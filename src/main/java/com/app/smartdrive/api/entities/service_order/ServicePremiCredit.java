@@ -19,13 +19,8 @@ import java.time.LocalDate;
 @Table(name = "service_premi_credit", schema = "so")
 public class ServicePremiCredit {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "secr_id")
-    private Long secrId;
-
-    @Column(name = "secr_serv_id", unique = true)
-    private Long secrServId;
+    @EmbeddedId
+    ServicePremiCreditId creditId;
 
     @Column(name = "secr_year")
     @Size(max = 4)
