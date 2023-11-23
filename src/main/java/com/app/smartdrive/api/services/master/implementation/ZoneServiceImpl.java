@@ -28,9 +28,4 @@ public class ZoneServiceImpl implements ZoneService {
     public Zones save(Zones entity) {
         return repository.save(entity);
     }
-
-    @Override
-    public void deleteById(Long aLong) {
-
-    }
 }

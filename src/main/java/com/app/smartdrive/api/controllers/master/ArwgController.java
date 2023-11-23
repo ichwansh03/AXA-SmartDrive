@@ -1,8 +1,10 @@
 package com.app.smartdrive.api.controllers.master;
 
+import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.AreaWorkGroupDto;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
-import com.app.smartdrive.api.services.master.implementation.ArwgServiceImpl;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.master.ArwgService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,36 +14,36 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/arwg")
-public class ArwgController {
-    private final ArwgServiceImpl service;
+public class ArwgController implements BaseController<AreaWorkGroupDto, String> {
+    private final ArwgService service;
 
+    @Override
     @GetMapping
-    public ResponseEntity<?> findAll() {
+    public ResponseEntity<?> findAllData() {
         return ResponseEntity.ok(service.getAll());
     }
 
+    @Override
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable String id) {
-        return ResponseEntity.ok(service.getById(id));
+    public ResponseEntity<?> findDataById(@PathVariable String id) {
+        AreaWorkGroup areaWorkGroup = service.getById(id);
+        AreaWorkGroupDto result = TransactionMapper.mapEntityToDto(areaWorkGroup, AreaWorkGroupDto.class);
+        return ResponseEntity.ok(result);
     }
 
+    @Override
     @PostMapping
-    public ResponseEntity<?> save(@Valid @RequestBody AreaWorkGroupDto areaWorkGroupDto) {
-        AreaWorkGroup areaWorkGroup = new AreaWorkGroup();
-        areaWorkGroup.setArwgDesc(areaWorkGroupDto.getArwgDesc());
-        return new ResponseEntity<>(service.save(areaWorkGroup), HttpStatus.CREATED);
+    public ResponseEntity<?> saveData(@Valid @RequestBody AreaWorkGroupDto request) {
+        AreaWorkGroup result = new AreaWorkGroup();
+        result = TransactionMapper.mapDtoToEntity(request, result);
+        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
 
-//    @PutMapping("/update")
-//    public ResponseEntity<?> updateCategory(@Valid @RequestBody AreaWorkGroup areaWorkGroup) {
-//        AreaWorkGroup existedData = service.getById(areaWorkGroup.getArwgCode());
-//        existedData.setArwgDesc(areaWorkGroup.getArwgDesc());
-//        return new ResponseEntity<>(service.save(existedData), HttpStatus.CREATED);
-//    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> destroy(@PathVariable String id) {
-        service.deleteById(id);
-        return ResponseEntity.ok("Category ID : " + id + " Deleted");
+    @Override
+    @PutMapping
+    public ResponseEntity<?> updateData(@Valid @RequestBody AreaWorkGroupDto request) {
+        AreaWorkGroup result = service.getById(request.getArwgCode());
+        result = TransactionMapper.mapDtoToEntity(request, result);
+        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
 }

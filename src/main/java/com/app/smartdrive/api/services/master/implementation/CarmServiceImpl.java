@@ -1,7 +1,5 @@
 package com.app.smartdrive.api.services.master.implementation;
 
-import com.app.smartdrive.api.dto.master.CarModelDto;
-import com.app.smartdrive.api.entities.master.CarBrand;
 import com.app.smartdrive.api.entities.master.CarModel;
 import com.app.smartdrive.api.repositories.master.CarmRepository;
 import com.app.smartdrive.api.services.master.CarmService;
@@ -17,22 +15,17 @@ public class CarmServiceImpl implements CarmService {
     private final CarmRepository repository;
 
     @Override
-    public List<CarModelDto> findAllCarModel() {
-        List<CarModel> carModels = repository.findAll();
-        List<CarModelDto> carModelDtos = carModels.stream().map(car -> {
-            return new CarModelDto(car.getCarmId(), car.getCarmName(), car.getCarmCarbId());
-        }).toList();
-        return carModelDtos;
+    public CarModel getById(Long aLong) {
+        return repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Model ID : " + aLong + " Not Found"));
     }
 
     @Override
-    public CarModel findCarModelById(Long id) {
-        CarModel carModel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Car Model ID : " + id + " Not Found !"));
-        return carModel;
+    public List<CarModel> getAll() {
+        return repository.findAll();
     }
 
     @Override
-    public CarModel createModel(CarModel carModel) {
-        return repository.save(carModel);
+    public CarModel save(CarModel entity) {
+        return repository.save(entity);
     }
 }

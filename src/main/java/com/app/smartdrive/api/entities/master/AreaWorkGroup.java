@@ -25,7 +25,7 @@ public class AreaWorkGroup {
     private String arwgDesc;
 
     @Column(name = "arwg_city_id")
-    private int arwgCityId;
+    private Long arwgCityId;
 
     @JsonIgnore
     @ManyToOne

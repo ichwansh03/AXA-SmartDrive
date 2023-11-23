@@ -28,9 +28,4 @@ public class TemiServiceImpl implements TemiService {
     public TemplateInsurancePremi save(TemplateInsurancePremi entity) {
         return repository.save(entity);
     }
-
-    @Override
-    public void deleteById(Long aLong) {
-
-    }
 }

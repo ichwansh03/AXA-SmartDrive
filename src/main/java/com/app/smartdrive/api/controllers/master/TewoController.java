@@ -1,10 +1,10 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.CitiesDto;
-import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.dto.master.TewoDto;
+import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.services.master.CityService;
+import com.app.smartdrive.api.services.master.TewoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/master/cities")
-public class CityController implements BaseController<CitiesDto, Long> {
-    private final CityService service;
+@RequestMapping("/master/tewo")
+public class TewoController implements BaseController<TewoDto, Long> {
+    private final TewoService service;
 
     @Override
     @GetMapping
@@ -26,23 +26,23 @@ public class CityController implements BaseController<CitiesDto, Long> {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        Cities cities = service.getById(id);
-        CitiesDto result = TransactionMapper.mapEntityToDto(cities, CitiesDto.class);
+        TemplateTaskWorkOrder tewo = service.getById(id);
+        TewoDto result = TransactionMapper.mapEntityToDto(tewo, TewoDto.class);
         return ResponseEntity.ok(result);
     }
 
     @Override
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody CitiesDto request) {
-        Cities result = new Cities();
+    public ResponseEntity<?> saveData(@Valid @RequestBody TewoDto request) {
+        TemplateTaskWorkOrder result = new TemplateTaskWorkOrder();
         result = TransactionMapper.mapDtoToEntity(request, result);
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
 
     @Override
     @PatchMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody CitiesDto request) {
-        Cities result = service.getById(request.getCityId());
+    public ResponseEntity<?> updateData(@Valid @RequestBody TewoDto request) {
+        TemplateTaskWorkOrder result = service.getById(request.getTewoId());
         result = TransactionMapper.mapDtoToEntity(request, result);
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }

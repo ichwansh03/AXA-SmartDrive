@@ -7,5 +7,7 @@ public interface BaseService<T, ID> {
     T getById(ID id);
     List<T> getAll();
     T save(T entity);
-    void deleteById(ID id);
+    default void deleteById(ID id) {
+
+    }
 }

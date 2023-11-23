@@ -1,48 +1,49 @@
 package com.app.smartdrive.api.controllers.master;
 
+import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.InsuranceTypeDto;
 import com.app.smartdrive.api.entities.master.InsuranceType;
-import com.app.smartdrive.api.services.master.implementation.IntyServiceImpl;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.master.IntyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/inty")
-public class IntyController {
-    private final IntyServiceImpl service;
+public class IntyController implements BaseController<InsuranceTypeDto, String> {
+    private final IntyService service;
 
+    @Override
     @GetMapping
-    public ResponseEntity<?> findAllInty() {
-        return ResponseEntity.ok(service.findAllInsuranceType());
+    public ResponseEntity<?> findAllData() {
+        return ResponseEntity.ok(service.getAll());
     }
 
+    @Override
     @GetMapping("/{id}")
-    public ResponseEntity<?> findIntyById(@PathVariable String id) {
+    public ResponseEntity<?> findDataById(@PathVariable String id) {
         InsuranceType insuranceType = service.getById(id);
-        InsuranceTypeDto insuranceTypeDto = new InsuranceTypeDto();
-        insuranceTypeDto.setIntyName(insuranceType.getIntyName());
-        insuranceTypeDto.setIntyName(insuranceType.getIntyDesc());
-        return ResponseEntity.ok(insuranceTypeDto);
+        InsuranceTypeDto result = TransactionMapper.mapEntityToDto(insuranceType, InsuranceTypeDto.class);
+        return ResponseEntity.ok(result);
     }
 
+    @Override
     @PostMapping
-    public ResponseEntity<?> saveProvinsi(@Valid @RequestBody InsuranceTypeDto request) {
-        InsuranceType insuranceType = new InsuranceType();
-        insuranceType.setIntyName(request.getIntyName());
-        insuranceType.setIntyDesc(request.getIntyDesc());
-        return new ResponseEntity<>(service.save(insuranceType), HttpStatus.CREATED);
+    public ResponseEntity<?> saveData(@Valid @RequestBody InsuranceTypeDto request) {
+        InsuranceType result = new InsuranceType();
+        result = TransactionMapper.mapDtoToEntity(request, result);
+        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateProvinsi(@Valid @RequestBody InsuranceTypeDto request) {
-        InsuranceType insuranceType = service.getById(request.getIntyName());
-        insuranceType.setIntyDesc(request.getIntyDesc());
-        return ResponseEntity.ok(service.save(insuranceType));
+    @Override
+    @PatchMapping
+    public ResponseEntity<?> updateData(@Valid @RequestBody InsuranceTypeDto request) {
+        InsuranceType result = service.getById(request.getIntyDesc());
+        result = TransactionMapper.mapDtoToEntity(request, result);
+        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
 }
