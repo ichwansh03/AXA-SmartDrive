@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_accounts", schema = "payment")
-public class User_accounts {
+public class UserAccounts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usac_id", updatable = false, nullable = false)
@@ -49,39 +49,31 @@ public class User_accounts {
     @Column(name = "usac_type", length = 15)
     private EnumClassPayment.EnumPaymentType enumPaymentType;
 
+    @Column(name = "usac_bank_entityid")
+    private Long usacBankEntityid;
+
+    @Column(name = "usac_fint_entityid")
+    private Long usacFintEntityid;
+
+    @Column(name = "usac_user_entityid")
+    private Long usacUserEntityid;
+
     // ----------------------------- //
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usac_bank_entityid", referencedColumnName = "bank_entityid")
+    @JoinColumn(name = "usac_bank_entityid",referencedColumnName = "bank_entityid",insertable = false, updatable = false)
     @JsonIgnore
     Banks banks;
 
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usac_fint_entityid", referencedColumnName = "fint_entityid")
+    @JoinColumn(name = "usac_fint_entityid", referencedColumnName = "fint_entityid", insertable = false, updatable = false)
     @JsonIgnore
     Fintech fintech;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usac_user_entityid", referencedColumnName = "user_entityid")
+    @JoinColumn(name = "usac_user_entityid", referencedColumnName = "user_entityid", insertable = false, updatable = false)
     @JsonIgnore
     User user;
 
-
-
-
-    // ManytoOne & OneToMany & ManytoMany // 
-
-    // @ManyToOne(fetch = FetchType.LAZY)
-//     @JoinColumn(name= "productid", insertable = false, updatable = false)
-//     Product product;
-
-    //@OneToOne(cascade = CascadeType.ALL)
-    //@JoinColumn(name = "address_id", referencedColumnName = "id")
-    //private Address address;
-
-    // @JsonIgnore
-    // @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    // private List<OrderDetails> orderDetails;    
-// }
 }

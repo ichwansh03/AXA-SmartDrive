@@ -54,4 +54,8 @@ public class BusinessEntity {
   @OneToMany(mappedBy = "businessEntity",cascade = CascadeType.ALL)
   private List<CustomerRequest> customerRequest;
 
+public Long getBanksById(Long businessEntityId) {
+    return null;
+}
+
 }

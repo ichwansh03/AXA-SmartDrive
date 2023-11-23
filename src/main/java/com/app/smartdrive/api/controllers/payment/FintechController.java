@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.payment;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +25,9 @@ import com.app.smartdrive.api.dto.payment.BanksDto;
 import com.app.smartdrive.api.dto.payment.FintechDto;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.Fintech;
+import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.services.payment.FintechService;
+import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +36,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/payment")
 public class FintechController {
-    final FintechService service;
-    
+    private final FintechService service;
+    private final BusinessEntityImpl serviceBusiness;
+
     @GetMapping("/fintech/all")
     public ResponseEntity<?> getAllFintech(){
         List<Fintech> listFintech = service.findAllFintech();
@@ -73,7 +77,13 @@ public class FintechController {
     public ResponseEntity<?> addFintech(@Valid 
     @RequestParam(name = "fint_name", required = true) String fint_name,
     @RequestParam(name = "fint_desc", required = true) String fint_desc){
+        BusinessEntity busines = new BusinessEntity();
+        busines.setEntityModifiedDate(LocalDateTime.now());
+        Long businessEntityId = serviceBusiness.save(busines);
+
         Fintech fintech = new Fintech();
+        fintech.setBusinessEntity(busines);
+        fintech.setFint_entityid(businessEntityId);
         fintech.setFint_name(fint_name);
         fintech.setFint_desc(fint_desc);
         service.addFintech(fintech);

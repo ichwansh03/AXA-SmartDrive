@@ -65,7 +65,7 @@ public class PaymentTransactions {
     private String patr_notes;
 
     
-    @Column(name="patr_trxno_rev", length = 55, updatable = false, insertable = false)
+    @Column(name="patr_trxno_rev")
     private String patr_trxno_rev;
 
 
