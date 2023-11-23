@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.IbmeDto;
 import com.app.smartdrive.api.entities.master.InboxMessaging;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.IbmeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/ibme")
+@Tag(name = "Master Module")
 public class IbmeController implements BaseController<IbmeDto, Long> {
     private final IbmeService service;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

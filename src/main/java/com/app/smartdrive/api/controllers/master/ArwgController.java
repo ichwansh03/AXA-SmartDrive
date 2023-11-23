@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.AreaWorkGroupDto;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ArwgService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/arwg")
+@Tag(name = "Master Module", description = "This Tab Contains All Operation for Master Module")
 public class ArwgController implements BaseController<AreaWorkGroupDto, String> {
     private final ArwgService service;
 

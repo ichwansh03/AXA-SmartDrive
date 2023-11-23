@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.TewoDto;
 import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TewoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/tewo")
+@Tag(name = "Master Module")
 public class TewoController implements BaseController<TewoDto, Long> {
     private final TewoService service;
 

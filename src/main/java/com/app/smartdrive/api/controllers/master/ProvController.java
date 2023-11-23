@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.ProvinsiDto;
 import com.app.smartdrive.api.entities.master.Provinsi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ProvService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/provinsi")
+@Tag(name = "Master Module")
 public class ProvController implements BaseController<ProvinsiDto, Long> {
     private final ProvService service;
 

@@ -4,6 +4,7 @@ import com.app.smartdrive.api.dto.master.ZonesDto;
 import com.app.smartdrive.api.entities.master.Zones;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ZoneService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/zones")
+@Tag(name = "Master Module")
 public class ZoneController {
     private final ZoneService service;
 

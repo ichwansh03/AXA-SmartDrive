@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.TemplateServiceTaskDto;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TestaService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/testa")
+@Tag(name = "Master Module")
 public class TestaController implements BaseController<TemplateServiceTaskDto, Long> {
     private final TestaService service;
 

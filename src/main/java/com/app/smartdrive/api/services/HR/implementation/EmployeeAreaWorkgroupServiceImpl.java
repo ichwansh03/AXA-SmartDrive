@@ -68,8 +68,8 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         employeesRepository.save(employee);
 
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
-        employeeAreaWorkgroup.setEawgId(businessEntityId + 2);
-        employeeAreaWorkgroup.setEawgEntityid(employee.getEmpEntityid());
+//        employeeAreaWorkgroup.setEawgId(businessEntityId + 2);
+//        employeeAreaWorkgroup.setEawgEntityid(employee.getEmpEntityid());
         employeeAreaWorkgroup.setEawgArwgCode(employeeAreaWorkgroupDto.getWorkGroup());
 
         AreaWorkGroup areaWorkGroup = new AreaWorkGroup();

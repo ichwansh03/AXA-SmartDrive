@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.master.CitiesDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.CityService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/cities")
+@Tag(name = "Master Module")
 public class CityController implements BaseController<CitiesDto, Long> {
     private final CityService service;
 
