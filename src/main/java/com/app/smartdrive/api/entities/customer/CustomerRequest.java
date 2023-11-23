@@ -81,6 +81,6 @@ public class CustomerRequest {
     @JoinColumn(name = "creq_agen_entityid")
     private Employees employee;
 
-    @OneToOne(mappedBy = "customerRequest")
+    @OneToOne(mappedBy = "customer")
     private Services services;
 }
