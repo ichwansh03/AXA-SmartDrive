@@ -39,35 +39,6 @@ public class CustomerRequestController {
         return this.customerRequestService.get();
     }
 
-    @PostMapping("/tengku")
-    public void createTemplate(
-        @RequestParam("temiName1") String name1,
-        @RequestParam("temiName2") String name2,
-        @RequestParam("temiName3") String name3
-    ){
-        InsuranceType existInsuranceType = this.intyRepository.findById("medic").get();
-
-        TemplateInsurancePremi temp1 = new TemplateInsurancePremi();
-        temp1.setTemiName(name1);
-        temp1.setTemiType("Category");
-        temp1.setInsuranceType(existInsuranceType);
-
-        TemplateInsurancePremi temp2 = new TemplateInsurancePremi();
-        temp2.setTemiName(name2);
-        temp2.setTemiType("Category");
-        temp2.setInsuranceType(existInsuranceType);
-
-        TemplateInsurancePremi temp3 = new TemplateInsurancePremi();
-        temp3.setTemiName(name3);
-        temp3.setTemiType("Category");
-        temp3.setInsuranceType(existInsuranceType);
-
-        this.temiRepository.save(temp1);
-        this.temiRepository.save(temp2);
-        this.temiRepository.save(temp3);
-
-    }
-
     @PostMapping
     public CustomerRequest create(
         @Valid @RequestParam("client") String client,
