@@ -29,6 +29,9 @@
 ### Link One-Drive
 SOP Project : [Mini Project](https://codedevid-my.sharepoint.com/:f:/g/personal/dian_code_id/EqJ6Vi_B2cNFllgpmYhC2PcBdZbHHTjTdn7OUFfvI0r5dQ?e=Bv8MeW)
 
+### Swagger Path
+Path : http://localhost:8088/api/swagger-ui/index.html
+
 ### Project Structure
 * java
   * com.app.smartdrive
