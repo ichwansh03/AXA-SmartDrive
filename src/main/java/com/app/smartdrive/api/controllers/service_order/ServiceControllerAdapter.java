@@ -12,6 +12,8 @@ import com.app.smartdrive.api.services.service_order.SoTasksService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +29,9 @@ public class ServiceControllerAdapter {
     private SoService soService;
     private SoOrderService soOrderService;
     private SoTasksService soTasksService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     public ServicesDto generateServiceDto(String seroId){
         Stream<ServiceOrderTasks> seot = soTasksService.findAllBySeotSeroId(seroId);
