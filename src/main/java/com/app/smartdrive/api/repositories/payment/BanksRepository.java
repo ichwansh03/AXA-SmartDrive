@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.repositories.payment;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +12,11 @@ import com.app.smartdrive.api.entities.payment.Banks;
 
 import jakarta.transaction.Transactional;
 
+
 @Repository
 public interface BanksRepository extends JpaRepository<Banks,Long> {
+    @Query(value = "SELECT * FROM PAYMENT.BANKS WHERE BANK_NAME = ?1", nativeQuery = true)
+    Optional<Banks> findByBankNameOptional(String bank_name);
 
     @Transactional
     @Modifying(clearAutomatically = true)
