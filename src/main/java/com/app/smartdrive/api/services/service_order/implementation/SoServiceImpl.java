@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
@@ -35,6 +36,12 @@ public class SoServiceImpl implements SoService {
     @Override
     public void deleteById(Long aLong) {
 
+    }
+
+    @Override
+    public CustomerRequest findCreqById(Long id) {
+
+        return soRepository.findByCreqEntityid(id);
     }
 
     @Override

@@ -9,5 +9,7 @@ import com.app.smartdrive.api.services.HR.EmployeesService;
 
 public interface SoService extends BaseService<Services, Long> {
 
+    CustomerRequest findCreqById(Long id);
+
     Services addServices(Services services);
 }

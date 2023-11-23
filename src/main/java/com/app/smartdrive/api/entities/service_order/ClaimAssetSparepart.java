@@ -44,7 +44,7 @@ public class ClaimAssetSparepart {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "casp_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
-    Partner partners;
+    Partner caspPartners;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

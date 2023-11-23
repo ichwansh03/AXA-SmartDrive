@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
+import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -68,7 +69,9 @@ public class PaymentTransactions {
     @Column(name="patr_trxno_rev")
     private String patr_trxno_rev;
 
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "paymentTransactions", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ServicePremiCredit> servicePremiCredits;
 
     @ManyToOne
     @JoinColumn(name = "patr_trxno")
