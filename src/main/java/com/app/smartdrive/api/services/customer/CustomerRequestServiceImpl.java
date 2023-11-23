@@ -25,7 +25,7 @@ import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.master.CarsRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.master.IntyRepository;
-import com.app.smartdrive.api.repositories.users.BusinessEntityRepo;
+import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestServiceImpl {
     private final CustomerRequestRepository customerRequestRepository;
 
-    private final BusinessEntityRepo businessEntityRepo;
+    private final BusinessEntityRepository businessEntityRepo;
 
     private final CarsRepository carsRepository;
 
