@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,11 +12,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
-/**
- * <a href="https://www.baeldung.com/jpa-mapping-single-entity-to-multiple-tables#multiple-entities">Mapping Entity JPA</a>
- */
 @Builder
 @Data
 @AllArgsConstructor
@@ -31,59 +27,69 @@ public class Services {
     @Column(name = "serv_id", updatable = false, nullable = false)
     private Long servId;
 
+    //CustomerRequest.creqCreateDate
     @Column(name = "serv_created_on")
     private LocalDate servCreatedOn;
 
+    //CustomerRequest.creqType
     @Column(name = "serv_type")
-    @Size(max = 15)
-    //@Enumerated(EnumType.STRING)
+    @Size(max = 15, message = "service type can't more than 15 character")
     private String servType;
 
     @Column(name = "serv_insuranceno")
-    @Size(max = 12)
+    @Size(max = 12, message = "insurance number can't more than 12 character")
     private String servInsuranceNo;
 
+    //CustomerInscAssets.ciasPoliceNumber
     @Column(name = "serv_vehicleno")
-    @Size(max = 12)
+    @Size(max = 12, message = "vehicle number can't more than 12 character")
     private String servVehicleNumber;
 
+    //CustomerInscAssets.ciasStartDate
     @Column(name = "serv_startdate")
     private LocalDateTime servStartDate;
 
+    //CustomerInscAssets.ciasEndDate
     @Column(name = "serv_enddate")
     private LocalDateTime servEndDate;
 
+    //CustomerRequest.creqStatus
     @Column(name = "serv_status")
-    //@Size(max = 15)
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.ServStatus servStatus;
+    {
+        servStatus = EnumModuleServiceOrders.ServStatus.INACTIVE;
+    }
 
-    //this field is FK, references to servId
     @Column(name = "serv_serv_id")
     private Long servServId;
 
+    //User.userEntityid
     @Column(name = "serv_cust_entityid")
     private Long servCustEntityid;
 
+    //Customer.Request.creqEntityid
     @Column(name = "serv_creq_entityid")
     private Long servCreqEntityid;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "serv_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services parentServices;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_cust_entityid", referencedColumnName = "user_entityid", insertable = false, updatable = false)
     User users;
 
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid",insertable = false, updatable = false)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid", insertable = false, updatable = false)
     CustomerRequest customer;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "services", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<ServiceOrders> serviceOrdersSet;
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ServiceOrders> serviceOrdersSet;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    List<ServicePremi> servicePremiSet;
 }

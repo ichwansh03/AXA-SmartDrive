@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.payment;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,9 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.smartdrive.api.dto.payment.BanksDto;
 import com.app.smartdrive.api.entities.payment.Banks;
+import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.services.payment.implementation.BankServiceImpl;
-
+import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,47 +37,53 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/payment")
 public class BanksController {
     private final BankServiceImpl service;
+    private final BusinessEntityImpl serviceBusiness;
 
     @GetMapping("/banks/all")
     public ResponseEntity<?> getAllBanks(){
-        List<Banks> newSteam = service.findAllBank();
+        List<BanksDto> newSteam = service.findAllBank();
 
-        List<BanksDto> listDto = newSteam.stream().map(banks ->{
-            BanksDto dto = new BanksDto();
-            dto.setBank_name(banks.getBank_name());
-            dto.setBank_desc(banks.getBank_desc());
-            return dto;
-        }).collect(Collectors.toList());
+        // List<BanksDto> listDto = newSteam.stream().map(banks ->{
+        //     BanksDto dto = new BanksDto();
+        //     dto.setBank_name(banks.getBank_name());
+        //     dto.setBank_desc(banks.getBank_desc());
+        //     return dto;
+        // }).collect(Collectors.toList());
 
-        return new ResponseEntity<>(listDto, HttpStatus.OK);
+        return new ResponseEntity<>(newSteam,HttpStatus.OK);
     }
-    @GetMapping("/banks/{bank_entityid}")
-    public ResponseEntity<?> getBanksById(@Valid @PathVariable("bank_entityid") Long bank_entityid){
-        Optional<Banks> banksData = service.getBankById(bank_entityid);
-        List<Banks> banksList = service.findAllBank();
-        BanksDto dto = new BanksDto();
-        if(banksData.isPresent()){
-            for (Banks  bank: banksList) {
-                if(bank_entityid.equals(bank.getBank_entityid())){
-                    dto.setBank_name(bank.getBank_name());
-                    dto.setBank_desc(bank.getBank_desc());
-                }
-            }
-            return new ResponseEntity<>(dto, HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>("Id tidak ditemukan", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+    // @GetMapping("/banks/{bank_entityid}")
+    // public ResponseEntity<?> getBanksById(@Valid @PathVariable("bank_entityid") Long bank_entityid){
+    //     Optional<Banks> banksData = service.getBankById(bank_entityid);
+    //     List<Banks> banksList = service.findAllBank();
+    //     BanksDto dto = new BanksDto();
+    //     if(banksData.isPresent()){
+    //         for (Banks  bank: banksList) {
+    //             if(bank_entityid.equals(bank.getBank_entityid())){
+    //                 dto.setBank_name(bank.getBank_name());
+    //                 dto.setBank_desc(bank.getBank_desc());
+    //             }
+    //         }
+    //         return new ResponseEntity<>(dto, HttpStatus.OK);
+    //     }else{
+    //         return new ResponseEntity<>("Id tidak ditemukan", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     @PostMapping("/banks/add")
     public ResponseEntity<?> addBanks(@Valid 
     @RequestParam(name = "bankName" , required = true ) String bank_name,
     @RequestParam(name = "description", required = true) String bank_desc){
 
+        BusinessEntity busines = new BusinessEntity();
+        busines.setEntityModifiedDate(LocalDateTime.now());
+        Long businessEntityId = serviceBusiness.save(busines);
+
         Banks banks = new Banks();
+        banks.setBusinessEntity(busines);
+        banks.setBank_entityid(businessEntityId);
         banks.setBank_name(bank_name);
         banks.setBank_desc(bank_desc);
-        banks.setBank_entityid(Long.valueOf(2));
         service.addBanks(banks);
         
         BanksDto banksDto = new BanksDto();
@@ -103,25 +113,25 @@ public class BanksController {
         }
     }
 
-    @DeleteMapping("/banks/delete/{bank_entityid}")
-    public ResponseEntity<?> deleteBanks(@Valid @PathVariable("bank_entityid") Long bank_entityid){
-        Optional<Banks> banksData = service.findById(bank_entityid);
-        List<Banks> banksList = service.findAllBank();
+    // @DeleteMapping("/banks/delete/{bank_entityid}")
+    // public ResponseEntity<?> deleteBanks(@Valid @PathVariable("bank_entityid") Long bank_entityid){
+    //     Optional<Banks> banksData = service.findById(bank_entityid);
+    //     List<Banks> banksList = service.findAllBank();
         
-        BanksDto banksDto = new BanksDto();
-        if(banksData.isPresent()){
-            for (Banks bankc : banksList) {
-                if(bank_entityid.equals(bankc.getBank_entityid())){
-                    banksDto.setBank_name(bankc.getBank_name());
-                    banksDto.setBank_desc(bankc.getBank_desc());
-                }
-            }
-            service.deleteById(bank_entityid);
-            return new ResponseEntity<>("Delete Success: " + "\n" +
-            "Bank: "+ banksDto.getBank_name() + "\n" + "Description: " +
-            banksDto.getBank_desc(),HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>("Tidak ada id tersebut",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }    
+    //     BanksDto banksDto = new BanksDto();
+    //     if(banksData.isPresent()){
+    //         for (Banks bankc : banksList) {
+    //             if(bank_entityid.equals(bankc.getBank_entityid())){
+    //                 banksDto.setBank_name(bankc.getBank_name());
+    //                 banksDto.setBank_desc(bankc.getBank_desc());
+    //             }
+    //         }
+    //         service.deleteById(bank_entityid);
+    //         return new ResponseEntity<>("Delete Success: " + "\n" +
+    //         "Bank: "+ banksDto.getBank_name() + "\n" + "Description: " +
+    //         banksDto.getBank_desc(),HttpStatus.OK);
+    //     }else{
+    //         return new ResponseEntity<>("Tidak ada id tersebut",HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }    
 }

@@ -4,7 +4,10 @@ import com.app.smartdrive.api.dto.partner.PartnerContactDto;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.service_order.ClaimAssetEvidence;
+import com.app.smartdrive.api.entities.service_order.ClaimAssetSparepart;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,7 +61,12 @@ public class Partner {
     private Cities city;
     @OneToMany(mappedBy = "partner")
     private List<PartnerContact> partnerContacts;
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "caevPartners", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ClaimAssetEvidence> claimAssetEvidence;
+    @JsonIgnore
+    @OneToMany(mappedBy = "caspPartners", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ClaimAssetSparepart> claimAssetSparepart;
     public PartnerDto convertToDto(){
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 

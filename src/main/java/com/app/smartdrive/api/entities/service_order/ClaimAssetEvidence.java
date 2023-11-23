@@ -50,7 +50,7 @@ public class ClaimAssetEvidence {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caev_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
-    Partner partners;
+    Partner caevPartners;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

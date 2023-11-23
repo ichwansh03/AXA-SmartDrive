@@ -5,7 +5,8 @@ import java.util.List;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.entities.payment.User_accounts;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
+import com.app.smartdrive.api.entities.service_order.Services;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -97,8 +98,12 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
-  private List<User_accounts> user_accounts;
+  private List<UserAccounts> user_accounts;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "customer")
   List<CustomerRequest> customerRequest;
+
+  @OneToMany(mappedBy = "users")
+  List<Services> services;
 }

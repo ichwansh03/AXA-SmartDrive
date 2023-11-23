@@ -2,7 +2,7 @@ package com.app.smartdrive.api.dto.user;
 
 import java.util.List;
 
-import com.app.smartdrive.api.entities.payment.User_accounts;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.entities.users.UserPhone;
 
@@ -18,6 +18,6 @@ public class UserDto {
   private String userEmail;
   private List<UserPhone> userPhone;
   private List<UserAddress> userAddresses;
-  private List<User_accounts> user_accounts;
+  private List<UserAccounts> user_accounts;
 
 }

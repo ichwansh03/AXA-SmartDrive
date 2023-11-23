@@ -40,17 +40,20 @@ public class ServicesController {
         return new ResponseEntity<>(soOrderService.findDtoById(seroId), HttpStatus.OK);
     }
 
+    @GetMapping("/servcreq")
+    public ResponseEntity<?> getServiceByCreqId(@RequestParam("creqid") Long creqId){
+        return new ResponseEntity<>(soService.findCreqById(creqId), HttpStatus.OK);
+    }
+
+    @GetMapping("/servall")
+    public ResponseEntity<?> getServiceAll(){
+        return new ResponseEntity<>(soService.getAll(), HttpStatus.OK);
+    }
+
     @GetMapping("/addserv")
     public ResponseEntity<?> addServices(){
-        CustomerRequest customerRequest = new CustomerRequest();
-        User user = new User();
         Services services = new Services();
         return new ResponseEntity<>(soService.addServices(services), HttpStatus.OK);
     }
 
-//    @GetMapping("/addsero")
-//    public ResponseEntity<?> addServiceOrders(){
-//
-//        return new ResponseEntity<>(soOrderService.addServiceOrders(), HttpStatus.OK);
-//    }
 }

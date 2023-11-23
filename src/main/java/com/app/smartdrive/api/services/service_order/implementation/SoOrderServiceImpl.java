@@ -5,6 +5,8 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.dto.service_order.ServicesDto;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.master.ArwgRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.service_order.SoOrderService;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +18,18 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SoOrderServiceImpl implements SoOrderService {
 
-    private final SoOrderRepository soRepository;
+    private final SoOrderRepository soOrderRepository;
+    private final UserRepository userRepository;
+    private final SoRepository soRepository;
     private final ArwgRepository arwgRepository;
     @Override
     public ServicesDto findDtoById(String seroId) {
-        return soRepository.findByIdWithServicesAndServiceOrdersAndEmployeesAndUser(seroId);
+        return soOrderRepository.findByIdServicesDto(seroId);
     }
 
     @Override
     public ServiceOrders addServiceOrders(ServiceOrders serviceOrders, String seroId) {
+        //Services services = soRepository.findById()
         AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode("1");
 
         serviceOrders = ServiceOrders.builder()
@@ -37,6 +42,6 @@ public class SoOrderServiceImpl implements SoOrderService {
                 .servClaimEnddate(LocalDateTime.now().plusDays(30))
                 .areaWorkGroup(areaWorkGroup).build();
 
-        return soRepository.save(serviceOrders);
+        return soOrderRepository.save(serviceOrders);
     }
 }

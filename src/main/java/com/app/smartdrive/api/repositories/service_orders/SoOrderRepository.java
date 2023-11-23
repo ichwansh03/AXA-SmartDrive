@@ -20,5 +20,5 @@ public interface SoOrderRepository extends JpaRepository<ServiceOrders, String> 
             "JOIN Employees empl ON sero.seroAgentEntityid = empl.empEntityid " +
             "JOIN User usr ON serv.servCustEntityid = usr.userEntityId " +
             "WHERE sero.seroId = :seroId")
-    ServicesDto findByIdWithServicesAndServiceOrdersAndEmployeesAndUser(@Param("seroId") String seroId);
+    ServicesDto findByIdServicesDto(@Param("seroId") String seroId);
 }

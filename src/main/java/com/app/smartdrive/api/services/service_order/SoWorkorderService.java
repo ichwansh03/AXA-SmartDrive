@@ -6,4 +6,5 @@ import java.util.stream.Stream;
 
 public interface SoWorkorderService {
     Stream<ServiceOrderWorkorder> findAllBySowoSeotId(Long seotId);
+    ServiceOrderWorkorder addSowoBySeotId(ServiceOrderWorkorder sowo);
 }
