@@ -47,7 +47,7 @@ public class ServiceControllerAdapter {
     }
 
     public SoTasksDto generateSoTasksDto(ServiceOrderTasks seot){
-        List<SoWorkorderDto> workorderDtos = seot.getServiceOrderWorkordersSet().stream()
+        List<SoWorkorderDto> workorderDtos = seot.getServiceOrderWorkorders().stream()
                 .map(this::generateSoWorkorderDto)
                 .collect(Collectors.toList());
 
