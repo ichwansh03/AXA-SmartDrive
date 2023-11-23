@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.master;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 

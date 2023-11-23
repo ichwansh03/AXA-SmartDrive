@@ -100,6 +100,7 @@ public class User {
   @JsonManagedReference
   private List<UserAccounts> user_accounts;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "customer")
   List<CustomerRequest> customerRequest;
 

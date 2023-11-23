@@ -61,7 +61,6 @@ public class CustomerRequest {
     @Column(name = "creq_modified_date")
     private LocalDateTime creqModifiedDate;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
@@ -82,6 +81,6 @@ public class CustomerRequest {
     @JoinColumn(name = "creq_agen_entityid")
     private Employees employee;
 
-    @OneToOne(mappedBy = "customerRequest")
+    @OneToOne(mappedBy = "customer")
     private Services services;
 }

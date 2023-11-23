@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.entities.users;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.partner.Partner;
@@ -52,7 +53,7 @@ public class BusinessEntity {
 
   @JsonManagedReference
   @OneToMany(mappedBy = "businessEntity",cascade = CascadeType.ALL)
-  private List<CustomerRequest> customerRequest;
+  private List<CustomerRequest> customerRequest = new ArrayList<>();
 
 public Long getBanksById(Long businessEntityId) {
     return null;

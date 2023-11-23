@@ -11,7 +11,7 @@ import com.app.smartdrive.api.dto.user.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.Fintech;
-import com.app.smartdrive.api.entities.payment.User_accounts;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
@@ -130,21 +130,21 @@ public class UserServiceImpl implements UserService {
 
     List<UserAddress> listAddress = List.of(userAddress);
 
-    User_accounts user_accounts = new User_accounts();
-    user_accounts.setUsac_accountno(userPost.getAccNumber());
+    UserAccounts UserAccounts = new UserAccounts();
+    UserAccounts.setUsac_accountno(userPost.getAccNumber());
     if (userPost.getAccountType().equals("BANK")) {
-      user_accounts.setEnumPaymentType(EnumPaymentType.BANK);
+      UserAccounts.setEnumPaymentType(EnumPaymentType.BANK);
       Banks bank = banksRepository.findByBankNameOptional(userPost.getBank())
           .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
-      user_accounts.setBanks(bank);
+      UserAccounts.setBanks(bank);
     }
     if (userPost.getAccountType().equals("FINTECH")) {
-      user_accounts.setEnumPaymentType(EnumPaymentType.FINTECH);
+      UserAccounts.setEnumPaymentType(EnumPaymentType.FINTECH);
       Fintech fintech = fintechRepository.findByFintNameOptional(userPost.getFintech())
           .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
-      user_accounts.setFintech(fintech);
+      UserAccounts.setFintech(fintech);
     }
-    List<User_accounts> listUser_accounts = List.of(user_accounts);
+    List<UserAccounts> listUserAccounts = List.of(UserAccounts);
 
     User user = new User();
     user.setUserBusinessEntity(businessEntity);
@@ -161,9 +161,9 @@ public class UserServiceImpl implements UserService {
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
     user.setUserAddress(listAddress);
-    user.setUser_accounts(listUser_accounts);
+    user.setUser_accounts(listUserAccounts);
 
-    user_accounts.setUser(user);
+    UserAccounts.setUser(user);
     userPhone.setUser(user);
     userRoles.setUser(user);
     userAddress.setUser(user);
