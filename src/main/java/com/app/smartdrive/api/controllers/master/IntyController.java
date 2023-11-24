@@ -44,7 +44,7 @@ public class IntyController implements BaseController<InsuranceTypeDto, String> 
     @Override
     @PatchMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody InsuranceTypeDto request) {
-        InsuranceType result = service.getById(request.getIntyDesc());
+        InsuranceType result = service.getById(request.getIntyName());
         result = TransactionMapper.mapDtoToEntity(request, result);
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
