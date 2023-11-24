@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,12 +30,12 @@ public class Services {
 
     //CustomerRequest.creqCreateDate
     @Column(name = "serv_created_on")
-    private LocalDate servCreatedOn;
+    private LocalDateTime servCreatedOn;
 
     //CustomerRequest.creqType
     @Column(name = "serv_type")
-    @Size(max = 15, message = "service type can't more than 15 character")
-    private String servType;
+    @Enumerated(EnumType.STRING)
+    private EnumCustomer.CreqType servType;
 
     @Column(name = "serv_insuranceno")
     @Size(max = 12, message = "insurance number can't more than 12 character")
@@ -58,7 +59,7 @@ public class Services {
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.ServStatus servStatus;
     {
-        servStatus = EnumModuleServiceOrders.ServStatus.INACTIVE;
+        servStatus = EnumModuleServiceOrders.ServStatus.ACTIVE;
     }
 
     @Column(name = "serv_serv_id")
@@ -85,7 +86,7 @@ public class Services {
     CustomerRequest customer;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL ,orphanRemoval = true)
     List<ServiceOrders> serviceOrdersSet;
 
     @JsonIgnore
