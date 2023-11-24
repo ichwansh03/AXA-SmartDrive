@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.InsuranceType;
@@ -30,9 +31,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestController {
     private final CustomerRequestServiceImpl customerRequestService;
 
-    private final IntyRepository intyRepository;
-
-    private final TemiRepository temiRepository;
 
     @GetMapping
     public List<CustomerRequest> getAll(){
@@ -40,14 +38,26 @@ public class CustomerRequestController {
     }
 
     @PostMapping
-    public CustomerRequest create(
+    public CustomerResponseDTO create(
         @Valid @RequestParam("client") String client,
          @RequestParam("file") MultipartFile[] files
         ) throws Exception{
         
         ObjectMapper mapper = new ObjectMapper();
         CustomerRequestDTO customerRequestDTO = mapper.readValue(client, CustomerRequestDTO.class);
-        return this.customerRequestService.create(customerRequestDTO, files);
+
+        CustomerRequest customerRequest = this.customerRequestService.create(customerRequestDTO, files);
+        
+        CustomerResponseDTO responseDTO = CustomerResponseDTO.builder()
+        .businessEntity(customerRequest.getBusinessEntity())
+        .creqCreateDate(customerRequest.getCreqCreateDate())
+        .creqStatus(customerRequest.getCreqStatus())
+        .creqType(customerRequest.getCreqType())
+        .customer(customerRequest.getCustomer())
+        .customerInscAssets(customerRequest.getCustomerInscAssets())
+        .build();
+
+        return responseDTO;
     }
 
 

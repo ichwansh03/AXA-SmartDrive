@@ -28,7 +28,7 @@ public class SoServiceImpl implements SoService {
     }
 
     @Override
-    public Services addServices(CustomerRequest customerRequest, CustomerInscAssets customerInscAssets, User user) {
+    public Services addServices(CustomerRequest customerRequest, CustomerInscAssets customerInscAssets, User user, Long entityId) {
         Services services = Services.builder()
                 .servCreatedOn(customerRequest.getCreqCreateDate())
                 .servType(customerRequest.getCreqType())
@@ -36,8 +36,8 @@ public class SoServiceImpl implements SoService {
                 .servStartDate(customerInscAssets.getCiasStartdate())
                 .servEndDate(customerInscAssets.getCiasEnddate())
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
-                .servCustEntityid(user.getUserEntityId())
-                .servCreqEntityid(customerRequest.getCreqEntityId())
+                .customer(customerRequest)
+                .servCreqEntityid(entityId)
                 .build();
 
         services.setServServId(services.getServId());
