@@ -41,9 +41,11 @@ public class AreaWorkGroup {
     @JsonManagedReference
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "areaWorkGroup")
     private List<ServiceOrders> serviceOrders;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "areaWorkGroup")
     private List<ServiceOrderTasks> serviceOrderTasks;
 }

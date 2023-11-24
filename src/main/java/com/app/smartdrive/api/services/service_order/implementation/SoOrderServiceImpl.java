@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.dto.service_order.ServicesDto;
@@ -30,10 +31,13 @@ public class SoOrderServiceImpl implements SoOrderService {
     @Override
     public ServiceOrders addServiceOrders(ServiceOrders serviceOrders, String seroId) {
         //Services services = soRepository.findById()
+
+        SoAdapter soAdapter = new SoAdapter();
+        String serviceOrderId = soAdapter.formatServiceOrderId(EnumCustomer.CreqType.POLIS, 1L, LocalDateTime.now());
         AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode("1");
 
         serviceOrders = ServiceOrders.builder()
-                .seroSeroId(seroId)
+                .seroSeroId(serviceOrderId)
                 .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
                 .seroStatus(EnumModuleServiceOrders.SeroStatus.OPEN)
                 .seroReason("Reason")

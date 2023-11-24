@@ -9,6 +9,7 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -79,14 +80,17 @@ public class Employees {
     @JsonBackReference
     private User user;
 
+    @JsonManagedReference
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private List<BatchEmployeeSalary> batchEmployeeSalary ;
 
+    @JsonManagedReference
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private List<EmployeeSalaryDetail> employeeSalaryDetails;
 
+    @JsonManagedReference
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
@@ -95,6 +99,7 @@ public class Employees {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<CustomerRequest> customerRequests;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrders;
 }

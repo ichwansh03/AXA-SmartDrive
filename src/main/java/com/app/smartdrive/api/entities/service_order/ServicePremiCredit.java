@@ -51,13 +51,11 @@ public class ServicePremiCredit {
     @Size(max = 55)
     private String secrPatrTrxno;
 
-    @JsonIgnore
     @ManyToOne
     @MapsId("secrServId")
     @JoinColumn(name = "secr_serv_id")
     ServicePremi servicePremi;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "secr_patr_trxno", referencedColumnName = "patr_trxno", insertable = false, updatable = false)
     PaymentTransactions paymentTransactions;

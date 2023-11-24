@@ -47,12 +47,10 @@ public class ClaimAssetEvidence {
     @Size(max = 25)
     private String caevSeroId;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caev_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
     Partner caevPartners;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caev_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders caevServiceOrders;

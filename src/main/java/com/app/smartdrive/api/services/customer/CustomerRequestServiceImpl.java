@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.implementation.SoServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerRequestServiceImpl {
     private final CustomerRequestRepository customerRequestRepository;
 
@@ -62,6 +64,7 @@ public class CustomerRequestServiceImpl {
         newEntity.setEntityModifiedDate(LocalDateTime.now());
 
         BusinessEntity existEntity = this.businessEntityRepo.saveAndFlush(newEntity);
+        log.info("BusinessEntity created {}",existEntity);
         User entityUser = this.userRepository.findById(customerRequestDTO.getCreq_cust_entityid()).get();
         Long entityId = existEntity.getEntityId();
 

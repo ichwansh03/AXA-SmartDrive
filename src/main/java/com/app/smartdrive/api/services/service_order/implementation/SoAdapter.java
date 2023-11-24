@@ -12,9 +12,11 @@ import com.app.smartdrive.api.services.service_order.SoTasksService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +26,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
+@Slf4j
 public class SoAdapter {
 
     private SoService soService;
@@ -39,6 +42,8 @@ public class SoAdapter {
 
         ServicesDto servicesDto = soOrderService.findDtoById(seroId);
         servicesDto.setServiceOrderTasksList(soTasksDtos);
+
+        log.info("ServicesDto::generateServiceDto created successfully {}",servicesDto);
 
         return servicesDto;
     }
@@ -64,9 +69,12 @@ public class SoAdapter {
                 .build();
     }
 
-    public String formatServiceOrderId(EnumCustomer.CreqType servType, Long seroId, LocalDate createdAt){
+    public String formatServiceOrderId(EnumCustomer.CreqType servType, Long servId, LocalDateTime createdAt){
+
+        log.info("Format ID for ServiceOrders has been created");
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formatSeroId = String.format("%04d", seroId);
+        String formatSeroId = String.format("%04d", servId);
 
         if (servType.equals("POLIS")) return "PL"+formatSeroId+"-"+createdAt.format(formatter);
         else if (servType.equals("CLAIM")) return "CL"+formatSeroId+"-"+createdAt.format(formatter);

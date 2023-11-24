@@ -23,15 +23,13 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @Table(name = "customer_insc_assets", schema = "customer")
 @Entity
 public class CustomerInscAssets {
@@ -81,7 +79,7 @@ public class CustomerInscAssets {
     @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private List<CustomerInscExtend> customerInscExtend = new ArrayList<>();
 
-    
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_cars_id")
     private CarSeries carSeries;
