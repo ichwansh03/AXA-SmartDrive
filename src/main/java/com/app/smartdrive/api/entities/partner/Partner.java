@@ -56,7 +56,7 @@ public class Partner {
     @ManyToOne
     @JoinColumn(name = "part_city_id", nullable = false)
     private Cities city;
-    @OneToMany(mappedBy = "partner")
+    @OneToMany(mappedBy = "partner", fetch = FetchType.LAZY)
     private List<PartnerContact> partnerContacts;
 
     public PartnerDto convertToDto(){
