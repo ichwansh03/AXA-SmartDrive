@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.services.service_order.implementation.SoServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +45,7 @@ public class CustomerRequestServiceImpl {
 
     private final CityRepository cityRepository;
 
+    private final SoRepository soRepository;
 
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
@@ -112,6 +115,9 @@ public class CustomerRequestServiceImpl {
 
 
         newCustomer.setCustomerInscAssets(cias);
+
+        SoServiceImpl service = new SoServiceImpl(soRepository);
+        service.addServices(newCustomer, cias, entityUser);
 
         return this.customerRequestRepository.save(newCustomer);
 

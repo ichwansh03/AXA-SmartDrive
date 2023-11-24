@@ -1,11 +1,10 @@
 package com.app.smartdrive.api.controllers.service_order;
 
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.Services;
-import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.services.service_order.SoOrderService;
 import com.app.smartdrive.api.services.service_order.SoService;
 import com.app.smartdrive.api.services.service_order.SoTasksService;
+import com.app.smartdrive.api.services.service_order.implementation.SoAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +14,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/service")
 @RequiredArgsConstructor
-public class ServicesController {
+public class ServiceOrdersController {
 
     private final SoService soService;
     private final SoOrderService soOrderService;
     private final SoTasksService soTasksService;
 
-    private ServiceControllerAdapter adapter;
-
     @GetMapping("/search")
     @Transactional(readOnly = true)
     public ResponseEntity<?> getSearchById(@RequestParam("seroId") String seroId){
 
-        adapter = ServiceControllerAdapter.builder()
+        SoAdapter adapter = SoAdapter.builder()
                 .soService(soService)
                 .soOrderService(soOrderService)
                 .soTasksService(soTasksService).build();
@@ -45,15 +42,5 @@ public class ServicesController {
         return new ResponseEntity<>(soService.findCreqById(creqId), HttpStatus.OK);
     }
 
-    @GetMapping("/servall")
-    public ResponseEntity<?> getServiceAll(){
-        return new ResponseEntity<>(soService.getAll(), HttpStatus.OK);
-    }
-
-    @GetMapping("/addserv")
-    public ResponseEntity<?> addServices(){
-        Services services = new Services();
-        return new ResponseEntity<>(soService.addServices(services), HttpStatus.OK);
-    }
 
 }

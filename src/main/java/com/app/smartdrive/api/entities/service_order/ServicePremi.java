@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Data
@@ -40,8 +41,12 @@ public class ServicePremi {
     @Column(name = "semi_modified_date")
     private LocalDate semiModifiedDate;
 
-    @JsonIgnore
     @ManyToOne
+    @MapsId
     @JoinColumn(name = "semi_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services services;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "servicePremi", cascade = CascadeType.ALL)
+    private List<ServicePremiCredit> servicePremiCredits;
 }

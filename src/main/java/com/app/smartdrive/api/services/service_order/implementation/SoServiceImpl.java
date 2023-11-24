@@ -1,12 +1,16 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
+import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.service_order.SoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,27 +20,6 @@ import java.util.List;
 public class SoServiceImpl implements SoService {
 
     private final SoRepository soRepository;
-    private final UserRepository userRepository;
-
-    @Override
-    public Services getById(Long aLong) {
-        return soRepository.findById(aLong).get();
-    }
-
-    @Override
-    public List<Services> getAll() {
-        return soRepository.findAll();
-    }
-
-    @Override
-    public Services save(Services services) {
-        return soRepository.save(services);
-    }
-
-    @Override
-    public void deleteById(Long aLong) {
-
-    }
 
     @Override
     public CustomerRequest findCreqById(Long id) {
@@ -45,17 +28,21 @@ public class SoServiceImpl implements SoService {
     }
 
     @Override
-    public Services addServices(Services services) {
+    public Services addServices(CustomerRequest customerRequest, CustomerInscAssets customerInscAssets, User user) {
+        Services services = Services.builder()
+                .servCreatedOn(customerRequest.getCreqCreateDate())
+                .servType(customerRequest.getCreqType())
+                .servVehicleNumber(customerInscAssets.getCiasPoliceNumber())
+                .servStartDate(customerInscAssets.getCiasStartdate())
+                .servEndDate(customerInscAssets.getCiasEnddate())
+                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
+                .servCustEntityid(user.getUserEntityId())
+                .servCreqEntityid(customerRequest.getCreqEntityId())
+                .build();
 
-        services = new Services();
-        services.setServStatus(EnumModuleServiceOrders.ServStatus.ACTIVE);
-        //..more data
-        Services save = soRepository.save(services);
+        services.setServServId(services.getServId());
 
-        Long userId = userRepository.findById(services.getServId()).get().getUserEntityId();
-        services.setServCustEntityid(userId);
-        soRepository.flush();
-
-        return save;
+        return soRepository.save(services);
     }
+
 }

@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.controllers.service_order;
+package com.app.smartdrive.api.services.service_order.implementation;
 
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
@@ -12,8 +12,7 @@ import com.app.smartdrive.api.services.service_order.SoTasksService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,14 +23,12 @@ import java.util.stream.Stream;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceControllerAdapter {
+@Component
+public class SoAdapter {
 
     private SoService soService;
     private SoOrderService soOrderService;
     private SoTasksService soTasksService;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     public ServicesDto generateServiceDto(String seroId){
         Stream<ServiceOrderTasks> seot = soTasksService.findAllBySeotSeroId(seroId);

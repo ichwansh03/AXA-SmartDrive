@@ -1,10 +1,11 @@
 package com.app.smartdrive.api.dto.service_order;
 
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -12,14 +13,14 @@ import java.util.List;
 public class ServicesDto {
 
     private String seroId;
-    private String servType;
+    private EnumCustomer.CreqType servType;
     private String servInsuranceNo;
-    private LocalDate servCreatedOn;
+    private LocalDateTime servCreatedOn;
     private EnumModuleServiceOrders.ServStatus servStatus;
     private String empName;
     private String userName;
     List<SoTasksDto> serviceOrderTasksList;
-    public ServicesDto(String seroId, String servType, String servInsuranceNo, LocalDate servCreatedOn, EnumModuleServiceOrders.ServStatus servStatus, String empName, String userName) {
+    public ServicesDto(String seroId, EnumCustomer.CreqType servType, String servInsuranceNo, LocalDateTime servCreatedOn, EnumModuleServiceOrders.ServStatus servStatus, String empName, String userName) {
         this.seroId = seroId;
         this.servType = servType;
         this.servInsuranceNo = servInsuranceNo;
