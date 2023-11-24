@@ -54,10 +54,10 @@ public class BatchEmployeeSalary {
     @Column(name="besa_modified_date")
     private LocalDateTime besaModifiedDate;
 
+    @JsonBackReference
     @ManyToOne
     @MapsId("besaEmpEntityid")
     @JoinColumn(name = "besa_emp_entity_id")
-    @JsonBackReference
     private Employees employees;
 
    

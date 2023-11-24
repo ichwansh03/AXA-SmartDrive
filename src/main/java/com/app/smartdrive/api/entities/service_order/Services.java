@@ -4,6 +4,7 @@ import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.entities.users.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -81,6 +82,7 @@ public class Services {
     @JoinColumn(name = "serv_cust_entityid", referencedColumnName = "user_entityid", insertable = false, updatable = false)
     User users;
 
+    @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid", insertable = false, updatable = false)
     CustomerRequest customer;

@@ -104,6 +104,7 @@ public class User {
   @OneToMany(mappedBy = "customer")
   List<CustomerRequest> customerRequest;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "users")
   List<Services> services;
 }

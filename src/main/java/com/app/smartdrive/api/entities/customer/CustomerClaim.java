@@ -27,7 +27,7 @@ public class CustomerClaim {
     @Column(name = "cucl_creq_entityid")
     private Long  cuclCreqEntityid;
 
-    @JsonIgnore
+    @JsonBackReference
     @OneToOne
     @MapsId
     @JoinColumn(name = "cucl_creq_entityid")
