@@ -28,6 +28,7 @@ import com.app.smartdrive.api.repositories.master.CarsRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.master.IntyRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
+import com.app.smartdrive.api.repositories.users.UserRepository;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,8 @@ public class CustomerRequestServiceImpl {
 
     private final SoRepository soRepository;
 
+    private final UserRepository userRepository;
+
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
     }
@@ -54,14 +57,20 @@ public class CustomerRequestServiceImpl {
     public CustomerRequest create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
 
-        BusinessEntity existEntity = this.businessEntityRepo.findById(customerRequestDTO.getCreqEntityId()).get();
-        User entityUser = existEntity.getUser();
+        // create new businessEntity
+        BusinessEntity newEntity = new BusinessEntity();
+        newEntity.setEntityModifiedDate(LocalDateTime.now());
+
+        BusinessEntity existEntity = this.businessEntityRepo.saveAndFlush(newEntity);
+        User entityUser = this.userRepository.findById(customerRequestDTO.getCreq_cust_entityid()).get();
         Long entityId = existEntity.getEntityId();
 
+        // get from table master
         CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCias_cars_id()).get();
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
         
+        // new customer
         CustomerRequest newCustomer = CustomerRequest.builder()
         .businessEntity(existEntity)
         .customer(entityUser)
@@ -71,6 +80,7 @@ public class CustomerRequestServiceImpl {
         .creqEntityId(entityId)
         .build();
         
+        // new cias
         CustomerInscAssets cias = CustomerInscAssets.builder()
         .ciasCreqEntityid(entityId)
         .ciasPoliceNumber(ciasDTO.getCiasPoliceNumber())
@@ -87,6 +97,7 @@ public class CustomerRequestServiceImpl {
         .customerRequest(newCustomer)
         .build();
 
+        // new cuex(sementara nunggu tengku)
         CustomerInscExtend cuex = CustomerInscExtend.builder()
         .cuexName("Perlindungan dan kerugian pihak ketiga")
         .cuexTotalItem(1)
@@ -95,37 +106,26 @@ public class CustomerRequestServiceImpl {
         .cuexCreqEntityid(entityId)
         .build();
 
-
-        List<CustomerInscDoc> ciasDocs = this.fileImagesCheck(files, entityId);
-
-
-        // List<CustomerInscDoc> ciasDocs = new ArrayList<>();
-        // ciasDocs.add(cadoc1);
-        // ciasDocs.add(cadoc2);
-
+        // pengecekan dan covert file upload ke cadocList
+        List<CustomerInscDoc> ciasDocs = this.fileCheck(files, entityId);
         cias.setCustomerInscDoc(ciasDocs);
 
-
+        // set cias ke creq
         List<CustomerInscExtend> ciasCuexs = new ArrayList<>();
         ciasCuexs.add(cuex);
         cias.setCustomerInscExtend(ciasCuexs);
 
-        // cias.setCustomerInscDoc(List.of(cadoc));
-        // cias.setCustomerInscExtend(List.of(cuex));
-
-
+        // set cias ke customer
         newCustomer.setCustomerInscAssets(cias);
 
+        // ikhwan generate
         SoServiceImpl service = new SoServiceImpl(soRepository);
-        service.addServices(newCustomer, cias, entityUser);
+        service.addServices(newCustomer, cias, entityUser, entityId);
 
         return this.customerRequestRepository.save(newCustomer);
-
-        // CustomerRequest creq = save(newCustomer);
-        // return creq;
     }
 
-    public List<CustomerInscDoc> fileImagesCheck(MultipartFile[] files, Long creqEntityId) throws Exception {
+    public List<CustomerInscDoc> fileCheck(MultipartFile[] files, Long creqEntityId) throws Exception {
         
         List<CustomerInscDoc> listDoc = new ArrayList<>();
 

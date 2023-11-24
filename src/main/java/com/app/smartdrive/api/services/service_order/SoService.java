@@ -12,5 +12,5 @@ public interface SoService {
 
     CustomerRequest findCreqById(Long id);
 
-    Services addServices(CustomerRequest customerRequest, CustomerInscAssets customerInscAssets, User user);
+    Services addServices(CustomerRequest customerRequest, CustomerInscAssets customerInscAssets, User user, Long entityId);
 }
