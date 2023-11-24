@@ -6,12 +6,15 @@ import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.users.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "partner_contacts", schema = "partners")
 public class PartnerContact {
     @EmbeddedId
@@ -24,15 +27,15 @@ public class PartnerContact {
         status = EnumClassHR.status.ACTIVE;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paco_patrn_entityid", insertable = false, updatable = false)
     private Partner partner;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paco_user_entityid", insertable = false, updatable = false)
     private User user;
 
-    @OneToMany(mappedBy = "partnerContact")
+    @OneToMany(mappedBy = "partnerContact", fetch = FetchType.LAZY)
     private List<PartnerAreaWorkgroup> partnerAreaWorkgroupList;
 
     public PartnerContactDto convertToDto(){
