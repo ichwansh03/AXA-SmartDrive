@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface CaspRepository extends JpaRepository<ClaimAssetSparepart, Long> {
 
-    List<ClaimAssetSparepart> findAllByCaspSeroId(String seroId);
+    List<ClaimAssetSparepart> findAllByCaspSeroId(Long seroId);
 }

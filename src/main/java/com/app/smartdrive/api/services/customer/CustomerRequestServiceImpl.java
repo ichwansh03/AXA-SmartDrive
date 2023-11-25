@@ -125,6 +125,8 @@ public class CustomerRequestServiceImpl {
         SoServiceImpl service = new SoServiceImpl(soRepository);
         service.addServices(newCustomer, cias, entityUser, entityId);
 
+        log.info("CustomerRequestServiceImpl::create successfully stored services {}",service);
+
         return this.customerRequestRepository.save(newCustomer);
     }
 

@@ -29,7 +29,7 @@ public class InsuranceType {
     @OneToMany(mappedBy = "insuranceType", fetch = FetchType.LAZY)
     private List<TemplateInsurancePremi> templateInsurancePremis;
 
-    @JsonIgnore
+    @JsonManagedReference
     @OneToMany(mappedBy = "insuranceType", cascade = CascadeType.ALL)
     private List<CustomerInscAssets> customerInscAssets;
 }

@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order;
 
-import com.app.smartdrive.api.entities.service_order.Services;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.services.service_order.SoOrderService;
 import com.app.smartdrive.api.services.service_order.SoService;
 import com.app.smartdrive.api.services.service_order.SoTasksService;
@@ -24,7 +24,7 @@ public class ServiceOrdersController {
 
     @GetMapping("/search")
     @Transactional(readOnly = true)
-    public ResponseEntity<?> getSearchById(@RequestParam("seroId") String seroId){
+    public ResponseEntity<?> getSearchById(@RequestParam("seroId") Long seroId){
 
         SoAdapter adapter = SoAdapter.builder()
                 .soService(soService)
@@ -35,15 +35,15 @@ public class ServiceOrdersController {
     }
 
     @GetMapping("/servorder")
-    public ResponseEntity<?> getServiceOrderById(@RequestParam("seroid") String seroId){
+    public ResponseEntity<?> getServiceOrderById(@RequestParam("seroid") Long seroId){
         log.info("ServiceOrdersController::getServiceOrderById successfully viewed");
         return new ResponseEntity<>(soOrderService.findDtoById(seroId), HttpStatus.OK);
     }
 
-    @GetMapping("/servcreq")
-    public ResponseEntity<?> getServiceByCreqId(@RequestParam("creqid") Long creqId){
-        log.info("ServiceOrdersController::getServiceByCreqId successfully viewed");
-        return new ResponseEntity<>(soService.findCreqById(creqId), HttpStatus.OK);
+    @PostMapping("/addsero")
+    public ResponseEntity<?> generateSero(@RequestParam("creqType") EnumCustomer.CreqType creqType,
+                                          @RequestParam("arwgCode") String arwgCode){
+        log.info("ServiceOrdersController::generateSero() successfully generated");
+        return new ResponseEntity<>(soOrderService.addServiceOrders(creqType, arwgCode), HttpStatus.OK);
     }
-
 }

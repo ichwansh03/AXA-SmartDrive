@@ -18,7 +18,7 @@ public class CaevServiceImpl implements CaevService {
     private final CaevRepository caevRepository;
 
     @Override
-    public List<ClaimAssetEvidence> findAllByCaevSeroId(String seroId) {
+    public List<ClaimAssetEvidence> findAllByCaevSeroId(Long seroId) {
         return caevRepository.findAllByCaevSeroId(seroId);
     }
 

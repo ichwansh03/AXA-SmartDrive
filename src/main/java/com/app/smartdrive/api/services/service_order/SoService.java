@@ -7,10 +7,13 @@ import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.services.BaseService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 
 public interface SoService {
 
-    CustomerRequest findCreqById(Long id);
-
-    Services addServices(CustomerRequest customerRequest, CustomerInscAssets customerInscAssets, User user, Long entityId);
+    Services addServices(CustomerRequest customerRequest,
+                         CustomerInscAssets customerInscAssets,
+                         User user,
+                         Long creqId);
 }
