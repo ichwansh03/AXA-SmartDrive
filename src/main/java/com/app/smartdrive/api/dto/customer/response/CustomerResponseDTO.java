@@ -48,9 +48,9 @@ public class CustomerResponseDTO {
     
     private CustomerClaim customerClaim;
 
-    private CustomerInscAssets customerInscAssets;
+    private CiasResponseDTO ciasResponseDTO;
 
-    private Employees employee;
+    private AgenResponseDTO agen;
 
     private Services services;
 }

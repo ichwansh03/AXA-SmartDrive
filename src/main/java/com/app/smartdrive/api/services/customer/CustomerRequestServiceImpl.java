@@ -3,6 +3,7 @@ package com.app.smartdrive.api.services.customer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.implementation.SoServiceImpl;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.app.smartdrive.api.dto.customer.request.AgenDTO;
 import com.app.smartdrive.api.dto.customer.request.CiasDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
@@ -19,11 +21,13 @@ import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.customer.EnumCustomer.CadocCategory;
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.master.CarsRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
@@ -51,6 +55,8 @@ public class CustomerRequestServiceImpl {
     private final SoRepository soRepository;
 
     private final UserRepository userRepository;
+
+    private final EmployeesRepository employeesRepository;
 
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
@@ -168,5 +174,24 @@ public class CustomerRequestServiceImpl {
         }
 
         return listDoc;
+    }
+
+    public CustomerRequest setAgenCreq(AgenDTO agenDTO) {
+        CustomerRequest customerRequest = this.customerRequestRepository.findById(agenDTO.getCreqId()).get();
+        Employees agen = this.employeesRepository.findById(agenDTO.getAgenId()).get();
+
+        customerRequest.setEmployee(agen);
+        
+        List<CustomerRequest> creqList = agen.getCustomerRequests();
+        creqList.add(customerRequest);
+
+        Employees savedAgen = this.employeesRepository.save(agen);
+
+        Optional<CustomerRequest> savedCreq = savedAgen.getCustomerRequests().stream()
+        .filter(creq -> 
+            creq.getCreqEntityId().equals(customerRequest.getCreqEntityId())
+        ).findFirst();
+
+        return savedCreq.orElse(null);
     }
 }
