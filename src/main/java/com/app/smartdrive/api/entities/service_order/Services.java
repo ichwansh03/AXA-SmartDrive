@@ -8,16 +8,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -74,25 +72,29 @@ public class Services {
     @Column(name = "serv_creq_entityid")
     private Long servCreqEntityid;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "serv_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services parentServices;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "parentServices")
+    private List<Services> servicesList;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_cust_entityid", referencedColumnName = "user_entityid", insertable = false, updatable = false)
-    User users;
+    private User users;
 
     @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid", insertable = false, updatable = false)
-    CustomerRequest customer;
+    private CustomerRequest customer;
 
     @JsonIgnore
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL ,orphanRemoval = true)
-    List<ServiceOrders> serviceOrdersSet;
+    private List<ServiceOrders> serviceOrdersSet;
 
     @JsonIgnore
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL, orphanRemoval = true)
     @PrimaryKeyJoinColumn
-    List<ServicePremi> servicePremiSet;
+    private List<ServicePremi> servicePremiSet;
 }

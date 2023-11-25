@@ -25,7 +25,7 @@ public class ClaimAssetController {
     private final CaspService caspService;
 
     @GetMapping("/evidence/search")
-    public ResponseEntity<?> getEvidenceById(@RequestParam("seroId") String seroId){
+    public ResponseEntity<?> getEvidenceById(@RequestParam("seroId") Long seroId){
 
         List<ClaimAssetEvidence> allByCaevSeroId = caevService.findAllByCaevSeroId(seroId);
 
@@ -43,7 +43,7 @@ public class ClaimAssetController {
     }
 
     @GetMapping("/sparepart/search")
-    public ResponseEntity<?> getSparepartById(@RequestParam("seroId") String seroId){
+    public ResponseEntity<?> getSparepartById(@RequestParam("seroId") Long seroId){
         List<ClaimAssetSparepart> allByCaspSeroId = caspService.findAllByCaspSeroId(seroId);
 
         List<CaspDto> caspDtoList = allByCaspSeroId.stream()

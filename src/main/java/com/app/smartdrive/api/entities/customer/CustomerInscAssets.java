@@ -85,12 +85,12 @@ public class CustomerInscAssets {
     private CarSeries carSeries;
 
 
-    
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_inty_name", referencedColumnName = "inty_name")
     private InsuranceType insuranceType;
 
-    
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_city_id")
     private Cities city;

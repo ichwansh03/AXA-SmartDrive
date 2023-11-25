@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ServicesDto {
 
-    private String seroId;
+    private Long seroId;
     private EnumCustomer.CreqType servType;
     private String servInsuranceNo;
     private LocalDateTime servCreatedOn;
@@ -20,7 +20,7 @@ public class ServicesDto {
     private String empName;
     private String userName;
     List<SoTasksDto> serviceOrderTasksList;
-    public ServicesDto(String seroId, EnumCustomer.CreqType servType, String servInsuranceNo, LocalDateTime servCreatedOn, EnumModuleServiceOrders.ServStatus servStatus, String empName, String userName) {
+    public ServicesDto(Long seroId, EnumCustomer.CreqType servType, String servInsuranceNo, LocalDateTime servCreatedOn, EnumModuleServiceOrders.ServStatus servStatus, String empName, String userName) {
         this.seroId = seroId;
         this.servType = servType;
         this.servInsuranceNo = servInsuranceNo;

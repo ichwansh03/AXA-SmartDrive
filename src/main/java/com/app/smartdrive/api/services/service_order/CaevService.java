@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CaevService {
 
-    List<ClaimAssetEvidence> findAllByCaevSeroId(String seroId);
+    List<ClaimAssetEvidence> findAllByCaevSeroId(Long seroId);
     ClaimAssetEvidence findById(Long caevId);
 
     List<ClaimAssetEvidence> findAllCaev();

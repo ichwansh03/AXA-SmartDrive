@@ -20,7 +20,7 @@ public class SoTasksServiceImpl implements SoTasksService {
     private final ArwgRepository arwgRepository;
 
     @Override
-    public Stream<ServiceOrderTasks> findAllBySeotSeroId(String seroId) {
+    public Stream<ServiceOrderTasks> findAllBySeotSeroId(Long seroId) {
         return soTasksRepository.findAllBySeotSeroId(seroId);
     }
 }

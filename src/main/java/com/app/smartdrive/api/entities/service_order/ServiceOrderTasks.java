@@ -51,8 +51,7 @@ public class ServiceOrderTasks {
     private String seotArwgCode;
 
     @Column(name = "seot_sero_id")
-    @Size(max = 25)
-    private String seotSeroId;
+    private Long seotSeroId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)

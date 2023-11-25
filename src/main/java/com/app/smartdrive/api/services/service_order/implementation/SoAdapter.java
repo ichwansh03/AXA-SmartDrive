@@ -33,7 +33,7 @@ public class SoAdapter {
     private SoOrderService soOrderService;
     private SoTasksService soTasksService;
 
-    public ServicesDto generateServiceDto(String seroId){
+    public ServicesDto generateServiceDto(Long seroId){
         Stream<ServiceOrderTasks> seot = soTasksService.findAllBySeotSeroId(seroId);
 
         List<SoTasksDto> soTasksDtos = seot
