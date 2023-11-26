@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class EmployeeAreaWorkgroupId implements Serializable {
    
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "eawg_id")
     private Long eawgId;
 

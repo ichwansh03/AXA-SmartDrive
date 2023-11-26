@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 public class CustomerResponseDTO {
     private Long creqEntityId;
 
-    private BusinessEntity businessEntity;
+    private BussinessEntityResponseDTO businessEntityResponseDTO;
         
     private LocalDateTime creqCreateDate;
     

@@ -26,4 +26,6 @@ public class CiasDTO {
     private String cias_inty_name;
 
     private Long cias_city_id;
+
+    private String arwg_code;
 }

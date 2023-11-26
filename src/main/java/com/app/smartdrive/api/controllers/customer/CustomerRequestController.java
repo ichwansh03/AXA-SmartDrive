@@ -45,12 +45,15 @@ public class CustomerRequestController {
 
 
     @GetMapping
-    public List<CustomerRequest> getAll(){
-        return this.customerRequestService.get();
+    public List<CustomerResponseDTO> getAll(){
+        List<CustomerRequest> creqList = this.customerRequestService.get();
+        List<CustomerResponseDTO> creqResponseDTOList = creqList.stream().map(creq -> this.customerRequestService.convert(creq)).toList();
+
+        return creqResponseDTOList;
     }
 
     @PostMapping
-    public CustomerRequest create(
+    public CustomerResponseDTO create(
         @Valid @RequestParam("client") String client,
          @RequestParam("file") MultipartFile[] files
         ) throws Exception{
@@ -60,80 +63,26 @@ public class CustomerRequestController {
 
         CustomerRequest customerRequest = this.customerRequestService.create(customerRequestDTO, files);
         
-        // CustomerResponseDTO responseDTO = CustomerResponseDTO.builder()
-        // .creqEntityId(customerRequest.getCreqEntityId())
-        // .businessEntity(customerRequest.getBusinessEntity())
-        // .creqCreateDate(customerRequest.getCreqCreateDate())
-        // .creqStatus(customerRequest.getCreqStatus())
-        // .creqType(customerRequest.getCreqType())
-        // .customer(customerRequest.getCustomer())
-        // .customerInscAssets(customerRequest.getCustomerInscAssets())
-        // .build();
 
-        // return responseDTO;
-
-        return customerRequest;
+        return this.customerRequestService.convert(customerRequest);
+        // return customerRequest;
     }
 
+    // city yang buat error
+    // gua apus dari agenDTO
     @PostMapping("/agen")
     public CustomerResponseDTO setAgen(@RequestBody AgenDTO agenDTO){
         CustomerRequest customerRequest = this.customerRequestService.setAgenCreq(agenDTO);
         Employees agen = customerRequest.getEmployee();
-        CustomerInscAssets cias = customerRequest.getCustomerInscAssets();
-        List<CustomerInscDoc> cadoc = cias.getCustomerInscDoc();
-        List<CustomerInscExtend> cuex = cias.getCustomerInscExtend();
-
-        List<UserAddress> userAddress = agen.getUser().getUserAddress();
-        List<Cities> cityList = userAddress.stream().map(address -> address.getCity()).toList();
 
         AgenResponseDTO agenResponseDTO = AgenResponseDTO.builder()
         .agenId(agen.getEmpEntityid())
         .agenName(agen.getEmpName())
         .agenAccountNumber(agen.getEmpAccountNumber())
-        .agenCity(cityList)
         .build();
 
-        List<CadocResponseDTO> cadocListDTO = cadoc.stream().map(doc -> new CadocResponseDTO(
-            doc.getCadocCreqEntityid(), doc.getCadocFilename(),
-            doc.getCadocFiletype(),
-            doc.getCadocFilesize(),
-            doc.getCadocCategory(),
-            doc.getCadocModifiedDate())
-        ).toList();
-
-        List<CuexResponseDTO> cuexListDTO = cuex.stream().map(extend -> new CuexResponseDTO(
-            extend.getCuexId(),
-            extend.getCuexCreqEntityid(),
-            extend.getCuexName(),
-            extend.getCuexTotalItem(),
-            extend.getCuex_nominal()
-        )).toList();
-
-        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
-        .ciasCreqEntityid(cias.getCiasCreqEntityid())
-        .ciasCurrentPrice(cias.getCiasCurrentPrice())
-        .ciasStartdate(cias.getCiasStartdate())
-        .ciasEnddate(cias.getCiasEnddate())
-        .ciasIsNewChar(cias.getCiasIsNewChar())
-        .ciasPaidType(cias.getCiasPaidType())
-        .ciasPoliceNumber(cias.getCiasPoliceNumber())
-        .ciasTotalPremi(cias.getCiasTotalPremi())
-        .ciasYear(cias.getCiasYear())
-        .city(cias.getCity().getCityName())
-        .cuexResponseDTOList(cuexListDTO)
-        .cadocResponseDTOList(cadocListDTO)
-        .build();
-
-
-        CustomerResponseDTO responseDTO = CustomerResponseDTO.builder()
-        .businessEntity(customerRequest.getBusinessEntity())
-        .creqCreateDate(customerRequest.getCreqCreateDate())
-        .creqStatus(customerRequest.getCreqStatus())
-        .creqType(customerRequest.getCreqType())
-        .customer(customerRequest.getCustomer())
-        .ciasResponseDTO(ciasResponseDTO)
-        .agen(agenResponseDTO)
-        .build();
+        CustomerResponseDTO responseDTO = this.customerRequestService.convert(customerRequest);
+        responseDTO.setAgen(agenResponseDTO);
 
         return responseDTO;
     }

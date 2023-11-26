@@ -3,6 +3,8 @@ package com.app.smartdrive.api.dto.customer.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.app.smartdrive.api.dto.master.CarSeriesDto;
+import com.app.smartdrive.api.dto.master.InsuranceTypeDto;
 import com.app.smartdrive.api.entities.customer.CustomerInscDoc;
 import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -58,9 +60,9 @@ public class CiasResponseDTO {
     
     private List<CuexResponseDTO> cuexResponseDTOList;
 
-    private CarSeries carSeries;
+    private CarSeriesDto carSeriesDto;
 
-    private InsuranceType insuranceType;
+    private InsuranceTypeDto insuranceTypeDto;
 
     private String city;
 
