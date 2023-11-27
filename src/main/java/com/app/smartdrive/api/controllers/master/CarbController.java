@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class CarbController implements BaseController<CarBrandDto, Long> {
     }
 
     @Override
+    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody CarBrandDto request) {
         CarBrand result = new CarBrand();
@@ -44,7 +46,8 @@ public class CarbController implements BaseController<CarBrandDto, Long> {
     }
 
     @Override
-    @PatchMapping
+    @Transactional
+    @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody CarBrandDto request) {
         CarBrand result = service.getById(request.getCabrID());
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);

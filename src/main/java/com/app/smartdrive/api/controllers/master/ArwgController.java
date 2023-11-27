@@ -37,16 +37,16 @@ public class ArwgController implements BaseController<AreaWorkGroupDto, String> 
         return ResponseEntity.ok(TransactionMapper.mapEntityToDto(areaWorkGroup, AreaWorkGroupDto.class));
     }
 
-    @Transactional
     @Override
+    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody AreaWorkGroupDto request) {
         AreaWorkGroup result = new AreaWorkGroup();
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
-    @Transactional
     @Override
+    @Transactional
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody AreaWorkGroupDto request) {
         AreaWorkGroup result = service.getById(request.getArwgCode());
