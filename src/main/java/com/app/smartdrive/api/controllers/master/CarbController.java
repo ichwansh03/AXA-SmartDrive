@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/carb")
@@ -22,7 +24,9 @@ public class CarbController implements BaseController<CarBrandDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<CarBrand> carBrands = service.getAll();
+        List<CarBrandDto> result = TransactionMapper.mapEntityListToDtoList(carBrands, CarBrandDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override

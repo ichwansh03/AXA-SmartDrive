@@ -17,6 +17,5 @@ public class CarModelDto {
     @NotBlank(message = "Car Model Name Cannot Be Null !")
     private String carmName;
 
-    @NotNull(message = "Car Brand ID Cannot be Null !")
     private Long carmCarbId;
 }

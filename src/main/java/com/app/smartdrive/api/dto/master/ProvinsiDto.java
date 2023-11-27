@@ -16,5 +16,5 @@ public class ProvinsiDto {
     @NotBlank(message = "Province Name Cannot Be Null")
     private String provName;
 
-    private Long prov_zones_id;
+    private Long provZonesId;
 }

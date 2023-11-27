@@ -21,7 +21,7 @@ public class TemplateType {
     @Column(name = "tety_name", unique = true)
     private String tetyName;
 
-    @Column(name = "tety_group", unique = true)
+    @Column(name = "tety_group")
     private String tetyGroup;
 
     @OneToMany(mappedBy = "templateType", fetch = FetchType.LAZY)

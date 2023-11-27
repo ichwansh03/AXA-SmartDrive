@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/arwg")
@@ -22,7 +24,9 @@ public class ArwgController implements BaseController<AreaWorkGroupDto, String> 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<AreaWorkGroup> areaWorkGroup = service.getAll();
+        List<AreaWorkGroupDto> result = TransactionMapper.mapEntityListToDtoList(areaWorkGroup, AreaWorkGroupDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
