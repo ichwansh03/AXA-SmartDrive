@@ -18,6 +18,6 @@ public class UserDto {
   private String userEmail;
   private List<UserPhone> userPhone;
   private List<UserAddress> userAddresses;
-  private List<UserAccounts> user_accounts;
+  private List<UserAccounts> userAccounts;
 
 }

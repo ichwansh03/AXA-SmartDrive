@@ -159,6 +159,8 @@ public class UserServiceImpl implements UserService {
           .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
       userAccounts.setFintech(fintech);
     }
+    userAccounts.setUser(user);
+    userAccounts.setUsacUserEntityid(businessEntityId);
     List<UserAccounts> listUserAccountuserAccounts = List.of(userAccounts);
 
     user.setUserPhone(listPhone);
@@ -193,16 +195,7 @@ public class UserServiceImpl implements UserService {
 
     NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(), user::getUserPassword);
 
-    NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail); 
-
-    Optional<UserAddress> userAddress = userAddressRepository.findByUserAdressIdUsdrId(id);
-    if(userAddress.isPresent()){
-    NullUtils.updateIfChanged(userAddress.get()::setUsdrAddress1, userPost.getAddress1(), userAddress.get()::getUsdrAddress1);
-    NullUtils.updateIfChanged(userAddress.get()::setUsdrAdress2, userPost.getAddress2(), userAddress.get()::getUsdrAdress2);
-    Cities city = cityRepository.findByCityName(userPost.getCity());
-    userAddress.get().setCity(city);
-  }
-
+    NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
 
     User userSaved = save(user);
     return userSaved;
