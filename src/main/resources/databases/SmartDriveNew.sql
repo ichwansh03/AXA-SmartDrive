@@ -1,6 +1,6 @@
 USE [master]
 GO
-/****** Object:  Database [SmartDrive]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Database [SmartDrive]    Script Date: 11/27/2023 10:08:54 AM ******/
 CREATE DATABASE [SmartDrive]
  CONTAINMENT = NONE
  ON  PRIMARY
@@ -696,7 +696,7 @@ CREATE TABLE [so].[claim_asset_evidence](
 	[caev_url] [varchar](255) NULL,
 	[caev_note] [varchar](15) NULL,
 	[caev_part_entityid] [int] NULL,
-	[caev_sero_id] [int] NULL,
+	[caev_sero_id] [varchar](25) NULL,
  CONSTRAINT [pk_caev_id] PRIMARY KEY CLUSTERED
 (
 	[caev_id] ASC
@@ -715,7 +715,7 @@ CREATE TABLE [so].[claim_asset_sparepart](
 	[casp_item_price] [money] NULL,
 	[casp_subtotal] [money] NULL,
 	[casp_part_entityid] [int] NULL,
-	[casp_sero_id] [int] NULL,
+	[casp_sero_id] [varchar](25) NULL,
  CONSTRAINT [pk_casp_id] PRIMARY KEY CLUSTERED
 (
 	[casp_id] ASC
@@ -736,7 +736,7 @@ CREATE TABLE [so].[service_order_tasks](
 	[seot_actual_enddate] [datetime] NULL,
 	[seot_status] [varchar](15) NULL,
 	[seot_arwg_code] [varchar](15) NULL,
-	[seot_sero_id] [int] NULL,
+	[seot_sero_id] [varchar](25) NULL,
  CONSTRAINT [pk_seot_id] PRIMARY KEY CLUSTERED
 (
 	[seot_id] ASC
@@ -766,7 +766,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [so].[service_orders](
-	[sero_id] [int] IDENTITY(1,1) NOT NULL,
+	[sero_id] [varchar](25) NOT NULL,
 	[sero_ordt_type] [varchar](15) NULL,
 	[sero_status] [varchar](15) NULL,
 	[sero_reason] [varchar](256) NULL,
@@ -774,7 +774,7 @@ CREATE TABLE [so].[service_orders](
 	[serv_claim_startdate] [datetime] NULL,
 	[serv_claim_enddate] [datetime] NULL,
 	[sero_serv_id] [int] NULL,
-	[sero_sero_id] [int] NULL,
+	[sero_sero_id] [varchar](25) NULL,
 	[sero_agent_entityid] [int] NULL,
 	[sero_arwg_code] [varchar](15) NULL,
  CONSTRAINT [pk_sero_id] PRIMARY KEY CLUSTERED
