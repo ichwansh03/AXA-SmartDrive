@@ -39,14 +39,12 @@ public class ClaimAssetSparepart {
     private Long caspPartEntityid;
 
     @Column(name = "casp_sero_id")
-    private String caspSeroId;
+    private Long caspSeroId;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "casp_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
-    Partner partners;
+    Partner caspPartners;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "casp_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders caspServiceOrders;

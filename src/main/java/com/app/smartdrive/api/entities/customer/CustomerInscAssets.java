@@ -1,11 +1,14 @@
 package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -17,15 +20,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @Table(name = "customer_insc_assets", schema = "customer")
 @Entity
 public class CustomerInscAssets {
@@ -68,21 +72,22 @@ public class CustomerInscAssets {
     private Character ciasIsNewChar;
 
     @JsonManagedReference
-    @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
-    private CustomerInscDoc customerInscDoc;
+    @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
+    private List<CustomerInscDoc> customerInscDoc = new ArrayList<>();
     
     @JsonManagedReference
-    @OneToOne(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
-    private CustomerInscExtend customerInscExtend;
+    @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
+    private List<CustomerInscExtend> customerInscExtend = new ArrayList<>();
 
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_cars_id")
     private CarSeries carSeries;
 
+
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "cias_inty_name")
+    @JoinColumn(name = "cias_inty_name", referencedColumnName = "inty_name")
     private InsuranceType insuranceType;
 
     @JsonBackReference

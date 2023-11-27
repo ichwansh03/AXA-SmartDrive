@@ -144,6 +144,7 @@ public class UserServiceImpl implements UserService {
 
     List<UserAddress> listAddress = List.of(userAddress);
 
+<<<<<<< HEAD
     UserAccounts userAccounts = new UserAccounts();
     userAccounts.setUsac_accountno(userPost.getAccNumber());
     if (userPost.getAccountType().equals("BANK")) {
@@ -160,12 +161,35 @@ public class UserServiceImpl implements UserService {
       userAccounts.setFintech(fintech);
     }
     List<UserAccounts> listUserAccountuserAccounts = List.of(userAccounts);
+=======
+    UserAccounts UserAccounts = new UserAccounts();
+    UserAccounts.setUsac_accountno(userPost.getAccNumber());
+    if (userPost.getAccountType().equals("BANK")) {
+      UserAccounts.setEnumPaymentType(EnumPaymentType.BANK);
+      Banks bank = banksRepository.findByBankNameOptional(userPost.getBank())
+          .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
+      UserAccounts.setBanks(bank);
+    }
+    if (userPost.getAccountType().equals("FINTECH")) {
+      UserAccounts.setEnumPaymentType(EnumPaymentType.FINTECH);
+      Fintech fintech = fintechRepository.findByFintNameOptional(userPost.getFintech())
+          .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
+      UserAccounts.setFintech(fintech);
+    }
+    List<UserAccounts> listUserAccounts = List.of(UserAccounts);
+>>>>>>> 4a94b6ae8ceb76b16e300b14fcb19538dea10322
 
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
     user.setUserAddress(listAddress);
+<<<<<<< HEAD
     user.setUserAccounts(listUserAccountuserAccounts);
     userAccounts.setUser(user);
+=======
+    user.setUser_accounts(listUserAccounts);
+
+    UserAccounts.setUser(user);
+>>>>>>> 4a94b6ae8ceb76b16e300b14fcb19538dea10322
     userPhone.setUser(user);
     userRoles.setUser(user);
     userAddress.setUser(user);

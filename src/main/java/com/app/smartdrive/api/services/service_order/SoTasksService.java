@@ -6,5 +6,5 @@ import java.util.stream.Stream;
 
 public interface SoTasksService {
 
-    Stream<ServiceOrderTasks> findAllBySeotSeroId(String seroId);
+    Stream<ServiceOrderTasks> findAllBySeotSeroId(Long seroId);
 }

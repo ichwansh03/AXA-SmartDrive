@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.customer;
 import java.time.LocalDateTime;
 
 import com.app.smartdrive.api.entities.hr.Employees;
+import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -24,15 +25,13 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @Table(name = "customerRequest", schema = "customer")
 @Entity
 public class CustomerRequest {
@@ -60,7 +59,7 @@ public class CustomerRequest {
     @Column(name = "creq_modified_date")
     private LocalDateTime creqModifiedDate;
 
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
@@ -81,4 +80,7 @@ public class CustomerRequest {
     @JoinColumn(name = "creq_agen_entityid")
     private Employees employee;
 
+    @JsonManagedReference
+    @OneToOne(mappedBy = "customer")
+    private Services services;
 }

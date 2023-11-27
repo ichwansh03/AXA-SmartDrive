@@ -25,7 +25,7 @@ public class CaspServiceImpl implements CaspService {
     }
 
     @Override
-    public List<ClaimAssetSparepart> findAllByCaspSeroId(String seroId) {
+    public List<ClaimAssetSparepart> findAllByCaspSeroId(Long seroId) {
         return caspRepository.findAllByCaspSeroId(seroId);
     }
 }
