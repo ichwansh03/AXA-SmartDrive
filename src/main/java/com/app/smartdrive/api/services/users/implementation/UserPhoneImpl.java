@@ -48,9 +48,10 @@ public class UserPhoneImpl implements UserPhoneService {
     // entityManager.flush();
     // listUserPhones.set(indexPhone, userPhone);
     // user.setUserPhone(listUserPhones);
-    User user = userRepository.findById(userId).get();
+
+    // User user = userRepository.findById(userId).get();
     Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(phoneNumber);
-    if(userPhone.isPresent() && userPhone.get().getUserPhoneId().getUsphEntityId().equals(user.getUserEntityId())){
+    if(userPhone.isPresent() && userPhone.get().getUserPhoneId().getUsphEntityId().equals(userId)){
       userPhoneRepository.setPhoneNumber(userPost.getUserPhoneNumber(), phoneNumber);
       return userPhoneRepository.findByUsphPhoneNumber(userPost.getUserPhoneNumber()).get();
     }
