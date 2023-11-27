@@ -81,7 +81,7 @@ public class CustomerInscAssets {
     @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private List<CustomerInscExtend> customerInscExtend = new ArrayList<>();
 
-    
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "cias_cars_id")
     private CarSeries carSeries;
