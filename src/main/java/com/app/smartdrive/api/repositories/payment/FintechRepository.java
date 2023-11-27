@@ -12,5 +12,5 @@ public interface FintechRepository extends JpaRepository<Fintech, Long> {
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(value = "delete from payment.fintech where fint_entityid=:fint_entityid", nativeQuery = true)
-    void deleteFintechById(Long fint_entityid);
+    int deleteFintechById(Long fint_entityid);
 }

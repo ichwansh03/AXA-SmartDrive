@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class FintechDto {
-    @NotBlank
+  
     private String fint_name;
     private String fint_desc;
 }
