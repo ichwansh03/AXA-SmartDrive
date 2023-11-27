@@ -13,4 +13,5 @@ public interface UserAddressRepository extends JpaRepository<UserAddress, UserAd
     @Query(value = "SELECT TOP(1) * FROM USERS.USER_ADDRESS ORDER BY usdr_id DESC", nativeQuery = true)
     Optional<UserAddress> findLastOptional();
     UserAddress findByUserUserEntityId(Long userEntityId);
+    Optional<UserAddress> findByUserAdressIdUsdrId(Long usdrId);
 }

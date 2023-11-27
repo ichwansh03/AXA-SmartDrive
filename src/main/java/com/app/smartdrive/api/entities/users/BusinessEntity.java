@@ -40,7 +40,7 @@ public class BusinessEntity {
   private User user;
 
   
-  @OneToOne(mappedBy = "businessEntity", cascade = CascadeType.ALL)
+  @OneToOne(cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
   private Banks banks;

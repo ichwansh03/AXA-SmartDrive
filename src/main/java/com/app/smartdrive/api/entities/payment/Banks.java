@@ -41,11 +41,11 @@ public class Banks {
     private String bank_desc;
 
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "bank_entityid")
-    @JsonBackReference
-    BusinessEntity businessEntity;
+    // @OneToOne
+    // @MapsId
+    // @JoinColumn(name = "bank_entityid")
+    // @JsonBackReference
+    // BusinessEntity businessEntity;
 
     
     @OneToMany(mappedBy = "banks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
