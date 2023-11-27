@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -40,9 +40,9 @@ public class UserPhone {
   @Column(name = "usph_modified_date")
   private LocalDateTime usphModifiedDate;
 
-  @ManyToOne
-  @MapsId("usphEntityId")
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "usph_entityid")
+  @MapsId("usphEntityId")
   @JsonBackReference
   private User user;
 }

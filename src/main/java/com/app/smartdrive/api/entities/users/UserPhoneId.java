@@ -16,6 +16,6 @@ public class UserPhoneId implements Serializable{
   @Column(name = "usph_entityid", nullable = false)
   private Long usphEntityId;
 
-  @Column(name = "usph_phone_number")
+  @Column(name = "usph_phone_number", nullable = false, updatable = true)
   private String usphPhoneNumber;
 }

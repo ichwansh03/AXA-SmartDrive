@@ -9,7 +9,7 @@ public class UserMapper {
       .userPhone(user.getUserPhone())
       .userEmail(user.getUserEmail())
       .userAddresses(user.getUserAddress())
-      .user_accounts(user.getUser_accounts())
+      .user_accounts(user.getUserAccounts())
       .build();
       return userDto;
   }
