@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/provinsi")
@@ -21,30 +23,29 @@ public class ProvController implements BaseController<ProvinsiDto, Long> {
 
     @Override
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<Provinsi> province = service.getAll();
+        List<ProvinsiDto> result = TransactionMapper.mapEntityListToDtoList(province, ProvinsiDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
         Provinsi provinsi = service.getById(id);
-        ProvinsiDto result = TransactionMapper.mapEntityToDto(provinsi, ProvinsiDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(provinsi, ProvinsiDto.class));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody ProvinsiDto request) {
         Provinsi result = new Provinsi();
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override
     @PatchMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody ProvinsiDto request) {
         Provinsi result = service.getById(request.getProvId());
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }

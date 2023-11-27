@@ -8,7 +8,6 @@ import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;

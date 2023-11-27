@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/cities")
@@ -22,30 +24,29 @@ public class CityController implements BaseController<CitiesDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<Cities> cities = service.getAll();
+        List<CitiesDto> result = TransactionMapper.mapEntityListToDtoList(cities, CitiesDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
         Cities cities = service.getById(id);
-        CitiesDto result = TransactionMapper.mapEntityToDto(cities, CitiesDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(cities, CitiesDto.class));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody CitiesDto request) {
         Cities result = new Cities();
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override
     @PatchMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody CitiesDto request) {
         Cities result = service.getById(request.getCityId());
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }

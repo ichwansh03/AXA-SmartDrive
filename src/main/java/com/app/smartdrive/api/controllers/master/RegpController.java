@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/regp")
@@ -22,30 +24,29 @@ public class RegpController implements BaseController<RegionPlatDto, String> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<RegionPlat> regionPlat = service.getAll();
+        List<RegionPlatDto> result = TransactionMapper.mapEntityListToDtoList(regionPlat, RegionPlatDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
         RegionPlat regionPlat = service.getById(id);
-        RegionPlatDto result = TransactionMapper.mapEntityToDto(regionPlat, RegionPlatDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(regionPlat, RegionPlatDto.class));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody RegionPlatDto request) {
         RegionPlat result = new RegionPlat();
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override
     @PatchMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody RegionPlatDto request) {
         RegionPlat result = service.getById(request.getRegpName());
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }

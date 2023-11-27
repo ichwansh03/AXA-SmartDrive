@@ -20,6 +20,5 @@ public class CarSeriesDto {
 
     private int carsPassenger;
 
-    @NotNull(message = "Car Model ID Cannot Be Null !")
     private Long carsCarmId;
 }
