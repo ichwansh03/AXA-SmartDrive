@@ -12,9 +12,9 @@ public class ErrorUtils {
    * @param httpStatusCode
    * @return error
    */
-  public static java.lang.Error createError(
-      final String errMsgKey, final String errorCode, final Integer httpStatusCode) {
-    java.lang.Error error = new java.lang.Error();
+  public static Error createError(
+          final String errMsgKey, final String errorCode, final Integer httpStatusCode) {
+    Error error = new Error();
     error.setMessage(errMsgKey);
     error.setErrorCode(errorCode);
     error.setStatus(httpStatusCode);

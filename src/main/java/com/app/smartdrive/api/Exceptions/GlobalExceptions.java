@@ -1,11 +1,9 @@
 package com.app.smartdrive.api.Exceptions;
 
-
 import java.time.LocalDateTime;
 import java.util.Locale;
 
-
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +28,10 @@ public class GlobalExceptions {
 
     @ExceptionHandler(BindException.class)
     public final ResponseEntity<?> handleBindException(BindException ex) {
-        java.lang.Error error = ErrorUtils.createError(
-                ex.getMessage(),
-                ex.getLocalizedMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value())
+        Error error = ErrorUtils.createError(
+                        ex.getMessage(),
+                        ex.getLocalizedMessage(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .setTimestamp(LocalDateTime.now());
 
         /*
@@ -52,7 +50,7 @@ public class GlobalExceptions {
     public ResponseEntity<?> handleException(
             HttpServletRequest request, Exception ex, Locale locale) {
 
-        java.lang.Error error = ErrorUtils.createError(
+        Error error = ErrorUtils.createError(
                         ex.getMessage(),
                         ex.getLocalizedMessage(),
                         HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -65,7 +63,7 @@ public class GlobalExceptions {
     @ExceptionHandler(UserExistException.class)
     public ResponseEntity<?> userExistException(UserExistException ex) {
 
-        java.lang.Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.NOT_FOUND.value());
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.NOT_FOUND.value());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
@@ -77,7 +75,7 @@ public class GlobalExceptions {
     public ResponseEntity<?> methodArgumentConversionNotSupportedException(
             MethodArgumentConversionNotSupportedException ex) {
 
-        java.lang.Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }
