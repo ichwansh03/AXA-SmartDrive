@@ -11,7 +11,7 @@ import com.app.smartdrive.api.dto.user.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.Fintech;
-import com.app.smartdrive.api.entities.payment.User_accounts;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
@@ -29,6 +29,7 @@ import com.app.smartdrive.api.repositories.payment.BanksRepository;
 import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserAddressRepository;
+import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
@@ -49,6 +50,7 @@ public class UserServiceImpl implements UserService {
   private final CityRepository cityRepository;
   private final BanksRepository banksRepository;
   private final FintechRepository fintechRepository;
+  private final UserPhoneRepository userPhoneRepository;
 
   @Override
   public UserDto getById(Long id) {
@@ -87,6 +89,19 @@ public class UserServiceImpl implements UserService {
     businessEntity.setEntityModifiedDate(LocalDateTime.now());
     Long businessEntityId = businessEntityService.save(businessEntity);
 
+    User user = new User();
+    user.setUserBusinessEntity(businessEntity);
+    user.setUserEntityId(businessEntityId);
+    user.setUserName(userPost.getUserName());
+    user.setUserPassword(userPost.getUserPassword());
+    user.setUserFullName(userPost.getFullName());
+    user.setUserEmail(userPost.getEmail());
+    user.setUserBirthPlace(userPost.getBirthPlace());
+    user.setUserBirthDate(userPost.getUserBirthDate());
+    user.setUserNPWP(userPost.getUserNpwp());
+    user.setUserNationalId(userPost.getUserNationalId() + businessEntity.getEntityId());
+    user.setUserModifiedDate(LocalDateTime.now());
+
     UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.CU);
 
     Roles roles = rolesRepository.findById(roleName.CU).get();
@@ -99,7 +114,6 @@ public class UserServiceImpl implements UserService {
     List<UserRoles> listRole = List.of(userRoles);
 
     UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, userPost.getUserPhoneNumber());
-
 
     UserPhone userPhone = new UserPhone();
     userPhone.setUserPhoneId(userPhoneId);
@@ -130,40 +144,28 @@ public class UserServiceImpl implements UserService {
 
     List<UserAddress> listAddress = List.of(userAddress);
 
-    User_accounts user_accounts = new User_accounts();
-    user_accounts.setUsac_accountno(userPost.getAccNumber());
+    UserAccounts userAccounts = new UserAccounts();
+    userAccounts.setUsac_accountno(userPost.getAccNumber());
     if (userPost.getAccountType().equals("BANK")) {
-      user_accounts.setEnumPaymentType(EnumPaymentType.BANK);
+      userAccounts.setEnumPaymentType(EnumPaymentType.BANK);
       Banks bank = banksRepository.findByBankNameOptional(userPost.getBank())
           .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
-      user_accounts.setBanks(bank);
+      userAccounts.setBanks(bank);
+      userAccounts.setUsacBankEntityid(bank.getBank_entityid());
     }
     if (userPost.getAccountType().equals("FINTECH")) {
-      user_accounts.setEnumPaymentType(EnumPaymentType.FINTECH);
+      userAccounts.setEnumPaymentType(EnumPaymentType.FINTECH);
       Fintech fintech = fintechRepository.findByFintNameOptional(userPost.getFintech())
           .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
-      user_accounts.setFintech(fintech);
+      userAccounts.setFintech(fintech);
     }
-    List<User_accounts> listUser_accounts = List.of(user_accounts);
+    List<UserAccounts> listUserAccountuserAccounts = List.of(userAccounts);
 
-    User user = new User();
-    user.setUserBusinessEntity(businessEntity);
-    user.setUserEntityId(businessEntityId);
-    user.setUserName(userPost.getUserName());
-    user.setUserPassword(userPost.getUserPassword());
-    user.setUserFullName(userPost.getFullName());
-    user.setUserEmail(userPost.getEmail());
-    user.setUserBirthPlace(userPost.getBirthPlace());
-    user.setUserBirthDate(userPost.getUserBirthDate());
-    user.setUserNPWP(userPost.getUserNpwp());
-    user.setUserNationalId(userPost.getUserNationalId() + businessEntity.getEntityId());
-    user.setUserModifiedDate(LocalDateTime.now());
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
     user.setUserAddress(listAddress);
-    user.setUser_accounts(listUser_accounts);
-
-    user_accounts.setUser(user);
+    user.setUserAccounts(listUserAccountuserAccounts);
+    userAccounts.setUser(user);
     userPhone.setUser(user);
     userRoles.setUser(user);
     userAddress.setUser(user);
@@ -181,14 +183,27 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public User save(CreateUserDto userPost, Long id) {
-    User user = userRepo.findById(id).get();
+    User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
     NullUtils.updateIfChanged(user::setUserName, userPost.getUserName(), user::getUserName);
     NullUtils.updateIfChanged(user::setUserFullName, userPost.getFullName(), user::getUserFullName);
-    NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
     NullUtils.updateIfChanged(user::setUserBirthPlace, userPost.getBirthPlace(),
         user::getUserBirthPlace);
     NullUtils.updateIfChanged(user::setUserBirthDate, userPost.getUserBirthDate(),
         user::getUserBirthDate);
+
+    NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(), user::getUserPassword);
+
+    NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail); 
+
+    Optional<UserAddress> userAddress = userAddressRepository.findByUserAdressIdUsdrId(id);
+    if(userAddress.isPresent()){
+    NullUtils.updateIfChanged(userAddress.get()::setUsdrAddress1, userPost.getAddress1(), userAddress.get()::getUsdrAddress1);
+    NullUtils.updateIfChanged(userAddress.get()::setUsdrAdress2, userPost.getAddress2(), userAddress.get()::getUsdrAdress2);
+    Cities city = cityRepository.findByCityName(userPost.getCity());
+    userAddress.get().setCity(city);
+  }
+
+
     User userSaved = save(user);
     return userSaved;
   }

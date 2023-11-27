@@ -97,7 +97,7 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
-  private List<UserAccounts> user_accounts;
+  private List<UserAccounts> userAccounts;
 
   @OneToMany(mappedBy = "customer")
   List<CustomerRequest> customerRequest;
