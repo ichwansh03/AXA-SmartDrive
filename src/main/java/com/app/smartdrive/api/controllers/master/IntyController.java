@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/inty")
@@ -22,30 +24,29 @@ public class IntyController implements BaseController<InsuranceTypeDto, String> 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<InsuranceType> insuranceType = service.getAll();
+        List<InsuranceTypeDto> result = TransactionMapper.mapEntityListToDtoList(insuranceType, InsuranceTypeDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
         InsuranceType insuranceType = service.getById(id);
-        InsuranceTypeDto result = TransactionMapper.mapEntityToDto(insuranceType, InsuranceTypeDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(insuranceType, InsuranceTypeDto.class));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody InsuranceTypeDto request) {
         InsuranceType result = new InsuranceType();
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override
     @PatchMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody InsuranceTypeDto request) {
         InsuranceType result = service.getById(request.getIntyName());
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }

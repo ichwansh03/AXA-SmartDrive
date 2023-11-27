@@ -33,23 +33,20 @@ public class CarbController implements BaseController<CarBrandDto, Long> {
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
         CarBrand carBrand = service.getById(id);
-        CarBrandDto result = TransactionMapper.mapEntityToDto(carBrand, CarBrandDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(carBrand, CarBrandDto.class));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody CarBrandDto request) {
         CarBrand result = new CarBrand();
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override
     @PatchMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody CarBrandDto request) {
         CarBrand result = service.getById(request.getCabrID());
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }

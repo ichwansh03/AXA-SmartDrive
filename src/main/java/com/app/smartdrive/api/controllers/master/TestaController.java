@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/testa")
@@ -22,30 +24,29 @@ public class TestaController implements BaseController<TemplateServiceTaskDto, L
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<TemplateServiceTask> testa = service.getAll();
+        List<TemplateServiceTaskDto> result = TransactionMapper.mapEntityListToDtoList(testa, TemplateServiceTaskDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
         TemplateServiceTask testa = service.getById(id);
-        TemplateServiceTaskDto result = TransactionMapper.mapEntityToDto(testa, TemplateServiceTaskDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(testa, TemplateServiceTaskDto.class));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody TemplateServiceTaskDto request) {
         TemplateServiceTask result = new TemplateServiceTask();
-        result = TransactionMapper.mapDtoToEntity(request,result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.OK);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.OK);
     }
 
     @Override
     @PatchMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody TemplateServiceTaskDto request) {
         TemplateServiceTask result = service.getById(request.getTestaId());
-        result = TransactionMapper.mapDtoToEntity(request,result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.OK);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.OK);
     }
 }

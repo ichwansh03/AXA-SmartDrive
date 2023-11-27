@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/temi")
@@ -22,30 +24,29 @@ public class TemiController implements BaseController<TemplateInsurancePremiDto,
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<TemplateInsurancePremi> temi = service.getAll();
+        List<TemplateInsurancePremiDto> result = TransactionMapper.mapEntityListToDtoList(temi, TemplateInsurancePremiDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
         TemplateInsurancePremi temi = service.getById(id);
-        TemplateInsurancePremiDto result = TransactionMapper.mapEntityToDto(temi, TemplateInsurancePremiDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(temi, TemplateInsurancePremiDto.class));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody TemplateInsurancePremiDto request) {
         TemplateInsurancePremi result = new TemplateInsurancePremi();
-        result = TransactionMapper.mapDtoToEntity(request,result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody TemplateInsurancePremiDto request) {
         TemplateInsurancePremi result = service.getById(request.getTemiId());
-        result = TransactionMapper.mapDtoToEntity(request,result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }

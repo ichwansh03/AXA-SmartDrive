@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/zones")
@@ -19,27 +21,26 @@ public class ZoneController {
 
     @GetMapping
     public ResponseEntity<?> findAllZones() {
-        return ResponseEntity.ok(service.getAll());
+        List<Zones> zones = service.getAll();
+        List<ZonesDto> result = TransactionMapper.mapEntityListToDtoList(zones, ZonesDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findZoneById(@PathVariable Long id) {
         Zones zones = service.getById(id);
-        ZonesDto result = TransactionMapper.mapEntityToDto(zones, ZonesDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(zones, ZonesDto.class));
     }
 
     @PostMapping
     public ResponseEntity<?> saveZone(@Valid @RequestBody ZonesDto request) {
         Zones result = new Zones();
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return ResponseEntity.ok(service.save(result));
+        return ResponseEntity.ok(service.save(TransactionMapper.mapDtoToEntity(request, result)));
     }
 
     @PutMapping("/update")
     public ResponseEntity<?> updateZoneById(@Valid @RequestBody ZonesDto request) {
         Zones result = service.getById(request.getZonesId());
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return ResponseEntity.ok(service.save(result));
+        return ResponseEntity.ok(service.save(TransactionMapper.mapDtoToEntity(request, result)));
     }
 }

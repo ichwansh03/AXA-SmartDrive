@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +27,9 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<InboxMessaging> inboxMessaging = service.getAll();
+        List<IbmeDto> result = TransactionMapper.mapEntityListToDtoList(inboxMessaging, IbmeDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
@@ -50,13 +53,12 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     }
 
     private ResponseEntity<?> getResponseEntity(@RequestBody @Valid IbmeDto request, InboxMessaging result) {
-        result = TransactionMapper.mapDtoToEntity(request, result);
         if(request.getIbmeDate() != null) {
             LocalDate localDate = LocalDate.parse(request.getIbmeDate().toString(), formatter);
             result.setIbmeDate(localDate);
         }
 
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override

@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/tety")
@@ -22,15 +24,16 @@ public class TetyController implements BaseController<TemplateTypeDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<TemplateType> tety = service.getAll();
+        List<TemplateTypeDto> result = TransactionMapper.mapEntityListToDtoList(tety, TemplateTypeDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
         TemplateType testy = service.getById(id);
-        TemplateTypeDto result = TransactionMapper.mapEntityToDto(testy, TemplateTypeDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(testy, TemplateTypeDto.class));
     }
 
     @Override

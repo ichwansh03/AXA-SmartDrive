@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,23 +34,22 @@ public class ArwgController implements BaseController<AreaWorkGroupDto, String> 
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
         AreaWorkGroup areaWorkGroup = service.getById(id);
-        AreaWorkGroupDto result = TransactionMapper.mapEntityToDto(areaWorkGroup, AreaWorkGroupDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(areaWorkGroup, AreaWorkGroupDto.class));
     }
 
+    @Transactional
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody AreaWorkGroupDto request) {
         AreaWorkGroup result = new AreaWorkGroup();
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
+    @Transactional
     @Override
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody AreaWorkGroupDto request) {
         AreaWorkGroup result = service.getById(request.getArwgCode());
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }
