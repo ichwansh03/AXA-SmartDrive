@@ -8,7 +8,6 @@ import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -23,15 +22,13 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @Table(name = "customer_insc_assets", schema = "customer")
 @Entity
 public class CustomerInscAssets {
@@ -81,18 +78,18 @@ public class CustomerInscAssets {
     @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
     private List<CustomerInscExtend> customerInscExtend = new ArrayList<>();
 
-    @JsonIgnore
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_cars_id")
     private CarSeries carSeries;
 
 
-    
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_inty_name", referencedColumnName = "inty_name")
     private InsuranceType insuranceType;
 
-    
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cias_city_id")
     private Cities city;

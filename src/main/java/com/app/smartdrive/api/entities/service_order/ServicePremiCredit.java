@@ -15,12 +15,21 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@IdClass(ServicePremiCreditId.class)
 @Entity
 @Table(name = "service_premi_credit", schema = "so")
 public class ServicePremiCredit {
 
-    @EmbeddedId
-    ServicePremiCreditId creditId;
+    //CREATE SEQUENCE serc_seq START WITH 1 INCREMENT BY 1;
+    @Id
+    @Column(name = "secr_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "idsecr-generator")
+    @SequenceGenerator(name = "idsecr-generator", sequenceName = "serc_seq", allocationSize = 1)
+    private Long secrId;
+
+    @Id
+    @Column(name = "secr_serv_id")
+    private Long secrServId;
 
     @Column(name = "secr_year")
     @Size(max = 4)
@@ -42,12 +51,11 @@ public class ServicePremiCredit {
     @Size(max = 55)
     private String secrPatrTrxno;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "secr_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
-    Services services;
+    @ManyToOne
+    @MapsId("secrServId")
+    @JoinColumn(name = "secr_serv_id")
+    ServicePremi servicePremi;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "secr_patr_trxno", referencedColumnName = "patr_trxno", insertable = false, updatable = false)
     PaymentTransactions paymentTransactions;

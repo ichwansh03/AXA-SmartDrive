@@ -25,9 +25,9 @@ public class ServiceOrders {
 
     //format seroId (condition serv type)
     @Id
-    @Column(name = "sero_id", unique = true)
-    @Size(max = 25, message = "Service order ID format can't more than 25 characters")
-    private String seroId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "sero_id")
+    private Long seroId;
 
     //Services.servType
     @Column(name = "sero_ordt_type")
@@ -65,7 +65,7 @@ public class ServiceOrders {
 
     //ServiceOrders.seroId
     @Column(name = "sero_sero_id")
-    private String seroSeroId;
+    private Long seroSeroId;
 
     //CustomerRequest.creqAgenEntityid
     @Column(name = "sero_agent_entityid")
@@ -78,29 +78,33 @@ public class ServiceOrders {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
-    Services services;
+    private Services services;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "sero_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
-    ServiceOrders parentServiceOrders;
+    private ServiceOrders parentServiceOrders;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "parentServiceOrders")
+    private List<ServiceOrders> serviceOrdersList;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "emp_entityid", insertable = false, updatable = false)
-    Employees employees;
+    private Employees employees;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
-    AreaWorkGroup areaWorkGroup;
+    private AreaWorkGroup areaWorkGroup;
 
     @JsonIgnore
     @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ServiceOrderTasks> serviceOrderTasks;
+    private List<ServiceOrderTasks> serviceOrderTasks;
 
     @JsonIgnore
     @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ClaimAssetEvidence> claimAssetEvidence;
+    private List<ClaimAssetEvidence> claimAssetEvidence;
 
     @JsonIgnore
     @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ClaimAssetSparepart> claimAssetSparepart;
+    private List<ClaimAssetSparepart> claimAssetSparepart;
 }

@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.controllers.service_order;
+package com.app.smartdrive.api.services.service_order.implementation;
 
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
@@ -12,10 +12,11 @@ import com.app.smartdrive.api.services.service_order.SoTasksService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,16 +25,15 @@ import java.util.stream.Stream;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceControllerAdapter {
+@Component
+@Slf4j
+public class SoAdapter {
 
     private SoService soService;
     private SoOrderService soOrderService;
     private SoTasksService soTasksService;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    public ServicesDto generateServiceDto(String seroId){
+    public ServicesDto generateServiceDto(Long seroId){
         Stream<ServiceOrderTasks> seot = soTasksService.findAllBySeotSeroId(seroId);
 
         List<SoTasksDto> soTasksDtos = seot
@@ -42,6 +42,8 @@ public class ServiceControllerAdapter {
 
         ServicesDto servicesDto = soOrderService.findDtoById(seroId);
         servicesDto.setServiceOrderTasksList(soTasksDtos);
+
+        log.info("ServicesDto::generateServiceDto created successfully {}",servicesDto);
 
         return servicesDto;
     }
@@ -67,9 +69,12 @@ public class ServiceControllerAdapter {
                 .build();
     }
 
-    public String formatServiceOrderId(EnumCustomer.CreqType servType, Long seroId, LocalDate createdAt){
+    public String formatServiceOrderId(EnumCustomer.CreqType servType, Long servId, LocalDateTime createdAt){
+
+        log.info("Format ID for ServiceOrders has been created");
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formatSeroId = String.format("%04d", seroId);
+        String formatSeroId = String.format("%04d", servId);
 
         if (servType.equals("POLIS")) return "PL"+formatSeroId+"-"+createdAt.format(formatter);
         else if (servType.equals("CLAIM")) return "CL"+formatSeroId+"-"+createdAt.format(formatter);

@@ -1,12 +1,10 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
-import com.app.smartdrive.api.entities.master.AreaWorkGroup;
-import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.dto.service_order.ServicesDto;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.repositories.master.ArwgRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoRepository;
-import com.app.smartdrive.api.repositories.users.UserRepository;
+
 import com.app.smartdrive.api.services.service_order.SoOrderService;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,28 +17,26 @@ import java.time.LocalDateTime;
 public class SoOrderServiceImpl implements SoOrderService {
 
     private final SoOrderRepository soOrderRepository;
-    private final UserRepository userRepository;
-    private final SoRepository soRepository;
-    private final ArwgRepository arwgRepository;
+
     @Override
-    public ServicesDto findDtoById(String seroId) {
+    public ServicesDto findDtoById(Long seroId) {
         return soOrderRepository.findByIdServicesDto(seroId);
     }
 
     @Override
-    public ServiceOrders addServiceOrders(ServiceOrders serviceOrders, String seroId) {
-        //Services services = soRepository.findById()
-        AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode("1");
+     public ServiceOrders addServiceOrders(EnumCustomer.CreqType creqType, String arwgCode) {
 
-        serviceOrders = ServiceOrders.builder()
-                .seroSeroId(seroId)
+        SoAdapter soAdapter = new SoAdapter();
+        String formatSeroId = soAdapter.formatServiceOrderId(creqType, 1L, LocalDateTime.now());
+
+        ServiceOrders serviceOrders = ServiceOrders.builder()
                 .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
                 .seroStatus(EnumModuleServiceOrders.SeroStatus.OPEN)
                 .seroReason("Reason")
                 .servClaimNo("Claim")
                 .servClaimStartdate(LocalDateTime.now())
                 .servClaimEnddate(LocalDateTime.now().plusDays(30))
-                .areaWorkGroup(areaWorkGroup).build();
+                .seroArwgCode(arwgCode).build();
 
         return soOrderRepository.save(serviceOrders);
     }

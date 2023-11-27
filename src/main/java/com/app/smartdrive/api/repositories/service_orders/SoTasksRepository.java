@@ -8,5 +8,5 @@ import java.util.stream.Stream;
 
 @Repository
 public interface SoTasksRepository extends JpaRepository<ServiceOrderTasks, Long> {
-    Stream<ServiceOrderTasks> findAllBySeotSeroId(String seroId);
+    Stream<ServiceOrderTasks> findAllBySeotSeroId(Long seroId);
 }

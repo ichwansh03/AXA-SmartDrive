@@ -75,7 +75,7 @@ public class User {
   @JsonBackReference
   private BusinessEntity userBusinessEntity;
   
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference
   @PrimaryKeyJoinColumn
   private List<UserPhone> userPhone;
@@ -104,6 +104,7 @@ public class User {
   @OneToMany(mappedBy = "customer")
   List<CustomerRequest> customerRequest;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "users")
   List<Services> services;
 }
