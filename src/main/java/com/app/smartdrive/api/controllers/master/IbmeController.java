@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -39,6 +40,7 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     }
 
     @Override
+    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody IbmeDto request) {
         InboxMessaging result = new InboxMessaging();
@@ -46,7 +48,8 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     }
 
     @Override
-    @PatchMapping
+    @Transactional
+    @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody IbmeDto request) {
         InboxMessaging result = service.getById(request.getIbmeId());
         return getResponseEntity(request, result);
@@ -62,6 +65,7 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     }
 
     @Override
+    @Transactional
     @DeleteMapping("/{id}")
     public ResponseEntity<?> destroyData(@PathVariable Long id) {
         service.deleteById(id);

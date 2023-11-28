@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class TemiController implements BaseController<TemplateInsurancePremiDto,
     }
 
     @Override
+    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody TemplateInsurancePremiDto request) {
         TemplateInsurancePremi result = new TemplateInsurancePremi();
@@ -44,6 +46,7 @@ public class TemiController implements BaseController<TemplateInsurancePremiDto,
     }
 
     @Override
+    @Transactional
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody TemplateInsurancePremiDto request) {
         TemplateInsurancePremi result = service.getById(request.getTemiId());

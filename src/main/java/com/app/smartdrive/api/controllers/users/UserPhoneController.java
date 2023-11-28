@@ -17,11 +17,11 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user/phone")
+@RequestMapping("/user/{id}/phone")
 public class UserPhoneController {
   private final UserPhoneService userPhoneService;
 
-  @PatchMapping("/{id}/{phoneNumber}")
+  @PatchMapping("/{phoneNumber}")
   public ResponseEntity<?> updateUserPhone(@PathVariable("id") Long id,
       @PathVariable("phoneNumber") String phoneNumber, @ModelAttribute CreateUserDto userPost) {
     UserPhone updatedPhone = userPhoneService.updateUserPhone(id, phoneNumber, userPost);

@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class CityController implements BaseController<CitiesDto, Long> {
     }
 
     @Override
+    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody CitiesDto request) {
         Cities result = new Cities();
@@ -44,7 +46,8 @@ public class CityController implements BaseController<CitiesDto, Long> {
     }
 
     @Override
-    @PatchMapping
+    @Transactional
+    @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody CitiesDto request) {
         Cities result = service.getById(request.getCityId());
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
