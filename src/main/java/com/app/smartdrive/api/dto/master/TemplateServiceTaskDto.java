@@ -10,5 +10,8 @@ public class TemplateServiceTaskDto {
     @Size(max = 55, message = "Template Service Task Length Exceeded !")
     private String testaName;
 
-    private Long testaGroup;
+    private Long testaTetyId;
+    private String testaGroup;
+    private String testaCallMethod;
+    private Integer testaSeqOrder;
 }

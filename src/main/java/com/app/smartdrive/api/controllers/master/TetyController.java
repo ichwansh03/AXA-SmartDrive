@@ -53,7 +53,6 @@ public class TetyController implements BaseController<TemplateTypeDto, Long> {
     public ResponseEntity<?> updateData(@Valid @RequestBody TemplateTypeDto request) {
         TemplateType result = service.getById(request.getTetyId());
         result.setTetyGroup(String.valueOf(request.getTetyGroup()));
-        result.setTetyName(String.valueOf(request.getTetyName()));
         return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
     }
 }

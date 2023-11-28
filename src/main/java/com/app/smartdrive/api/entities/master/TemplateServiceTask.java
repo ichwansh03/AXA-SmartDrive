@@ -24,12 +24,21 @@ public class TemplateServiceTask {
     @Column(name = "testa_name")
     private String testaName;
 
+    @Column(name = "testa_tety_id")
+    private String testaTetyId;
+
     @Column(name = "testa_group")
-    private Long testaGroup;
+    private String testaGroup;
+
+    @Column(name = "testa_callmethod")
+    private String testaCallMethod;
+
+    @Column(name = "testa_seqorder")
+    private Integer testaSeqOrder;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "testa_group", insertable = false, updatable = false)
+    @JoinColumn(name = "testa_tety_id", insertable = false, updatable = false)
     private TemplateType templateType;
 
     @OneToMany(mappedBy = "templateServiceTask", fetch = FetchType.LAZY)
