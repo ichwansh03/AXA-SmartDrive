@@ -8,5 +8,5 @@ import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 
 @Repository
 public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, Long > {
-    
+    EmployeeAreaWorkgroup findByEawgArwgCode(String eawgArwgCode);
 }

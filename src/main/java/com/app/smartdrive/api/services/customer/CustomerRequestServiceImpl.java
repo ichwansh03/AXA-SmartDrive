@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.implementation.SoServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +54,8 @@ public class CustomerRequestServiceImpl {
 
     private final UserRepository userRepository;
 
+    private final EmployeeAreaWorkgroupRepository eawagRepository;
+
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
     }
@@ -72,7 +76,10 @@ public class CustomerRequestServiceImpl {
         CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCias_cars_id()).get();
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
-        
+
+        EmployeeAreaWorkgroup eawag = this.eawagRepository.findByEawgArwgCode(customerRequestDTO.getArwg_code());
+
+
         // new customer
         CustomerRequest newCustomer = CustomerRequest.builder()
         .businessEntity(existEntity)
@@ -81,6 +88,7 @@ public class CustomerRequestServiceImpl {
         .creqStatus(EnumCustomer.CreqStatus.OPEN)
         .creqType(EnumCustomer.CreqType.POLIS)
         .creqEntityId(entityId)
+                .employeeAreaWorkgroup(eawag)
         .build();
         
         // new cias
@@ -93,7 +101,7 @@ public class CustomerRequestServiceImpl {
         .ciasCurrentPrice(1_000_000.00)
         .ciasTotalPremi(50_000_000.00)
         .ciasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasDTO.getCiasPaidType()))
-        .ciasIsNewChar(ciasDTO.getCiasIsNewChar())
+        .ciasIsNewChar('Y')
         .carSeries(carSeries)
         .city(existCity)
         .insuranceType(existInty)

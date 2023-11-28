@@ -3,26 +3,15 @@ package com.app.smartdrive.api.entities.hr;
 import java.time.LocalDateTime;
 
 
-
-
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,6 +47,10 @@ public class EmployeeAreaWorkgroup {
     @JoinColumn(name = "eawg_entityid")
     @JsonBackReference
     private Employees employees;
+
+    @JsonManagedReference
+    @OneToOne(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL)
+    private CustomerRequest customerRequests;
 
 
 

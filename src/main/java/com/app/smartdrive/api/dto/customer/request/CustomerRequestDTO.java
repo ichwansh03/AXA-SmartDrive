@@ -44,7 +44,7 @@ public class CustomerRequestDTO {
 
     private Long creq_cust_entityid;
     
-    private Long creq_agen_entityid;
+    private String arwg_code;
 
     private CiasDTO ciasDTO;
 }

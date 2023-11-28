@@ -2,6 +2,7 @@ package com.app.smartdrive.api.entities.customer;
 
 import java.time.LocalDateTime;
 
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
@@ -78,7 +79,7 @@ public class CustomerRequest {
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "creq_agen_entityid")
-    private Employees employee;
+    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
     @JsonManagedReference
     @OneToOne(mappedBy = "customer")
