@@ -49,6 +49,7 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
 
     @Override
     @Transactional
+    @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody IbmeDto request) {
         InboxMessaging result = service.getById(request.getIbmeId());
         return getResponseEntity(request, result);
