@@ -22,4 +22,5 @@ public class CreateUserDto {
   private String bank;
   private String fintech;
   private String accNumber;
+  private String userPhoto;
 }
