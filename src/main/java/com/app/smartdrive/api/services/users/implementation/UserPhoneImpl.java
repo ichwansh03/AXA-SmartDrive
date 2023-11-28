@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.users.implementation;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.CreateUserDto;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
@@ -58,9 +60,25 @@ public class UserPhoneImpl implements UserPhoneService {
     throw new EntityNotFoundException("Phone Number is not exist or you are not granted access to this phone number");
   }
 
-  UserPhone save(UserPhone userPhone) {
-    entityManager.persist(userPhone);
-    return userPhone;
+  @Override
+  public UserPhone addUserPhone(Long id, CreateUserDto userPost) {
+    User user = userRepository.findById(id).get();
+    UserPhoneId userPhoneId = new UserPhoneId(user.getUserEntityId(), userPost.getUserPhoneNumber());
+    UserPhone userPhone = new UserPhone();
+    userPhone.setUserPhoneId(userPhoneId);
+    userPhone.setUsphPhoneType(userPost.getPhoneType());
+    userPhone.setUsphModifiedDate(LocalDateTime.now());
+    userPhone.setUser(user);
+    return userPhoneRepository.save(userPhone);
+  }
+
+  @Override
+  public void deleteUserPhone(Long id, String number) {
+    Optional<User> user = userRepository.findById(id);
+    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(number);
+    if(user.get().getUserEntityId().equals(userPhone.get().getUserPhoneId().getUsphEntityId())){
+      userPhoneRepository.delete(userPhone.get());
+    }
   }
 
 
