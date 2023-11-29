@@ -1,8 +1,5 @@
 package com.app.smartdrive.api.dto.customer.response;
 
-import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -95,10 +95,6 @@ public class Employees {
     @PrimaryKeyJoinColumn
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
 
-//    @JsonManagedReference
-//    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-//    private List<CustomerRequest> customerRequests;
-
     @JsonIgnore
     @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrders;

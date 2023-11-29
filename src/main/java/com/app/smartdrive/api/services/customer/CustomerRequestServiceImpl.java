@@ -367,7 +367,7 @@ public class CustomerRequestServiceImpl {
 
         CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
                 .creqEntityId(customerRequest.getCreqEntityId())
-                .businessBussinessEntityResponseDTO(bussinessEntityResponseDTO)
+                .bussinessEntity(bussinessEntityResponseDTO)
                 .creqModifiedDate(customerRequest.getCreqModifiedDate())
                 .creqCreateDate(customerRequest.getCreqCreateDate())
                 .creqStatus(customerRequest.getCreqStatus())
@@ -375,7 +375,7 @@ public class CustomerRequestServiceImpl {
                 .customerInscAssets(ciasResponseDTO)
                 .customer(customerUserResponseDTO)
                 .employee(agenUserResponseDTO)
-                .empAreaWorkgroupDto(employeeAreaWorkgroupDto)
+                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
                 .build();
 
         return customerResponseDTO;

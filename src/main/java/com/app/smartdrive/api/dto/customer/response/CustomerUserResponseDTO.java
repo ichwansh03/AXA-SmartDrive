@@ -1,10 +1,5 @@
 package com.app.smartdrive.api.dto.customer.response;
 
-import com.app.smartdrive.api.entities.payment.UserAccounts;
-import com.app.smartdrive.api.entities.users.UserAddress;
-import com.app.smartdrive.api.entities.users.UserPhone;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

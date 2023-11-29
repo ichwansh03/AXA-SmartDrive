@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.dto.customer.response;
 
-import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
