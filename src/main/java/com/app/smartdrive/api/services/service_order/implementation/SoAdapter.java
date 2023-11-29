@@ -1,21 +1,17 @@
 package com.app.smartdrive.api.services.service_order.implementation;
 
-import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
-import com.app.smartdrive.api.dto.service_order.ServicesDto;
-import com.app.smartdrive.api.dto.service_order.SoTasksDto;
-import com.app.smartdrive.api.dto.service_order.SoWorkorderDto;
-import com.app.smartdrive.api.services.service_order.SoOrderService;
-import com.app.smartdrive.api.services.service_order.SoService;
-import com.app.smartdrive.api.services.service_order.SoTasksService;
+import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
+import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
+import com.app.smartdrive.api.entities.service_order.Services;
+import com.app.smartdrive.api.services.service_order.ServOrderService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,24 +25,22 @@ import java.util.stream.Stream;
 @Slf4j
 public class SoAdapter {
 
-    private SoService soService;
-    private SoOrderService soOrderService;
-    private SoTasksService soTasksService;
+    private ServOrderService servOrderService;
 
-    public ServicesDto generateServiceDto(Long seroId){
-        Stream<ServiceOrderTasks> seot = soTasksService.findAllBySeotSeroId(seroId);
-
-        List<SoTasksDto> soTasksDtos = seot
-                .map(this::generateSoTasksDto)
-                .collect(Collectors.toList());
-
-        ServicesDto servicesDto = soOrderService.findDtoById(seroId);
-        servicesDto.setServiceOrderTasksList(soTasksDtos);
-
-        log.info("ServicesDto::generateServiceDto created successfully {}",servicesDto);
-
-        return servicesDto;
-    }
+//    public ServSeroDto generateServiceDto(String seroId){
+//        Stream<ServiceOrderTasks> seot = servOrderService.findAllBySeotSeroId(seroId);
+//
+//        List<SoTasksDto> soTasksDtos = seot
+//                .map(this::generateSoTasksDto)
+//                .collect(Collectors.toList());
+//
+//        ServSeroDto servSeroDto = servOrderService.findDtoById(seroId);
+//        servSeroDto.setServiceOrderTasksList(soTasksDtos);
+//
+//        log.info("ServicesDto::generateServiceDto created successfully {}", servSeroDto);
+//
+//        return servSeroDto;
+//    }
 
     public SoTasksDto generateSoTasksDto(ServiceOrderTasks seot){
         List<SoWorkorderDto> workorderDtos = seot.getServiceOrderWorkorders().stream()
@@ -54,12 +48,12 @@ public class SoAdapter {
                 .collect(Collectors.toList());
 
         return SoTasksDto.builder()
-                .taskId(seot.getSeotId())
-                .taskName(seot.getSeotName())
-                .startDate(seot.getSeotStartDate())
-                .endDate(seot.getSeotEndDate())
-                .status(seot.getSeotStatus())
-                .serviceOrderWorkorder(workorderDtos).build();
+                .seotId(seot.getSeotId())
+                .seotName(seot.getSeotName())
+                .seotStartDate(seot.getSeotStartDate())
+                .seotEndDate(seot.getSeotEndDate())
+                .seotStatus(seot.getSeotStatus())
+                .serviceOrderWorkorders(workorderDtos).build();
     }
 
     public SoWorkorderDto generateSoWorkorderDto(ServiceOrderWorkorder sowo) {
@@ -69,17 +63,23 @@ public class SoAdapter {
                 .build();
     }
 
-    public String formatServiceOrderId(EnumCustomer.CreqType servType, Long servId, LocalDateTime createdAt){
+    public String formatServiceOrderId(Services services, Long userId, LocalDateTime endDate){
+
+        String servTypes = services.getServType().toString();
 
         log.info("Format ID for ServiceOrders has been created");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formatSeroId = String.format("%04d", servId);
+        String formatSeroId = String.format("%04d", userId);
+        String formatEndDate = endDate.format(formatter);
 
-        if (servType.equals("POLIS")) return "PL"+formatSeroId+"-"+createdAt.format(formatter);
-        else if (servType.equals("CLAIM")) return "CL"+formatSeroId+"-"+createdAt.format(formatter);
+        return switch (servTypes) {
+            case "POLIS" -> "PL" + formatSeroId + "-" + formatEndDate;
+            case "CLAIM" -> "CL" + formatSeroId + "-" + formatEndDate;
+            case "FEASIBLITY" -> "FS" + formatSeroId + "-" + formatEndDate;
+            default -> "TP" + formatSeroId + "-" + formatEndDate;
+        };
 
-        return "TP"+formatSeroId+"-"+createdAt.format(formatter);
     }
 
 }

@@ -44,7 +44,7 @@ public class ClaimAssetEvidence {
     private Long caevPartEntityid;
 
     @Column(name = "caev_sero_id")
-    private Long caevSeroId;
+    private String caevSeroId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caev_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)

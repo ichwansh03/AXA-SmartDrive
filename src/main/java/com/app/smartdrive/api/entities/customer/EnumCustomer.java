@@ -10,7 +10,9 @@ public class EnumCustomer {
 
     public enum CreqType{
         POLIS,
-        CLAIM
+        CLAIM,
+        CLOSE,
+        FEASIBLITY
     }
 
     public enum CadocCategory{

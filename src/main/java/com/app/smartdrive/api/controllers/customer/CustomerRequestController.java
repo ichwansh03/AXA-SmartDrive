@@ -46,10 +46,10 @@ public class CustomerRequestController {
 
     @PostMapping
     public CustomerResponseDTO create(
-        @Valid @RequestParam("client") String client,
-         @RequestParam("file") MultipartFile[] files
-        ) throws Exception{
-        
+            @Valid @RequestParam("client") String client,
+            @RequestParam("file") MultipartFile[] files
+    ) throws Exception{
+
         ObjectMapper mapper = new ObjectMapper();
         CustomerRequestDTO customerRequestDTO = mapper.readValue(client, CustomerRequestDTO.class);
 
@@ -57,7 +57,5 @@ public class CustomerRequestController {
 
         return customerRequest;
     }
-
-
 
 }

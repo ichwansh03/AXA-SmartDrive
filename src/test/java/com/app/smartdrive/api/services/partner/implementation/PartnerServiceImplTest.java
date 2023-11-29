@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// @SpringBootTest
+ //@SpringBootTest
 class PartnerServiceImplTest {
 //     @Autowired
 //     PartnerService partnerService;

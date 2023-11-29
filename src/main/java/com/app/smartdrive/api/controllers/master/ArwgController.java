@@ -3,8 +3,8 @@ package com.app.smartdrive.api.controllers.master;
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
 import com.app.smartdrive.api.dto.master.AreaWorkGroupDto;
-import com.app.smartdrive.api.dto.service_order.ServicesDto;
-import com.app.smartdrive.api.dto.service_order.SoTasksDto;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
+import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ArwgService;
@@ -30,7 +30,8 @@ public class ArwgController implements BaseController<AreaWorkGroupDto, String> 
     public ResponseEntity<?> findAllData() {
         List<AreaWorkGroup> areaWorkGroup = service.getAll();
         List<AreaWorkGroupDto> result = areaWorkGroup.stream().map(arwg -> {
-            return new AreaWorkGroupDto(arwg.getArwgCode(), arwg.getArwgDesc(), arwg.getArwgCityId(), TransactionMapper.mapEntityListToDtoList(arwg.getEmployeeAreaWorkgroup(), EmployeeAreaWorkgroupDto.class), TransactionMapper.mapEntityListToDtoList(arwg.getServiceOrders(), ServicesDto.class), TransactionMapper.mapEntityListToDtoList(arwg.getServiceOrderTasks(), SoTasksDto.class));
+            return new AreaWorkGroupDto(arwg.getArwgCode(), arwg.getArwgDesc(), arwg.getArwgCityId(), TransactionMapper.mapEntityListToDtoList(arwg.getEmployeeAreaWorkgroup(), EmployeeAreaWorkgroupDto.class),
+                    TransactionMapper.mapEntityListToDtoList(arwg.getServiceOrders(), ServiceRespDto.class), TransactionMapper.mapEntityListToDtoList(arwg.getServiceOrderTasks(), SoTasksDto.class));
         }).toList();
         return ResponseEntity.ok(result);
     }

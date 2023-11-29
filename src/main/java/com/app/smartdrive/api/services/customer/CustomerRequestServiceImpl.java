@@ -18,7 +18,7 @@ import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
-import com.app.smartdrive.api.services.service_order.implementation.SoServiceImpl;
+import com.app.smartdrive.api.services.service_order.implementation.ServOrderServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

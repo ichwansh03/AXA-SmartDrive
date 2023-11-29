@@ -28,7 +28,7 @@ public class CustomerRequest {
     @MapsId
     @JoinColumn(name = "creq_entityid")
     private BusinessEntity businessEntity;
-        
+
     @Column(name = "creq_create_date")
     private LocalDateTime creqCreateDate;
 
@@ -48,7 +48,7 @@ public class CustomerRequest {
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
 
-    
+
     @JsonManagedReference
     @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
