@@ -52,10 +52,12 @@ public class UserPhoneImpl implements UserPhoneService {
     // user.setUserPhone(listUserPhones);
 
     // User user = userRepository.findById(userId).get();
-    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(phoneNumber);
-    if(userPhone.isPresent() && userPhone.get().getUserPhoneId().getUsphEntityId().equals(userId)){
+    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(phoneNumber, userId);
+    if(userPhone.isPresent()){
+      userPhone.get().setUsphModifiedDate(LocalDateTime.now());
+      userPhoneRepository.save(userPhone.get());
       userPhoneRepository.setPhoneNumber(userPost.getUserPhoneNumber(), phoneNumber);
-      return userPhoneRepository.findByUsphPhoneNumber(userPost.getUserPhoneNumber()).get();
+      return userPhoneRepository.findByUsphPhoneNumber(userPost.getUserPhoneNumber(), userId).get();
     }
     throw new EntityNotFoundException("Phone Number is not exist or you are not granted access to this phone number");
   }
@@ -74,12 +76,9 @@ public class UserPhoneImpl implements UserPhoneService {
 
   @Override
   public void deleteUserPhone(Long id, String number) {
-    Optional<User> user = userRepository.findById(id);
-    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(number);
-    if(user.get().getUserEntityId().equals(userPhone.get().getUserPhoneId().getUsphEntityId())){
+    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(number, id);
+    if(userPhone.isPresent()){
       userPhoneRepository.delete(userPhone.get());
     }
   }
-
-
 }
