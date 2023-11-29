@@ -1,7 +1,9 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
+import com.app.smartdrive.api.dto.master.CitiesDto;
 import com.app.smartdrive.api.dto.master.ProvinsiDto;
+import com.app.smartdrive.api.dto.master.RegionPlatDto;
 import com.app.smartdrive.api.entities.master.Provinsi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ProvService;
@@ -23,9 +25,12 @@ public class ProvController implements BaseController<ProvinsiDto, Long> {
     private final ProvService service;
 
     @Override
+    @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<Provinsi> province = service.getAll();
-        List<ProvinsiDto> result = TransactionMapper.mapEntityListToDtoList(province, ProvinsiDto.class);
+        List<Provinsi> provinces = service.getAll();
+        List<ProvinsiDto> result = provinces.stream().map(provinsi -> {
+            return new ProvinsiDto(provinsi.getProvId(), provinsi.getProvName(), provinsi.getProvZonesId(), TransactionMapper.mapEntityListToDtoList(provinsi.getCities(), CitiesDto.class), TransactionMapper.mapEntityListToDtoList(provinsi.getRegionPlats(), RegionPlatDto.class));
+        }).toList();
         return ResponseEntity.ok(result);
     }
 

@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
+import com.app.smartdrive.api.dto.master.TemplateServiceTaskDto;
 import com.app.smartdrive.api.dto.master.TemplateTypeDto;
 import com.app.smartdrive.api.entities.master.TemplateType;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -25,9 +26,11 @@ public class TetyController implements BaseController<TemplateTypeDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<TemplateType> tety = service.getAll();
-        List<TemplateTypeDto> result = TransactionMapper.mapEntityListToDtoList(tety, TemplateTypeDto.class);
-        return ResponseEntity.ok(result);
+//        List<TemplateType> templateTypes = service.getAll();
+//        List<TemplateTypeDto> result = templateTypes.stream().map(tety -> {
+//            return new TemplateTypeDto(tety.getTetyId(), tety.getTetyName(), tety.getTetyGroup(), TransactionMapper.mapEntityListToDtoList(tety.getTemplateServiceTasks(), TemplateServiceTaskDto.class));
+//        }).toList();
+        return ResponseEntity.ok(service.getAll());
     }
 
     @Override

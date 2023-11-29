@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
+import com.app.smartdrive.api.dto.master.AreaWorkGroupDto;
 import com.app.smartdrive.api.dto.master.CitiesDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -26,7 +27,9 @@ public class CityController implements BaseController<CitiesDto, Long> {
     @GetMapping
     public ResponseEntity<?> findAllData() {
         List<Cities> cities = service.getAll();
-        List<CitiesDto> result = TransactionMapper.mapEntityListToDtoList(cities, CitiesDto.class);
+        List<CitiesDto> result = cities.stream().map(city -> {
+            return new CitiesDto(city.getCityId(), city.getCityName(), city.getCityProvId(), TransactionMapper.mapEntityListToDtoList(city.getAreaWorkGroups(), AreaWorkGroupDto.class));
+        }).toList();
         return ResponseEntity.ok(result);
     }
 

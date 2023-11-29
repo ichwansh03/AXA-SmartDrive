@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.TemplateServiceTaskDto;
+import com.app.smartdrive.api.dto.master.TewoDto;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TestaService;
@@ -25,8 +26,10 @@ public class TestaController implements BaseController<TemplateServiceTaskDto, L
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<TemplateServiceTask> testa = service.getAll();
-        List<TemplateServiceTaskDto> result = TransactionMapper.mapEntityListToDtoList(testa, TemplateServiceTaskDto.class);
+        List<TemplateServiceTask> templateServiceTasks = service.getAll();
+        List<TemplateServiceTaskDto> result = templateServiceTasks.stream().map(testa -> {
+            return new TemplateServiceTaskDto(testa.getTestaId(), testa.getTestaName(), testa.getTestaId(), testa.getTestaGroup(), testa.getTestaCallMethod(), testa.getTestaSeqOrder(), TransactionMapper.mapEntityListToDtoList(testa.getTemplateTaskWorkOrder(), TewoDto.class));
+        }).toList();
         return ResponseEntity.ok(result);
     }
 

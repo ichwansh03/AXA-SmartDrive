@@ -25,4 +25,7 @@ public class Zones {
 
     @OneToMany(mappedBy = "zones", fetch = FetchType.LAZY)
     private List<TemplateInsurancePremi> templateInsurancePremis;
+
+    @OneToMany(mappedBy = "zones", fetch = FetchType.LAZY)
+    private List<Provinsi> provinsi;
 }

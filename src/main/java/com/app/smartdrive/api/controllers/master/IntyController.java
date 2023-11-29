@@ -2,7 +2,9 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.InsuranceTypeDto;
+import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.entities.master.InsuranceType;
+import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.IntyService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +28,10 @@ public class IntyController implements BaseController<InsuranceTypeDto, String> 
     @GetMapping
     public ResponseEntity<?> findAllData() {
         List<InsuranceType> insuranceType = service.getAll();
-        List<InsuranceTypeDto> result = TransactionMapper.mapEntityListToDtoList(insuranceType, InsuranceTypeDto.class);
+        List<InsuranceTypeDto> result = insuranceType.stream().map(inty -> {
+            return new InsuranceTypeDto(inty.getIntyName(), inty.getIntyDesc(), TransactionMapper.mapEntityListToDtoList(inty.getTemplateInsurancePremis(), TemplateInsurancePremiDto.class));
+        }).toList();
+
         return ResponseEntity.ok(result);
     }
 
