@@ -69,13 +69,13 @@ public class User {
   @Column(name = "user_modified_date")
   private LocalDateTime userModifiedDate;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @MapsId
   @JoinColumn(name = "user_entityid")
   @JsonBackReference
   private BusinessEntity userBusinessEntity;
   
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   @JsonManagedReference
   @PrimaryKeyJoinColumn
   private List<UserPhone> userPhone;
@@ -101,10 +101,10 @@ public class User {
   private List<UserAccounts> userAccounts;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "customer")
+  @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
   List<CustomerRequest> customerRequest;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "users")
+  @OneToMany(mappedBy = "users",cascade = CascadeType.ALL)
   List<Services> services;
 }
