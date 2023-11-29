@@ -11,10 +11,10 @@ public class CreateUserDto {
   private String fullName;
   private String email;
   private String birthPlace;
-  private LocalDateTime userBirthDate;
+  private String userBirthDate;
   private String userNationalId;
   private String userNpwp;
-  private String userPhoneNumber;
+  private String userPhoneNumber; //Buat dto spesifik dan photo dilainkan endpointnya
   private String address1;
   private String address2;
   private String city;
@@ -24,5 +24,5 @@ public class CreateUserDto {
   private String accNumber;
   private String userPhoto;
   private String phoneType;
-  private MultipartFile photo;
+  private MultipartFile photo; //terpisah
 }

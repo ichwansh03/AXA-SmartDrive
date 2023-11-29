@@ -75,7 +75,7 @@ public class UserAddressImpl implements UserAddressService {
     Optional<User> user = userRepository.findById(id);
     Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(addressId);
     if(user.get().getUserEntityId().equals(userAddress.get().getUserAdressId().getUsdrEntityId())){
-      userAddressRepository.delete(userAddress.get());;
+      userAddressRepository.delete(userAddress.get());
     }
   }
 }
