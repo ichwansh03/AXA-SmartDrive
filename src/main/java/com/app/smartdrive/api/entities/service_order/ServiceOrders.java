@@ -6,28 +6,28 @@ import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServic
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
+@NamedQuery(
+        name = "ServiceOrders.findServiceOrdersById",
+        query = "SELECT sero FROM ServiceOrders sero JOIN sero.services s JOIN sero.employees emp" +
+                " JOIN sero.areaWorkGroup arwg WHERE sero.seroId = :seroId")
 public class ServiceOrders {
 
     //format seroId (condition serv type)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sero_id")
-    private Long seroId;
+    @Column(name = "sero_id", unique = true)
+    private String seroId;
 
     //Services.servType
     @Column(name = "sero_ordt_type")
@@ -42,7 +42,7 @@ public class ServiceOrders {
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroStatus seroStatus;
     {
-        seroStatus = EnumModuleServiceOrders.SeroStatus.CLOSED;
+        seroStatus = EnumModuleServiceOrders.SeroStatus.OPEN;
     }
 
     //CustomerClaim.cuclReason
@@ -59,52 +59,39 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
-    //Services.servId
-    @Column(name = "sero_serv_id")
-    private Long seroServId;
-
-    //ServiceOrders.seroId
-    @Column(name = "sero_sero_id")
-    private Long seroSeroId;
-
-    //CustomerRequest.creqAgenEntityid
-    @Column(name = "sero_agent_entityid")
-    private Long seroAgentEntityid;
-
-    //AreaWorkGroup.arwgCode
-    @Column(name = "sero_arwg_code")
-    @Size(max = 15)
-    private String seroArwgCode;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
-    private Services services;
-
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "sero_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
+    @JoinColumn(name = "sero_sero_id")
     private ServiceOrders parentServiceOrders;
 
-    @JsonIgnore
+    //@JsonIgnore
     @OneToMany(mappedBy = "parentServiceOrders")
     private List<ServiceOrders> serviceOrdersList;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "emp_entityid", insertable = false, updatable = false)
+    @JoinColumn(name = "sero_serv_id")
+    private Services services;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sero_agent_entityid")
     private Employees employees;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
+    @JoinColumn(name = "sero_arwg_code")
     private AreaWorkGroup areaWorkGroup;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@JsonIgnore
+    @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
     private List<ServiceOrderTasks> serviceOrderTasks;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@JsonIgnore
+    @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetEvidence> claimAssetEvidence;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@JsonIgnore
+    @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetSparepart> claimAssetSparepart;
 }
