@@ -54,14 +54,12 @@ public class UserServiceImpl implements UserService {
   private final UserPhoneRepository userPhoneRepository;
 
   @Override
-  public UserDto getById(Long id) {
-    // TODO Auto-generated method stub
+  public UserDto getByIdDto(Long id) {
     return UserMapper.convertUserToDto(userRepo.findById(id).get());
   }
 
   @Override
-  public List<UserDto> getAll() {
-    // TODO Auto-generated method stub
+  public List<UserDto> getAllDto() {
     List<User> users = userRepo.findAll();
     List<UserDto> userDto = new ArrayList<>();
     for (User user : users) {
@@ -71,16 +69,9 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDto save(UserDto entity) {
-    // TODO Auto-generated method stub
-
-    return null;
-  }
-
-  @Override
+  @Transactional
   public void deleteById(Long id) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+    userRepo.deleteById(id);
   }
 
   @Override
@@ -94,18 +85,18 @@ public class UserServiceImpl implements UserService {
     user.setUserBusinessEntity(businessEntity);
     user.setUserEntityId(businessEntityId);
     user.setUserName(userPost.getUserName());
-    user.setUserPassword(userPost.getUserPassword());
+    user.setUserPassword(userPost.getUserPassword()); //Encrypt
     user.setUserFullName(userPost.getFullName());
     user.setUserEmail(userPost.getEmail());
     user.setUserBirthPlace(userPost.getBirthPlace());
-    user.setUserBirthDate(userPost.getUserBirthDate());
+    user.setUserBirthDate(LocalDateTime.parse(userPost.getUserBirthDate()));
     user.setUserNPWP(userPost.getUserNpwp());
     user.setUserNationalId(userPost.getUserNationalId() + businessEntity.getEntityId());
     user.setUserModifiedDate(LocalDateTime.now());
 
     UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.CU);
 
-    Roles roles = rolesRepository.findById(roleName.CU).get();
+    Roles roles = rolesRepository.findById(roleName.PC).get();
     UserRoles userRoles = new UserRoles();
     userRoles.setRoles(roles);
     userRoles.setUserRolesId(userRolesId);
@@ -119,10 +110,11 @@ public class UserServiceImpl implements UserService {
     UserPhone userPhone = new UserPhone();
     userPhone.setUserPhoneId(userPhoneId);
     userPhone.setUsphPhoneType(userPost.getPhoneType());
+    userPhone.setUsphModifiedDate(LocalDateTime.now());
 
     List<UserPhone> listPhone = List.of(userPhone);
 
-    Cities city = cityRepository.findByCityName(userPost.getCity());
+    Cities city = cityRepository.findByCityName(userPost.getCity()); //Validate
 
     Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
     Long lastIndexUsdr;
@@ -133,7 +125,7 @@ public class UserServiceImpl implements UserService {
     }
 
     UserAdressId userAdressId = new UserAdressId();
-    userAdressId.setUsdrId(lastIndexUsdr + 1);
+    userAdressId.setUsdrId(lastIndexUsdr + 1); //tambahin sequence
     userAdressId.setUsdrEntityId(businessEntityId);
     UserAddress userAddress = new UserAddress();
     userAddress.setUsdrCityId(city.getCityId());
@@ -147,7 +139,7 @@ public class UserServiceImpl implements UserService {
 
     UserAccounts userAccounts = new UserAccounts();
     userAccounts.setUsac_accountno(userPost.getAccNumber());
-    if (userPost.getAccountType().equals("BANK")) {
+    if (userPost.getAccountType().equals("BANK")) { //urusan giry
       userAccounts.setEnumPaymentType(EnumPaymentType.BANK);
       Banks bank = banksRepository.findByBankNameOptional(userPost.getBank())
           .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
@@ -189,12 +181,12 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public User save(CreateUserDto userPost, Long id) {
-    User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found")); //protect dto
     NullUtils.updateIfChanged(user::setUserName, userPost.getUserName(), user::getUserName);
     NullUtils.updateIfChanged(user::setUserFullName, userPost.getFullName(), user::getUserFullName);
     NullUtils.updateIfChanged(user::setUserBirthPlace, userPost.getBirthPlace(),
         user::getUserBirthPlace);
-    NullUtils.updateIfChanged(user::setUserBirthDate, userPost.getUserBirthDate(),
+    NullUtils.updateIfChanged(user::setUserBirthDate, LocalDateTime.parse(userPost.getUserBirthDate()),
         user::getUserBirthDate);
 
     NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(), user::getUserPassword);
@@ -209,25 +201,58 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void delete(Long id) {
-    userRepo.deleteById(id);
-  }
-
-  @Override
   public Optional<User> getUserById(Long id) {
     return userRepo.findById(id);
   }
 
   @Override
-  public String login(String identity, String password) {
+  public String loginCu(String identity, String password) {
     Optional<User> user = userRepo.findUserByIden(identity);
     if(user.isPresent()){
-      if(user.get().getUserPassword().equals(password)){
-        return "Access Granted";
-      }
+      List<String> listRole = new ArrayList<>();
+      for (UserRoles role : user.get().getUserRoles()) {
+        listRole.add(role.getRoles().getRoleName().toString());
+      } 
+      if(listRole.contains("PC")||listRole.contains("CU")){
+        if(user.get().getUserPassword().equals(password)){
+          return "Access Granted";
+        }
         return "Wrong Password";
+      }
+      return "Access Denied";
     }
     return "Input email atau username atau phoneNumber salah";
+  }
+
+  @Override
+  public String loginEm(String identity, String password) {
+    Optional<User> user = userRepo.findUserByIden(identity);
+    if(user.isPresent()){
+      List<String> listRole = new ArrayList<>();
+      for (UserRoles role : user.get().getUserRoles()) {
+        listRole.add(role.getRoles().getRoleName().toString());
+      } 
+      if(listRole.contains("EM")){
+        if(user.get().getUserPassword().equals(password)){
+        return "Access Granted";
+        }
+        return "Wrong Password";
+      }
+      return "Access Denied";
+    }
+    return "Input email atau username atau phoneNumber salah";
+  }
+
+  @Override
+  public User getById(Long id) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getById'");
+  }
+
+  @Override
+  public List<User> getAll() {
+    List<User> users = userRepo.findAll();
+    return users;
   }
 
 }
