@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.users.implementation;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +85,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User create(CreateUserDto userPost) {
+  public User create(CreateUserDto userPost) throws Exception{
     BusinessEntity businessEntity = new BusinessEntity();
     businessEntity.setEntityModifiedDate(LocalDateTime.now());
     Long businessEntityId = businessEntityService.save(businessEntity);
@@ -117,7 +118,7 @@ public class UserServiceImpl implements UserService {
 
     UserPhone userPhone = new UserPhone();
     userPhone.setUserPhoneId(userPhoneId);
-    userPhone.setUsphPhoneType("HP");
+    userPhone.setUsphPhoneType(userPost.getPhoneType());
 
     List<UserPhone> listPhone = List.of(userPhone);
 
@@ -163,6 +164,9 @@ public class UserServiceImpl implements UserService {
     userAccounts.setUsacUserEntityid(businessEntityId);
     List<UserAccounts> listUserAccountuserAccounts = List.of(userAccounts);
 
+    user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
+    userPost.getPhoto().transferTo(new File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
+
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
     user.setUserAddress(listAddress);
@@ -196,9 +200,34 @@ public class UserServiceImpl implements UserService {
     NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(), user::getUserPassword);
 
     NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
+    if(userPost.getPhoto() != null){
+      user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
+    }
 
     User userSaved = save(user);
     return userSaved;
+  }
+
+  @Override
+  public void delete(Long id) {
+    userRepo.deleteById(id);
+  }
+
+  @Override
+  public Optional<User> getUserById(Long id) {
+    return userRepo.findById(id);
+  }
+
+  @Override
+  public String login(String identity, String password) {
+    Optional<User> user = userRepo.findUserByIden(identity);
+    if(user.isPresent()){
+      if(user.get().getUserPassword().equals(password)){
+        return "Access Granted";
+      }
+        return "Wrong Password";
+    }
+    return "Input email atau username atau phoneNumber salah";
   }
 
 }

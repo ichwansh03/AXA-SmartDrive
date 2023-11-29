@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.dto.user;
 
 import java.time.LocalDateTime;
-
+import org.springframework.web.multipart.MultipartFile;
 import lombok.Data;
 
 @Data
@@ -23,4 +23,6 @@ public class CreateUserDto {
   private String fintech;
   private String accNumber;
   private String userPhoto;
+  private String phoneType;
+  private MultipartFile photo;
 }

@@ -5,4 +5,6 @@ import com.app.smartdrive.api.entities.payment.UserAccounts;
 
 public interface UserUserAccountService {
   UserAccounts updateUserAccounts(Long id, Long accountid, CreateUserDto userPost);
+  UserAccounts createUserAccounts(Long id, CreateUserDto userPost);
+  void deleteUserAccounts(Long id, Long ucId);
 }

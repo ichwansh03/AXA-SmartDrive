@@ -90,11 +90,11 @@ public class Services {
     private CustomerRequest customer;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL ,orphanRemoval = true)
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrdersSet;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private List<ServicePremi> servicePremiSet;
 }
