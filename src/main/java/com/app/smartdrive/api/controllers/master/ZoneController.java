@@ -1,6 +1,8 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
+import com.app.smartdrive.api.dto.master.ProvinsiDto;
+import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.dto.master.ZonesDto;
 import com.app.smartdrive.api.entities.master.Zones;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -26,7 +28,9 @@ public class ZoneController implements BaseController<ZonesDto, Long> {
     @GetMapping
     public ResponseEntity<?> findAllData() {
         List<Zones> zones = service.getAll();
-        List<ZonesDto> result = TransactionMapper.mapEntityListToDtoList(zones, ZonesDto.class);
+        List<ZonesDto> result = zones.stream().map(zone -> {
+            return new ZonesDto(zone.getZonesId(), zone.getZonesName(), TransactionMapper.mapEntityListToDtoList(zone.getTemplateInsurancePremis(), TemplateInsurancePremiDto.class), TransactionMapper.mapEntityListToDtoList(zone.getProvinsi(), ProvinsiDto.class));
+        }).toList();
         return ResponseEntity.ok(result);
     }
 

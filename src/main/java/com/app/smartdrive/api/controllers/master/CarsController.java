@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
+import com.app.smartdrive.api.dto.customer.request.CiasDTO;
 import com.app.smartdrive.api.dto.master.CarSeriesDto;
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -26,7 +27,9 @@ public class CarsController implements BaseController<CarSeriesDto, Long> {
     @GetMapping
     public ResponseEntity<?> findAllData() {
         List<CarSeries> carSeries = service.getAll();
-        List<CarSeriesDto> result = TransactionMapper.mapEntityListToDtoList(carSeries, CarSeriesDto.class);
+        List<CarSeriesDto> result = carSeries.stream().map(series -> {
+            return new CarSeriesDto(series.getCarsId(), series.getCarsName(), series.getCarsPassenger(), series.getCarsCarmId(), TransactionMapper.mapEntityListToDtoList(series.getCustomerInscAssets(), CiasDTO.class));
+        }).toList();
         return ResponseEntity.ok(result);
     }
 

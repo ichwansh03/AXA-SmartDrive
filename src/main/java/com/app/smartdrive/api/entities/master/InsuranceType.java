@@ -32,4 +32,7 @@ public class InsuranceType {
     @JsonManagedReference
     @OneToMany(mappedBy = "insuranceType", cascade = CascadeType.ALL)
     private List<CustomerInscAssets> customerInscAssets;
+
+    public InsuranceType(String intyName, String intyDesc, List<TemplateInsurancePremi> templateInsurancePremis) {
+    }
 }

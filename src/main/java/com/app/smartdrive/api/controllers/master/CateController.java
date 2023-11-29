@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.CategoryDto;
+import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.entities.master.Category;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.CateService;
@@ -26,7 +27,9 @@ public class CateController implements BaseController<CategoryDto, Long> {
     @GetMapping
     public ResponseEntity<?> findAllData() {
         List<Category> cate = service.getAll();
-        List<CategoryDto> result = TransactionMapper.mapEntityListToDtoList(cate, CategoryDto.class);
+        List<CategoryDto> result = cate.stream().map(category -> {
+            return new CategoryDto(category.getCateId(), category.getCateName(), TransactionMapper.mapEntityListToDtoList(category.getTemplateInsurancePremis(), TemplateInsurancePremiDto.class));
+        }).toList();
         return ResponseEntity.ok(result);
     }
 

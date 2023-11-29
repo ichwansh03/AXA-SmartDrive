@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.CarBrandDto;
+import com.app.smartdrive.api.dto.master.CarModelDto;
 import com.app.smartdrive.api.entities.master.CarBrand;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.CarbService;
@@ -26,7 +27,9 @@ public class CarbController implements BaseController<CarBrandDto, Long> {
     @GetMapping
     public ResponseEntity<?> findAllData() {
         List<CarBrand> carBrands = service.getAll();
-        List<CarBrandDto> result = TransactionMapper.mapEntityListToDtoList(carBrands, CarBrandDto.class);
+        List<CarBrandDto> result = carBrands.stream().map(carBrand -> {
+            return new CarBrandDto(carBrand.getCabrID(), carBrand.getCabrName(), TransactionMapper.mapEntityListToDtoList(carBrand.getCarModels(), CarModelDto.class));
+        }).toList();
         return ResponseEntity.ok(result);
     }
 
