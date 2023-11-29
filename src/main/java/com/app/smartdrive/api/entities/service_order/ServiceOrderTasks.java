@@ -53,15 +53,17 @@ public class ServiceOrderTasks {
     @Column(name = "seot_sero_id")
     private Long seotSeroId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     AreaWorkGroup areaWorkGroup;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders serviceOrders;
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ServiceOrderWorkorder> serviceOrderWorkorders;
 }

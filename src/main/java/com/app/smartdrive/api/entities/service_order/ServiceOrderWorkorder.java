@@ -34,6 +34,7 @@ public class ServiceOrderWorkorder {
     @Column(name = "sowo_seot_id")
     private Long sowoSeotId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sowo_seot_id", referencedColumnName = "seot_id", insertable = false, updatable = false)
     ServiceOrderTasks serviceOrderTasks;

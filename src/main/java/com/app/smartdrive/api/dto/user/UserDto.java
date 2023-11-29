@@ -9,10 +9,12 @@ import com.app.smartdrive.api.entities.users.UserPhone;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
   private String userPhoto;
   private String userEmail;
