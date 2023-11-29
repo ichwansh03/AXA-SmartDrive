@@ -1,11 +1,22 @@
 package com.app.smartdrive.api.services.customer;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
+import com.app.smartdrive.api.dto.HR.EmployeesDto;
+import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.dto.master.CitiesDto;
+import com.app.smartdrive.api.dto.user.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.hr.Employees;
+import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
+import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
+import com.app.smartdrive.api.repositories.master.*;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.implementation.SoServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -21,15 +32,9 @@ import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.customer.EnumCustomer.CadocCategory;
-import com.app.smartdrive.api.entities.master.CarSeries;
-import com.app.smartdrive.api.entities.master.Cities;
-import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
-import com.app.smartdrive.api.repositories.master.CarsRepository;
-import com.app.smartdrive.api.repositories.master.CityRepository;
-import com.app.smartdrive.api.repositories.master.IntyRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 
@@ -56,11 +61,18 @@ public class CustomerRequestServiceImpl {
 
     private final EmployeeAreaWorkgroupRepository eawagRepository;
 
+    private final ArwgRepository arwgRepository;
+
+    private final CustomerInscExtendRepository cuexRepository;
+
+    private final TemiRepository temiRepository;
+
+
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
     }
 
-    public CustomerRequest create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
 
         // create new businessEntity
@@ -80,6 +92,9 @@ public class CustomerRequestServiceImpl {
         EmployeeAreaWorkgroup eawag = this.eawagRepository.findByEawgArwgCode(customerRequestDTO.getArwg_code());
 
 
+        Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
+
+
         // new customer
         CustomerRequest newCustomer = CustomerRequest.builder()
         .businessEntity(existEntity)
@@ -90,16 +105,23 @@ public class CustomerRequestServiceImpl {
         .creqEntityId(entityId)
                 .employeeAreaWorkgroup(eawag)
         .build();
-        
+
+//        eawag.setCustomerRequests(List.of(newCustomer));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasDTO.getCiasStartdate(), formatter);
+
+
+
         // new cias
         CustomerInscAssets cias = CustomerInscAssets.builder()
         .ciasCreqEntityid(entityId)
         .ciasPoliceNumber(ciasDTO.getCiasPoliceNumber())
         .ciasYear(ciasDTO.getCiasYear())
-        .ciasStartdate(LocalDateTime.now())
-        .ciasEnddate(LocalDateTime.now().plusYears(1))
-        .ciasCurrentPrice(1_000_000.00)
-        .ciasTotalPremi(50_000_000.00)
+        .ciasStartdate(ciasStartdate)
+        .ciasEnddate(ciasStartdate.plusYears(1))
+        .ciasCurrentPrice(ciasDTO.getCurrentPrice())
+                .ciasInsurancePrice(ciasDTO.getCurrentPrice())
         .ciasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasDTO.getCiasPaidType()))
         .ciasIsNewChar('Y')
         .carSeries(carSeries)
@@ -108,14 +130,6 @@ public class CustomerRequestServiceImpl {
         .customerRequest(newCustomer)
         .build();
 
-        // new cuex(sementara nunggu tengku)
-        CustomerInscExtend cuex = CustomerInscExtend.builder()
-        .cuexName("Perlindungan dan kerugian pihak ketiga")
-        .cuexTotalItem(1)
-        .cuex_nominal(155_000_000)
-        .customerInscAssets(cias)
-        .cuexCreqEntityid(entityId)
-        .build();
 
         // pengecekan dan covert file upload ke cadocList
         List<CustomerInscDoc> ciasDocs = this.fileCheck(files, entityId);
@@ -123,19 +137,41 @@ public class CustomerRequestServiceImpl {
 
         // set cias ke creq
         List<CustomerInscExtend> ciasCuexs = new ArrayList<>();
-        ciasCuexs.add(cuex);
+
+        for (Long i: cuexIds) {
+            Double nominal;
+
+            TemplateInsurancePremi temi = this.temiRepository.findById(i).get();
+
+            if(Objects.nonNull(temi.getTemiRateMin())){
+                nominal = temi.getTemiRateMin() * temi.getTemiNominal();
+            }else{
+                nominal = temi.getTemiNominal();
+            }
+
+            CustomerInscExtend cuex = CustomerInscExtend.builder()
+                    .cuexId(temi.getTemiId())
+                    .cuexName(temi.getTemiName())
+                    .cuex_nominal(nominal)
+                    .cuexTotalItem(1)
+                    .customerInscAssets(cias)
+                    .cuexCreqEntityid(entityId)
+                    .build();
+
+            ciasCuexs.add(cuex);
+        }
+
+        Double premi = this.getPremiPrice(existInty.getIntyName(), "bruh", eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesId(), ciasDTO.getCurrentPrice(), ciasCuexs);
+
+        cias.setCiasTotalPremi(premi);
         cias.setCustomerInscExtend(ciasCuexs);
 
         // set cias ke customer
         newCustomer.setCustomerInscAssets(cias);
 
-        // ikhwan generate
-        SoServiceImpl service = new SoServiceImpl(soRepository);
-        service.addServices(newCustomer, cias, entityUser, entityId);
 
-        log.info("CustomerRequestServiceImpl::create successfully stored services {}",service);
-
-        return this.customerRequestRepository.save(newCustomer);
+        CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomer);
+        return this.convert(savedCreq);
     }
 
     public List<CustomerInscDoc> fileCheck(MultipartFile[] files, Long creqEntityId) throws Exception {
@@ -179,4 +215,189 @@ public class CustomerRequestServiceImpl {
 
         return listDoc;
     }
+
+    public CustomerResponseDTO convert(CustomerRequest customerRequest){
+        CustomerInscAssets cias = customerRequest.getCustomerInscAssets();
+        List<CustomerInscExtend> cuexList = cias.getCustomerInscExtend();
+        List<CustomerInscDoc> cadocList = cias.getCustomerInscDoc();
+        User customer = customerRequest.getCustomer();
+        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
+        Employees employee = eawag.getEmployees();
+        InsuranceType insuranceType = cias.getInsuranceType();
+        CarSeries carSeries = cias.getCarSeries();
+
+
+        BussinessEntityResponseDTO bussinessEntityResponseDTO = BussinessEntityResponseDTO.builder()
+                .entityId(customerRequest.getBusinessEntity().getEntityId())
+                .entityModifiedDate(customerRequest.getBusinessEntity().getEntityModifiedDate())
+                .build();
+
+
+        List<CuexResponseDTO> cuexResponseDTOList = cuexList.stream().map(cuex -> new CuexResponseDTO(
+                cuex.getCuexId(),
+                cuex.getCuexCreqEntityid(),
+                cuex.getCuexName(),
+                cuex.getCuexTotalItem(),
+                cuex.getCuex_nominal()
+        )).toList();
+
+        List<CadocResponseDTO> cadocResponseDTOList = cadocList.stream().map(cadoc -> new CadocResponseDTO(
+                cadoc.getCadocId(),
+                cadoc.getCadocCreqEntityid(),
+                cadoc.getCadocFilename(),
+                cadoc.getCadocFiletype(),
+                cadoc.getCadocFilesize(),
+                cadoc.getCadocCategory(),
+                cadoc.getCadocModifiedDate()
+        )).toList();
+
+        CitiesResponseDTO citiesResponseDTO = CitiesResponseDTO.builder()
+                .cityId(cias.getCity().getCityId())
+                .cityName(cias.getCity().getCityName())
+                .provName(cias.getCity().getProvinsi().getProvName())
+                .build();
+
+        IntyResponseDTO intyResponseDTO = IntyResponseDTO.builder()
+                .intyName(insuranceType.getIntyName())
+                .intyDesc(insuranceType.getIntyDesc())
+                .build();
+
+        CarSeriesResponseDTO carSeriesResponseDTO = CarSeriesResponseDTO.builder()
+                .carsId(carSeries.getCarsId())
+                .carsPassenger(carSeries.getCarsPassenger())
+                .carsName(carSeries.getCarsName())
+                .build();
+
+        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
+                .ciasCreqEntityid(cias.getCiasCreqEntityid())
+                .ciasEnddate(cias.getCiasEnddate())
+                .ciasStartdate(cias.getCiasStartdate())
+                .ciasYear(cias.getCiasYear())
+                .ciasCurrentPrice(cias.getCiasCurrentPrice())
+                .ciasInsurancePrice(cias.getCiasInsurancePrice())
+                .ciasTotalPremi(cias.getCiasTotalPremi())
+                .ciasIsNewChar(cias.getCiasIsNewChar())
+                .ciasPaidType(cias.getCiasPaidType())
+                .ciasPoliceNumber(cias.getCiasPoliceNumber())
+                .customerInscDoc(cadocResponseDTOList)
+                .customerInscExtend(cuexResponseDTOList)
+                .city(citiesResponseDTO)
+                .carSeriesResponseDTO(carSeriesResponseDTO)
+                .intyResponseDTO(intyResponseDTO)
+                .build();
+
+
+        List<UserPhoneResponseDTO> userPhoneResponseDTOList = customer.getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
+                phone.getUserPhoneId().getUsphEntityId(),
+                phone.getUserPhoneId().getUsphPhoneNumber(),
+                phone.getUsphMime(),
+                phone.getUsphPhoneType(),
+                phone.getUsphStatus(),
+                phone.getUsphModifiedDate()
+        )).toList();
+
+        // Address and Phone User
+        List<UserAddressResponseDTO> addressUserResponseDTOList = customer.getUserAddress().stream().map(address -> new UserAddressResponseDTO(
+                address.getUserAdressId().getUsdrId(),
+                address.getUserAdressId().getUsdrEntityId(),
+                address.getUsdrAddress1(),
+                address.getUsdrAdress2(),
+                address.getUsdrCityId(),
+                address.getUsdrModifiedDate()
+        )).toList();
+
+        CustomerUserResponseDTO customerUserResponseDTO = CustomerUserResponseDTO.builder()
+                .userEntityId(customer.getUserEntityId())
+                .userName(customer.getUserName())
+                .userFullName(customer.getUserFullName())
+                .userBirthPlace(customer.getUserBirthPlace())
+                .userNationalId(customer.getUserNationalId())
+                .userNPWP(customer.getUserNPWP())
+                .userBirthDate(customer.getUserBirthDate())
+                .userModifiedDate(customer.getUserModifiedDate())
+                .userEmail(customer.getUserEmail())
+                .userPhoto(customer.getUserPhoto())
+                .userAddresses(addressUserResponseDTOList)
+                .userPhone(userPhoneResponseDTOList)
+                .build();
+
+        //  Address and Phone Agen
+        List<UserPhoneResponseDTO> agenPhoneResponseDTOList = employee.getUser().getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
+                phone.getUserPhoneId().getUsphEntityId(),
+                phone.getUserPhoneId().getUsphPhoneNumber(),
+                phone.getUsphMime(),
+                phone.getUsphPhoneType(),
+                phone.getUsphStatus(),
+                phone.getUsphModifiedDate()
+        )).toList();
+
+        List<UserAddressResponseDTO> addressAgenResponseDTOList = employee.getUser().getUserAddress().stream().map(address -> new UserAddressResponseDTO(
+                address.getUserAdressId().getUsdrId(),
+                address.getUserAdressId().getUsdrEntityId(),
+                address.getUsdrAddress1(),
+                address.getUsdrAdress2(),
+                address.getUsdrCityId(),
+                address.getUsdrModifiedDate()
+        )).toList();
+
+        CustomerUserResponseDTO agenUserResponseDTO = CustomerUserResponseDTO.builder()
+                .userEntityId(employee.getUser().getUserEntityId())
+                .userName(employee.getUser().getUserName())
+                .userFullName(employee.getUser().getUserFullName())
+                .userBirthPlace(employee.getUser().getUserBirthPlace())
+                .userNationalId(employee.getUser().getUserNationalId())
+                .userNPWP(employee.getUser().getUserNPWP())
+                .userBirthDate(employee.getUser().getUserBirthDate())
+                .userModifiedDate(employee.getUser().getUserModifiedDate())
+                .userEmail(employee.getUser().getUserEmail())
+                .userPhoto(employee.getUser().getUserPhoto())
+                .userAddresses(addressAgenResponseDTOList)
+                .userPhone(agenPhoneResponseDTOList)
+                .build();
+
+        // EAWAG
+        EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto = EmployeeAreaWorkgroupDto.builder()
+                .empName(eawag.getEmployees().getEmpName())
+                .workGroup(eawag.getAreaWorkGroup().getArwgCode())
+                .cityName(eawag.getAreaWorkGroup().getCities().getCityName())
+                .provinsi(eawag.getAreaWorkGroup().getCities().getProvinsi().getProvName())
+                .zoneName(eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesName())
+                .build();
+
+
+        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+                .creqEntityId(customerRequest.getCreqEntityId())
+                .businessBussinessEntityResponseDTO(bussinessEntityResponseDTO)
+                .creqModifiedDate(customerRequest.getCreqModifiedDate())
+                .creqCreateDate(customerRequest.getCreqCreateDate())
+                .creqStatus(customerRequest.getCreqStatus())
+                .creqType(customerRequest.getCreqType())
+                .customerInscAssets(ciasResponseDTO)
+                .customer(customerUserResponseDTO)
+                .employee(agenUserResponseDTO)
+                .empAreaWorkgroupDto(employeeAreaWorkgroupDto)
+                .build();
+
+        return customerResponseDTO;
+    }
+
+    public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs){
+        TemplateInsurancePremi temiMain = this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(zonesId, insuraceType, 1L);
+
+        Double premiMain = currentPrice * temiMain.getTemiRateMin();
+
+        Double premiExtend = 0.0;
+
+        if(!cuexs.isEmpty()){
+            for (CustomerInscExtend  cuex: cuexs) {
+                premiExtend += cuex.getCuex_nominal();
+            }
+
+        }
+
+        Double totalPremi = premiMain + premiExtend;
+
+        return totalPremi;
+    }
+
 }

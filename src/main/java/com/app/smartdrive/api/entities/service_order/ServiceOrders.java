@@ -76,22 +76,26 @@ public class ServiceOrders {
     @Size(max = 15)
     private String seroArwgCode;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     private Services services;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "sero_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     private ServiceOrders parentServiceOrders;
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToMany(mappedBy = "parentServiceOrders")
     private List<ServiceOrders> serviceOrdersList;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "emp_entityid", insertable = false, updatable = false)
     private Employees employees;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
     private AreaWorkGroup areaWorkGroup;

@@ -34,14 +34,14 @@ public class CustomerRequestDTO {
 
     private Long creqEntityId;
         
-    private LocalDateTime creqCreateDate;
-
-    private EnumCustomer.CreqStatus creqStatus;
-
-    private EnumCustomer.CreqType creqType;
-
-    private LocalDateTime creqModifiedDate;
-
+//    private LocalDateTime creqCreateDate;
+//
+//    private EnumCustomer.CreqStatus creqStatus;
+//
+//    private EnumCustomer.CreqType creqType;
+//
+//    private LocalDateTime creqModifiedDate;
+//
     private Long creq_cust_entityid;
     
     private String arwg_code;

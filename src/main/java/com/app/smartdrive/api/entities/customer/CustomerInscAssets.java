@@ -72,11 +72,11 @@ public class CustomerInscAssets {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
-    private List<CustomerInscDoc> customerInscDoc = new ArrayList<>();
+    private List<CustomerInscDoc> customerInscDoc;
     
     @JsonManagedReference
     @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
-    private List<CustomerInscExtend> customerInscExtend = new ArrayList<>();
+    private List<CustomerInscExtend> customerInscExtend;
 
     @JsonBackReference
     @ManyToOne
