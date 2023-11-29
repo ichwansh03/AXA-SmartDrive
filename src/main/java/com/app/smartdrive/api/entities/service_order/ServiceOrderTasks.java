@@ -61,7 +61,6 @@ public class ServiceOrderTasks {
     ServiceOrders serviceOrders;
 
     @JsonManagedReference
-    //@JsonIgnore
     @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL)
     List<ServiceOrderWorkorder> serviceOrderWorkorders;
 }
