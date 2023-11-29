@@ -38,16 +38,16 @@ public class AreaWorkGroup {
     @JoinColumn(name = "arwg_city_id", insertable = false, updatable = false)
     private Cities cities;
 
-    @OneToMany(mappedBy = "areaWorkGroup", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
+    @OneToMany(mappedBy = "areaWorkGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
 
-    @JsonIgnore
+    //    @JsonIgnore
     @OneToMany(mappedBy = "areaWorkGroup")
     private List<ServiceOrders> serviceOrders;
 
-    @JsonIgnore
+    //    @JsonIgnore
     @OneToMany(mappedBy = "areaWorkGroup")
     private List<ServiceOrderTasks> serviceOrderTasks;
 }

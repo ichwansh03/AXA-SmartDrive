@@ -1,8 +1,8 @@
 package com.app.smartdrive.api.dto.master;
 
 import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
-import com.app.smartdrive.api.dto.service_order.ServicesDto;
-import com.app.smartdrive.api.dto.service_order.SoTasksDto;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
+import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +21,6 @@ public class AreaWorkGroupDto {
 
     private Long arwgCityId;
     private List<EmployeeAreaWorkgroupDto> empWoDto;
-    private List<ServicesDto> servicesDto;
+    private List<ServiceRespDto> servicesDto;
     private List<SoTasksDto> soTasksDto;
 }

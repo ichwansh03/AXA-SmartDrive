@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
-import com.app.smartdrive.api.services.service_order.implementation.SoServiceImpl;
+import com.app.smartdrive.api.services.service_order.implementation.ServOrderServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -122,7 +122,7 @@ public class CustomerRequestServiceImpl {
         newCustomer.setCustomerInscAssets(cias);
 
         // ikhwan generate
-        SoServiceImpl service = new SoServiceImpl(soRepository);
+        ServOrderServiceImpl service = new ServOrderServiceImpl(soRepository, null, null, null);
         service.addServices(newCustomer, cias, entityUser, entityId);
 
         log.info("CustomerRequestServiceImpl::create successfully stored services {}",service);
