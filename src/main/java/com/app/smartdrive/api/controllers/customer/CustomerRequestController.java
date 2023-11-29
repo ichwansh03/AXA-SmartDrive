@@ -34,14 +34,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestController {
     private final CustomerRequestServiceImpl customerRequestService;
 
-    private final TemiRepository temiRepository;
-
-    @GetMapping("/search")
-    public TemplateInsurancePremi test(){
-        return this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(1L,"Total Loss Only", 1L);
-    }
-
-
     @GetMapping
     public List<CustomerResponseDTO> getAll(){
         List<CustomerRequest> customerRequestList = this.customerRequestService.get();
