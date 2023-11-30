@@ -298,8 +298,8 @@ public class CustomerRequestServiceImpl {
 
         // Address and Phone User
         List<UserAddressResponseDTO> addressUserResponseDTOList = customer.getUserAddress().stream().map(address -> new UserAddressResponseDTO(
-                address.getUserAdressId().getUsdrId(),
-                address.getUserAdressId().getUsdrEntityId(),
+                address.getUsdrId(),
+                address.getUsdrEntityId(),
                 address.getUsdrAddress1(),
                 address.getUsdrAdress2(),
                 address.getUsdrCityId(),
@@ -332,8 +332,8 @@ public class CustomerRequestServiceImpl {
         )).toList();
 
         List<UserAddressResponseDTO> addressAgenResponseDTOList = employee.getUser().getUserAddress().stream().map(address -> new UserAddressResponseDTO(
-                address.getUserAdressId().getUsdrId(),
-                address.getUserAdressId().getUsdrEntityId(),
+                address.getUsdrId(),
+                address.getUsdrEntityId(),
                 address.getUsdrAddress1(),
                 address.getUsdrAdress2(),
                 address.getUsdrCityId(),

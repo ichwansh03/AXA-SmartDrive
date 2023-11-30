@@ -17,11 +17,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDto {
   private String userPhoto;
-  private String fullName;
-  private List<String> role;
+  private String userFullName;
+  private List<UserRoles> userRoles;
   private String userEmail;
   private List<UserPhone> userPhone;
-  private List<UserAddress> userAddresses;
+  private List<UserAddress> userAddress;
   private List<UserAccounts> userAccounts;
 
 }
