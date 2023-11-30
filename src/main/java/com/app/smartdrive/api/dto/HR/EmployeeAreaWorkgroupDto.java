@@ -17,6 +17,5 @@ public class EmployeeAreaWorkgroupDto implements Serializable {
     private String cityName;
     private String areaworkGroup;
     private String empName;
-    private Long empEntityid;
     
 }

@@ -3,7 +3,7 @@ package com.app.smartdrive.api.controllers;
 import org.springframework.http.ResponseEntity;
 
 public interface BaseController<T, ID> {
-     ResponseEntity<?> findAllData();
+    ResponseEntity<?> findAllData();
 
     ResponseEntity<?> findDataById(ID id);
 

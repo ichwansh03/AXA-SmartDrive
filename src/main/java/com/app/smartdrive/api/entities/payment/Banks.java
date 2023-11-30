@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@jakarta.persistence.Entity
+@Entity
 @Table(name = "banks", schema = "payment")
 public class Banks {
     
@@ -47,7 +47,7 @@ public class Banks {
     @JsonBackReference
     BusinessEntity businessEntity;
 
-    @JsonIgnore
+    // @JsonIgnore
     @OneToMany(mappedBy = "banks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<UserAccounts> user_accounts;   
 

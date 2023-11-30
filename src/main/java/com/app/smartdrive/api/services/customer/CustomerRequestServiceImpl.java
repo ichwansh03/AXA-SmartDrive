@@ -88,7 +88,7 @@ public class CustomerRequestServiceImpl {
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
 
-        EmployeeAreaWorkgroup eawag = this.eawagRepository.findByEawgArwgCode(customerRequestDTO.getArwg_code());
+        EmployeeAreaWorkgroup eawag = this.eawagRepository.findByAgenAndArwgCode(customerRequestDTO.getAgen_id(), customerRequestDTO.getArwg_code());
 
 
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
@@ -101,8 +101,8 @@ public class CustomerRequestServiceImpl {
         .creqCreateDate(LocalDateTime.now())
         .creqStatus(EnumCustomer.CreqStatus.OPEN)
         .creqType(EnumCustomer.CreqType.POLIS)
+        .employeeAreaWorkgroup(eawag)
         .creqEntityId(entityId)
-                .employeeAreaWorkgroup(eawag)
         .build();
 
 //        eawag.setCustomerRequests(List.of(newCustomer));

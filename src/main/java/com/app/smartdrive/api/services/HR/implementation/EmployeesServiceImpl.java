@@ -24,9 +24,11 @@ import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
+import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
+import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserAddressRepository;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
@@ -47,6 +49,8 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     private final EmployeesRepository employeesRepository;
 
+    private final RolesRepository rolesRepository;
+
     private final UserRepository userRepository;
 
     private final UserServiceImpl userServiceImpl;
@@ -56,6 +60,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     private final UserAddressRepository userAddressRepository;
 
     private final CityRepository cityRepository;
+
 
     @Override
     @Transactional
@@ -86,41 +91,50 @@ public class EmployeesServiceImpl implements EmployeesService {
         user.setUserModifiedDate(LocalDateTime.now());
         user.setUserNationalId("idnn" + businessEntityId);
         user.setUserNPWP("npwp" + businessEntityId);
-        
     
+        
+        UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.EM);
+        Roles roles = rolesRepository.findById(roleName.EM).get();
         
         UserRoles userRoles = new UserRoles();
-        UserRolesId userRolesId = new UserRolesId(businessEntityId,roleName.EM);
         userRoles.setUserRolesId(userRolesId);
+        userRoles.setRoles(roles);
+        userRoles.setUsroStatus("ACTIVE");
         userRoles.setUsroModifiedDate(LocalDateTime.now());
-    
+        userRoles.setUser(user);
+        
+        List<UserRoles> listRole = List.of(userRoles);
+        
         UserPhone userPhone = new UserPhone();
         UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.getEmpPhone());
         userPhone.setUserPhoneId(userPhoneId);
         userPhone.setUsphPhoneType("HP");
         userPhone.setUsphModifiedDate(LocalDateTime.now());
         userPhone.setUser(user);
+        List<UserPhone> listUserPhones = List.of(userPhone);
     
         Cities empCityEntity = cityRepository.findByCityName(employeesDto.getEmpCity());
     
         UserAddress userAddress = new UserAddress();
-        // UserAdressId userAdressId = new UserAdressId();
-        // userAddress.setUsdrId(businessEntityId);
         userAddress.setUsdrEntityId(businessEntityId);
         userAddress.setUsdrAddress1(employeesDto.getEmpAddress());
         userAddress.setUsdrAddress2(employeesDto.getEmpAddress2());
         userAddress.setUser(user);
         userAddress.setCity(empCityEntity);
         
-        userPhoneRepository.save(userPhone);
-        userAddressRepository.save(userAddress);
+        List<UserAddress> listuAddresses = List.of(userAddress);
+        
+        
+        
+        // userPhoneRepository.save(userPhone);
+        // userAddressRepository.save(userAddress);
         // }
-
+        
         // double commissionPercentage = 0.10; // 10%
         // double premiumAmount = 1000000.0; // Example premium amount
-
+        
         // double commission = commissionPercentage * premiumAmount;
-    
+        
         Employees employee = new Employees();
         employee.setEmpEntityid(businessEntityId);
         employee.setEmpName(employeesDto.getEmpName());
@@ -132,11 +146,12 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setUser(user);
         employee.setEmpJobCode(employeesDto.getEmpRole());
 
-        
+        user.setUserRoles(listRole);
+        user.setUserPhone(listUserPhones);
+        user.setUserAddress(listuAddresses);
 
+        // userServiceImpl.save(user);
 
-        userServiceImpl.save(user);
-        
 
         employeesRepository.save(employee);
 

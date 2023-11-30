@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.payment;
+package com.app.smartdrive.api.dto.payment.Response;
 
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
 
@@ -7,7 +7,7 @@ import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 @Data
-public class UserAccountsDto {
+public class UserAccountsDtoResponse {
     
     private String usac_accountno;
     private Double usac_debet;

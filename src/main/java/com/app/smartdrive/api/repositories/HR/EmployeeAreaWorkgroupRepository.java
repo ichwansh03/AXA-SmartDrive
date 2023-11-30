@@ -1,8 +1,10 @@
 package com.app.smartdrive.api.repositories.HR;
 
 
+import java.util.List;
 import java.util.Optional;
 
+import org.antlr.v4.runtime.atn.SemanticContext.AND;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,7 +24,7 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, EmployeeAreaWorkgroupId> {
+public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, Long> {
     @Query(value = "SELECT TOP(1) * FROM HR.EMPLOYEE_ARE_WORKGROUP ORDER BY eawg_id DESC", nativeQuery = true)
     Optional<EmployeeAreaWorkgroup> findLastOptional();
 
@@ -39,6 +41,10 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     
     EmployeeAreaWorkgroup findByEawgArwgCode(String eawgArwgCode);
     EmployeeAreaWorkgroup findByAreaWorkGroup(AreaWorkGroup areaWorkGroup);
+
+    @Transactional
+    @Query(value = "SELECT * FROM hr.employee_are_workgroup WHERE eawg_entityid =:eawgEntityid AND eawg_arwg_code =:arwgCode", nativeQuery=true)
+    public EmployeeAreaWorkgroup findByAgenAndArwgCode(Long eawgEntityid, String arwgCode);
 
 
 }

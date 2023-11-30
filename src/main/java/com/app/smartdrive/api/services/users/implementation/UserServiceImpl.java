@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
     //TODO USERPHOTO API
     // user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
     // userPost.getPhoto().transferTo(new File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
-    
+ 
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
     user.setUserAddress(listAddress);
