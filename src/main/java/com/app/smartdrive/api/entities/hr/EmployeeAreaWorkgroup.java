@@ -76,10 +76,10 @@ public class EmployeeAreaWorkgroup {
     @JsonIgnore
     private Employees employees;
 
-    @MapsId("eawgId")
-    @JsonManagedReference
-    @OneToMany(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CustomerRequest> customerRequests;
+    // @MapsId("eawgId")
+    // @JsonManagedReference
+    // @OneToMany(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<CustomerRequest> customerRequests;
 
 
 
