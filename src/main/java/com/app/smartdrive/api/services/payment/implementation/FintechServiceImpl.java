@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.text.html.Option;
+
 import org.apache.catalina.mapper.Mapper;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
-import com.app.smartdrive.api.dto.payment.FintechDto;
+import com.app.smartdrive.api.dto.payment.Response.FintechDto;
+import com.app.smartdrive.api.dto.payment.Response.FintechIdForUserDto;
 import com.app.smartdrive.api.entities.payment.Fintech;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.mapper.payment.FintechMapper;
 import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.services.payment.FintechService;
@@ -30,34 +34,13 @@ public class FintechServiceImpl implements FintechService {
     private final BusinessEntityService businessEntityService;
     private final BusinessEntityRepository businessRepository;
 
-    @Transactional
+   
     public Fintech addFintech(Fintech fintech){
         entityManager.persist(fintech);
         return fintech;
     }
    
-    @Transactional
-    @Override
-    public Fintech addedFintech(String fint_name, String fint_desc) {
-        BusinessEntity businessEntity = new BusinessEntity();
-        businessEntity.setEntityModifiedDate(LocalDateTime.now());
-        Long businessEntityId = businessEntityService.save(businessEntity);
-
-        Fintech fintech = new Fintech();
-        fintech.setBusinessEntity(businessEntity);
-        fintech.setFint_entityid(businessEntityId);
-        fintech.setFint_name(fint_name);
-        fintech.setFint_desc(fint_desc);
-        addFintech(fintech);
-        return fintech;
-    }
-
-
-
-
-
-
-    @Transactional
+   
     @Override
     public Boolean deleteFintech(Long fintech_entityid) {
         Optional<Fintech> findId = fintechRepository.findById(fintech_entityid);
@@ -75,7 +58,7 @@ public class FintechServiceImpl implements FintechService {
         
     }
 
-    @Transactional
+
     @Override
     public Boolean updateFintech(Long fint_entityid,String fint_name, String fint_desc) {
         Optional<Fintech> fintechId = fintechRepository.findById(fint_entityid);
@@ -116,25 +99,59 @@ public class FintechServiceImpl implements FintechService {
 
 
     @Override
-    public FintechDto getUserFintId(String fint_name) {
+    public FintechIdForUserDto getUserFintId(String fint_name) {
         Optional<Fintech> getName = fintechRepository.findByFintNameOptional(fint_name);
         List<Fintech> fintData = fintechRepository.findAll();
+
         return null;
     }
 
+
     @Override
-    public List<Fintech> getAll() {
-        return fintechRepository.findAll();
+    public List<FintechDto> getAll() {
+        List<Fintech> listFintech = fintechRepository.findAll();
+        List<FintechDto> listDto = new ArrayList<>();
+        for (Fintech fint : listFintech) {
+            FintechDto fintechDto = FintechMapper.convertEntityToDto(fint);
+            listDto.add(fintechDto);
+        }
+        return listDto;
     }
+
+
     @Override
-    public Fintech getById(Long id) {
-        return fintechRepository.findById(id).get();
+    public FintechDto getById(Long id) {
+        Optional<Fintech> idFintech = fintechRepository.findById(id);
+        FintechDto fintechDto = new FintechDto();
+        if(idFintech.isPresent()){
+            Fintech fint = idFintech.get();
+            fintechDto = FintechMapper.convertEntityToDto(fint);
+        }
+
+        return fintechDto;
     }
+
+    
     @Override
-    public Fintech save(Fintech entity) {
-        
-        return fintechRepository.save(entity);
+    public FintechDto save(FintechDto fintechDto) {
+        BusinessEntity businessEntity = new BusinessEntity();
+        businessEntity.setEntityModifiedDate(LocalDateTime.now());
+        Long businessEntityId = businessEntityService.save(businessEntity);
+
+        Fintech fintech = new Fintech();
+        fintech.setBusinessEntity(businessEntity);
+        fintech.setFint_entityid(businessEntityId);
+        fintech.setFint_name(fintechDto.getFint_name());
+        fintech.setFint_desc(fintechDto.getFint_desc());
+        addFintech(fintech);
+
+        FintechDto fintechDtoo = FintechMapper.convertEntityToDto(fintech);
+
+        return fintechDtoo;
     }
+
+    
+    
     
     
     

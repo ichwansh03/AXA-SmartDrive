@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.payment.PaymentTransactionsDto;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactionsDto;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.services.payment.PaymentTransactionsService;
 import com.app.smartdrive.api.services.payment.implementation.PaymentTransactionsImpl;

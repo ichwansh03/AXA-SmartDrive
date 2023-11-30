@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.hibernate.validator.internal.engine.validationcontext.BaseBeanValidationContext;
 
-import com.app.smartdrive.api.dto.payment.UserAccountsDtoRequests;
-import com.app.smartdrive.api.dto.payment.UserAccountsDtoResponse;
+import com.app.smartdrive.api.dto.payment.Request.UserAccountsDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.UserAccountsDtoResponse;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.services.BaseService;
 

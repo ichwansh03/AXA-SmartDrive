@@ -22,12 +22,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.smartdrive.api.dto.payment.Response.FintechDto;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.Fintech;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.services.payment.FintechService;
 import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -40,21 +42,20 @@ public class FintechController {
 
     @GetMapping("/fintech/all")
     public ResponseEntity<?> getAllFintech(){
-        List<Fintech> listFintech = service.getAll();
+        List<FintechDto> listFintech = service.getAll();
         return new ResponseEntity<>(listFintech, HttpStatus.OK);
     }
 
     @GetMapping("/fintech/{fint_entityid}")
     public ResponseEntity<?> getFintechById(@Valid @PathVariable("fint_entityid") Long fint_entityid){
-        Fintech newFintechId = service.getById(fint_entityid);
+        FintechDto newFintechId = service.getById(fint_entityid);
         return new ResponseEntity<>(newFintechId, HttpStatus.OK);
     }
 
     @PostMapping("/fintech/add")
-    public ResponseEntity<?> addFintech(@Valid @RequestParam(name = "fint_name", required = true) String fint_name,
-    @RequestParam(name = "fint_desc", required = true) String fint_desc){
-        Fintech addFintech = service.addedFintech(fint_name, fint_desc);
-        return new ResponseEntity<>(addFintech, HttpStatus.OK);
+    public ResponseEntity<?> addFintech(@Valid @RequestBody FintechDto fintechDto){;
+        FintechDto resulDto = service.save(fintechDto);
+        return new ResponseEntity<>(resulDto, HttpStatus.OK);
     }
 
     @PutMapping("/fintech/{fint_entityid}/update")

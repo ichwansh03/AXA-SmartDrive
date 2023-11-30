@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.app.smartdrive.api.dto.payment.PaymentTransactionsDto;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactionsDto;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.mapper.payment.PaymentTransactionsMapper;
 import com.app.smartdrive.api.repositories.payment.PaymentTransactionsRepository;

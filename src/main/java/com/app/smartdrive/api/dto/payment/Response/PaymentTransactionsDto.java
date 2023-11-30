@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.payment;
+package com.app.smartdrive.api.dto.payment.Response;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
