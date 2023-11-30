@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
@@ -34,12 +33,8 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
         List<ServiceOrderTasks> tasksList = soTasksRepository.saveAll(seot);
 
-//        ServiceOrderTasks task = new ServiceOrderTasks();
-//
-//        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository);
-//
-//        List<ServiceOrderWorkorder> workorders = servOrderWorkorder.generateSowo(task);
-//        task.setServiceOrderWorkorders(workorders);
+        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository);
+        servOrderWorkorder.generateSowo(seot);
 
         return tasksList;
     }
