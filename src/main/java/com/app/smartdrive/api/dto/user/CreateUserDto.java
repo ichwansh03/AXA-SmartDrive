@@ -14,15 +14,9 @@ public class CreateUserDto {
   private String userBirthDate;
   private String userNationalId;
   private String userNpwp;
-  private String userPhoneNumber; //Buat dto spesifik dan photo dilainkan endpointnya
-  private String address1;
-  private String address2;
-  private String city;
-  private String accountType;
-  private String bank;
-  private String fintech;
-  private String accNumber;
-  private String userPhoto;
-  private String phoneType;
-  private MultipartFile photo; //terpisah
+  private UserPhoneDto userPhone;
+  private UserAddressDto userAddress;
+  private UserUserAccountDto userAccount;
+  // private String userPhoto;
+  // private MultipartFile photo; //terpisah
 }

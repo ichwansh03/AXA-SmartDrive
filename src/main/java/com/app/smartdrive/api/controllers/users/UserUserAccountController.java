@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.user.CreateUserDto;
+import com.app.smartdrive.api.dto.user.UserUserAccountDto;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.services.users.UserUserAccountService;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,13 @@ public class UserUserAccountController {
   private final UserUserAccountService userAccountService;
 
   @PatchMapping("/{ucId}")
-  public ResponseEntity<?> updateUC(@PathVariable("id") Long id, @PathVariable Long ucId, CreateUserDto userPost){
+  public ResponseEntity<?> updateUC(@PathVariable("id") Long id, @PathVariable Long ucId, UserUserAccountDto userPost){
     UserAccounts userAccounts = userAccountService.updateUserAccounts(id, ucId, userPost);
     return ResponseEntity.status(HttpStatus.OK).body(userAccounts);
   }
 
   @PostMapping
-  public ResponseEntity<?> createUC(@PathVariable("id") Long id, CreateUserDto userPost){
+  public ResponseEntity<?> createUC(@PathVariable("id") Long id, UserUserAccountDto userPost){
     UserAccounts userAccounts= userAccountService.createUserAccounts(id, userPost);
     return ResponseEntity.status(HttpStatus.CREATED).body(userAccounts);
   }

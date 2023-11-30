@@ -300,7 +300,7 @@ public class CustomerRequestServiceImpl {
                 address.getUsdrId(),
                 address.getUsdrEntityId(),
                 address.getUsdrAddress1(),
-                address.getUsdrAdress2(),
+                address.getUsdrAddress2(),
                 address.getUsdrCityId(),
                 address.getUsdrModifiedDate()
         )).toList();
@@ -334,7 +334,7 @@ public class CustomerRequestServiceImpl {
                 address.getUsdrId(),
                 address.getUsdrEntityId(),
                 address.getUsdrAddress1(),
-                address.getUsdrAdress2(),
+                address.getUsdrAddress2(),
                 address.getUsdrCityId(),
                 address.getUsdrModifiedDate()
         )).toList();

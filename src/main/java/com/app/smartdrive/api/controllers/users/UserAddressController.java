@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.user.CreateUserDto;
+import com.app.smartdrive.api.dto.user.UserAddressDto;
 import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.services.users.UserAddressService;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +23,14 @@ public class UserAddressController {
 
   @PatchMapping("/{addressId}")
   public ResponseEntity<?> updateUserAddress(@PathVariable("id") Long id,
-      @PathVariable("addressId") Long addressId, @ModelAttribute CreateUserDto userPost) {
+      @PathVariable("addressId") Long addressId, @ModelAttribute UserAddressDto userPost) {
 
     UserAddress userAddress = userAddressService.updateUserAddress(id, addressId, userPost);
     return ResponseEntity.status(HttpStatus.OK).body(userAddress);
   }
 
   @PostMapping
-  public ResponseEntity<?> createUserAddress(@PathVariable("id") Long id, CreateUserDto userPost){
+  public ResponseEntity<?> createUserAddress(@PathVariable("id") Long id, UserAddressDto userPost){
     UserAddress userAddress = userAddressService.createUserAddress(id, userPost);
     return ResponseEntity.status(HttpStatus.CREATED).body(userAddress);
   }

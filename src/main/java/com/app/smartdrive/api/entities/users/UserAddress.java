@@ -47,7 +47,7 @@ public class UserAddress {
   private String usdrAddress1;
 
   @Column(name = "usdr_address2")
-  private String usdrAdress2;
+  private String usdrAddress2;
   
   @Column(name = "usdr_city_id")
   private Long usdrCityId;

@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.services.users.implementation;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,19 +17,17 @@ import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserAddress;
-import com.app.smartdrive.api.entities.users.UserAdressId;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.payment.BanksRepository;
 import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
-import com.app.smartdrive.api.repositories.users.UserAddressRepository;
-import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
@@ -43,7 +40,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-  private final UserAddressRepository userAddressRepository;
   private final EntityManager entityManager;
   private final UserRepository userRepo;
   private final BusinessEntityService businessEntityService;
@@ -51,7 +47,6 @@ public class UserServiceImpl implements UserService {
   private final CityRepository cityRepository;
   private final BanksRepository banksRepository;
   private final FintechRepository fintechRepository;
-  private final UserPhoneRepository userPhoneRepository;
 
   @Override
   public UserDto getByIdDto(Long id) {
@@ -94,7 +89,7 @@ public class UserServiceImpl implements UserService {
     user.setUserNationalId(userPost.getUserNationalId() + businessEntity.getEntityId());
     user.setUserModifiedDate(LocalDateTime.now());
 
-    UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.CU);
+    UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.PC);
 
     Roles roles = rolesRepository.findById(roleName.PC).get();
     UserRoles userRoles = new UserRoles();
@@ -105,16 +100,16 @@ public class UserServiceImpl implements UserService {
 
     List<UserRoles> listRole = List.of(userRoles);
 
-    UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, userPost.getUserPhoneNumber());
+    UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, userPost.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
 
     UserPhone userPhone = new UserPhone();
     userPhone.setUserPhoneId(userPhoneId);
-    userPhone.setUsphPhoneType(userPost.getPhoneType());
+    userPhone.setUsphPhoneType(userPost.getUserPhone().getUsphPhoneType());
     userPhone.setUsphModifiedDate(LocalDateTime.now());
 
     List<UserPhone> listPhone = List.of(userPhone);
 
-    Cities city = cityRepository.findByCityName(userPost.getCity()); //Validate
+    // Cities city = cityRepository.findByCityName(userPost.getUserAddress().getCity()); //Validate
 
     // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
     // Long lastIndexUsdr;
@@ -128,42 +123,43 @@ public class UserServiceImpl implements UserService {
     // userAdressId.setUsdrId(lastIndexUsdr + 1); //tambahin sequence
     UserAddress userAddress = new UserAddress();
     userAddress.setUsdrEntityId(businessEntityId);
-    userAddress.setUsdrCityId(city.getCityId());
+    // userAddress.setUsdrCityId(city.getCityId());
     // userAddress.setUserAdressId(userAdressId);
-    userAddress.setCity(city);
-    userAddress.setUsdrAddress1(userPost.getAddress1());
-    userAddress.setUsdrAdress2(userPost.getAddress2());
+    // userAddress.setCity(city);
+    userAddress.setUsdrAddress1(userPost.getUserAddress().getUsdrAddress1());
+    userAddress.setUsdrAddress2(userPost.getUserAddress().getUsdrAddress2());
     userAddress.setUsdrModifiedDate(LocalDateTime.now());
 
     List<UserAddress> listAddress = List.of(userAddress);
 
-    UserAccounts userAccounts = new UserAccounts();
-    userAccounts.setUsac_accountno(userPost.getAccNumber());
-    if (userPost.getAccountType().equals("BANK")) { //urusan giry
-      userAccounts.setEnumPaymentType(EnumPaymentType.BANK);
-      Banks bank = banksRepository.findByBankNameOptional(userPost.getBank())
-          .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
-      userAccounts.setBanks(bank);
-      userAccounts.setUsacBankEntityid(bank.getBank_entityid());
-    }
-    if (userPost.getAccountType().equals("FINTECH")) {
-      userAccounts.setEnumPaymentType(EnumPaymentType.FINTECH);
-      Fintech fintech = fintechRepository.findByFintNameOptional(userPost.getFintech())
-          .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
-      userAccounts.setFintech(fintech);
-    }
-    userAccounts.setUser(user);
-    userAccounts.setUsacUserEntityid(businessEntityId);
-    List<UserAccounts> listUserAccountuserAccounts = List.of(userAccounts);
+    // UserAccounts userAccounts = new UserAccounts();
+    // userAccounts.setUsac_accountno(userPost.getUserAccount().getUsac_accountno());
+    // if (userPost.getUserAccount().getEnumPaymentType().equals("BANK")) { //urusan giry
+    //   userAccounts.setEnumPaymentType(EnumPaymentType.BANK);
+    //   Banks bank = banksRepository.findByBankNameOptional(userPost.getUserAccount().getBank())
+    //       .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
+    //   userAccounts.setBanks(bank);
+    //   userAccounts.setUsacBankEntityid(bank.getBank_entityid());
+    // }
+    // if (userPost.getUserAccount().getEnumPaymentType().equals("FINTECH")) {
+    //   userAccounts.setEnumPaymentType(EnumPaymentType.FINTECH);
+    //   Fintech fintech = fintechRepository.findByFintNameOptional(userPost.getUserAccount().getFintech())
+    //       .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
+    //   userAccounts.setFintech(fintech);
+    // }
+    // userAccounts.setUser(user);
+    // userAccounts.setUsacUserEntityid(businessEntityId);
+    // List<UserAccounts> listUserAccountuserAccounts = List.of(userAccounts);
 
-    user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
-    userPost.getPhoto().transferTo(new File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
-
+    //TODO USERPHOTO API
+    // user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
+    // userPost.getPhoto().transferTo(new File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
+    
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
     user.setUserAddress(listAddress);
-    user.setUserAccounts(listUserAccountuserAccounts);
-    userAccounts.setUser(user);
+    // user.setUserAccounts(listUserAccountuserAccounts);
+    // userAccounts.setUser(user);
     userPhone.setUser(user);
     userRoles.setUser(user);
     userAddress.setUser(user);
@@ -192,9 +188,10 @@ public class UserServiceImpl implements UserService {
     NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(), user::getUserPassword);
 
     NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
-    if(userPost.getPhoto() != null){
-      user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
-    }
+    // TODO USERPHOTO API
+    // if(userPost.getPhoto() != null){
+    //   user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
+    // }
 
     User userSaved = save(user);
     return userSaved;
