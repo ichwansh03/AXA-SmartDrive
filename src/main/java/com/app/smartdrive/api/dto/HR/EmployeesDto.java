@@ -17,5 +17,5 @@ public class EmployeesDto {
     private String empCity;
     private String empAddress;
     private String empAddress2;
-    
+    private Boolean GrantUserAccess ;
 }
