@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.stream.Stream;
 
 @Builder
 @Data
@@ -22,5 +23,5 @@ public class ServiceRespDto {
     private LocalDateTime servEndDate;
     private Long servCustEntityid;
     private Long servCreqEntityid;
-
+    private Stream<ServiceOrderRespDto> serviceOrderRespDtoStream;
 }

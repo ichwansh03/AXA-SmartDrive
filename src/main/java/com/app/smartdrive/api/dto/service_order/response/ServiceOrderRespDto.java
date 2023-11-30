@@ -3,6 +3,8 @@ package com.app.smartdrive.api.dto.service_order.response;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import lombok.*;
 
+import java.util.stream.Stream;
+
 @Builder
 @Getter
 @Setter
@@ -20,5 +22,5 @@ public class ServiceOrderRespDto {
     private Long seroServId;
     private Long seroAgentEntityid;
     private String seroArwgCode;
-
+    private Stream<SoTasksDto> soTasksDtoStream;
 }

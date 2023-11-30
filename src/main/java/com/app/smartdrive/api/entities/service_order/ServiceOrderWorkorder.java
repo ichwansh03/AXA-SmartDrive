@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -17,17 +16,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_workorder", schema = "so")
+@NamedQuery(
+        name = "ServiceOrderWorkorder.findBySowoId",
+        query = "SELECT sowo FROM ServiceOrderWorkorder sowo JOIN sowo.serviceOrderTasks seot WHERE sowo.sowoId = :sowoId")
 public class ServiceOrderWorkorder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sowo_id", insertable = false, updatable = false)
+    @Column(name = "sowo_id")
     private Long sowoId;
 
-    @Column(name = "sowo_id")
+    @Column(name = "sowo_name")
     private String sowoName;
 
-    @LastModifiedDate
     @Column(name = "sowo_modified_date")
     private LocalDateTime sowoModDate;
 
@@ -35,11 +36,8 @@ public class ServiceOrderWorkorder {
     @Size(max = 15, message = "work order status can't more than 15 characters")
     private String sowoStatus;
 
-    @Column(name = "sowo_seot_id")
-    private Long sowoSeotId;
-
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sowo_seot_id", referencedColumnName = "seot_id", insertable = false, updatable = false)
+    @JoinColumn(name = "sowo_seot_id")
     private ServiceOrderTasks serviceOrderTasks;
 }

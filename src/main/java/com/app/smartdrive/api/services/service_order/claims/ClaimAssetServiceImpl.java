@@ -1,8 +1,7 @@
-package com.app.smartdrive.api.services.service_order.implementation;
+package com.app.smartdrive.api.services.service_order.claims;
 
 import com.app.smartdrive.api.entities.service_order.ClaimAssetEvidence;
 import com.app.smartdrive.api.repositories.service_orders.CaevRepository;
-import com.app.smartdrive.api.services.service_order.ClaimAssetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
