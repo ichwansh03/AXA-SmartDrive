@@ -22,8 +22,7 @@ import java.util.List;
 @Table(name = "services", schema = "so")
 @NamedQuery(
         name = "Services.findServicesById",
-        query = "SELECT s FROM Services s JOIN s.users u " +
-                "JOIN s.customer c WHERE s.servId = :servId")
+        query = "SELECT s FROM Services s JOIN s.users u JOIN s.customer c WHERE s.servId = :servId")
 public class Services {
 
     @Id
