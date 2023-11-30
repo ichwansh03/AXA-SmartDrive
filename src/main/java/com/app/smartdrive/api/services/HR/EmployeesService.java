@@ -3,6 +3,7 @@ package com.app.smartdrive.api.services.HR;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 
 import com.app.smartdrive.api.dto.HR.EmployeesDto;
 import com.app.smartdrive.api.entities.hr.Employees;
@@ -14,4 +15,6 @@ public interface EmployeesService extends BaseService<Employees, Long>  {
  public EmployeesDto updateEmployee(Long employeeId, EmployeesDto updatedEmployeeDto);
  public List<EmployeesDto> getAllEmployeesDto();
  public List<Employees> getAllByEmployeeName(String employeeName);
+ 
+ public Page<Employees> searchEmployees(String value, int page, int size) ;
 }

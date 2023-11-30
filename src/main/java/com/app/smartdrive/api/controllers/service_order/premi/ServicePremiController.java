@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.controllers.service_order;
+package com.app.smartdrive.api.controllers.service_order.premi;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

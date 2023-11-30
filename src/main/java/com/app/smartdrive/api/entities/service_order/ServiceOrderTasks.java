@@ -1,10 +1,10 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,8 +47,10 @@ public class ServiceOrderTasks {
     private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
-    @Size(max = 15)
-    private String seotStatus;
+    private EnumModuleServiceOrders.SeotStatus seotStatus;
+    {
+        seotStatus = EnumModuleServiceOrders.SeotStatus.INPORGRESS;
+    }
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

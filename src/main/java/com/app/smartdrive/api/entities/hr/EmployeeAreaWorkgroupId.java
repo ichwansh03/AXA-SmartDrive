@@ -13,10 +13,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Embeddable
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class EmployeeAreaWorkgroupId implements Serializable {
+    
 
     @Column(name = "eawg_entityid")
     private Long eawgEntityid;
+   
 }
