@@ -9,7 +9,7 @@ import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -27,10 +27,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Entity
 @Table(name="employee_are_workgroup",schema="hr")
 public class EmployeeAreaWorkgroup {
@@ -45,20 +44,19 @@ public class EmployeeAreaWorkgroup {
     @Column(name = "eawg_arwg_code",length=15)
     private String eawgArwgCode;
 
-
     @ManyToOne
-    @MapsId
+    @MapsId("eawgArwgCode")
     @JoinColumn(name = "eawg_arwg_code",insertable = false, updatable = false)
     @JsonBackReference
     private AreaWorkGroup areaWorkGroup;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @MapsId("eawgEntityid")
-    @JoinColumn(name = "eawg_entityid")
+    @JoinColumn(name = "eawg_entityid", referencedColumnName = "emp_entityid")
     @JsonBackReference
     private Employees employees;
 
 
-
+    
 }
