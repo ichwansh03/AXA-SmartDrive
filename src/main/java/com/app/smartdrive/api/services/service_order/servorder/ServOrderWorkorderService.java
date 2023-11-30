@@ -1,10 +1,13 @@
 package com.app.smartdrive.api.services.service_order.servorder;
 
+import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
+
+import java.util.List;
 
 public interface ServOrderWorkorderService {
 
-    ServiceOrderWorkorder addSoWorkorder(ServiceOrderWorkorder serviceOrderWorkorder);
+    List<ServiceOrderWorkorder> generateSowo(ServiceOrderTasks seot);
 
     ServiceOrderWorkorder findBySowoId(Long sowoId);
 }

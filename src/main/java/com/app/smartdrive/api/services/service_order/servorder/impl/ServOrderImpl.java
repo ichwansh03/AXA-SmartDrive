@@ -1,14 +1,19 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +22,8 @@ public class ServOrderImpl implements ServOrderService {
 
     private final SoRepository soRepository;
     private final SoOrderRepository soOrderRepository;
+    private final SoTasksRepository soTasksRepository;
+    private final SoWorkorderRepository soWorkorderRepository;
 
     SoAdapter soAdapter = new SoAdapter();
 
@@ -26,7 +33,7 @@ public class ServOrderImpl implements ServOrderService {
 
         String formatSeroId = soAdapter.formatServiceOrderId(
                 services,
-                services.getUsers().getUserEntityId(),
+                services.getServId(),
                 services.getServStartDate());
 
         ServiceOrders serviceOrders = new ServiceOrders();
@@ -40,10 +47,14 @@ public class ServOrderImpl implements ServOrderService {
                 .servClaimEnddate(services.getServStartDate().plusYears(1))
                 .services(services).build();
 
-        ServiceOrders saved = soOrderRepository.save(serviceOrders);
+        ServiceOrders seroSaved = soOrderRepository.save(serviceOrders);
         log.info("SoOrderServiceImpl::addServiceOrders in ID {}",formatSeroId);
 
-        return saved;
+        ServOrderTaskImpl servOrderTask = new ServOrderTaskImpl(soTasksRepository, soWorkorderRepository);
+        List<ServiceOrderTasks> serviceOrderTasks = servOrderTask.generateSeotFeasiblity(seroSaved, services);
+        seroSaved.setServiceOrderTasks(serviceOrderTasks);
+
+        return serviceOrders;
     }
 
     @Override
