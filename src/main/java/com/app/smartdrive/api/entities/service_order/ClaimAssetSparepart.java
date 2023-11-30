@@ -39,7 +39,7 @@ public class ClaimAssetSparepart {
     private Long caspPartEntityid;
 
     @Column(name = "casp_sero_id")
-    private Long caspSeroId;
+    private String caspSeroId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "casp_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)

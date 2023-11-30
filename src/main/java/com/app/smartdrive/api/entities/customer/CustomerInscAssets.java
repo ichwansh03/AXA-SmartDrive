@@ -1,29 +1,15 @@
 package com.app.smartdrive.api.entities.customer;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -73,11 +59,11 @@ public class CustomerInscAssets {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
-    private List<CustomerInscDoc> customerInscDoc = new ArrayList<>();
+    private List<CustomerInscDoc> customerInscDoc;
     
     @JsonManagedReference
     @OneToMany(mappedBy = "customerInscAssets", cascade = CascadeType.ALL)
-    private List<CustomerInscExtend> customerInscExtend = new ArrayList<>();
+    private List<CustomerInscExtend> customerInscExtend;
 
     @JsonBackReference
     @ManyToOne

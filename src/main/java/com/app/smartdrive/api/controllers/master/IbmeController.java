@@ -10,10 +10,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +28,9 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<InboxMessaging> inboxMessaging = service.getAll();
+        List<IbmeDto> result = TransactionMapper.mapEntityListToDtoList(inboxMessaging, IbmeDto.class);
+        return ResponseEntity.ok(result);
     }
 
     @Override
@@ -36,6 +40,7 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     }
 
     @Override
+    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody IbmeDto request) {
         InboxMessaging result = new InboxMessaging();
@@ -43,23 +48,24 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     }
 
     @Override
-    @PatchMapping
+    @Transactional
+    @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody IbmeDto request) {
         InboxMessaging result = service.getById(request.getIbmeId());
         return getResponseEntity(request, result);
     }
 
     private ResponseEntity<?> getResponseEntity(@RequestBody @Valid IbmeDto request, InboxMessaging result) {
-        result = TransactionMapper.mapDtoToEntity(request, result);
         if(request.getIbmeDate() != null) {
             LocalDate localDate = LocalDate.parse(request.getIbmeDate().toString(), formatter);
             result.setIbmeDate(localDate);
         }
 
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override
+    @Transactional
     @DeleteMapping("/{id}")
     public ResponseEntity<?> destroyData(@PathVariable Long id) {
         service.deleteById(id);

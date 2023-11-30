@@ -5,16 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Embeddable
+import java.io.Serializable;
+
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServicePremiCreditId {
+public class ServicePremiCreditId implements Serializable {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "secr_id", nullable = false)
     private Long secrId;
 
-    @Column(name = "secr_serv_id", nullable = false)
     private Long secrServId;
 }

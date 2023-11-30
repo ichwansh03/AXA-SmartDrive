@@ -20,6 +20,9 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "services", schema = "so")
+@NamedQuery(
+        name = "Services.findServicesById",
+        query = "SELECT s FROM Services s JOIN s.users u JOIN s.customer c WHERE s.servId = :servId")
 public class Services {
 
     @Id
@@ -61,19 +64,8 @@ public class Services {
         servStatus = EnumModuleServiceOrders.ServStatus.ACTIVE;
     }
 
-    @Column(name = "serv_serv_id")
-    private Long servServId;
-
-    //User.userEntityid
-    @Column(name = "serv_cust_entityid")
-    private Long servCustEntityid;
-
-    //Customer.Request.creqEntityid
-    @Column(name = "serv_creq_entityid")
-    private Long servCreqEntityid;
-
     @ManyToOne
-    @JoinColumn(name = "serv_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
+    @JoinColumn(name = "serv_serv_id")
     Services parentServices;
 
     @JsonIgnore
@@ -81,20 +73,20 @@ public class Services {
     private List<Services> servicesList;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "serv_cust_entityid", referencedColumnName = "user_entityid", insertable = false, updatable = false)
+    @JoinColumn(name = "serv_cust_entityid")
     private User users;
 
     @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "serv_creq_entityid", referencedColumnName = "creq_entityid", insertable = false, updatable = false)
+    @JoinColumn(name = "serv_creq_entityid")
     private CustomerRequest customer;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL ,orphanRemoval = true)
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrdersSet;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private List<ServicePremi> servicePremiSet;
 }

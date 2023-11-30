@@ -3,8 +3,8 @@ package com.app.smartdrive.api.entities.service_order;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +19,11 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_tasks", schema = "so")
+@NamedQuery(
+        name = "ServiceOrderTasks.findSeotById",
+        query = "SELECT seot FROM ServiceOrderTasks seot JOIN seot.serviceOrders sero " +
+                "JOIN seot.areaWorkGroup arwg WHERE seot.seotId = :seotId"
+)
 public class ServiceOrderTasks {
 
     @Id
@@ -42,26 +47,22 @@ public class ServiceOrderTasks {
     private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
-    @Size(max = 15)
-    @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeotStatus seotStatus;
-
-    @Column(name = "seot_arwg_code")
-    @Size(max = 15)
-    private String seotArwgCode;
-
-    @Column(name = "seot_sero_id")
-    private Long seotSeroId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seot_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
-    AreaWorkGroup areaWorkGroup;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seot_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
-    ServiceOrders serviceOrders;
+    {
+        seotStatus = EnumModuleServiceOrders.SeotStatus.INPORGRESS;
+    }
 
     @JsonIgnore
-    @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seot_arwg_code")
+    AreaWorkGroup areaWorkGroup;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seot_sero_id")
+    ServiceOrders serviceOrders;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL)
     List<ServiceOrderWorkorder> serviceOrderWorkorders;
 }

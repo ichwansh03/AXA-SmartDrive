@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.TemplateServiceTaskDto;
+import com.app.smartdrive.api.dto.master.TewoDto;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TestaService;
@@ -10,7 +11,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,30 +26,33 @@ public class TestaController implements BaseController<TemplateServiceTaskDto, L
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<TemplateServiceTask> templateServiceTasks = service.getAll();
+        List<TemplateServiceTaskDto> result = templateServiceTasks.stream().map(testa -> {
+            return new TemplateServiceTaskDto(testa.getTestaId(), testa.getTestaName(), testa.getTestaId(), testa.getTestaGroup(), testa.getTestaCallMethod(), testa.getTestaSeqOrder(), TransactionMapper.mapEntityListToDtoList(testa.getTemplateTaskWorkOrder(), TewoDto.class));
+        }).toList();
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
         TemplateServiceTask testa = service.getById(id);
-        TemplateServiceTaskDto result = TransactionMapper.mapEntityToDto(testa, TemplateServiceTaskDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(testa, TemplateServiceTaskDto.class));
     }
 
     @Override
+    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody TemplateServiceTaskDto request) {
         TemplateServiceTask result = new TemplateServiceTask();
-        result = TransactionMapper.mapDtoToEntity(request,result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.OK);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.OK);
     }
 
     @Override
-    @PatchMapping
+    @Transactional
+    @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody TemplateServiceTaskDto request) {
         TemplateServiceTask result = service.getById(request.getTestaId());
-        result = TransactionMapper.mapDtoToEntity(request,result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.OK);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.OK);
     }
 }

@@ -2,7 +2,11 @@ package com.app.smartdrive.api.services.HR.implementation;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -10,6 +14,7 @@ import com.app.smartdrive.api.dto.HR.EmployeesDto;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserAddress;
@@ -28,6 +33,7 @@ import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.implementation.UserServiceImpl;
+import com.app.smartdrive.api.utils.NullUtils;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -56,6 +62,14 @@ public class EmployeesServiceImpl implements EmployeesService {
     public EmployeesDto addEmployee(EmployeesDto employeesDto) {
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
     
+        // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
+        // Long lastIndexUsdr;
+        // if(findTopByOrderByIdDesc.isPresent()){
+        // lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
+        // } else {
+        // lastIndexUsdr = 1L;
+        // }
+
         User user = new User();
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
@@ -63,6 +77,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         // Save the business entity and get the ID
         Long businessEntityId = businessEntityService.save(businessEntity); 
         
+        // if(employeesDto.getGrantUserAccess()){
         user.setUserBusinessEntity(businessEntity);
         user.setUserEntityId(businessEntityId);
         user.setUserName(employeesDto.getEmpName()+businessEntityId);
@@ -73,6 +88,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         user.setUserNPWP("npwp" + businessEntityId);
         
     
+        
         UserRoles userRoles = new UserRoles();
         UserRolesId userRolesId = new UserRolesId(businessEntityId,roleName.EM);
         userRoles.setUserRolesId(userRolesId);
@@ -88,14 +104,22 @@ public class EmployeesServiceImpl implements EmployeesService {
         Cities empCityEntity = cityRepository.findByCityName(employeesDto.getEmpCity());
     
         UserAddress userAddress = new UserAddress();
-        UserAdressId userAdressId = new UserAdressId();
-        userAdressId.setUsdrId(businessEntityId);
-        userAdressId.setUsdrEntityId(businessEntityId);
-        userAddress.setUserAdressId(userAdressId);
+        // UserAdressId userAdressId = new UserAdressId();
+        // userAddress.setUsdrId(businessEntityId);
+        userAddress.setUsdrEntityId(businessEntityId);
         userAddress.setUsdrAddress1(employeesDto.getEmpAddress());
         userAddress.setUsdrAdress2(employeesDto.getEmpAddress2());
         userAddress.setUser(user);
         userAddress.setCity(empCityEntity);
+        
+        userPhoneRepository.save(userPhone);
+        userAddressRepository.save(userAddress);
+        // }
+
+        // double commissionPercentage = 0.10; // 10%
+        // double premiumAmount = 1000000.0; // Example premium amount
+
+        // double commission = commissionPercentage * premiumAmount;
     
         Employees employee = new Employees();
         employee.setEmpEntityid(businessEntityId);
@@ -108,10 +132,11 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setUser(user);
         employee.setEmpJobCode(employeesDto.getEmpRole());
 
+        
+
 
         userServiceImpl.save(user);
-        userPhoneRepository.save(userPhone);
-        userAddressRepository.save(userAddress);
+        
 
         employeesRepository.save(employee);
 
@@ -136,56 +161,69 @@ public class EmployeesServiceImpl implements EmployeesService {
         // Retrieve the existing employee entity from the database
         Employees existingEmployee = employeesRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + employeeId));
-    
-        // Update the employee details
-        existingEmployee.setEmpName(updatedEmployeeDto.getEmpName());
-        LocalDateTime empJoinDate = LocalDateTime.parse(updatedEmployeeDto.getEmpJoinDate());
-        existingEmployee.setEmpJoinDate(empJoinDate);
-        existingEmployee.setEmpGraduate(EnumClassHR.emp_graduate.valueOf(updatedEmployeeDto.getEmpGraduate()));
-        existingEmployee.setEmpStatus(EnumClassHR.status.ACTIVE);
-        existingEmployee.setEmpNetSalary(updatedEmployeeDto.getEmpSalary());
-        existingEmployee.setEmpAccountNumber(updatedEmployeeDto.getEmpAccountNumber());
-        existingEmployee.setEmpJobCode(updatedEmployeeDto.getEmpRole());
-    
-        // Update associated user details
-        User user = existingEmployee.getUser();
-        user.setUserName(updatedEmployeeDto.getEmpName());
-        user.setUserEmail(updatedEmployeeDto.getEmpEmail());
-    
-        // Update associated user phone details
-        UserPhone userPhone = userPhoneRepository.findByUserUserEntityId(user.getUserEntityId());
-        userPhone.setUsphPhoneType("HP");
-        userPhone.setUsphModifiedDate(LocalDateTime.now());
-        userPhoneRepository.save(userPhone);
-    
-        // Update associated user address details
-        UserAddress userAddress = userAddressRepository.findByUserUserEntityId(user.getUserEntityId());
-        userAddress.setUsdrAddress1(updatedEmployeeDto.getEmpAddress());
-        userAddress.setUsdrAdress2(updatedEmployeeDto.getEmpAddress2());
-        userAddress.setCity(cityRepository.findByCityName(updatedEmployeeDto.getEmpCity()));
-        userAddressRepository.save(userAddress);
-    
-        // Save the updated entities
-        userServiceImpl.save(user);
-        employeesRepository.save(existingEmployee);
 
-        updatedEmployeeDto.setEmpName(updatedEmployeeDto.getEmpName());
-        updatedEmployeeDto.setEmpEmail(updatedEmployeeDto.getEmpEmail());
-        updatedEmployeeDto.setEmpPhone(updatedEmployeeDto.getEmpPhone());
-        updatedEmployeeDto.setEmpJoinDate(updatedEmployeeDto.getEmpJoinDate());
-        updatedEmployeeDto.setEmpGraduate(updatedEmployeeDto.getEmpGraduate());
-        updatedEmployeeDto.setEmpRole(updatedEmployeeDto.getEmpRole());
-        updatedEmployeeDto.setEmpSalary(updatedEmployeeDto.getEmpSalary());
-        updatedEmployeeDto.setEmpCity(updatedEmployeeDto.getEmpCity());
-        updatedEmployeeDto.setEmpAddress(updatedEmployeeDto.getEmpAddress());
-        updatedEmployeeDto.setEmpAddress2(updatedEmployeeDto.getEmpAddress2());
+        User user = existingEmployee.getUser(); 
+        
+        UserAddress userAddress = userAddressRepository.findByUserUserEntityId(user.getUserEntityId());
+        userAddress.setCity(cityRepository.findByCityName(updatedEmployeeDto.getEmpCity()));
+
+        LocalDateTime empJoinDate = LocalDateTime.parse(updatedEmployeeDto.getEmpJoinDate());
+        EnumClassHR.emp_graduate empGraduate = EnumClassHR.emp_graduate.valueOf(updatedEmployeeDto.getEmpGraduate());
+        NullUtils.updateIfChanged(existingEmployee::setEmpName, updatedEmployeeDto.getEmpName(), existingEmployee::getEmpName);
+        NullUtils.updateIfChanged(existingEmployee::setEmpJoinDate,empJoinDate,existingEmployee::getEmpJoinDate);
+        NullUtils.updateIfChanged(existingEmployee::setEmpGraduate, empGraduate, existingEmployee::getEmpGraduate);
+        NullUtils.updateIfChanged(existingEmployee::setEmpNetSalary, updatedEmployeeDto.getEmpSalary(), existingEmployee::getEmpNetSalary);
+        NullUtils.updateIfChanged(existingEmployee::setEmpAccountNumber, updatedEmployeeDto.getEmpPhone(), existingEmployee::getEmpAccountNumber);
+        NullUtils.updateIfChanged(user::setUserEmail, updatedEmployeeDto.getEmpEmail(), user::getUserEmail);
+        NullUtils.updateIfChanged(userAddress::setUsdrAddress1, updatedEmployeeDto.getEmpAddress(), userAddress::getUsdrAddress1);
+        NullUtils.updateIfChanged(userAddress::setUsdrAdress2, updatedEmployeeDto.getEmpAddress2(), userAddress::getUsdrAdress2);
+        // // Update the employee details
+        // existingEmployee.setEmpName(updatedEmployeeDto.getEmpName());
+        // LocalDateTime empJoinDate = LocalDateTime.parse(updatedEmployeeDto.getEmpJoinDate());
+        // existingEmployee.setEmpJoinDate(empJoinDate);
+        // existingEmployee.setEmpGraduate(EnumClassHR.emp_graduate.valueOf(updatedEmployeeDto.getEmpGraduate()));
+        // existingEmployee.setEmpStatus(EnumClassHR.status.ACTIVE);
+        // existingEmployee.setEmpNetSalary(updatedEmployeeDto.getEmpSalary());
+        // existingEmployee.setEmpAccountNumber(updatedEmployeeDto.getEmpAccountNumber());
+        // existingEmployee.setEmpJobCode(updatedEmployeeDto.getEmpRole());
+    
+        // // Update associated user details
+        // User user = existingEmployee.getUser();
+        // user.setUserName(updatedEmployeeDto.getEmpName());
+        // user.setUserEmail(updatedEmployeeDto.getEmpEmail());
+    
+        // // Update associated user phone details
+        // UserPhone userPhone = userPhoneRepository.findByUserUserEntityId(user.getUserEntityId());
+        // userPhone.setUsphPhoneType("HP");
+        // userPhone.setUsphModifiedDate(LocalDateTime.now());
+        // userPhoneRepository.save(userPhone);
+    
+        // // Update associated user address details
+        // UserAddress userAddress = userAddressRepository.findByUserUserEntityId(user.getUserEntityId());
+        // userAddress.setUsdrAddress1(updatedEmployeeDto.getEmpAddress());
+        // userAddress.setUsdrAdress2(updatedEmployeeDto.getEmpAddress2());
+        // userAddress.setCity(cityRepository.findByCityName(updatedEmployeeDto.getEmpCity()));
+        // userAddressRepository.save(userAddress);
+    
+        // // Save the updated entities
+        // userServiceImpl.save(user);
+        // employeesRepository.save(existingEmployee);
+
+        // updatedEmployeeDto.setEmpName(updatedEmployeeDto.getEmpName());
+        // updatedEmployeeDto.setEmpEmail(updatedEmployeeDto.getEmpEmail());
+        // updatedEmployeeDto.setEmpPhone(updatedEmployeeDto.getEmpPhone());
+        // updatedEmployeeDto.setEmpJoinDate(updatedEmployeeDto.getEmpJoinDate());
+        // updatedEmployeeDto.setEmpGraduate(updatedEmployeeDto.getEmpGraduate());
+        // updatedEmployeeDto.setEmpRole(updatedEmployeeDto.getEmpRole());
+        // updatedEmployeeDto.setEmpSalary(updatedEmployeeDto.getEmpSalary());
+        // updatedEmployeeDto.setEmpCity(updatedEmployeeDto.getEmpCity());
+        // updatedEmployeeDto.setEmpAddress(updatedEmployeeDto.getEmpAddress());
+        // updatedEmployeeDto.setEmpAddress2(updatedEmployeeDto.getEmpAddress2());
     
         // Return the updated DTO
         return updatedEmployeeDto;
     }
     
-    
-
 
     @Override
     public List<EmployeesDto> getAllEmployeesDto(){
@@ -198,6 +236,26 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.getEmpAccountNumber();
 
         return List.of(employee);
+    }
+
+    @Override
+    public Page<Employees> searchEmployees(String value, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        EnumClassHR.emp_graduate empGraduate = valueEmpGraduate(value);
+
+        if (empGraduate != null) {
+            return employeesRepository.findByEmpGraduate(empGraduate, pageable);
+        } else {
+            return employeesRepository.findByEmpNameContaining(value, pageable);
+        }
+    }
+
+    private EnumClassHR.emp_graduate valueEmpGraduate(String value) {
+        try {
+            return EnumClassHR.emp_graduate.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
     
 
@@ -225,9 +283,9 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
 
     @Override
-    public void deleteById(Long empEntityid) {
+    public void deleteById(Long emp_entityid) {
         // TODO Auto-generated method stub
-         employeesRepository.deleteById(empEntityid);
+         employeesRepository.deleteById(emp_entityid);
     }
     
 }

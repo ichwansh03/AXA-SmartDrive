@@ -26,7 +26,7 @@ public class Provinsi {
     private String provName;
 
     @Column(name = "prov_zones_id")
-    private Long prov_zones_id;
+    private Long provZonesId;
 
     @OneToMany(mappedBy = "provinsi")
     private List<Cities> cities;

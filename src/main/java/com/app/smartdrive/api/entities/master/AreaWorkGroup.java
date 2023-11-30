@@ -14,11 +14,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@DynamicUpdate
 @Table(name = "area_workgroup", schema = "mtr")
 public class AreaWorkGroup {
     @Id
@@ -36,16 +38,16 @@ public class AreaWorkGroup {
     @JoinColumn(name = "arwg_city_id", insertable = false, updatable = false)
     private Cities cities;
 
-    @OneToMany(mappedBy = "areaWorkGroup", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
+    @OneToMany(mappedBy = "areaWorkGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToMany(mappedBy = "areaWorkGroup")
     private List<ServiceOrders> serviceOrders;
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToMany(mappedBy = "areaWorkGroup")
     private List<ServiceOrderTasks> serviceOrderTasks;
 }

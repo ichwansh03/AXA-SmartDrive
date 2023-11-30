@@ -2,7 +2,9 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.InsuranceTypeDto;
+import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.entities.master.InsuranceType;
+import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.IntyService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,7 +12,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,30 +27,34 @@ public class IntyController implements BaseController<InsuranceTypeDto, String> 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(service.getAll());
+        List<InsuranceType> insuranceType = service.getAll();
+        List<InsuranceTypeDto> result = insuranceType.stream().map(inty -> {
+            return new InsuranceTypeDto(inty.getIntyName(), inty.getIntyDesc(), TransactionMapper.mapEntityListToDtoList(inty.getTemplateInsurancePremis(), TemplateInsurancePremiDto.class));
+        }).toList();
+
+        return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
         InsuranceType insuranceType = service.getById(id);
-        InsuranceTypeDto result = TransactionMapper.mapEntityToDto(insuranceType, InsuranceTypeDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(insuranceType, InsuranceTypeDto.class));
     }
 
     @Override
+    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody InsuranceTypeDto request) {
         InsuranceType result = new InsuranceType();
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 
     @Override
-    @PatchMapping
+    @Transactional
+    @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody InsuranceTypeDto request) {
-        InsuranceType result = service.getById(request.getIntyDesc());
-        result = TransactionMapper.mapDtoToEntity(request, result);
-        return new ResponseEntity<>(service.save(result), HttpStatus.CREATED);
+        InsuranceType result = service.getById(request.getIntyName());
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }

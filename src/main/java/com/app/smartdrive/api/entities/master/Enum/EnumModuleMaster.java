@@ -2,20 +2,20 @@ package com.app.smartdrive.api.entities.master.Enum;
 
 public enum EnumModuleMaster {
     CHECK,
-    SERVICE,
+    SERVICES,
     ORDER,
     STATUS;
 
     public enum TetyGroup {
-        SERVICE,
+        SERVICES,
         ORDER,
         STATUS
     }
 
     public enum Tety {
         CHECK_FEASIBILITY(EnumModuleMaster.CHECK, "FEASIBILITY"),
-        SERVICE_POLIS(EnumModuleMaster.SERVICE, "POLIS"),
-        SERVICE_CLAIM(EnumModuleMaster.SERVICE, "CLAIM"),
+        SERVICE_POLIS(EnumModuleMaster.SERVICES, "CREATE_POLIS"),
+        SERVICE_CLAIM(EnumModuleMaster.SERVICES, "CLAIM"),
         ORDER_CREATE(EnumModuleMaster.ORDER, "CREATE"),
         ORDER_MODIFY(EnumModuleMaster.ORDER, "MODIFY"),
         STATUS_OPEN(EnumModuleMaster.STATUS, "OPEN"),

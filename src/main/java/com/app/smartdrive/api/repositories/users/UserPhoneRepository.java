@@ -11,8 +11,8 @@ public interface UserPhoneRepository extends JpaRepository<UserPhone, UserPhoneI
   
     UserPhone findByUserUserEntityId(Long userEntityId);
 
-    @Query(value = "SELECT * FROM USERS.USER_PHONE WHERE USPH_PHONE_NUMBER = ?1", nativeQuery = true)
-    Optional<UserPhone> findByUsphPhoneNumber(String usphPhoneNumber);
+    @Query(value = "SELECT * FROM USERS.USER_PHONE WHERE USPH_PHONE_NUMBER = ?1 AND USPH_ENTITYID = ?2", nativeQuery = true)
+    Optional<UserPhone> findByUsphPhoneNumber(String usphPhoneNumber, Long id);
 
     @Modifying
     @Query(value = "UPDATE USERS.USER_PHONE SET USPH_PHONE_NUMBER =?1 WHERE USPH_PHONE_NUMBER =?2", nativeQuery = true) 

@@ -3,6 +3,9 @@ package com.app.smartdrive.api.controllers.customer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,35 +34,28 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestController {
     private final CustomerRequestServiceImpl customerRequestService;
 
-
     @GetMapping
-    public List<CustomerRequest> getAll(){
-        return this.customerRequestService.get();
+    public List<CustomerResponseDTO> getAll(){
+        List<CustomerRequest> customerRequestList = this.customerRequestService.get();
+        List<CustomerResponseDTO> customerRequestDTOList = customerRequestList.stream()
+                .map(creq -> this.customerRequestService.convert(creq)).
+                toList();
+        return customerRequestDTOList;
     }
+
 
     @PostMapping
     public CustomerResponseDTO create(
-        @Valid @RequestParam("client") String client,
-         @RequestParam("file") MultipartFile[] files
-        ) throws Exception{
-        
+            @Valid @RequestParam("client") String client,
+            @RequestParam("file") MultipartFile[] files
+    ) throws Exception{
+
         ObjectMapper mapper = new ObjectMapper();
         CustomerRequestDTO customerRequestDTO = mapper.readValue(client, CustomerRequestDTO.class);
 
-        CustomerRequest customerRequest = this.customerRequestService.create(customerRequestDTO, files);
-        
-        CustomerResponseDTO responseDTO = CustomerResponseDTO.builder()
-        .businessEntity(customerRequest.getBusinessEntity())
-        .creqCreateDate(customerRequest.getCreqCreateDate())
-        .creqStatus(customerRequest.getCreqStatus())
-        .creqType(customerRequest.getCreqType())
-        .customer(customerRequest.getCustomer())
-        .customerInscAssets(customerRequest.getCustomerInscAssets())
-        .build();
+        CustomerResponseDTO customerRequest = this.customerRequestService.create(customerRequestDTO, files);
 
-        return responseDTO;
+        return customerRequest;
     }
-
-
 
 }

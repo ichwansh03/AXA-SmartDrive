@@ -1,7 +1,5 @@
 package com.app.smartdrive.api.dto.customer.request;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +13,7 @@ public class CiasDTO {
 
     private String ciasYear;
 
-    private LocalDateTime ciasStartdate;
+    private String ciasStartdate;
 
     private Character ciasIsNewChar;
 
@@ -26,4 +24,8 @@ public class CiasDTO {
     private String cias_inty_name;
 
     private Long cias_city_id;
+
+    private Double currentPrice;
+
+    private Long[] cuexIds;
 }
