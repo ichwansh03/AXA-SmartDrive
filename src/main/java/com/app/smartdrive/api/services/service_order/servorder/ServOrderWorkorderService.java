@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ServOrderWorkorderService {
 
-    List<ServiceOrderWorkorder> generateSowo(ServiceOrderTasks seot);
+    List<ServiceOrderWorkorder> generateSowo(List<ServiceOrderTasks> seotList);
 
     ServiceOrderWorkorder findBySowoId(Long sowoId);
 }

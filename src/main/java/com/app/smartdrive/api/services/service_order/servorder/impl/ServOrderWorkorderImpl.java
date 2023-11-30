@@ -20,13 +20,12 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     private final SoWorkorderRepository soWorkorderRepository;
 
     @Override
-    public List<ServiceOrderWorkorder> generateSowo(ServiceOrderTasks seot) {
+    public List<ServiceOrderWorkorder> generateSowo(List<ServiceOrderTasks> seotList) {
         List<ServiceOrderWorkorder> sowo = new ArrayList<>();
-        sowo.add(new ServiceOrderWorkorder("CHECK UMUR", LocalDateTime.now(), false, 1, seot));
-        sowo.add(new ServiceOrderWorkorder("RELATE GOVERNMENT", LocalDateTime.now(), false, 1, seot));
-        sowo.add(new ServiceOrderWorkorder("PREMI SCHEMA", LocalDateTime.now(), false, 3, seot));
-        sowo.add(new ServiceOrderWorkorder("LEGAL DOCUMENT SIGNED", LocalDateTime.now(), false, 3, seot));
-
+        sowo.add(new ServiceOrderWorkorder("CHECK UMUR", LocalDateTime.now(), false, 1, seotList.get(0)));
+        sowo.add(new ServiceOrderWorkorder("RELATE GOVERNMENT", LocalDateTime.now(), false, 1, seotList.get(0)));
+        sowo.add(new ServiceOrderWorkorder("PREMI SCHEMA", LocalDateTime.now(), false, 3, seotList.get(2)));
+        sowo.add(new ServiceOrderWorkorder("LEGAL DOCUMENT SIGNED", LocalDateTime.now(), false, 3, seotList.get(2)));
         return soWorkorderRepository.saveAll(sowo);
     }
 
