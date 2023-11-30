@@ -2,9 +2,15 @@ package com.app.smartdrive.api.mapper.user;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.app.smartdrive.api.dto.user.UserAddressDto;
 import com.app.smartdrive.api.dto.user.UserDto;
+import com.app.smartdrive.api.dto.user.UserPhoneDto;
+import com.app.smartdrive.api.dto.user.UserRoleDto;
+import com.app.smartdrive.api.dto.user.UserUserAccountDto;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserRoles;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 
 public class UserMapper {
   public static UserDto convertUserToDto(User user){
@@ -12,13 +18,16 @@ public class UserMapper {
     for (UserRoles role : user.getUserRoles()) {
       listRole.add(role.getRoles().getRoleName().getValue());
     }
+
+
     UserDto userDto = UserDto.builder()
-      .userPhone(user.getUserPhone())
+      .userPhone(TransactionMapper.mapEntityListToDtoList(user.getUserPhone(), UserPhoneDto.class))
       .userEmail(user.getUserEmail())
-      .userAddress(user.getUserAddress())
-      .userAccounts(user.getUserAccounts())
+      .userAddress(TransactionMapper.mapEntityListToDtoList(user.getUserAddress(), UserAddressDto.class))
+      .userAccounts(TransactionMapper.mapEntityListToDtoList(user.getUserAccounts(), UserUserAccountDto.class))
       .userPhoto(user.getUserPhoto())
-      .userRoles(user.getUserRoles())
+      .userRoles(TransactionMapper.mapEntityListToDtoList(user.getUserRoles(), UserRoleDto.class))
+      .userFullName(user.getUserFullName())
       .build();
       return userDto;
   }

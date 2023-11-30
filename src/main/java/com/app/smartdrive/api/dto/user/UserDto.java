@@ -14,14 +14,13 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserDto {
   private String userPhoto;
   private String userFullName;
-  private List<UserRoles> userRoles;
+  private List<UserRoleDto> userRoles;
   private String userEmail;
-  private List<UserPhone> userPhone;
-  private List<UserAddress> userAddress;
-  private List<UserAccounts> userAccounts;
+  private List<UserPhoneDto> userPhone;
+  private List<UserAddressDto> userAddress;
+  private List<UserUserAccountDto> userAccounts;
 
 }

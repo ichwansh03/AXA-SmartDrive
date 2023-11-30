@@ -118,7 +118,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         UserAddress userAddress = new UserAddress();
         userAddress.setUsdrEntityId(businessEntityId);
         userAddress.setUsdrAddress1(employeesDto.getEmpAddress());
-        userAddress.setUsdrAdress2(employeesDto.getEmpAddress2());
+        userAddress.setUsdrAddress2(employeesDto.getEmpAddress2());
         userAddress.setUser(user);
         userAddress.setCity(empCityEntity);
         
@@ -191,7 +191,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         NullUtils.updateIfChanged(existingEmployee::setEmpAccountNumber, updatedEmployeeDto.getEmpPhone(), existingEmployee::getEmpAccountNumber);
         NullUtils.updateIfChanged(user::setUserEmail, updatedEmployeeDto.getEmpEmail(), user::getUserEmail);
         NullUtils.updateIfChanged(userAddress::setUsdrAddress1, updatedEmployeeDto.getEmpAddress(), userAddress::getUsdrAddress1);
-        NullUtils.updateIfChanged(userAddress::setUsdrAdress2, updatedEmployeeDto.getEmpAddress2(), userAddress::getUsdrAdress2);
+        NullUtils.updateIfChanged(userAddress::setUsdrAddress2, updatedEmployeeDto.getEmpAddress2(), userAddress::getUsdrAddress2);
         // // Update the employee details
         // existingEmployee.setEmpName(updatedEmployeeDto.getEmpName());
         // LocalDateTime empJoinDate = LocalDateTime.parse(updatedEmployeeDto.getEmpJoinDate());
