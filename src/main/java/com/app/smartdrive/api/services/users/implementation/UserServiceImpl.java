@@ -139,18 +139,24 @@ public class UserServiceImpl implements UserService {
 
     UserAccounts userAccounts = new UserAccounts();
     userAccounts.setUsac_accountno(userPost.getAccNumber());
-    if (userPost.getAccountType().equals("BANK")) { //urusan giry
+
+    
+   
+    if (userPost.getAccountType().equals("BANK")) { 
       userAccounts.setEnumPaymentType(EnumPaymentType.BANK);
       Banks bank = banksRepository.findByBankNameOptional(userPost.getBank())
           .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
       userAccounts.setBanks(bank);
       userAccounts.setUsacBankEntityid(bank.getBank_entityid());
+      userAccounts.setUsacUserEntityid(user.getUserEntityId());
     }
     if (userPost.getAccountType().equals("FINTECH")) {
       userAccounts.setEnumPaymentType(EnumPaymentType.FINTECH);
       Fintech fintech = fintechRepository.findByFintNameOptional(userPost.getFintech())
           .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
       userAccounts.setFintech(fintech);
+      userAccounts.setUsacFintEntityid(fintech.getFint_entityid());
+      userAccounts.setUsacUserEntityid(user.getUserEntityId());
     }
     userAccounts.setUser(user);
     userAccounts.setUsacUserEntityid(businessEntityId);

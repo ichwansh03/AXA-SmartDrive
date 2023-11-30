@@ -8,11 +8,10 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
-import com.app.smartdrive.api.dto.payment.BanksDto;
+import com.app.smartdrive.api.dto.payment.BanksIdForUserDto;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.mapper.payment.BanksMapper;
 import com.app.smartdrive.api.repositories.payment.BanksRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.services.payment.BankService;
@@ -35,79 +34,78 @@ public class BankServiceImpl implements BankService {
         entityManager.persist(banks);
         return banks;
     }
-   
+
+
+    @Override
+    public Banks getById(Long id) {
+        return banksRepository.findById(id).get();
+    }
+
+
+    @Override
+    public List<Banks> getAll() {
+        return banksRepository.findAll();
+    }
+    
     @Transactional
     @Override
-    public BanksDto addBanks(BanksDto banksDto) {
+    public Banks addedBanks(String bank_name, String bank_desc) {
         BusinessEntity busines = new BusinessEntity();
         busines.setEntityModifiedDate(LocalDateTime.now());
         Long businessEntityId = businessEntityService.save(busines);
-
+        
         Banks banks = new Banks();
         banks.setBusinessEntity(busines);
         banks.setBank_entityid(businessEntityId);
-        banks.setBank_name(banksDto.getBank_name());
-        banks.setBank_desc(banksDto.getBank_desc());
+        banks.setBank_name(bank_name);
+        banks.setBank_desc(bank_desc);
         addaBanks(banks);
-        BanksDto dto = BanksMapper.convertEntityToDto(banks);
-
-        return dto;
+        return banks;
     }
 
-    
-
-    @Override
-    public List<BanksDto> getAAll() {
-        List<Banks> listBanks = banksRepository.findAll();
-        List<BanksDto> listDto = new ArrayList<>();
-        for (Banks banks : listBanks) {
-            BanksDto banksDto = BanksMapper.convertEntityToDto(banks);
-            listDto.add(banksDto);
-        }
-        return listDto;
-    
-    }
-
-    @Override
-    public List<BanksDto> findById(Long id) {
-        Optional<Banks> Id = banksRepository.findById(id);
-        List<Banks> listBanks = banksRepository.findAll();
-        List<BanksDto> listDto = new ArrayList<>();
-        if(Id.isPresent()){
-            for (Banks banks : listBanks) {
-                if(id.equals(banks.getBank_entityid())){
-                    BanksDto dto = BanksMapper.convertEntityToDto(banks);
-                    listDto.add(dto);
-                }
-            }
-           
-        } return listDto;
-    }
 
     @Transactional
     @Override
-    public List<BanksDto> updateBanks(Long bank_entityid,BanksDto banksDto) {
+    public Banks save(Banks entity) {
+        return banksRepository.save(entity);
+    }
+
+
+    @Transactional
+    @Override
+    public Boolean updateBanks(Long bank_entityid,String banks_name, String banks_desc) {
         Optional<Banks> banksId = banksRepository.findById(bank_entityid);
-        List<BanksDto> listDto = new ArrayList<>();
         List<BusinessEntity> bE = businessEntityService.getAll();
         Banks bankss = banksId.get();
         BusinessEntity busines = new BusinessEntity();
         busines.setEntityModifiedDate(LocalDateTime.now());
-        if(banksId.isPresent()){ 
+        if(banksId.isPresent()){
             for (BusinessEntity bisnis: bE) {
                 if(bank_entityid.equals(bisnis.getEntityId())){
-                    bisnis.setEntityModifiedDate(LocalDateTime.now());
-                    bankss.setBank_name(banksDto.getBank_name());
-                    bankss.setBank_desc(banksDto.getBank_desc());
-                    repositoryBisnis.save(bisnis);
-                    banksRepository.save(bankss);
+                    if(banks_name!=null && banks_desc!=null){
+                        bisnis.setEntityModifiedDate(LocalDateTime.now());
+                        bankss.setBank_name(banks_name);
+                        bankss.setBank_desc(banks_desc);
+                        repositoryBisnis.save(bisnis);
+                        banksRepository.save(bankss);
+                    }else if(banks_name!=null){
+                        bisnis.setEntityModifiedDate(LocalDateTime.now());
+                        bankss.setBank_name(banks_name);
+                        repositoryBisnis.save(bisnis);
+                        banksRepository.save(bankss);
+                    }else if(banks_desc!=null){
+                        bisnis.setEntityModifiedDate(LocalDateTime.now());
+                        bankss.setBank_desc(banks_desc);
+                        repositoryBisnis.save(bisnis);
+                        banksRepository.save(bankss);
+                    }else{
+                        return false;
+                    }
+                    return true;
                 }
             }
-            BanksDto dto = BanksMapper.convertEntityToDto(bankss);
-            listDto.add(dto);
-                
-        }return listDto;
-       
+        }
+        return false;
     }
 
     @Override
@@ -128,36 +126,25 @@ public class BankServiceImpl implements BankService {
 
     }
 
-    @Override
-    public Optional<Banks> getId(Long id) {
-        // TODO Auto-generated method stub
-        return banksRepository.findById(id);
-    }
 
     @Override
-    public Banks getById(Long id) {
-        // TODO Auto-generated method stub
-        return null;
+    public BanksIdForUserDto getBanksUser(String bank_name) {
+        List<Banks> banksData = banksRepository.findAll();
+        Optional<Banks> banksName = banksRepository.findByBankNameOptional(bank_name);
+        BanksIdForUserDto bankUser = new BanksIdForUserDto();
+        if(banksName.isPresent()){
+            for (Banks banks : banksData) {
+                if(bank_name.equals(banks.getBank_name())){
+                    bankUser.setBank_entity_id(banks.getBank_entityid());
+                }
+            }
+        }
+        return bankUser;
     }
 
     
 
-
-    @Override
-    public List<Banks> getAll() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-
-
-    @Override
-    public Banks save(Banks entity) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    
 
 
 

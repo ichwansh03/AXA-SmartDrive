@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.payment.BanksDto;
+import com.app.smartdrive.api.dto.payment.BanksIdForUserDto;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
@@ -31,6 +31,7 @@ import com.app.smartdrive.api.services.payment.implementation.BankServiceImpl;
 import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -42,35 +43,29 @@ public class BanksController {
 
     @GetMapping("/banks/all")
     public ResponseEntity<?> getAllBanks(){
-        List<BanksDto> newSteam = service.getAAll();
-
-        // List<BanksDto> listDto = newSteam.stream().map(banks ->{
-        //     BanksDto dto = new BanksDto();
-        //     dto.setBank_name(banks.getBank_name());
-        //     dto.setBank_desc(banks.getBank_desc());
-        //     return dto;
-        // }).collect(Collectors.toList());
-
+        List<Banks> newSteam = service.getAll();
         return new ResponseEntity<>(newSteam,HttpStatus.OK);
     }
     @GetMapping("/banks/{bank_entityid}")
     public ResponseEntity<?> getBanksById(@Valid @PathVariable("bank_entityid") Long bank_entityid){
-        List<BanksDto> newid = service.findById(bank_entityid);
-        return new ResponseEntity<>(newid,HttpStatus.OK);
+       Banks newid = service.getById(bank_entityid);
+       return new ResponseEntity<>(newid,HttpStatus.OK);
     }
 
     @PostMapping("/banks/add")
-    public ResponseEntity<?> addBanks(@Valid @ModelAttribute BanksDto banksDto){
+    public ResponseEntity<?> addBanks(@Valid @RequestParam(name = "bank_name", required = true) String bank_name,
+    @RequestParam(name = "bank_desc",required = true) String bank_desc){
 
-       BanksDto addBanks = service.addBanks(banksDto);
-       return new ResponseEntity<>(addBanks,HttpStatus.CREATED);
+       Banks banks = service.addedBanks(bank_name, bank_desc);
+       return new ResponseEntity<>(banks,HttpStatus.CREATED);
     }
 
     @PutMapping("/banks/{bank_entityid}/update")
-    public ResponseEntity<?> updateBanks(@Valid @PathVariable("bank_entityid") Long bank_entityid, @ModelAttribute
-    BanksDto banksDto){
-        List<BanksDto> newDto = service.updateBanks(bank_entityid,banksDto);
-        return new ResponseEntity<>(newDto, HttpStatus.OK);
+    public ResponseEntity<?> updateBanks(@Valid @PathVariable("bank_entityid") Long bank_entityid, 
+    @RequestParam(name = "bank_name", required = false)String bank_name,
+    @RequestParam(name = "bank_desc", required = false)String bank_desc){
+        Boolean newBank = service.updateBanks(bank_entityid,bank_name, bank_desc);
+        return new ResponseEntity<>(newBank, HttpStatus.OK);
     }
 
     @DeleteMapping("/banks/delete/{bank_entityid}")
@@ -78,5 +73,11 @@ public class BanksController {
         var deleteId = service.deleteBanks(bank_entityid);
         
         return new ResponseEntity<>(deleteId, HttpStatus.OK);
-    }    
+    }   
+    @GetMapping("/banks/user/{bank_name}")
+    public ResponseEntity<?> getUserBanks(@Valid @PathVariable("bank_name") String bank_name){
+        BanksIdForUserDto getUser = service.getBanksUser(bank_name);
+        return new ResponseEntity<>(getUser, HttpStatus.OK);
+
+    } 
 }

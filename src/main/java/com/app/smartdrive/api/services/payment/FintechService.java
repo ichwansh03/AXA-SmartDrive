@@ -8,11 +8,9 @@ import com.app.smartdrive.api.entities.payment.Fintech;
 import com.app.smartdrive.api.services.BaseService;
 
 public interface FintechService extends BaseService<Fintech, Long>{
-
-    List<FintechDto> findAllFintech();
-    List<FintechDto> findFintechById(Long fintech_entityid);
-    FintechDto addFintech(FintechDto fintechDto);
-    Boolean updateFintech(Long fint_entityid, FintechDto fintechDto);
+    Fintech addedFintech(String fint_name, String fint_desc);
+    Boolean updateFintech(Long fint_entityid, String fint_name, String fint_desc);
     Boolean deleteFintech(Long fintech_entityid);
+    FintechDto getUserFintId(String fint_name);
     
 } 

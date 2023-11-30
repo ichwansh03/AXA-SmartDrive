@@ -3,14 +3,19 @@ package com.app.smartdrive.api.services.payment;
 import java.util.List;
 import java.util.Optional;
 
-import com.app.smartdrive.api.entities.payment.UserAccounts;
+import org.hibernate.validator.internal.engine.validationcontext.BaseBeanValidationContext;
 
-public interface UserAccountsService {
-    List<UserAccounts> findAllUserAccounts();
-    UserAccounts addUserAcc(UserAccounts userAccounts);
-    UserAccounts updateUserAcc(UserAccounts userAccounts);
-    void deleteUserAccountsById(Long usac_id);
-    Optional<UserAccounts> findByIdUserAcc(Long usac_id);
+import com.app.smartdrive.api.dto.payment.UserAccountsDtoRequests;
+import com.app.smartdrive.api.dto.payment.UserAccountsDtoResponse;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
+import com.app.smartdrive.api.services.BaseService;
+
+public interface UserAccountsService extends BaseService<UserAccounts, Long>{
+    List<UserAccountsDtoResponse> listDtoResponses();
+    UserAccountsDtoResponse getIdUser(Long usac_id);
+    Boolean addDebitCredit(Long usac_id, UserAccountsDtoRequests userAccountsDtoRequests);
+    Boolean updateDebitCredit(Long usac_id, UserAccountsDtoRequests userAccountsDto);
+    Boolean deleteUAById(Long usac_id);
 } 
    
 

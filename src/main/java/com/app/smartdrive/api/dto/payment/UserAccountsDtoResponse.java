@@ -7,7 +7,7 @@ import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 @Data
-public class UserAccountsDto {
+public class UserAccountsDtoResponse {
     
     private String usac_accountno;
     private Double usac_debet;
