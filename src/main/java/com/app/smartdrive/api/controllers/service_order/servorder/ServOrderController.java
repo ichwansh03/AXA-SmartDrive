@@ -3,6 +3,7 @@ package com.app.smartdrive.api.controllers.service_order.servorder;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class ServOrderController {
                 .map(serviceOrderTasks -> SoTasksDto.builder()
                         .seotId(serviceOrderTasks.getSeotId())
                         .seotName(serviceOrderTasks.getSeotName())
-                        .seotStatus(serviceOrderTasks.getSeotStatus())
+                        .seotStatus(EnumModuleServiceOrders.SeotStatus.valueOf(serviceOrderTasks.getSeotStatus()))
                         .seotStartDate(serviceOrderTasks.getSeotStartDate())
                         .seotEndDate(serviceOrderTasks.getSeotEndDate()).build());
 
