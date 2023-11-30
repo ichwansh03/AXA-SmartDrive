@@ -1,21 +1,18 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
-import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_tasks", schema = "so")
@@ -24,6 +21,8 @@ import java.util.List;
         query = "SELECT seot FROM ServiceOrderTasks seot JOIN seot.serviceOrders sero " +
                 "JOIN seot.areaWorkGroup arwg WHERE seot.seotId = :seotId"
 )
+@DynamicInsert
+@DynamicUpdate
 public class ServiceOrderTasks {
 
     @Id
@@ -47,10 +46,10 @@ public class ServiceOrderTasks {
     private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
-    private EnumModuleServiceOrders.SeotStatus seotStatus;
-    {
-        seotStatus = EnumModuleServiceOrders.SeotStatus.INPORGRESS;
-    }
+    private String seotStatus;
+
+    @Column(name = "seot_order")
+    private Integer seotOrder;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -65,4 +64,14 @@ public class ServiceOrderTasks {
     @JsonManagedReference
     @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL)
     List<ServiceOrderWorkorder> serviceOrderWorkorders;
+
+    public ServiceOrderTasks(String seotName, LocalDateTime seotActualStartdate, LocalDateTime seotActualEnddate, String seotStatus, Integer seotOrder, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders) {
+        this.seotName = seotName;
+        this.seotActualStartdate = seotActualStartdate;
+        this.seotActualEnddate = seotActualEnddate;
+        this.seotStatus = seotStatus;
+        this.seotOrder = seotOrder;
+        this.areaWorkGroup = areaWorkGroup;
+        this.serviceOrders = serviceOrders;
+    }
 }
