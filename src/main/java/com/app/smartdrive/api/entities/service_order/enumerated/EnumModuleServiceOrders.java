@@ -17,7 +17,7 @@ public class EnumModuleServiceOrders {
     }
 
     public enum SeotStatus {
-        INPORGRESS,
+        INPROGRESS,
         CANCELLED,
         COMPLETED
     }
