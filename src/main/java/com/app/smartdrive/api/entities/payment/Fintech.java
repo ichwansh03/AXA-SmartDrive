@@ -49,9 +49,9 @@ public class Fintech {
     @OneToMany(mappedBy = "fintech", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<UserAccounts> user_accounts;
 
-    // public Optional<Fintech> stream() {
-    //     return null;
-    // }   
+    public Optional<Fintech> stream() {
+        return null;
+    }   
 
 
 }
