@@ -62,13 +62,13 @@ public class EmployeesServiceImpl implements EmployeesService {
     public EmployeesDto addEmployee(EmployeesDto employeesDto) {
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
     
-        Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
-        Long lastIndexUsdr;
-        if(findTopByOrderByIdDesc.isPresent()){
-        lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
-        } else {
-        lastIndexUsdr = 1L;
-        }
+        // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
+        // Long lastIndexUsdr;
+        // if(findTopByOrderByIdDesc.isPresent()){
+        // lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
+        // } else {
+        // lastIndexUsdr = 1L;
+        // }
 
         User user = new User();
         BusinessEntity businessEntity = new BusinessEntity();
