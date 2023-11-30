@@ -1,25 +1,15 @@
 package com.app.smartdrive.api.entities.customer;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,17 +17,24 @@ import lombok.NoArgsConstructor;
 @Table(name = "customer_insc_doc", schema = "customer")
 @Entity
 public class CustomerInscDoc {
+
     @Id
-    @Column(name = "cadoc_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cadoc_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, 
+      generator = "id-generator")
+    @SequenceGenerator(
+      name = "id-generator",
+      sequenceName = "cadoc_cuex_id",
+      allocationSize = 1
+    )
     private Long cadocId;
 
     @Id
     @Column(name = "cadoc_creq_entityid")
     private Long cadocCreqEntityid;
 
-    @JsonBackReference
-    @OneToOne
+    @JsonIgnore
+    @ManyToOne
     @MapsId("cadocCreqEntityid")
     @JoinColumn(name = "cadoc_creq_entityid")
     private CustomerInscAssets customerInscAssets;

@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +18,8 @@ import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.users.UserAddress;
 
 import jakarta.transaction.Transactional;
+
+import java.util.Optional;
 
 @Repository
 public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, EmployeeAreaWorkgroupId> {
@@ -27,13 +31,14 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
 
     Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
 
-    
-
-
 
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(value = "delete from hr.employee_are_workgroup where eawg_id=:eawg_id", nativeQuery = true)
     void deleteEawgById(Long eawg_id);
     
+    EmployeeAreaWorkgroup findByEawgArwgCode(String eawgArwgCode);
+    EmployeeAreaWorkgroup findByAreaWorkGroup(AreaWorkGroup areaWorkGroup);
+
+
 }

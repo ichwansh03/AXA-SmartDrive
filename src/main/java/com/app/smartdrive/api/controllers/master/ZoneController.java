@@ -1,40 +1,59 @@
 package com.app.smartdrive.api.controllers.master;
 
+import com.app.smartdrive.api.controllers.BaseController;
+import com.app.smartdrive.api.dto.master.ProvinsiDto;
+import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.dto.master.ZonesDto;
 import com.app.smartdrive.api.entities.master.Zones;
-import com.app.smartdrive.api.services.master.implementation.ZoneServiceImpl;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.master.ZoneService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/zones")
-public class ZoneController {
-    private final ZoneServiceImpl service;
+@Tag(name = "Master Module")
+public class ZoneController implements BaseController<ZonesDto, Long> {
+    private final ZoneService service;
 
+    @Override
     @GetMapping
-    public ResponseEntity<?> findAllZones() {
-        return ResponseEntity.ok(service.getAll());
+    public ResponseEntity<?> findAllData() {
+        List<Zones> zones = service.getAll();
+        List<ZonesDto> result = zones.stream().map(zone -> {
+            return new ZonesDto(zone.getZonesId(), zone.getZonesName(), TransactionMapper.mapEntityListToDtoList(zone.getTemplateInsurancePremis(), TemplateInsurancePremiDto.class), TransactionMapper.mapEntityListToDtoList(zone.getProvinsi(), ProvinsiDto.class));
+        }).toList();
+        return ResponseEntity.ok(result);
     }
 
+    @Override
     @GetMapping("/{id}")
-    public ResponseEntity<?> findZoneById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+    public ResponseEntity<?> findDataById(@PathVariable Long id) {
+        Zones zones = service.getById(id);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(zones, ZonesDto.class));
     }
 
+    @Override
+    @Transactional
     @PostMapping
-    public ResponseEntity<?> saveZone(@Valid @RequestBody ZonesDto request) {
-        Zones zones = new Zones();
-        zones.setZonesName(request.getZonesName());
-        return ResponseEntity.ok(service.save(zones));
+    public ResponseEntity<?> saveData(@Valid @RequestBody ZonesDto request) {
+        Zones result = new Zones();
+        return ResponseEntity.ok(service.save(TransactionMapper.mapDtoToEntity(request, result)));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateZoneById(@Valid @RequestBody ZonesDto request) {
-        Zones zones = service.getById(request.getZonesId());
-        zones.setZonesName(request.getZonesName());
-        return ResponseEntity.ok(service.save(zones));
+    @Override
+    @Transactional
+    @PutMapping
+    public ResponseEntity<?> updateData(@Valid @RequestBody ZonesDto request) {
+        Zones result = service.getById(request.getZonesId());
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
     }
 }

@@ -3,6 +3,7 @@ package com.app.smartdrive.api.entities.payment;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.engine.jdbc.Size;
 
 import com.app.smartdrive.api.entities.users.BusinessEntity;
@@ -41,11 +42,12 @@ public class Fintech {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fint_entityid", referencedColumnName = "entityid")
-    @JsonIgnore
+    @JsonBackReference
     BusinessEntity businessEntity;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "fintech", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<User_accounts> user_accounts;
+    List<UserAccounts> user_accounts;
 
     public Optional<Fintech> stream() {
         return null;

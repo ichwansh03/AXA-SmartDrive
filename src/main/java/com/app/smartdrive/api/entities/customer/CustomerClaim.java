@@ -1,21 +1,12 @@
 package com.app.smartdrive.api.entities.customer;
 
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -27,7 +18,7 @@ public class CustomerClaim {
     @Column(name = "cucl_creq_entityid")
     private Long  cuclCreqEntityid;
 
-    @JsonIgnore
+    @JsonBackReference
     @OneToOne
     @MapsId
     @JoinColumn(name = "cucl_creq_entityid")

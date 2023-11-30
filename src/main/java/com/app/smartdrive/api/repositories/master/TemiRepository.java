@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TemiRepository extends JpaRepository<TemplateInsurancePremi, Long> {
+    TemplateInsurancePremi findByTemiZonesIdAndTemiIntyNameAndTemiCateId(Long zonesId, String temiIntyName, Long temiCateId);
 }

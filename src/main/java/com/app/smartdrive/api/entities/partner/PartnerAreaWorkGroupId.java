@@ -2,10 +2,14 @@ package com.app.smartdrive.api.entities.partner;
 
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
 @Embeddable
+@Getter
+@Setter
 public class PartnerAreaWorkGroupId implements Serializable {
     @Column(name = "pawo_arwg_code", nullable = false)
     private String areaWorkGroup;

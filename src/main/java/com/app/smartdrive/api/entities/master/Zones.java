@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -23,4 +25,7 @@ public class Zones {
 
     @OneToMany(mappedBy = "zones", fetch = FetchType.LAZY)
     private List<TemplateInsurancePremi> templateInsurancePremis;
+
+    @OneToMany(mappedBy = "zones", fetch = FetchType.LAZY)
+    private List<Provinsi> provinsi;
 }

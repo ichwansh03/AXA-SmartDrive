@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface CaevRepository extends JpaRepository<ClaimAssetEvidence, Long> {
 
-    List<ClaimAssetEvidence> findAllByCaevSeroId(String seroId);
 }

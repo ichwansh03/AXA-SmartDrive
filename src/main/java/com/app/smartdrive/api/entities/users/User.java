@@ -5,7 +5,8 @@ import java.util.List;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.entities.payment.User_accounts;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
+import com.app.smartdrive.api.entities.service_order.Services;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -68,7 +69,7 @@ public class User {
   @Column(name = "user_modified_date")
   private LocalDateTime userModifiedDate;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @MapsId
   @JoinColumn(name = "user_entityid")
   @JsonBackReference
@@ -97,8 +98,13 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
-  private List<User_accounts> user_accounts;
+  private List<UserAccounts> userAccounts;
 
-  @OneToMany(mappedBy = "customer")
+  @JsonIgnore
+  @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
   List<CustomerRequest> customerRequest;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "users",cascade = CascadeType.ALL)
+  List<Services> services;
 }

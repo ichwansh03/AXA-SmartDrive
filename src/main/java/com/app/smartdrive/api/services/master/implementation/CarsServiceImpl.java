@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.services.master.implementation;
 
-import com.app.smartdrive.api.dto.master.CarSeriesDto;
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.repositories.master.CarsRepository;
 import com.app.smartdrive.api.services.master.CarsService;
@@ -14,22 +13,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CarsServiceImpl implements CarsService {
     private final CarsRepository repository;
+
     @Override
-    public List<CarSeriesDto> findAllCarSeries() {
-        List<CarSeries> carSeries = repository.findAll();
-        List<CarSeriesDto> carSeriesDtos =  carSeries.stream().map(car -> {
-            return new CarSeriesDto(car.getCarsId(), car.getCarsName(), car.getCarsPassenger(), car.getCarsCarmId());
-        }).toList();
-        return carSeriesDtos;
-    }
-    @Override
-    public CarSeries findCarSeriesById(Long id) {
-        CarSeries carSeries = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Car Series ID : " + id + " Not Found !"));
-        return carSeries;
+    public CarSeries getById(Long aLong) {
+        return repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Series ID : " + aLong + " Not Found"));
     }
 
     @Override
-    public CarSeries createSeries(CarSeries carSeries) {
-        return repository.save(carSeries);
+    public List<CarSeries> getAll() {
+        return repository.findAll();
+    }
+
+    @Override
+    public CarSeries save(CarSeries entity) {
+        return repository.save(entity);
     }
 }

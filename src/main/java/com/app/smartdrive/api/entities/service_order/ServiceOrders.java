@@ -6,43 +6,51 @@ import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServic
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
+@NamedQuery(
+        name = "ServiceOrders.findServiceOrdersById",
+        query = "SELECT sero FROM ServiceOrders sero JOIN sero.services s JOIN sero.employees emp" +
+                " JOIN sero.areaWorkGroup arwg WHERE sero.seroId = :seroId")
 public class ServiceOrders {
 
+    //format seroId (condition serv type)
     @Id
     @Column(name = "sero_id", unique = true)
-    @Size(max = 25)
     private String seroId;
 
+    //Services.servType
     @Column(name = "sero_ordt_type")
-    @Size(max = 15)
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
+    {
+        seroOrdtType = EnumModuleServiceOrders.SeroOrdtType.CLOSE;
+    }
 
+    //CustomerRequest.creqStatus
     @Column(name = "sero_status")
-    @Size(max = 15)
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroStatus seroStatus;
+    {
+        seroStatus = EnumModuleServiceOrders.SeroStatus.OPEN;
+    }
 
+    //CustomerClaim.cuclReason
     @Column(name = "sero_reason")
     private String seroReason;
 
     @Column(name = "serv_claim_no")
-    @Size(max = 12)
+    @Size(max = 12, message = "claim number can't more than 12 characters")
     private String servClaimNo;
 
     @Column(name = "serv_claim_startdate")
@@ -51,49 +59,39 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
-    @Column(name = "sero_serv_id")
-    private Long seroServId;
-
-    @Column(name = "sero_sero_id")
-    private String seroSeroId;
-
-    @Column(name = "sero_agent_entityid")
-    private Long seroAgentEntityid;
-
-    @Column(name = "sero_arwg_code")
-    @Size(max = 15)
-    private String seroArwgCode;
-
-    //add referenced column
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false, unique = true)
-    Services services;
+    @ManyToOne
+    @JoinColumn(name = "sero_sero_id")
+    private ServiceOrders parentServiceOrders;
 
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "sero_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
-    ServiceOrders parentServiceOrders;
+    //@JsonIgnore
+    @OneToMany(mappedBy = "parentServiceOrders")
+    private List<ServiceOrders> serviceOrdersList;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "emp_entityid", insertable = false, updatable = false)
-    Employees employees;
+    @JoinColumn(name = "sero_serv_id")
+    private Services services;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_arwg_code", referencedColumnName = "arwg_code", insertable = false, updatable = false)
-    AreaWorkGroup areaWorkGroup;
+    @JoinColumn(name = "sero_agent_entityid")
+    private Employees employees;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "serviceOrders", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<ServiceOrderTasks> serviceOrderTasksSet;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sero_arwg_code")
+    private AreaWorkGroup areaWorkGroup;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "caevServiceOrders", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<ClaimAssetEvidence> claimAssetEvidenceSet;
+    //@JsonIgnore
+    @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
+    private List<ServiceOrderTasks> serviceOrderTasks;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "caspServiceOrders", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<ClaimAssetSparepart> claimAssetSparepartSet;
+    //@JsonIgnore
+    @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL)
+    private List<ClaimAssetEvidence> claimAssetEvidence;
+
+    //@JsonIgnore
+    @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL)
+    private List<ClaimAssetSparepart> claimAssetSparepart;
 }

@@ -28,7 +28,7 @@ public class CarSeries {
     @Column(name = "cars_passenger")
     private int carsPassenger;
 
-    @Column(name = "cars_carm_id", nullable = false)
+    @Column(name = "cars_carm_id")
     private Long carsCarmId;
 
     @JsonIgnore

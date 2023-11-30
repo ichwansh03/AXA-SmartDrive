@@ -30,7 +30,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     public Partner getById(Long entityId) {
-        return partnerRepository.findById(entityId).orElseThrow(()->new RuntimeException());
+        return partnerRepository.findById(entityId).get();
     }
 
     @Override
@@ -71,8 +71,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     public Page<Partner> searchByNameOrNpwp(String value, int page) {
-        Pageable pageable = PageRequest.of(page, 1);
-        String valueWithBound = "%"+value+"%";
+        Pageable pageable = PageRequest.of(page, 2);
         Page<Partner> partnerWithNameOrNpwpByValue;
         partnerWithNameOrNpwpByValue = partnerRepository.findAllByPartNameContainingOrPartNpwpContaining(value, value, pageable);
         return partnerWithNameOrNpwpByValue;

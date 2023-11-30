@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,7 +26,7 @@ public class Provinsi {
     private String provName;
 
     @Column(name = "prov_zones_id")
-    private Long prov_zones_id;
+    private Long provZonesId;
 
     @OneToMany(mappedBy = "provinsi")
     private List<Cities> cities;
