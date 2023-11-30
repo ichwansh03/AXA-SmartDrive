@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.mapper.payment;
 
-import com.app.smartdrive.api.dto.payment.UserAccountsDtoResponse;
+import com.app.smartdrive.api.dto.payment.Response.UserAccountsDtoResponse;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 
 import lombok.Data;

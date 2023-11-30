@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.payment.BanksIdForUserDto;
+import com.app.smartdrive.api.dto.payment.Response.BanksDto;
+import com.app.smartdrive.api.dto.payment.Response.BanksIdForUserDto;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
@@ -43,28 +44,25 @@ public class BanksController {
 
     @GetMapping("/banks/all")
     public ResponseEntity<?> getAllBanks(){
-        List<Banks> newSteam = service.getAll();
-        return new ResponseEntity<>(newSteam,HttpStatus.OK);
+        List<BanksDto> resultDto = service.getAll();
+        return new ResponseEntity<>(resultDto,HttpStatus.OK);
     }
     @GetMapping("/banks/{bank_entityid}")
     public ResponseEntity<?> getBanksById(@Valid @PathVariable("bank_entityid") Long bank_entityid){
-       Banks newid = service.getById(bank_entityid);
-       return new ResponseEntity<>(newid,HttpStatus.OK);
+       BanksDto resultDto = service.getById(bank_entityid);
+       return new ResponseEntity<>(resultDto,HttpStatus.OK);
     }
 
     @PostMapping("/banks/add")
-    public ResponseEntity<?> addBanks(@Valid @RequestParam(name = "bank_name", required = true) String bank_name,
-    @RequestParam(name = "bank_desc",required = true) String bank_desc){
-
-       Banks banks = service.addedBanks(bank_name, bank_desc);
-       return new ResponseEntity<>(banks,HttpStatus.CREATED);
+    public ResponseEntity<?> addBanks(@Valid @RequestBody BanksDto banksDto){
+       BanksDto resultDto = service.save(banksDto);
+       return new ResponseEntity<>(resultDto,HttpStatus.CREATED);
     }
 
-    @PutMapping("/banks/{bank_entityid}/update")
+    @PutMapping("/banks/update/{bank_entityid}")
     public ResponseEntity<?> updateBanks(@Valid @PathVariable("bank_entityid") Long bank_entityid, 
-    @RequestParam(name = "bank_name", required = false)String bank_name,
-    @RequestParam(name = "bank_desc", required = false)String bank_desc){
-        Boolean newBank = service.updateBanks(bank_entityid,bank_name, bank_desc);
+    @RequestBody BanksDto banksDto){
+        Boolean newBank = service.updateBanks(bank_entityid,banksDto);
         return new ResponseEntity<>(newBank, HttpStatus.OK);
     }
 

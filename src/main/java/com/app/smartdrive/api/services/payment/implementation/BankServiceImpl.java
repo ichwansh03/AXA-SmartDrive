@@ -8,10 +8,12 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
-import com.app.smartdrive.api.dto.payment.BanksIdForUserDto;
+import com.app.smartdrive.api.dto.payment.Response.BanksDto;
+import com.app.smartdrive.api.dto.payment.Response.BanksIdForUserDto;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.mapper.payment.BanksMapper;
 import com.app.smartdrive.api.repositories.payment.BanksRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.services.payment.BankService;
@@ -23,13 +25,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BankServiceImpl implements BankService {
     private final EntityManager entityManager;
     private final BanksRepository banksRepository;
     private final BusinessEntityService businessEntityService;
     private final BusinessEntityRepository repositoryBisnis;
 
-    @Transactional
     public Banks addaBanks(Banks banks){
         entityManager.persist(banks);
         return banks;
@@ -37,65 +39,66 @@ public class BankServiceImpl implements BankService {
 
 
     @Override
-    public Banks getById(Long id) {
-        return banksRepository.findById(id).get();
+    public BanksDto getById(Long id) {
+        Optional<Banks> idBanks = banksRepository.findById(id);
+        Banks banks = idBanks.get();
+        BanksDto dto = BanksMapper.convertEntityToDto(banks);
+        return dto;
     }
 
 
     @Override
-    public List<Banks> getAll() {
-        return banksRepository.findAll();
+    public List<BanksDto> getAll() {
+        List<Banks> banksList = banksRepository.findAll();
+        List<BanksDto> banksDtos = new ArrayList<>();
+        for (Banks banks : banksList) {
+            BanksDto dto = BanksMapper.convertEntityToDto(banks);
+            banksDtos.add(dto);
+        }
+        return banksDtos;
     }
-    
-    @Transactional
+
     @Override
-    public Banks addedBanks(String bank_name, String bank_desc) {
-        BusinessEntity busines = new BusinessEntity();
+    public BanksDto save(BanksDto banksDto) {
+       BusinessEntity busines = new BusinessEntity();
         busines.setEntityModifiedDate(LocalDateTime.now());
         Long businessEntityId = businessEntityService.save(busines);
         
         Banks banks = new Banks();
         banks.setBusinessEntity(busines);
         banks.setBank_entityid(businessEntityId);
-        banks.setBank_name(bank_name);
-        banks.setBank_desc(bank_desc);
+        banks.setBank_name(banksDto.getBank_name());
+        banks.setBank_desc(banksDto.getBank_desc());
         addaBanks(banks);
-        return banks;
+
+        BanksDto dto = BanksMapper.convertEntityToDto(banks);
+        return dto;
     }
 
-
-    @Transactional
     @Override
-    public Banks save(Banks entity) {
-        return banksRepository.save(entity);
-    }
-
-
-    @Transactional
-    @Override
-    public Boolean updateBanks(Long bank_entityid,String banks_name, String banks_desc) {
+    public Boolean updateBanks(Long bank_entityid,BanksDto banksDto) {
         Optional<Banks> banksId = banksRepository.findById(bank_entityid);
-        List<BusinessEntity> bE = businessEntityService.getAll();
+        List<BusinessEntity> listBusinessEntities = businessEntityService.getAll();
         Banks bankss = banksId.get();
         BusinessEntity busines = new BusinessEntity();
         busines.setEntityModifiedDate(LocalDateTime.now());
         if(banksId.isPresent()){
-            for (BusinessEntity bisnis: bE) {
+            for (BusinessEntity bisnis: listBusinessEntities) {
                 if(bank_entityid.equals(bisnis.getEntityId())){
-                    if(banks_name!=null && banks_desc!=null){
+                    if(banksDto.getBank_name()!=null && banksDto.getBank_desc()!=null){
                         bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        bankss.setBank_name(banks_name);
-                        bankss.setBank_desc(banks_desc);
+                        bankss.setBank_name(banksDto.getBank_name());
+                        bankss.setBank_desc(banksDto.getBank_desc());
                         repositoryBisnis.save(bisnis);
                         banksRepository.save(bankss);
-                    }else if(banks_name!=null){
+                    }else if(banksDto.getBank_name()!=null){
                         bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        bankss.setBank_name(banks_name);
+                        bankss.setBank_name(banksDto.getBank_name());
                         repositoryBisnis.save(bisnis);
                         banksRepository.save(bankss);
-                    }else if(banks_desc!=null){
+                    }else if(banksDto.getBank_desc()!=null){
                         bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        bankss.setBank_desc(banks_desc);
+                        bankss.setBank_desc(banksDto.getBank_desc());
                         repositoryBisnis.save(bisnis);
                         banksRepository.save(bankss);
                     }else{
@@ -125,38 +128,18 @@ public class BankServiceImpl implements BankService {
         }
 
     }
-
-
     @Override
     public BanksIdForUserDto getBanksUser(String bank_name) {
         List<Banks> banksData = banksRepository.findAll();
         Optional<Banks> banksName = banksRepository.findByBankNameOptional(bank_name);
-        BanksIdForUserDto bankUser = new BanksIdForUserDto();
+        BanksIdForUserDto bankDtoId = new BanksIdForUserDto();
         if(banksName.isPresent()){
             for (Banks banks : banksData) {
                 if(bank_name.equals(banks.getBank_name())){
-                    bankUser.setBank_entity_id(banks.getBank_entityid());
+                    bankDtoId.setBank_entity_id(banks.getBank_entityid());
                 }
             }
         }
-        return bankUser;
+        return bankDtoId;
     }
-
-    
-
-    
-
-
-
-   
-    
-
-    
-    
-
-    
-
-    
-    
-    
 }

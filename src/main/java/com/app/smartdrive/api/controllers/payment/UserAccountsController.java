@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.payment.UserAccountsDtoRequests;
-import com.app.smartdrive.api.dto.payment.UserAccountsDtoResponse;
+import com.app.smartdrive.api.dto.payment.Request.UserAccountsDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.UserAccountsDtoResponse;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.services.payment.UserAccountsService;

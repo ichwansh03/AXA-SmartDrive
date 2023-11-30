@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.payment;
+package com.app.smartdrive.api.dto.payment.Response;
 
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
 

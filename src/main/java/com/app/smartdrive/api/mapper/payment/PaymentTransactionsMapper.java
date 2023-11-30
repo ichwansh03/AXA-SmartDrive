@@ -3,7 +3,7 @@ package com.app.smartdrive.api.mapper.payment;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.app.smartdrive.api.dto.payment.PaymentTransactionsDto;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactionsDto;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 
 import lombok.Data;
