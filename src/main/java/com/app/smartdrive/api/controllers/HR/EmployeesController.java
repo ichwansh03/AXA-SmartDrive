@@ -39,13 +39,10 @@ import lombok.RequiredArgsConstructor;
 public class EmployeesController {
      private final EmployeesService employeesService;
 
-     
-
      @PostMapping("/add")
-     public ResponseEntity<?> addEmployee(@ModelAttribute EmployeesDto employeesDto) {
+     public ResponseEntity<?> addEmployee(@RequestBody EmployeesDto employeesDto) {
             EmployeesDto addedEmployee = employeesService.addEmployee(employeesDto);
             return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
-        
     }
 
     @DeleteMapping("/delete")

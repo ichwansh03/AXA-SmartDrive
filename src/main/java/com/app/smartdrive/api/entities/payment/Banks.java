@@ -47,7 +47,7 @@ public class Banks {
     @JsonBackReference
     BusinessEntity businessEntity;
 
-    @JsonIgnore
+    // @JsonIgnore
     @OneToMany(mappedBy = "banks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<UserAccounts> user_accounts;   
 
