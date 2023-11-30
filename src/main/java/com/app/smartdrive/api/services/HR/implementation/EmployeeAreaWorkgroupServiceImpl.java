@@ -66,7 +66,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         Employees existingEmployee = employeesRepository.findByEmpName(employeeAreaWorkgroupDto.getEmpName());
            
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
-        
+         
         employeeAreaWorkgroup.setEawgEntityid(existingEmployee.getEmpEntityid());
         employeeAreaWorkgroup.setEmployees(existingEmployee);   
         
