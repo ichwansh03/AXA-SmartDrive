@@ -1,7 +1,8 @@
 package com.app.smartdrive.api.dto.user;
 
-import com.app.smartdrive.api.dto.payment.BanksDto;
-import com.app.smartdrive.api.dto.payment.FintechDto;
+
+import com.app.smartdrive.api.dto.payment.Response.BanksDto;
+import com.app.smartdrive.api.dto.payment.Response.FintechDto;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
