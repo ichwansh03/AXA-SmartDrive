@@ -11,7 +11,7 @@ import com.app.smartdrive.api.entities.users.UserAdressId;
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface UserAddressRepository extends JpaRepository<UserAddress, UserAdressId> {
+public interface UserAddressRepository extends JpaRepository<UserAddress, Long> {
     @Query(value = "SELECT TOP(1) * FROM USERS.USER_ADDRESS ORDER BY usdr_id DESC", nativeQuery = true)
     Optional<UserAddress> findLastOptional();
     @Query(value = "SELECT * FROM USERS.USER_ADDRESS WHERE USDR_ID = ?1", nativeQuery = true)

@@ -116,20 +116,20 @@ public class UserServiceImpl implements UserService {
 
     Cities city = cityRepository.findByCityName(userPost.getCity()); //Validate
 
-    Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
-    Long lastIndexUsdr;
-    if (findTopByOrderByIdDesc.isPresent()) {
-      lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
-    } else {
-      lastIndexUsdr = 1L;
-    }
+    // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
+    // Long lastIndexUsdr;
+    // if (findTopByOrderByIdDesc.isPresent()) {
+    //   lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
+    // } else {
+    //   lastIndexUsdr = 1L;
+    // }
 
-    UserAdressId userAdressId = new UserAdressId();
-    userAdressId.setUsdrId(lastIndexUsdr + 1); //tambahin sequence
-    userAdressId.setUsdrEntityId(businessEntityId);
+    // UserAdressId userAdressId = new UserAdressId();
+    // userAdressId.setUsdrId(lastIndexUsdr + 1); //tambahin sequence
     UserAddress userAddress = new UserAddress();
+    userAddress.setUsdrEntityId(businessEntityId);
     userAddress.setUsdrCityId(city.getCityId());
-    userAddress.setUserAdressId(userAdressId);
+    // userAddress.setUserAdressId(userAdressId);
     userAddress.setCity(city);
     userAddress.setUsdrAddress1(userPost.getAddress1());
     userAddress.setUsdrAdress2(userPost.getAddress2());

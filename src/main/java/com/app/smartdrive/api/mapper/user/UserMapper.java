@@ -15,10 +15,10 @@ public class UserMapper {
     UserDto userDto = UserDto.builder()
       .userPhone(user.getUserPhone())
       .userEmail(user.getUserEmail())
-      .userAddresses(user.getUserAddress())
+      .userAddress(user.getUserAddress())
       .userAccounts(user.getUserAccounts())
       .userPhoto(user.getUserPhoto())
-      .role(listRole)
+      .userRoles(user.getUserRoles())
       .build();
       return userDto;
   }

@@ -104,8 +104,9 @@ public class EmployeesServiceImpl implements EmployeesService {
         Cities empCityEntity = cityRepository.findByCityName(employeesDto.getEmpCity());
     
         UserAddress userAddress = new UserAddress();
-        UserAdressId userAdressId = new UserAdressId(lastIndexUsdr + 1, businessEntityId);
-        userAddress.setUserAdressId(userAdressId);
+        // UserAdressId userAdressId = new UserAdressId();
+        // userAddress.setUsdrId(businessEntityId);
+        userAddress.setUsdrEntityId(businessEntityId);
         userAddress.setUsdrAddress1(employeesDto.getEmpAddress());
         userAddress.setUsdrAdress2(employeesDto.getEmpAddress2());
         userAddress.setUser(user);

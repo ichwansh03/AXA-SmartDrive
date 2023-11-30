@@ -32,7 +32,7 @@ public class UserAddressImpl implements UserAddressService {
     // TODO Auto-generated method stub
     Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(idAddress);
     if (userAddress.isPresent()
-        && userAddress.get().getUserAdressId().getUsdrEntityId().equals(id)) {
+        && userAddress.get().getUsdrEntityId().equals(id)) {
       NullUtils.updateIfChanged(userAddress.get()::setUsdrAddress1, userPost.getAddress1(),
           userAddress.get()::getUsdrAddress1);
       NullUtils.updateIfChanged(userAddress.get()::setUsdrAdress2, userPost.getAddress2(),
@@ -48,15 +48,16 @@ public class UserAddressImpl implements UserAddressService {
   @Override
   public UserAddress createUserAddress(Long id, CreateUserDto userPost) {
     UserAddress userAddress = new UserAddress();
-    Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
-    Long lastIndexUsdr;
-    if (findTopByOrderByIdDesc.isPresent()) {
-      lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
-    } else {
-      lastIndexUsdr = 1L;
-    }
-    UserAdressId userAdressId = new UserAdressId(lastIndexUsdr+1, id);
-    userAddress.setUserAdressId(userAdressId);
+    // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
+    // Long lastIndexUsdr;
+    // if (findTopByOrderByIdDesc.isPresent()) {
+    //   lastIndexUsdr = findTopByOrderByIdDesc.get().getUsdrId();
+    // } else {
+    //   lastIndexUsdr = 1L;
+    // }
+    // UserAdressId userAdressId = new UserAdressId(lastIndexUsdr+1, id);
+    // userAddress.setUserAdressId(userAdressId);
+    userAddress.setUsdrEntityId(id);
     User user = userRepository.findById(id).get();
     userAddress.setUsdrAddress1(userPost.getAddress1());
     userAddress.setUsdrAdress2(userPost.getAddress2());
@@ -74,7 +75,7 @@ public class UserAddressImpl implements UserAddressService {
   public void deleteAddressById(Long id, Long addressId){
     Optional<User> user = userRepository.findById(id);
     Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(addressId);
-    if(user.get().getUserEntityId().equals(userAddress.get().getUserAdressId().getUsdrEntityId())){
+    if(user.get().getUserEntityId().equals(userAddress.get().getUsdrEntityId())){
       userAddressRepository.delete(userAddress.get());
     }
   }
