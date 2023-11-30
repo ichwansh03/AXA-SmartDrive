@@ -77,7 +77,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         // Save the business entity and get the ID
         Long businessEntityId = businessEntityService.save(businessEntity); 
         
-        if(employeesDto.getGrantUserAccess()){
+        // if(employeesDto.getGrantUserAccess()){
         user.setUserBusinessEntity(businessEntity);
         user.setUserEntityId(businessEntityId);
         user.setUserName(employeesDto.getEmpName()+businessEntityId);
@@ -113,7 +113,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         
         userPhoneRepository.save(userPhone);
         userAddressRepository.save(userAddress);
-        }
+        // }
 
         // double commissionPercentage = 0.10; // 10%
         // double premiumAmount = 1000000.0; // Example premium amount

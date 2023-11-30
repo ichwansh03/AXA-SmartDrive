@@ -48,8 +48,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
       
     private final CityRepository cityRepository;
-
-    
     
 
     @Transactional
@@ -57,7 +55,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
 
-        Optional<EmployeeAreaWorkgroup> findTopByOrderByIdDesc = employeeAreaWorkgroupRepository.findLastOptional();
+        Optional<EmployeeAreaWorkgroup> findTopByOrderByIdDesc = employeeAreaWorkgroupRepository.findLastOptional(); 
     Long lastIndexUsdr;
     if(findTopByOrderByIdDesc.isPresent()){
        lastIndexUsdr = findTopByOrderByIdDesc.get().getEawgId();
@@ -70,9 +68,8 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
         EmployeeAreaWorkgroupId employeeAreaWorkgroupId = new EmployeeAreaWorkgroupId();
         employeeAreaWorkgroupId.setEawgEntityid(existingEmployee.getEmpEntityid());
-        employeeAreaWorkgroup.setEawgId(lastIndexUsdr+1);
         employeeAreaWorkgroup.setEmployees(existingEmployee);   
-        employeeAreaWorkgroup.setEmployeeAreaWorkgroupId(employeeAreaWorkgroupId);
+        
         
 
         if (employeeAreaWorkgroupDto.getCityName() != null) {
