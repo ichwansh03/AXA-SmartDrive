@@ -15,5 +15,7 @@ public class CustomerRequestDTO {
     
     private String arwg_code;
 
+    private Long agen_id;
+
     private CiasDTO ciasDTO;
 }
