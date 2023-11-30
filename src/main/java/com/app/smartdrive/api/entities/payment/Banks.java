@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@jakarta.persistence.Entity
+@Entity
 @Table(name = "banks", schema = "payment")
 public class Banks {
     

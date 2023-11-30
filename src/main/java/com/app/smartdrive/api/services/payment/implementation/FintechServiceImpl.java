@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.payment.FintechDto;
 import com.app.smartdrive.api.entities.payment.Fintech;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.mapper.payment.FintechMapper;
 import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.services.payment.FintechService;
@@ -24,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FintechServiceImpl implements FintechService {
     private final FintechRepository fintechRepository;
     private final EntityManager entityManager;
@@ -35,39 +35,10 @@ public class FintechServiceImpl implements FintechService {
         entityManager.persist(fintech);
         return fintech;
     }
-    @Override
-    public List<FintechDto> findAllFintech() {
-        
-        List<Fintech> listFintech = fintechRepository.findAll();
-        List<FintechDto> listDto = new ArrayList<>();
-
-        for (Fintech fintech : listFintech) {
-            FintechDto fintechDto = FintechMapper.convertEntityToDto(fintech);
-            listDto.add(fintechDto);
-        }
-        return listDto;
-    }
-
-
-    @Override
-    public List<FintechDto> findFintechById(Long fintech_entityid) {
-        Optional<Fintech> fintechId = fintechRepository.findById(fintech_entityid);
-        List<Fintech> fintechData = fintechRepository.findAll();
-        List<FintechDto> listDto = new ArrayList<>();
-        if(fintechId.isPresent()){
-            for (Fintech fi : fintechData) {
-                if(fintech_entityid.equals(fi.getFint_entityid())){
-                    FintechDto fintDto = FintechMapper.convertEntityToDto(fi);
-                    listDto.add(fintDto);
-                }
-            }
-        }
-        return listDto;
-    }
-
+   
     @Transactional
     @Override
-    public FintechDto addFintech(FintechDto fintechDto) {
+    public Fintech addedFintech(String fint_name, String fint_desc) {
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
         Long businessEntityId = businessEntityService.save(businessEntity);
@@ -75,13 +46,16 @@ public class FintechServiceImpl implements FintechService {
         Fintech fintech = new Fintech();
         fintech.setBusinessEntity(businessEntity);
         fintech.setFint_entityid(businessEntityId);
-        fintech.setFint_name(fintechDto.getFint_name());
-        fintech.setFint_desc(fintechDto.getFint_desc());
+        fintech.setFint_name(fint_name);
+        fintech.setFint_desc(fint_desc);
         addFintech(fintech);
-
-        FintechDto fintechDtoo = FintechMapper.convertEntityToDto(fintech);
-        return fintechDtoo;
+        return fintech;
     }
+
+
+
+
+
 
     @Transactional
     @Override
@@ -103,47 +77,63 @@ public class FintechServiceImpl implements FintechService {
 
     @Transactional
     @Override
-    public Boolean updateFintech(Long fint_entityid,FintechDto fintechDto) {
+    public Boolean updateFintech(Long fint_entityid,String fint_name, String fint_desc) {
         Optional<Fintech> fintechId = fintechRepository.findById(fint_entityid);
         List<BusinessEntity> businessData = businessRepository.findAll();
         Fintech fintech = fintechId.get();
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
-        List<FintechDto> listDto = new ArrayList<>();
         if(fintechId.isPresent()){
             for (BusinessEntity bisnis : businessData) {
                 if(fint_entityid.equals(bisnis.getEntityId())){
-                    bisnis.setEntityModifiedDate(LocalDateTime.now());
-                    fintech.setFint_name(fintechDto.getFint_name());
-                    fintech.setFint_desc(fintechDto.getFint_desc());
-                    businessRepository.save(bisnis);
-                    fintechRepository.save(fintech);
-                    FintechDto dto = FintechMapper.convertEntityToDto(fintech);
-                    listDto.add(dto);
+                    if(fint_name!=null && fint_desc!=null){
+                        bisnis.setEntityModifiedDate(LocalDateTime.now());
+                        fintech.setFint_name(fint_name);
+                        fintech.setFint_desc(fint_desc);
+                        businessRepository.save(bisnis);
+                        fintechRepository.save(fintech);
+                    }else if(fint_name!=null){
+                        bisnis.setEntityModifiedDate(LocalDateTime.now());
+                        fintech.setFint_name(fint_name);
+                        businessRepository.save(bisnis);
+                        fintechRepository.save(fintech);
+                    }else if(fint_desc!=null){
+                        bisnis.setEntityModifiedDate(LocalDateTime.now());
+                        fintech.setFint_desc(fint_desc);
+                        businessRepository.save(bisnis);
+                        fintechRepository.save(fintech);
+                    }else{
+                        return false;
+                    }
+                    return true;
                 }
             }
-            return true;
-        }else{
-            return false;
-        }
+        }return false;
         
     }
 
+    
+
+
+    @Override
+    public FintechDto getUserFintId(String fint_name) {
+        Optional<Fintech> getName = fintechRepository.findByFintNameOptional(fint_name);
+        List<Fintech> fintData = fintechRepository.findAll();
+        return null;
+    }
 
     @Override
     public List<Fintech> getAll() {
-        // TODO Auto-generated method stub
-        return null;
+        return fintechRepository.findAll();
     }
     @Override
     public Fintech getById(Long id) {
-        // TODO Auto-generated method stub
-        return null;
+        return fintechRepository.findById(id).get();
     }
     @Override
     public Fintech save(Fintech entity) {
-        // TODO Auto-generated method stub
-        return null;
+        
+        return fintechRepository.save(entity);
     }
     
     
