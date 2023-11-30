@@ -17,12 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmployeeAreaWorkgroupId implements Serializable {
     
-    @Column(name = "eawg_id")
-    private Long eawgId;
 
-    
     @Column(name = "eawg_entityid")
     private Long eawgEntityid;
-
-    
+   
 }

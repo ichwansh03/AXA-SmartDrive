@@ -60,7 +60,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         Optional<EmployeeAreaWorkgroup> findTopByOrderByIdDesc = employeeAreaWorkgroupRepository.findLastOptional();
     Long lastIndexUsdr;
     if(findTopByOrderByIdDesc.isPresent()){
-       lastIndexUsdr = findTopByOrderByIdDesc.get().getEmployeeAreaWorkgroupId().getEawgId();
+       lastIndexUsdr = findTopByOrderByIdDesc.get().getEawgId();
     } else {
       lastIndexUsdr = 1L;
     }
@@ -70,8 +70,8 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
         EmployeeAreaWorkgroupId employeeAreaWorkgroupId = new EmployeeAreaWorkgroupId();
         employeeAreaWorkgroupId.setEawgEntityid(existingEmployee.getEmpEntityid());
-        employeeAreaWorkgroupId.setEawgId(lastIndexUsdr+1);
-        employeeAreaWorkgroup.setEmployees(existingEmployee);
+        employeeAreaWorkgroup.setEawgId(lastIndexUsdr+1);
+        employeeAreaWorkgroup.setEmployees(existingEmployee);   
         employeeAreaWorkgroup.setEmployeeAreaWorkgroupId(employeeAreaWorkgroupId);
         
 
