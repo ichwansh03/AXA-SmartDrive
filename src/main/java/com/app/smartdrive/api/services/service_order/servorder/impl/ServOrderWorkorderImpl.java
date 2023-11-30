@@ -2,7 +2,6 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
-import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
@@ -10,27 +9,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
 
-    private final SoTasksRepository soTasksRepository;
     private final SoWorkorderRepository soWorkorderRepository;
 
     @Override
-    public ServiceOrderWorkorder addSoWorkorder(ServiceOrderWorkorder serviceOrderWorkorder) {
-        ServiceOrderTasks seotById = soTasksRepository.findSeotById(1L);
+    public List<ServiceOrderWorkorder> generateSowo(ServiceOrderTasks seot) {
+        List<ServiceOrderWorkorder> sowo = new ArrayList<>();
+        sowo.add(new ServiceOrderWorkorder("CHECK UMUR", LocalDateTime.now(), false, 1, seot));
+        sowo.add(new ServiceOrderWorkorder("RELATE GOVERNMENT", LocalDateTime.now(), false, 1, seot));
+        sowo.add(new ServiceOrderWorkorder("PREMI SCHEMA", LocalDateTime.now(), false, 3, seot));
+        sowo.add(new ServiceOrderWorkorder("LEGAL DOCUMENT SIGNED", LocalDateTime.now(), false, 3, seot));
 
-        serviceOrderWorkorder = ServiceOrderWorkorder.builder()
-                .sowoName(serviceOrderWorkorder.getSowoName())
-                .sowoModDate(LocalDateTime.now())
-                .sowoStatus(serviceOrderWorkorder.getSowoStatus())
-                .serviceOrderTasks(seotById).build();
-
-        log.info("SoOrderServiceImpl::addSoWorkorder created {} ", serviceOrderWorkorder);
-        return soWorkorderRepository.save(serviceOrderWorkorder);
+        return soWorkorderRepository.saveAll(sowo);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class ServOrderWorkorderController {
 
         SoWorkorderDto soWorkorderDto = SoWorkorderDto.builder()
                 .sowoName(serviceOrderWorkorder.getSowoName())
-                .sowoStatus(serviceOrderWorkorder.getSowoStatus())
+                //.sowoStatus(serviceOrderWorkorder.getSowoStatus())
                 .sowoSeotId(serviceOrderWorkorder.getServiceOrderTasks().getSeotId()).build();
 
         log.info("ServiceOrdersController::getServiceOrderTasksById successfully viewed");

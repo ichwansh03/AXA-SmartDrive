@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,12 +24,18 @@ import java.util.List;
         name = "ServiceOrders.findServiceOrdersById",
         query = "SELECT sero FROM ServiceOrders sero JOIN sero.services s JOIN sero.employees emp" +
                 " JOIN sero.areaWorkGroup arwg WHERE sero.seroId = :seroId")
+@DynamicInsert
+@DynamicUpdate
 public class ServiceOrders {
 
     //format seroId (condition serv type)
     @Id
     @Column(name = "sero_id", unique = true)
     private String seroId;
+
+    @Transient
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long seroIden;
 
     //Services.servType
     @Column(name = "sero_ordt_type")

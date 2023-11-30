@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +25,8 @@ import java.util.List;
 @NamedQuery(
         name = "Services.findServicesById",
         query = "SELECT s FROM Services s JOIN s.users u JOIN s.customer c WHERE s.servId = :servId")
+@DynamicInsert
+@DynamicUpdate
 public class Services {
 
     @Id
