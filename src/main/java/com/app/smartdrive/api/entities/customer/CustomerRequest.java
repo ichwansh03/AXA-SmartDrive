@@ -61,7 +61,7 @@ public class CustomerRequest {
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "creq_agen_entityid")
+    @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id")
     private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
     @JsonManagedReference
