@@ -149,7 +149,6 @@ public class CustomerRequestServiceImpl {
             }
 
             CustomerInscExtend cuex = CustomerInscExtend.builder()
-                    .cuexId(temi.getTemiId())
                     .cuexName(temi.getTemiName())
                     .cuex_nominal(nominal)
                     .cuexTotalItem(1)
@@ -157,6 +156,7 @@ public class CustomerRequestServiceImpl {
                     .cuexCreqEntityid(entityId)
                     .build();
 
+//                    .cuexId(temi.getTemiId())
             ciasCuexs.add(cuex);
         }
 
