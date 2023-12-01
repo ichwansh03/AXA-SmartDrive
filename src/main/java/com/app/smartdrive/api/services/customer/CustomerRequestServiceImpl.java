@@ -88,7 +88,7 @@ public class CustomerRequestServiceImpl {
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
 
-        EmployeeAreaWorkgroup eawag = this.eawagRepository.findByAgenAndArwgCode(customerRequestDTO.getAgen_id(), customerRequestDTO.getArwg_code());
+//        EmployeeAreaWorkgroup eawag = this.eawagRepository.findByAgenAndArwgCode(customerRequestDTO.getAgen_id(), customerRequestDTO.getArwg_code());
 
 
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
@@ -101,10 +101,10 @@ public class CustomerRequestServiceImpl {
         .creqCreateDate(LocalDateTime.now())
         .creqStatus(EnumCustomer.CreqStatus.OPEN)
         .creqType(EnumCustomer.CreqType.POLIS)
-        .employeeAreaWorkgroup(eawag)
         .creqEntityId(entityId)
         .build();
 
+//        .employeeAreaWorkgroup(eawag)
 //        eawag.setCustomerRequests(List.of(newCustomer));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -160,8 +160,9 @@ public class CustomerRequestServiceImpl {
             ciasCuexs.add(cuex);
         }
 
-        Double premi = this.getPremiPrice(existInty.getIntyName(), "bruh", eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesId(), ciasDTO.getCurrentPrice(), ciasCuexs);
+//        Double premi = this.getPremiPrice(existInty.getIntyName(), "bruh", eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesId(), ciasDTO.getCurrentPrice(), ciasCuexs);
 
+        Double premi = customerRequestDTO.getCiasDTO().getCurrentPrice();
         cias.setCiasTotalPremi(premi);
         cias.setCustomerInscExtend(ciasCuexs);
 
@@ -220,11 +221,11 @@ public class CustomerRequestServiceImpl {
         List<CustomerInscExtend> cuexList = cias.getCustomerInscExtend();
         List<CustomerInscDoc> cadocList = cias.getCustomerInscDoc();
         User customer = customerRequest.getCustomer();
-        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
-        Employees employee = eawag.getEmployees();
         InsuranceType insuranceType = cias.getInsuranceType();
         CarSeries carSeries = cias.getCarSeries();
 
+//        Employees employee = eawag.getEmployees();
+//        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
 
         BussinessEntityResponseDTO bussinessEntityResponseDTO = BussinessEntityResponseDTO.builder()
                 .entityId(customerRequest.getBusinessEntity().getEntityId())
@@ -320,49 +321,49 @@ public class CustomerRequestServiceImpl {
                 .userPhone(userPhoneResponseDTOList)
                 .build();
 
-        //  Address and Phone Agen
-        List<UserPhoneResponseDTO> agenPhoneResponseDTOList = employee.getUser().getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
-                phone.getUserPhoneId().getUsphEntityId(),
-                phone.getUserPhoneId().getUsphPhoneNumber(),
-                phone.getUsphMime(),
-                phone.getUsphPhoneType(),
-                phone.getUsphStatus(),
-                phone.getUsphModifiedDate()
-        )).toList();
-
-        List<UserAddressResponseDTO> addressAgenResponseDTOList = employee.getUser().getUserAddress().stream().map(address -> new UserAddressResponseDTO(
-                address.getUsdrId(),
-                address.getUsdrEntityId(),
-                address.getUsdrAddress1(),
-                address.getUsdrAddress2(),
-                address.getUsdrCityId(),
-                address.getUsdrModifiedDate()
-        )).toList();
-
-        CustomerUserResponseDTO agenUserResponseDTO = CustomerUserResponseDTO.builder()
-                .userEntityId(employee.getUser().getUserEntityId())
-                .userName(employee.getUser().getUserName())
-                .userFullName(employee.getUser().getUserFullName())
-                .userBirthPlace(employee.getUser().getUserBirthPlace())
-                .userNationalId(employee.getUser().getUserNationalId())
-                .userNPWP(employee.getUser().getUserNPWP())
-                .userBirthDate(employee.getUser().getUserBirthDate())
-                .userModifiedDate(employee.getUser().getUserModifiedDate())
-                .userEmail(employee.getUser().getUserEmail())
-                .userPhoto(employee.getUser().getUserPhoto())
-                .userAddresses(addressAgenResponseDTOList)
-                .userPhone(agenPhoneResponseDTOList)
-                .build();
-
-        // EAWAG
-        EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto = EmployeeAreaWorkgroupDto.builder()
-                .empName(eawag.getEmployees().getEmpName())
-                .cityName(eawag.getAreaWorkGroup().getCities().getCityName())
-                .provinsi(eawag.getAreaWorkGroup().getCities().getProvinsi().getProvName())
-                .zoneName(eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesName())
-                .build();
-                
-                // .workGroup(eawag.getAreaWorkGroup().getArwgCode())
+//        //  Address and Phone Agen
+//        List<UserPhoneResponseDTO> agenPhoneResponseDTOList = employee.getUser().getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
+//                phone.getUserPhoneId().getUsphEntityId(),
+//                phone.getUserPhoneId().getUsphPhoneNumber(),
+//                phone.getUsphMime(),
+//                phone.getUsphPhoneType(),
+//                phone.getUsphStatus(),
+//                phone.getUsphModifiedDate()
+//        )).toList();
+//
+//        List<UserAddressResponseDTO> addressAgenResponseDTOList = employee.getUser().getUserAddress().stream().map(address -> new UserAddressResponseDTO(
+//                address.getUsdrId(),
+//                address.getUsdrEntityId(),
+//                address.getUsdrAddress1(),
+//                address.getUsdrAddress2(),
+//                address.getUsdrCityId(),
+//                address.getUsdrModifiedDate()
+//        )).toList();
+//
+//        CustomerUserResponseDTO agenUserResponseDTO = CustomerUserResponseDTO.builder()
+//                .userEntityId(employee.getUser().getUserEntityId())
+//                .userName(employee.getUser().getUserName())
+//                .userFullName(employee.getUser().getUserFullName())
+//                .userBirthPlace(employee.getUser().getUserBirthPlace())
+//                .userNationalId(employee.getUser().getUserNationalId())
+//                .userNPWP(employee.getUser().getUserNPWP())
+//                .userBirthDate(employee.getUser().getUserBirthDate())
+//                .userModifiedDate(employee.getUser().getUserModifiedDate())
+//                .userEmail(employee.getUser().getUserEmail())
+//                .userPhoto(employee.getUser().getUserPhoto())
+//                .userAddresses(addressAgenResponseDTOList)
+//                .userPhone(agenPhoneResponseDTOList)
+//                .build();
+//
+//        // EAWAG
+//        EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto = EmployeeAreaWorkgroupDto.builder()
+//                .empName(eawag.getEmployees().getEmpName())
+//                .cityName(eawag.getAreaWorkGroup().getCities().getCityName())
+//                .provinsi(eawag.getAreaWorkGroup().getCities().getProvinsi().getProvName())
+//                .zoneName(eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesName())
+//                .build();
+//
+//                // .workGroup(eawag.getAreaWorkGroup().getArwgCode())
 
         CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
                 .creqEntityId(customerRequest.getCreqEntityId())
@@ -373,10 +374,10 @@ public class CustomerRequestServiceImpl {
                 .creqType(customerRequest.getCreqType())
                 .customerInscAssets(ciasResponseDTO)
                 .customer(customerUserResponseDTO)
-                .employee(agenUserResponseDTO)
-                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
                 .build();
 
+//                .employee(agenUserResponseDTO)
+//                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
         return customerResponseDTO;
     }
 

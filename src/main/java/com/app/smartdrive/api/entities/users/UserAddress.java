@@ -49,7 +49,7 @@ public class UserAddress {
   @Column(name = "usdr_address2")
   private String usdrAddress2;
   
-  @Column(name = "usdr_city_id")
+  @Column(name = "usdr_city_id", insertable = false, updatable = false)
   private Long usdrCityId;
 
   @Column(name = "usdr_modified_date")
@@ -61,8 +61,8 @@ public class UserAddress {
   @JsonBackReference
   User user;
 
+//  @MapsId("usdrCityId")
   @ManyToOne
-  @MapsId("usdrCityId")
   @JoinColumn(name = "usdr_city_id")
   @JsonBackReference
   private Cities city;
