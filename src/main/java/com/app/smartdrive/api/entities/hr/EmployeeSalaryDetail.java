@@ -39,8 +39,8 @@ public class EmployeeSalaryDetail {
      @Column(name="emsa_subtotal")
      private Double emsaSubtotal;
 
+//    @MapsId("emsaEmpEntityid")
     @ManyToOne
-    @MapsId("emsaEmpEntityid")
     @JoinColumn(name = "emsa_emp_entityid")
     @JsonBackReference
     private Employees employees;

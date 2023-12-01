@@ -63,7 +63,7 @@ public class EmployeeAreaWorkgroup {
     private String eawgArwgCode;
 
 
-    @MapsId("eawgArwgCode")
+//    @MapsId("eawgArwgCode")
     @ManyToOne
     @JoinColumn(name = "eawg_arwg_code",insertable = false, updatable = false)
     @JsonBackReference
