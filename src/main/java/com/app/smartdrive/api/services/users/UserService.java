@@ -2,8 +2,8 @@ package com.app.smartdrive.api.services.users;
 
 import java.util.List;
 import java.util.Optional;
-import com.app.smartdrive.api.dto.user.CreateUserDto;
-import com.app.smartdrive.api.dto.user.UserDto;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.services.BaseService;
 

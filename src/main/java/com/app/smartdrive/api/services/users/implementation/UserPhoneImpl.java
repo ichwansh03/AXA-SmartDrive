@@ -3,7 +3,7 @@ package com.app.smartdrive.api.services.users.implementation;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
-import com.app.smartdrive.api.dto.user.UserPhoneDto;
+import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;

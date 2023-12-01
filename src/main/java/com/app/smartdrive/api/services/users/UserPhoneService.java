@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.services.users;
 
-import com.app.smartdrive.api.dto.user.UserPhoneDto;
+import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.entities.users.UserPhone;
 
 public interface UserPhoneService {

@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
-
-import com.app.smartdrive.api.dto.user.CreateUserDto;
-import com.app.smartdrive.api.dto.user.UserDto;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.Fintech;

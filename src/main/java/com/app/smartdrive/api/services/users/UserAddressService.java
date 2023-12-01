@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.services.users;
 
-import com.app.smartdrive.api.dto.user.UserAddressDto;
+import com.app.smartdrive.api.dto.user.response.UserAddressDto;
 import com.app.smartdrive.api.entities.users.UserAddress;
 
 public interface UserAddressService {
