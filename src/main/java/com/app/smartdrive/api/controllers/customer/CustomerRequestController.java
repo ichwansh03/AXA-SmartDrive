@@ -82,19 +82,20 @@ public class CustomerRequestController {
     public Page<CustomerResponseDTO> getAllCustomersRequest(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "3") int size,
-            @RequestParam(value = "sortBy", defaultValue = "creqEntityId") String sortBy,
+            @RequestParam(value = "type", defaultValue = "ALL") String type,
+            @RequestParam(value = "status", defaultValue = "OPEN") String status,
             @RequestParam(value = "sort", defaultValue = "ascending") String sort,
             @RequestParam(value = "custId") Long custId
     ){
         Pageable paging;
 
         if(Objects.equals(sort, "descending")){
-            paging = PageRequest.of(page, size, Sort.by(sortBy).descending());
+            paging = PageRequest.of(page, size, Sort.by("creqEntityId").descending());
         }else {
-            paging = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+            paging = PageRequest.of(page, size, Sort.by("creqEntityId").ascending());
         }
 
-        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingCustomer(custId, paging);
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingCustomer(custId, paging, type, status);
 
         return pagingCustomerResponseDTO;
     }

@@ -403,9 +403,19 @@ public class CustomerRequestServiceImpl implements CustomerRequestService{
     }
 
     @Override
-    public Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging) {
+    public Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging, String type, String status) {
         User user = this.userRepository.findById(custId).get();
-        Page<CustomerRequest> pageCustomerRequest = this.customerRequestRepository.findByCustomer(user, paging);
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
+
+        Page<CustomerRequest> pageCustomerRequest;
+
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqStatus(user, paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqTypeAndCreqStatus(user, paging, creqType, creqStatus);
+        }
+
         Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
             @Override
             public CustomerResponseDTO apply(CustomerRequest customerRequest) {

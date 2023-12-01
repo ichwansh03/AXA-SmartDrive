@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.repositories.customer;
 
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.users.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,4 +14,8 @@ import java.util.List;
 @Repository
 public interface CustomerRequestRepository extends JpaRepository<CustomerRequest, Long>{
     Page<CustomerRequest> findByCustomer(User customer, Pageable pageable);
+
+    Page<CustomerRequest> findByCustomerAndCreqTypeAndCreqStatus(User customer, Pageable pageable, EnumCustomer.CreqType creqType, EnumCustomer.CreqStatus creqStatus);
+
+    Page<CustomerRequest> findByCustomerAndCreqStatus(User customer, Pageable pageable, EnumCustomer.CreqStatus creqStatus);
 }
