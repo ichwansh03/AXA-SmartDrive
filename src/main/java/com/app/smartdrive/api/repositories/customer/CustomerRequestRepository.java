@@ -7,5 +7,5 @@ import com.app.smartdrive.api.entities.customer.CustomerRequest;
 
 @Repository
 public interface CustomerRequestRepository extends JpaRepository<CustomerRequest, Long>{
-    
+
 }

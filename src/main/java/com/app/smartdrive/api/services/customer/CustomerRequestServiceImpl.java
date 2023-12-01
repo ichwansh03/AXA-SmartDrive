@@ -5,20 +5,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
-import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
-import com.app.smartdrive.api.dto.HR.EmployeesDto;
 import com.app.smartdrive.api.dto.customer.response.*;
-import com.app.smartdrive.api.dto.master.CitiesDto;
 import com.app.smartdrive.api.dto.user.BussinessEntityResponseDTO;
-import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
-import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +41,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CustomerRequestServiceImpl {
+public class CustomerRequestServiceImpl implements CustomerRequestService{
     private final CustomerRequestRepository customerRequestRepository;
 
     private final BusinessEntityRepository businessEntityRepo;
@@ -54,21 +52,25 @@ public class CustomerRequestServiceImpl {
 
     private final CityRepository cityRepository;
 
-    private final SoRepository soRepository;
-
     private final UserRepository userRepository;
-
-    private final EmployeeAreaWorkgroupRepository eawagRepository;
-
-    private final ArwgRepository arwgRepository;
-
-    private final CustomerInscExtendRepository cuexRepository;
 
     private final TemiRepository temiRepository;
 
 
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
+    }
+
+    public Page<CustomerResponseDTO> getPaging(Pageable pageable){
+        Page<CustomerRequest> pageCustomerRequest = this.customerRequestRepository.findAll(pageable);
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return convert(customerRequest);
+            }
+        });
+
+        return pageCustomerResponseDTO;
     }
 
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
@@ -399,5 +401,6 @@ public class CustomerRequestServiceImpl {
 
         return totalPremi;
     }
+
 
 }
