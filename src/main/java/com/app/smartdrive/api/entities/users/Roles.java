@@ -26,7 +26,7 @@ public class Roles {
   @Id
   @Enumerated(EnumType.STRING)
   @Column(name = "role_name", length = 2)
-  private EnumUsers.roleName roleName;
+  private EnumUsers.RoleName roleName;
 
   @Column(name = "role_description", length = 35)
   private String roleDescription;

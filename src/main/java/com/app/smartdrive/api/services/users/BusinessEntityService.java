@@ -6,6 +6,7 @@ import com.app.smartdrive.api.entities.users.BusinessEntity;
 
 public interface BusinessEntityService {
   List<BusinessEntity> getAll();
+  BusinessEntity createBusinessEntity();
   Long save(BusinessEntity businessEntity);
   
 }

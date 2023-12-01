@@ -6,6 +6,7 @@ import com.app.smartdrive.api.dto.user.LoginDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.users.UserService;
 import lombok.RequiredArgsConstructor;
@@ -49,8 +50,8 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<?> addUser(@ModelAttribute CreateUserDto userPost) throws Exception{
-    User userSaved = userService.create(userPost);
+  public ResponseEntity<?> addUserCustomer(@RequestBody CreateUserDto userPost) throws Exception{
+    User userSaved = userService.createUser(userPost, RoleName.CU);
     UserDto userDto = TransactionMapper.mapEntityToDto(userSaved, UserDto.class);
     return ResponseEntity.status(HttpStatus.CREATED).body(userDto); //pake dto
   }

@@ -23,7 +23,7 @@ import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
-import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
+import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
@@ -93,8 +93,8 @@ public class EmployeesServiceImpl implements EmployeesService {
         user.setUserNPWP("npwp" + businessEntityId);
     
         
-        UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.EM);
-        Roles roles = rolesRepository.findById(roleName.EM).get();
+        UserRolesId userRolesId = new UserRolesId(businessEntityId, RoleName.EM);
+        Roles roles = rolesRepository.findById(RoleName.EM).get();
         
         UserRoles userRoles = new UserRoles();
         userRoles.setUserRolesId(userRolesId);

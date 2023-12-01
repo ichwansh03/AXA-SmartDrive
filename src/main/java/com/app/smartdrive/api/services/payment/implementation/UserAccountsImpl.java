@@ -13,7 +13,7 @@ import com.app.smartdrive.api.dto.payment.Request.UserAccountsDtoRequests;
 import com.app.smartdrive.api.dto.payment.Response.UserAccountsDtoResponse;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
+import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.mapper.payment.UserAccountsMapperResponse;
 import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
 import com.app.smartdrive.api.services.payment.UserAccountsService;

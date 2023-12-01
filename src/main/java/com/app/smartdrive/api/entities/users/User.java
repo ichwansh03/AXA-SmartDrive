@@ -49,7 +49,7 @@ public class User {
   @Column(name = "user_full_name", length = 85)
   private String userFullName;
 
-  @Column(name = "User_email", length = 25, nullable = false)
+  @Column(name = "user_email", length = 25, nullable = false)
   private String userEmail;
 
   @Column(name = "user_birth_place", length = 55)
@@ -65,7 +65,7 @@ public class User {
   private String userNPWP;
 
   @Column(name = "user_photo", length = 255)
-  private String userPhoto;
+  private String userPhoto; //nanti dulu
 
   @Column(name = "user_modified_date")
   private LocalDateTime userModifiedDate;
