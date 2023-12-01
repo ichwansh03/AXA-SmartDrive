@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 
-import com.app.smartdrive.api.dto.HR.EmployeesDto;
+import com.app.smartdrive.api.dto.HR.response.CreateEmployeesDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
@@ -69,9 +69,9 @@ public class Employees {
     private String empJobCode;
     
 
+    // @MapsId("empJobCode")
     @ManyToOne
-    @MapsId("empJobCode")
-    @JoinColumn(name = "emp_job_code")
+    @JoinColumn(name = "emp_job_code",insertable = false, updatable = false)
     @JsonBackReference
     private JobType jobType;
 

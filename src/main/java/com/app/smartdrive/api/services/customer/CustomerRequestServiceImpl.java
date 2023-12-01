@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
-import com.app.smartdrive.api.dto.HR.EmployeesDto;
+import com.app.smartdrive.api.dto.HR.response.CreateEmployeesDto;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.dto.master.CitiesDto;
 import com.app.smartdrive.api.dto.user.BussinessEntityResponseDTO;

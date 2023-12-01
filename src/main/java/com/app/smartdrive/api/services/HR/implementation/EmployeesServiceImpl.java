@@ -9,10 +9,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-
-import com.app.smartdrive.api.dto.HR.EmployeesDto;
+import com.app.smartdrive.api.dto.HR.response.CreateEmployeesDto;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
+import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
@@ -26,6 +26,7 @@ import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
+import com.app.smartdrive.api.repositories.HR.JobTypeRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
@@ -51,29 +52,17 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     private final RolesRepository rolesRepository;
 
-    private final UserRepository userRepository;
-
-    private final UserServiceImpl userServiceImpl;
-    
-    private final UserPhoneRepository userPhoneRepository;
-
     private final UserAddressRepository userAddressRepository;
 
     private final CityRepository cityRepository;
 
+    private final JobTypeRepository jobTypeRepository;
+
 
     @Override
     @Transactional
-    public EmployeesDto addEmployee(EmployeesDto employeesDto) {
+    public CreateEmployeesDto addEmployee(CreateEmployeesDto employeesDto) {
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
-    
-        // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
-        // Long lastIndexUsdr;
-        // if(findTopByOrderByIdDesc.isPresent()){
-        // lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
-        // } else {
-        // lastIndexUsdr = 1L;
-        // }
 
         User user = new User();
         BusinessEntity businessEntity = new BusinessEntity();
@@ -85,12 +74,13 @@ public class EmployeesServiceImpl implements EmployeesService {
         // if(employeesDto.getGrantUserAccess()){
         user.setUserBusinessEntity(businessEntity);
         user.setUserEntityId(businessEntityId);
-        user.setUserName(employeesDto.getEmpName()+businessEntityId);
+        user.setUserName(employeesDto.getEmail());
+        user.setUserPassword(employeesDto.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
         user.setUserFullName(employeesDto.getEmpName());
-        user.setUserEmail(employeesDto.getEmpEmail());
+        user.setUserEmail(employeesDto.getEmail());
         user.setUserModifiedDate(LocalDateTime.now());
-        user.setUserNationalId("idnn" + businessEntityId);
-        user.setUserNPWP("npwp" + businessEntityId);
+        user.setUserNationalId("ind"+businessEntityId);
+        user.setUserNPWP("npwp"+businessEntityId);
     
         
         UserRolesId userRolesId = new UserRolesId(businessEntityId, RoleName.EM);
@@ -106,35 +96,26 @@ public class EmployeesServiceImpl implements EmployeesService {
         List<UserRoles> listRole = List.of(userRoles);
         
         UserPhone userPhone = new UserPhone();
-        UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.getEmpPhone());
+        UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
         userPhone.setUserPhoneId(userPhoneId);
         userPhone.setUsphPhoneType("HP");
         userPhone.setUsphModifiedDate(LocalDateTime.now());
         userPhone.setUser(user);
         List<UserPhone> listUserPhones = List.of(userPhone);
     
-        Cities empCityEntity = cityRepository.findByCityName(employeesDto.getEmpCity());
+        Cities empCityEntity = cityRepository.findByCityName(employeesDto.getUserAddress().getCity().getCityName());
     
         UserAddress userAddress = new UserAddress();
         userAddress.setUsdrEntityId(businessEntityId);
-        userAddress.setUsdrAddress1(employeesDto.getEmpAddress());
-        userAddress.setUsdrAddress2(employeesDto.getEmpAddress2());
-        userAddress.setUser(user);
+        userAddress.setUsdrAddress1(employeesDto.getUserAddress().getUsdrAddress1());
+        userAddress.setUsdrAddress2(employeesDto.getUserAddress().getUsdrAddress2());
         userAddress.setCity(empCityEntity);
+        userAddress.setUser(user);
         
         List<UserAddress> listuAddresses = List.of(userAddress);
         
         
-        
-        // userPhoneRepository.save(userPhone);
-        // userAddressRepository.save(userAddress);
-        // }
-        
-        // double commissionPercentage = 0.10; // 10%
-        // double premiumAmount = 1000000.0; // Example premium amount
-        
-        // double commission = commissionPercentage * premiumAmount;
-        
+        JobType jobType = jobTypeRepository.findById(employeesDto.getEmpJobType().getJobCode()).get();
         Employees employee = new Employees();
         employee.setEmpEntityid(businessEntityId);
         employee.setEmpName(employeesDto.getEmpName());
@@ -144,35 +125,24 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setEmpNetSalary(employeesDto.getEmpSalary());
         employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         employee.setUser(user);
-        employee.setEmpJobCode(employeesDto.getEmpRole());
+        employee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
+        employee.setJobType(jobType);
 
         user.setUserRoles(listRole);
         user.setUserPhone(listUserPhones);
         user.setUserAddress(listuAddresses);
 
-        // userServiceImpl.save(user);
-
 
         employeesRepository.save(employee);
 
-        employeesDto.setEmpName(employeesDto.getEmpName());
-        employeesDto.setEmpEmail(employeesDto.getEmpEmail());
-        employeesDto.setEmpPhone(employeesDto.getEmpPhone());
-        employeesDto.setEmpJoinDate(employeesDto.getEmpJoinDate());
-        employeesDto.setEmpGraduate(employeesDto.getEmpGraduate());
-        employeesDto.setEmpRole(employeesDto.getEmpRole());
-        employeesDto.setEmpSalary(employeesDto.getEmpSalary());
-        employeesDto.setEmpCity(employeesDto.getEmpCity());
-        employeesDto.setEmpAddress(employeesDto.getEmpAddress());
-        employeesDto.setEmpAddress2(employeesDto.getEmpAddress2());
-
+        
     
         return employeesDto;
     }
 
     @Override
     @Transactional
-    public EmployeesDto updateEmployee(Long employeeId, EmployeesDto updatedEmployeeDto) {
+    public CreateEmployeesDto updateEmployee(Long employeeId, CreateEmployeesDto updatedEmployeeDto) {
         // Retrieve the existing employee entity from the database
         Employees existingEmployee = employeesRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + employeeId));
@@ -180,7 +150,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         User user = existingEmployee.getUser(); 
         
         UserAddress userAddress = userAddressRepository.findByUserUserEntityId(user.getUserEntityId());
-        userAddress.setCity(cityRepository.findByCityName(updatedEmployeeDto.getEmpCity()));
+        userAddress.setCity(cityRepository.findByCityName(updatedEmployeeDto.getUserAddress().getCity().getCityName()));
 
         LocalDateTime empJoinDate = LocalDateTime.parse(updatedEmployeeDto.getEmpJoinDate());
         EnumClassHR.emp_graduate empGraduate = EnumClassHR.emp_graduate.valueOf(updatedEmployeeDto.getEmpGraduate());
@@ -188,10 +158,10 @@ public class EmployeesServiceImpl implements EmployeesService {
         NullUtils.updateIfChanged(existingEmployee::setEmpJoinDate,empJoinDate,existingEmployee::getEmpJoinDate);
         NullUtils.updateIfChanged(existingEmployee::setEmpGraduate, empGraduate, existingEmployee::getEmpGraduate);
         NullUtils.updateIfChanged(existingEmployee::setEmpNetSalary, updatedEmployeeDto.getEmpSalary(), existingEmployee::getEmpNetSalary);
-        NullUtils.updateIfChanged(existingEmployee::setEmpAccountNumber, updatedEmployeeDto.getEmpPhone(), existingEmployee::getEmpAccountNumber);
-        NullUtils.updateIfChanged(user::setUserEmail, updatedEmployeeDto.getEmpEmail(), user::getUserEmail);
-        NullUtils.updateIfChanged(userAddress::setUsdrAddress1, updatedEmployeeDto.getEmpAddress(), userAddress::getUsdrAddress1);
-        NullUtils.updateIfChanged(userAddress::setUsdrAddress2, updatedEmployeeDto.getEmpAddress2(), userAddress::getUsdrAddress2);
+        NullUtils.updateIfChanged(existingEmployee::setEmpAccountNumber, updatedEmployeeDto.getEmpAccountNumber(), existingEmployee::getEmpAccountNumber);
+        NullUtils.updateIfChanged(user::setUserEmail, updatedEmployeeDto.getEmail(), user::getUserEmail);
+        NullUtils.updateIfChanged(userAddress::setUsdrAddress1, updatedEmployeeDto.getUserAddress().getUsdrAddress1(), userAddress::getUsdrAddress1);
+        NullUtils.updateIfChanged(userAddress::setUsdrAddress2, updatedEmployeeDto.getUserAddress().getUsdrAddress2(), userAddress::getUsdrAddress2);
         // // Update the employee details
         // existingEmployee.setEmpName(updatedEmployeeDto.getEmpName());
         // LocalDateTime empJoinDate = LocalDateTime.parse(updatedEmployeeDto.getEmpJoinDate());
@@ -241,12 +211,12 @@ public class EmployeesServiceImpl implements EmployeesService {
     
 
     @Override
-    public List<EmployeesDto> getAllEmployeesDto(){
-        EmployeesDto employee = new EmployeesDto();
+    public List<CreateEmployeesDto> getAllEmployeesDto(){
+        CreateEmployeesDto employee = new CreateEmployeesDto();
         employee.getEmpName();
         employee.getEmpJoinDate();
         employee.getEmpGraduate();
-        employee.getEmpRole();
+        // employee.get().getJobDesc();
         employee.getEmpSalary();
         employee.getEmpAccountNumber();
 
