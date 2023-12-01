@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
-import com.app.smartdrive.api.entities.payment.Banks;
-import com.app.smartdrive.api.entities.payment.Fintech;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
-import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
@@ -20,7 +17,7 @@ import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
-import com.app.smartdrive.api.entities.users.EnumUsers.roleName;
+import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
@@ -40,16 +37,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
   private final EntityManager entityManager;
+  private final CityRepository cityRepository;
   private final UserRepository userRepo;
   private final BusinessEntityService businessEntityService;
   private final RolesRepository rolesRepository;
-  private final CityRepository cityRepository;
   private final BanksRepository banksRepository;
   private final FintechRepository fintechRepository;
 
   @Override
   public UserDto getByIdDto(Long id) {
-    return UserMapper.convertUserToDto(userRepo.findById(id).get());
+    return TransactionMapper.mapEntityToDto(userRepo.findById(id).get(), UserDto.class);
   }
 
   @Override
@@ -70,27 +67,19 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User create(CreateUserDto userPost) throws Exception{
-    BusinessEntity businessEntity = new BusinessEntity();
-    businessEntity.setEntityModifiedDate(LocalDateTime.now());
-    Long businessEntityId = businessEntityService.save(businessEntity);
+  public User createUser(CreateUserDto userPost, RoleName roleName) throws Exception {
+    BusinessEntity businessEntity = businessEntityService.createBusinessEntity();
 
-    User user = new User();
+    User newUser = new User();
+    User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
+
     user.setUserBusinessEntity(businessEntity);
-    user.setUserEntityId(businessEntityId);
-    user.setUserName(userPost.getUserName());
-    user.setUserPassword(userPost.getUserPassword()); //Encrypt
-    user.setUserFullName(userPost.getFullName());
-    user.setUserEmail(userPost.getEmail());
-    user.setUserBirthPlace(userPost.getBirthPlace());
-    user.setUserBirthDate(LocalDateTime.parse(userPost.getUserBirthDate()));
-    user.setUserNPWP(userPost.getUserNpwp());
-    user.setUserNationalId(userPost.getUserNationalId() + businessEntity.getEntityId());
+    user.setUserEntityId(businessEntity.getEntityId());
     user.setUserModifiedDate(LocalDateTime.now());
 
-    UserRolesId userRolesId = new UserRolesId(businessEntityId, roleName.PC);
+    UserRolesId userRolesId = new UserRolesId(businessEntity.getEntityId(), roleName);
 
-    Roles roles = rolesRepository.findById(roleName.PC).get();
+    Roles roles = rolesRepository.findById(roleName).get();
     UserRoles userRoles = new UserRoles();
     userRoles.setRoles(roles);
     userRoles.setUserRolesId(userRolesId);
@@ -99,69 +88,47 @@ public class UserServiceImpl implements UserService {
 
     List<UserRoles> listRole = List.of(userRoles);
 
-    UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, userPost.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
+    List<UserPhone> userPhone = user.getUserPhone();
+    userPhone.forEach(phone -> {
+      phone.setUser(user);
+      phone.getUserPhoneId().setUsphEntityId(businessEntity.getEntityId());
+      phone.setUsphModifiedDate(LocalDateTime.now());
+    });
 
-    UserPhone userPhone = new UserPhone();
-    userPhone.setUserPhoneId(userPhoneId);
-    userPhone.setUsphPhoneType(userPost.getUserPhone().getUsphPhoneType());
-    userPhone.setUsphModifiedDate(LocalDateTime.now());
+    List<UserAddress> userAddress = user.getUserAddress();
+    userAddress.forEach(address -> {
+      Cities city = cityRepository.findByCityName(userPost.getCityName()); // nanti by id
+      address.setCity(city);
+      address.setUsdrEntityId(businessEntity.getEntityId());
+      address.setUsdrCityId(city.getCityId());
+      address.setUsdrModifiedDate(LocalDateTime.now());
+      address.setUser(user);
+    });
+    
+    List<UserAccounts> userAccounts = user.getUserAccounts();
+    for (int i = 0; i < userAccounts.size(); i++) {
+      if(userAccounts.get(i).getEnumPaymentType().toString().equals("BANK")){
+        Long idBank = userPost.getUserAccounts().get(i).getBankId();
+        userAccounts.get(i).setBanks(banksRepository.findById(idBank).orElse(null));
+        userAccounts.get(i).setUsacBankEntityid(idBank);
+      }
+      if(userAccounts.get(i).getEnumPaymentType().toString().equals("FINTECH")){
+        Long idFintech = userPost.getUserAccounts().get(i).getFintechId();
+        userAccounts.get(i).setFintech(fintechRepository.findById(idFintech).orElse(null));
+        userAccounts.get(i).setUsacFintEntityid(idFintech);
+      }
+      userAccounts.get(i).setUser(user);
+      userAccounts.get(i).setUsacUserEntityid(businessEntity.getEntityId());
+    }
 
-    List<UserPhone> listPhone = List.of(userPhone);
-
-    // Cities city = cityRepository.findByCityName(userPost.getUserAddress().getCity()); //Validate
-
-    // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
-    // Long lastIndexUsdr;
-    // if (findTopByOrderByIdDesc.isPresent()) {
-    //   lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
-    // } else {
-    //   lastIndexUsdr = 1L;
-    // }
-
-    // UserAdressId userAdressId = new UserAdressId();
-    // userAdressId.setUsdrId(lastIndexUsdr + 1); //tambahin sequence
-    UserAddress userAddress = new UserAddress();
-    userAddress.setUsdrEntityId(businessEntityId);
-    // userAddress.setUsdrCityId(city.getCityId());
-    // userAddress.setUserAdressId(userAdressId);
-    // userAddress.setCity(city);
-    userAddress.setUsdrAddress1(userPost.getUserAddress().getUsdrAddress1());
-    userAddress.setUsdrAddress2(userPost.getUserAddress().getUsdrAddress2());
-    userAddress.setUsdrModifiedDate(LocalDateTime.now());
-
-    List<UserAddress> listAddress = List.of(userAddress);
-
-    // UserAccounts userAccounts = new UserAccounts();
-    // userAccounts.setUsac_accountno(userPost.getUserAccount().getUsac_accountno());
-    // if (userPost.getUserAccount().getEnumPaymentType().equals("BANK")) { //urusan giry
-    //   userAccounts.setEnumPaymentType(EnumPaymentType.BANK);
-    //   Banks bank = banksRepository.findByBankNameOptional(userPost.getUserAccount().getBank())
-    //       .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
-    //   userAccounts.setBanks(bank);
-    //   userAccounts.setUsacBankEntityid(bank.getBank_entityid());
-    // }
-    // if (userPost.getUserAccount().getEnumPaymentType().equals("FINTECH")) {
-    //   userAccounts.setEnumPaymentType(EnumPaymentType.FINTECH);
-    //   Fintech fintech = fintechRepository.findByFintNameOptional(userPost.getUserAccount().getFintech())
-    //       .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
-    //   userAccounts.setFintech(fintech);
-    // }
-    // userAccounts.setUser(user);
-    // userAccounts.setUsacUserEntityid(businessEntityId);
-    // List<UserAccounts> listUserAccountuserAccounts = List.of(userAccounts);
-
-    //TODO USERPHOTO API
+   
+    // TODO USERPHOTO API
     // user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
-    // userPost.getPhoto().transferTo(new File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
- 
-    user.setUserPhone(listPhone);
+    // userPost.getPhoto().transferTo(new
+    // File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
+
     user.setUserRoles(listRole);
-    user.setUserAddress(listAddress);
-    // user.setUserAccounts(listUserAccountuserAccounts);
-    // userAccounts.setUser(user);
-    userPhone.setUser(user);
     userRoles.setUser(user);
-    userAddress.setUser(user);
     return save(user);
   }
 
@@ -176,20 +143,25 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public User save(CreateUserDto userPost, Long id) {
-    User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found")); //protect dto
-    NullUtils.updateIfChanged(user::setUserName, userPost.getUserName(), user::getUserName);
-    NullUtils.updateIfChanged(user::setUserFullName, userPost.getFullName(), user::getUserFullName);
-    NullUtils.updateIfChanged(user::setUserBirthPlace, userPost.getBirthPlace(),
-        user::getUserBirthPlace);
-    NullUtils.updateIfChanged(user::setUserBirthDate, LocalDateTime.parse(userPost.getUserBirthDate()),
-        user::getUserBirthDate);
+    User user =
+        userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found")); // protect
+                                                                                                // dto
+    // NullUtils.updateIfChanged(user::setUserName, userPost.getUserName(), user::getUserName);
+    // NullUtils.updateIfChanged(user::setUserFullName, userPost.getFullName(),
+    // user::getUserFullName);
+    // NullUtils.updateIfChanged(user::setUserBirthPlace, userPost.getBirthPlace(),
+    // user::getUserBirthPlace);
+    // NullUtils.updateIfChanged(user::setUserBirthDate,
+    // LocalDateTime.parse(userPost.getUserBirthDate()),
+    // user::getUserBirthDate);
 
-    NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(), user::getUserPassword);
+    // NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(),
+    // user::getUserPassword);
 
-    NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
+    // NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
     // TODO USERPHOTO API
     // if(userPost.getPhoto() != null){
-    //   user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
+    // user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
     // }
 
     User userSaved = save(user);
@@ -204,13 +176,13 @@ public class UserServiceImpl implements UserService {
   @Override
   public String loginCu(String identity, String password) {
     Optional<User> user = userRepo.findUserByIden(identity);
-    if(user.isPresent()){
+    if (user.isPresent()) {
       List<String> listRole = new ArrayList<>();
       for (UserRoles role : user.get().getUserRoles()) {
         listRole.add(role.getRoles().getRoleName().toString());
-      } 
-      if(listRole.contains("PC")||listRole.contains("CU")){
-        if(user.get().getUserPassword().equals(password)){
+      }
+      if (listRole.contains("PC") || listRole.contains("CU")) {
+        if (user.get().getUserPassword().equals(password)) {
           return "Access Granted";
         }
         return "Wrong Password";
@@ -223,14 +195,14 @@ public class UserServiceImpl implements UserService {
   @Override
   public String loginEm(String identity, String password) {
     Optional<User> user = userRepo.findUserByIden(identity);
-    if(user.isPresent()){
+    if (user.isPresent()) {
       List<String> listRole = new ArrayList<>();
       for (UserRoles role : user.get().getUserRoles()) {
         listRole.add(role.getRoles().getRoleName().toString());
-      } 
-      if(listRole.contains("EM")){
-        if(user.get().getUserPassword().equals(password)){
-        return "Access Granted";
+      }
+      if (listRole.contains("EM")) {
+        if (user.get().getUserPassword().equals(password)) {
+          return "Access Granted";
         }
         return "Wrong Password";
       }
