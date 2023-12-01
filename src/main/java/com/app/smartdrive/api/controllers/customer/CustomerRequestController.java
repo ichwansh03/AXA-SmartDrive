@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.customer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 import com.app.smartdrive.api.dto.customer.response.*;
@@ -64,7 +65,7 @@ public class CustomerRequestController {
     ) {
         Pageable paging;
 
-        if(sort == "descending"){
+        if(Objects.equals(sort, "descending")){
              paging = PageRequest.of(page, size, Sort.by(sortBy).descending());
         }else {
              paging = PageRequest.of(page, size, Sort.by(sortBy).ascending());
