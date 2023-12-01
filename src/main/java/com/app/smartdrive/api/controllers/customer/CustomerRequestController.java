@@ -78,6 +78,27 @@ public class CustomerRequestController {
 
     }
 
+    @GetMapping("/request")
+    public Page<CustomerResponseDTO> getAllCustomersRequest(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "3") int size,
+            @RequestParam(value = "sortBy", defaultValue = "creqEntityId") String sortBy,
+            @RequestParam(value = "sort", defaultValue = "ascending") String sort,
+            @RequestParam(value = "custId") Long custId
+    ){
+        Pageable paging;
+
+        if(Objects.equals(sort, "descending")){
+            paging = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }else {
+            paging = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        }
+
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingCustomer(custId, paging);
+
+        return pagingCustomerResponseDTO;
+    }
+
 
     @PostMapping
     public CustomerResponseDTO create(

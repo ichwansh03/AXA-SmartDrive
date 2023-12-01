@@ -36,4 +36,6 @@ public interface CustomerRequestService {
     public CustomerResponseDTO convert(CustomerRequest customerRequest);
 
     public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs);
+
+    Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging);
 }

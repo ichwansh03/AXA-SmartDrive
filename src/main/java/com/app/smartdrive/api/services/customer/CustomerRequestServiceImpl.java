@@ -402,5 +402,19 @@ public class CustomerRequestServiceImpl implements CustomerRequestService{
         return totalPremi;
     }
 
+    @Override
+    public Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging) {
+        User user = this.userRepository.findById(custId).get();
+        Page<CustomerRequest> pageCustomerRequest = this.customerRequestRepository.findByCustomer(user, paging);
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return convert(customerRequest);
+            }
+        });
+
+        return pageCustomerResponseDTO;
+    }
+
 
 }
