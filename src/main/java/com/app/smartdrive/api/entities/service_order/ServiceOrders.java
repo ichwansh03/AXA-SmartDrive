@@ -2,8 +2,10 @@ package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -42,7 +44,7 @@ public class ServiceOrders {
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
     {
-        seroOrdtType = EnumModuleServiceOrders.SeroOrdtType.CLOSE;
+        seroOrdtType = EnumModuleServiceOrders.SeroOrdtType.CREATE;
     }
 
     //CustomerRequest.creqStatus
@@ -67,12 +69,15 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
+    @JsonManagedReference
+    @OneToOne(mappedBy = "serviceOrders")
+    private Partner partner;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "sero_sero_id")
     private ServiceOrders parentServiceOrders;
 
-    //@JsonIgnore
     @OneToMany(mappedBy = "parentServiceOrders")
     private List<ServiceOrders> serviceOrdersList;
 
@@ -91,15 +96,12 @@ public class ServiceOrders {
     @JoinColumn(name = "sero_arwg_code")
     private AreaWorkGroup areaWorkGroup;
 
-    //@JsonIgnore
     @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
     private List<ServiceOrderTasks> serviceOrderTasks;
 
-    //@JsonIgnore
     @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetEvidence> claimAssetEvidence;
 
-    //@JsonIgnore
     @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetSparepart> claimAssetSparepart;
 }
