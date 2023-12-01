@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.user;
+package com.app.smartdrive.api.dto.user.response;
 
 import java.util.List;
 

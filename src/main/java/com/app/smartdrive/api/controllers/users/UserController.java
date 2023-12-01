@@ -2,10 +2,9 @@ package com.app.smartdrive.api.controllers.users;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.app.smartdrive.api.dto.user.CreateUserDto;
 import com.app.smartdrive.api.dto.user.LoginDto;
-import com.app.smartdrive.api.dto.user.UserDto;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.users.UserService;

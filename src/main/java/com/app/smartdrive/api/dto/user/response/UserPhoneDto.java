@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.user;
+package com.app.smartdrive.api.dto.user.response;
 
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import lombok.AllArgsConstructor;
