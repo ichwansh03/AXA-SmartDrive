@@ -1,10 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
 import com.app.smartdrive.api.dto.master.AreaWorkGroupDto;
-import com.app.smartdrive.api.dto.service_order.ServicesDto;
-import com.app.smartdrive.api.dto.service_order.SoTasksDto;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ArwgService;
@@ -16,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/arwg")
@@ -28,33 +23,26 @@ public class ArwgController implements BaseController<AreaWorkGroupDto, String> 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<AreaWorkGroup> areaWorkGroup = service.getAll();
-        List<AreaWorkGroupDto> result = areaWorkGroup.stream().map(arwg -> {
-            return new AreaWorkGroupDto(arwg.getArwgCode(), arwg.getArwgDesc(), arwg.getArwgCityId(), TransactionMapper.mapEntityListToDtoList(arwg.getEmployeeAreaWorkgroup(), EmployeeAreaWorkgroupDto.class), TransactionMapper.mapEntityListToDtoList(arwg.getServiceOrders(), ServicesDto.class), TransactionMapper.mapEntityListToDtoList(arwg.getServiceOrderTasks(), SoTasksDto.class));
-        }).toList();
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), AreaWorkGroupDto.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
-        AreaWorkGroup areaWorkGroup = service.getById(id);
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(areaWorkGroup, AreaWorkGroupDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), AreaWorkGroupDto.class));
     }
 
     @Override
     @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody AreaWorkGroupDto request) {
-        AreaWorkGroup result = new AreaWorkGroup();
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new AreaWorkGroup())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody AreaWorkGroupDto request) {
-        AreaWorkGroup result = service.getById(request.getArwgCode());
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getArwgCode()))), HttpStatus.CREATED);
     }
 }
