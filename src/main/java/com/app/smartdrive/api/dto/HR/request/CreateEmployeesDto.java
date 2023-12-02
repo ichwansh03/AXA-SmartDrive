@@ -5,6 +5,8 @@ import java.io.Serializable;
 import com.app.smartdrive.api.dto.HR.response.EmployeesJobTypeResponseDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

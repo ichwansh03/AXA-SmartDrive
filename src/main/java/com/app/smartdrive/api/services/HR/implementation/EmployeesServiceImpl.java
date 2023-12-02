@@ -68,7 +68,7 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         // // Save the business entity and get the ID
         // Long businessEntityId = businessEntityService.save(businessEntity); 
-        
+
         // // if(employeesDto.getGrantUserAccess()){
         // user.setUserBusinessEntity(businessEntity);
         // user.setUserEntityId(businessEntityId);
@@ -92,7 +92,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         // userRoles.setUser(user);
         
         // List<UserRoles> listRole = List.of(userRoles);
-        
+
         // UserPhone userPhone = new UserPhone();
         // UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
         // userPhone.setUserPhoneId(userPhoneId);
@@ -148,7 +148,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     //             .orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + employeeId));
 
     //     User user = existingEmployee.getUser(); 
-        
+
     //     UserAddress userAddress = userAddressRepository.findByUserUserEntityId(user.getUserEntityId());
     //     userAddress.setCity(cityRepository.findByCityName(updatedEmployeeDto.getUserAddress().getCity().getCityName()));
 
@@ -171,7 +171,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     //     // existingEmployee.setEmpNetSalary(updatedEmployeeDto.getEmpSalary());
     //     // existingEmployee.setEmpAccountNumber(updatedEmployeeDto.getEmpAccountNumber());
     //     // existingEmployee.setEmpJobCode(updatedEmployeeDto.getEmpRole());
-    
+
     //     // // Update associated user details
     //     // User user = existingEmployee.getUser();
     //     // user.setUserName(updatedEmployeeDto.getEmpName());
@@ -267,8 +267,6 @@ public class EmployeesServiceImpl implements EmployeesService {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
-
-    
 
     @Override
     public void deleteById(Long emp_entityid) {
