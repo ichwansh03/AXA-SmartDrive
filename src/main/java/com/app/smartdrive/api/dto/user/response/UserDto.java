@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
   private String userPhoto;
   private String userFullName;
@@ -21,6 +22,6 @@ public class UserDto {
   private String userEmail;
   private List<UserPhoneDto> userPhone;
   private List<UserAddressDto> userAddress;
-  private List<UserUserAccountDto> userAccounts;
+  private List<UserUserAccountResponseDto> userAccounts;
 
 }

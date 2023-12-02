@@ -22,14 +22,17 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.app.smartdrive.api.dto.HR.EmployeesDto;
+import com.app.smartdrive.api.dto.HR.response.CreateEmployeesDto;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
+import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.partner.Partner;
+import com.app.smartdrive.api.repositories.HR.JobTypeRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -38,10 +41,11 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/master/hr")
 public class EmployeesController {
      private final EmployeesService employeesService;
+     private final JobTypeRepository jobTypeRepository;
 
      @PostMapping("/add")
-     public ResponseEntity<?> addEmployee(@ModelAttribute EmployeesDto employeesDto) {
-            EmployeesDto addedEmployee = employeesService.addEmployee(employeesDto);
+     public ResponseEntity<?> addEmployee(@RequestBody CreateEmployeesDto employeesDto) {
+            CreateEmployeesDto addedEmployee = employeesService.addEmployee(employeesDto);
             return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
     }
 
@@ -52,10 +56,10 @@ public class EmployeesController {
     }
 
     @PutMapping("/update/{employeeId}")
-    public ResponseEntity<EmployeesDto> updateEmployee(
+    public ResponseEntity<CreateEmployeesDto> updateEmployee(
             @PathVariable Long employeeId,
-            @RequestBody EmployeesDto updatedEmployeeDto) {
-        EmployeesDto updatedEmployee = employeesService.updateEmployee(employeeId, updatedEmployeeDto);
+            @RequestBody CreateEmployeesDto updatedEmployeeDto) {
+        CreateEmployeesDto updatedEmployee = employeesService.updateEmployee(employeeId, updatedEmployeeDto);
         return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
     }
 
@@ -66,6 +70,12 @@ public class EmployeesController {
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         return employeesService.searchEmployees(value, page, size);
+    }
+
+    @GetMapping("/find")
+    public JobType findById(@RequestBody CreateEmployeesDto employeesDto){
+        JobType jobType = jobTypeRepository.findById(employeesDto.getEmpJobType().getJobCode()).get();
+        return jobType;
     }
 
     
