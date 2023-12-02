@@ -99,6 +99,7 @@ public class UserUserAccountImpl implements UserUserAccountService {
       userAccounts.get(i).setUser(user);
       userAccounts.get(i).setUsacUserEntityid(user.getUserEntityId());
     }
+    user.setUserAccounts(userAccounts);
     return userAccounts;
   }
 }

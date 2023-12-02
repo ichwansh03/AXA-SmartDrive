@@ -84,11 +84,13 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     
 
+
         
     
         // User user = new User();
         // BusinessEntity businessEntity = new BusinessEntity();
         // businessEntity.setEntityModifiedDate(LocalDateTime.now());
+
 
         // // Save the business entity and get the ID
         // Long businessEntityId = businessEntityService.save(businessEntity); 
@@ -100,6 +102,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         //     passwordBuilder.append(up.getUserPhoneId().getUsphPhoneNumber());
         // }
         
+
         // // if(employeesDto.getGrantUserAccess()){
         // user.setUserBusinessEntity(businessEntity);
         // user.setUserEntityId(businessEntityId);
@@ -123,6 +126,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         // user.setUserModifiedDate(LocalDateTime.now());
         // user.setUserNationalId("ind"+businessEntityId);
         // user.setUserNPWP("npwp"+businessEntityId);
+
     
         
         // UserRolesId userRolesId = new UserRolesId(businessEntityId, RoleName.EM);
@@ -135,9 +139,11 @@ public class EmployeesServiceImpl implements EmployeesService {
         // userRoles.setUsroModifiedDate(LocalDateTime.now());
         // userRoles.setUser(user);
         
+
         // List<UserRoles> listRole = List.of(userRoles);
         
         // List<UserRoles> listRole = List.of(userRoles);
+
 
         // UserPhone userPhone = new UserPhone();
         // UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.get);
@@ -159,6 +165,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         // List<UserAddress> listuAddresses = List.of(userAddress);
         
         
+
         // JobType jobType = jobTypeRepository.findById(employeesDto.getEmpJobType().getJobCode()).get();
         // Employees employee = new Employees();
         // employee.setEmpEntityid(user.getUserEntityId());
@@ -171,6 +178,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         // employee.setUser(user);
         // employee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
         // employee.setJobType(jobType);
+
         // user.setUserName(employeesDto.getUser().getUserEmail());
         // user.setUserPassword(employeesDto.getUser().getUserPhone().get();
 

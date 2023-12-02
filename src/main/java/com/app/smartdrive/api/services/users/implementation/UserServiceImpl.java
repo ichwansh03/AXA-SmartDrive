@@ -98,8 +98,7 @@ public class UserServiceImpl implements UserService {
 
     userAddressService.createUserAddress(user, userPost.getUserAddress(), userPost.getCityId());
 
-    Long paymentId = (userPost.getBankId() != null) ? userPost.getBankId() : 
-    (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
+    Long paymentId = (userPost.getBankId() != null) ? userPost.getBankId() : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
 
     userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
 
