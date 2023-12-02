@@ -17,6 +17,7 @@ import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -520,6 +521,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         return this.convert(savedCustomerRequest);
+    }
+
+    @Transactional
+    @Override
+    public void delete(Long creqEntityId) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + creqEntityId + " tidak ditemukan")
+        );
+
+        this.customerRequestRepository.delete(existCustomerRequest);
     }
 
 

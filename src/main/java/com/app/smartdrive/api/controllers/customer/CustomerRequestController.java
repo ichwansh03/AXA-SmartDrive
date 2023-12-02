@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -116,5 +117,15 @@ public class CustomerRequestController {
 
         return customerResponseDTO;
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> delete(
+            @RequestParam("creqEntityId") Long creqEntityId
+    ){
+        this.customerRequestService.delete(creqEntityId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 }
