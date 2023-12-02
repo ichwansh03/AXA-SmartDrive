@@ -10,6 +10,16 @@ public interface ServOrderTaskService {
 
     List<ServiceOrderTasks> generateSeotFeasiblity(ServiceOrders serviceOrders, Services services);
 
-    ServiceOrderTasks findSeotById(Long seotId);
+    List<ServiceOrderTasks> generateSeotPolis(ServiceOrders serviceOrders, Services services);
+
+    List<ServiceOrderTasks> generateSeotClaim(ServiceOrders serviceOrders, Services services);
+
+    List<ServiceOrderTasks> closeAllTasks(ServiceOrders serviceOrders, Services services);
+
+    List<ServiceOrderTasks> checkAllTaskComplete(List<ServiceOrderTasks> seotList, ServiceOrderTasks seot);
+
+    List<ServiceOrderTasks> findSeotBySeroId(String seroId);
+
+    int updateTasksStatus(String seotStatus, Long seotId);
 
 }

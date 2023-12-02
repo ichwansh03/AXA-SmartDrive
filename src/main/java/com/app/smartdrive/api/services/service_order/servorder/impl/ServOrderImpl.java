@@ -12,6 +12,7 @@ import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,18 +24,16 @@ public class ServOrderImpl implements ServOrderService {
     private final SoRepository soRepository;
     private final SoOrderRepository soOrderRepository;
     private final SoTasksRepository soTasksRepository;
-    private final SoWorkorderRepository soWorkorderRepository;
-
+    private final SoWorkorderRepository workorderRepository;
     SoAdapter soAdapter = new SoAdapter();
 
+    @Transactional
     @Override
-    public ServiceOrders addServiceOrders(Services services) {
-        services = soRepository.findById(services.getServId()).get();
+    public ServiceOrders addServiceOrders(Long servId) {
 
-        String formatSeroId = soAdapter.formatServiceOrderId(
-                services,
-                services.getServId(),
-                services.getServStartDate());
+        Services services = soRepository.findById(servId).get();
+
+        String formatSeroId = soAdapter.formatServiceOrderId(services);
 
         ServiceOrders serviceOrders = new ServiceOrders();
         serviceOrders = ServiceOrders.builder()
@@ -50,16 +49,27 @@ public class ServOrderImpl implements ServOrderService {
         ServiceOrders seroSaved = soOrderRepository.save(serviceOrders);
         log.info("SoOrderServiceImpl::addServiceOrders in ID {}",formatSeroId);
 
-        ServOrderTaskImpl servOrderTask = new ServOrderTaskImpl(soTasksRepository, soWorkorderRepository);
-        List<ServiceOrderTasks> serviceOrderTasks = servOrderTask.generateSeotFeasiblity(seroSaved, services);
+        ServOrderTaskImpl servOrderTask = new ServOrderTaskImpl(soTasksRepository, workorderRepository);
+        List<ServiceOrderTasks> seotList;
+
+        switch (services.getServType().toString()){
+            case "FEASIBLITY" -> seotList = servOrderTask.generateSeotFeasiblity(seroSaved, services);
+            case "POLIS" -> seotList = servOrderTask.generateSeotPolis(seroSaved, services);
+            case "CLAIM" -> seotList = servOrderTask.generateSeotClaim(seroSaved, services);
+            default -> seotList = servOrderTask.closeAllTasks(seroSaved, services);
+        }
+
+        List<ServiceOrderTasks> serviceOrderTasks = seotList;
+
         seroSaved.setServiceOrderTasks(serviceOrderTasks);
 
         return serviceOrders;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ServiceOrders findServiceOrdersById(String seroId) {
-        ServiceOrders serviceOrdersById = soOrderRepository.findServiceOrdersById(seroId);
+        ServiceOrders serviceOrdersById = soOrderRepository.findById(seroId).get();
         log.info("SoOrderServiceImpl::findServiceOrdersById in ID {} ",serviceOrdersById);
         return serviceOrdersById;
     }
