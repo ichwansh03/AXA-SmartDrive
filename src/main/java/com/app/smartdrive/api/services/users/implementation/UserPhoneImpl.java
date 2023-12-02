@@ -1,12 +1,14 @@
 package com.app.smartdrive.api.services.users.implementation;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.UserPhoneService;
@@ -71,5 +73,17 @@ public class UserPhoneImpl implements UserPhoneService {
     if(userPhone.isPresent()){
       userPhoneRepository.delete(userPhone.get());
     }
+  }
+
+  @Override
+  public List<UserPhone> createUserPhone(User user, List<UserPhoneDto> userPost) {
+    List<UserPhone> userPhone = TransactionMapper.mapListDtoToListEntity(userPost, UserPhone.class);
+    userPhone.forEach(phone -> {
+      phone.setUser(user);
+      phone.getUserPhoneId().setUsphEntityId(user.getUserEntityId());
+      phone.setUsphModifiedDate(LocalDateTime.now());
+    });
+    user.setUserPhone(userPhone);
+    return userPhone;
   }
 }

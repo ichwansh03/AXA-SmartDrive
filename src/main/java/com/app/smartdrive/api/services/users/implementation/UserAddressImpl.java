@@ -1,12 +1,14 @@
 package com.app.smartdrive.api.services.users.implementation;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.response.UserAddressDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserAddress;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.users.UserAddressRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
@@ -44,7 +46,7 @@ public class UserAddressImpl implements UserAddressService {
   }
 
   @Override
-  public UserAddress createUserAddress(Long id, UserAddressDto userPost) {
+  public UserAddress addUserAddress(Long id, UserAddressDto userPost) {
     UserAddress userAddress = new UserAddress();
     // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
     // Long lastIndexUsdr;
@@ -76,5 +78,20 @@ public class UserAddressImpl implements UserAddressService {
     if(user.get().getUserEntityId().equals(userAddress.get().getUsdrEntityId())){
       userAddressRepository.delete(userAddress.get());
     }
+  }
+
+  @Override
+  public List<UserAddress> createUserAddress(User user, List<UserAddressDto> userPost, Long cityId) {
+    List<UserAddress> userAddress = TransactionMapper.mapListDtoToListEntity(userPost, UserAddress.class);
+    userAddress.forEach(address -> {
+      Cities city = cityRepository.findById(cityId).orElse(null);
+      address.setCity(city);
+      address.setUsdrEntityId(user.getUserEntityId());
+      address.setUsdrCityId(cityId);
+      address.setUsdrModifiedDate(LocalDateTime.now());
+      address.setUser(user);
+    });
+    user.setUserAddress(userAddress);
+    return userAddress;
   }
 }

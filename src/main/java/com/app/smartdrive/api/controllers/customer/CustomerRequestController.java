@@ -5,6 +5,13 @@ import java.util.Objects;
 
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
+import com.app.smartdrive.api.entities.customer.CustomerInscDoc;
+import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.master.CarSeries;
+import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
@@ -16,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
+import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
+import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
