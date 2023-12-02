@@ -40,7 +40,13 @@ import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
+import com.app.smartdrive.api.services.users.UserAddressService;
+import com.app.smartdrive.api.services.users.UserPhoneService;
+import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
+import com.app.smartdrive.api.services.users.implementation.UserAddressImpl;
+import com.app.smartdrive.api.services.users.implementation.UserPhoneImpl;
+import com.app.smartdrive.api.services.users.implementation.UserRolesImpl;
 import com.app.smartdrive.api.services.users.implementation.UserServiceImpl;
 import com.app.smartdrive.api.utils.NullUtils;
 
@@ -53,6 +59,14 @@ import lombok.RequiredArgsConstructor;
 public class EmployeesServiceImpl implements EmployeesService {
     
     private final BusinessEntityService businessEntityService;
+
+    private final UserAddressService userAddressService;
+
+    private final UserPhoneService userPhoneService;
+
+    private final UserRolesService userRolesService;
+
+    private final UserService userService2;
 
     private final EmployeesRepository employeesRepository;
 
@@ -67,34 +81,35 @@ public class EmployeesServiceImpl implements EmployeesService {
     @Transactional
     public CreateEmployeesDto addEmployee(CreateEmployeesDto employeesDto){
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
-        // User user = userService.createUser(employeesDto.getUser(), RoleName.EM);
+
     
-        User user = new User();
-        BusinessEntity businessEntity = new BusinessEntity();
-        businessEntity.setEntityModifiedDate(LocalDateTime.now());
 
-<<<<<<< HEAD
-        // Save the business entity and get the ID
-        Long businessEntityId = businessEntityService.save(businessEntity); 
-
-        List<UserPhone> userPhones = user.getUserPhone();
-        StringBuilder passwordBuilder = new StringBuilder();
-
-        for (UserPhone up : userPhones) {
-            passwordBuilder.append(up.getUserPhoneId().getUsphPhoneNumber());
-        }
         
-        // if(employeesDto.getGrantUserAccess()){
-        user.setUserBusinessEntity(businessEntity);
-        user.setUserEntityId(businessEntityId);
-        user.setUserName(employeesDto.getUser().getUserEmail());
-        user.setUserPassword(passwordBuilder.toString());
-        user.setUserFullName(employeesDto.getEmpName());
-        user.setUserEmail(employeesDto.getUser().getUserEmail());
-        user.setUserModifiedDate(LocalDateTime.now());
-        user.setUserNationalId("ind"+businessEntityId);
-        user.setUserNPWP("npwp"+businessEntityId);
-=======
+    
+        // User user = new User();
+        // BusinessEntity businessEntity = new BusinessEntity();
+        // businessEntity.setEntityModifiedDate(LocalDateTime.now());
+
+        // // Save the business entity and get the ID
+        // Long businessEntityId = businessEntityService.save(businessEntity); 
+
+        // List<UserPhone> userPhones = user.getUserPhone();
+        // StringBuilder passwordBuilder = new StringBuilder();
+
+        // for (UserPhone up : userPhones) {
+        //     passwordBuilder.append(up.getUserPhoneId().getUsphPhoneNumber());
+        // }
+        
+        // // if(employeesDto.getGrantUserAccess()){
+        // user.setUserBusinessEntity(businessEntity);
+        // user.setUserEntityId(businessEntityId);
+        // user.setUserName(employeesDto.getUser().getUserEmail());
+        // user.setUserPassword(passwordBuilder.toString());
+        // user.setUserFullName(employeesDto.getEmpName());
+        // user.setUserEmail(employeesDto.getUser().getUserEmail());
+        // user.setUserModifiedDate(LocalDateTime.now());
+        // user.setUserNationalId("ind"+businessEntityId);
+        // user.setUserNPWP("npwp"+businessEntityId);
         // // Save the business entity and get the ID
         // Long businessEntityId = businessEntityService.save(businessEntity); 
 
@@ -108,26 +123,22 @@ public class EmployeesServiceImpl implements EmployeesService {
         // user.setUserModifiedDate(LocalDateTime.now());
         // user.setUserNationalId("ind"+businessEntityId);
         // user.setUserNPWP("npwp"+businessEntityId);
->>>>>>> 8e25e58ede0b21749689a9150372dab761846515
     
         
-        UserRolesId userRolesId = new UserRolesId(businessEntityId, RoleName.EM);
-        Roles roles = rolesRepository.findById(RoleName.EM).get();
+        // UserRolesId userRolesId = new UserRolesId(businessEntityId, RoleName.EM);
+        // Roles roles = rolesRepository.findById(RoleName.EM).get();
         
-        UserRoles userRoles = new UserRoles();
-        userRoles.setUserRolesId(userRolesId);
-        userRoles.setRoles(roles);
-        userRoles.setUsroStatus("ACTIVE");
-        userRoles.setUsroModifiedDate(LocalDateTime.now());
-        userRoles.setUser(user);
+        // UserRoles userRoles = new UserRoles();
+        // userRoles.setUserRolesId(userRolesId);
+        // userRoles.setRoles(roles);
+        // userRoles.setUsroStatus("ACTIVE");
+        // userRoles.setUsroModifiedDate(LocalDateTime.now());
+        // userRoles.setUser(user);
         
-<<<<<<< HEAD
-        List<UserRoles> listRole = List.of(userRoles);
+        // List<UserRoles> listRole = List.of(userRoles);
         
-=======
         // List<UserRoles> listRole = List.of(userRoles);
 
->>>>>>> 8e25e58ede0b21749689a9150372dab761846515
         // UserPhone userPhone = new UserPhone();
         // UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.get);
         // userPhone.setUserPhoneId(userPhoneId);
@@ -148,19 +159,19 @@ public class EmployeesServiceImpl implements EmployeesService {
         // List<UserAddress> listuAddresses = List.of(userAddress);
         
         
-        JobType jobType = jobTypeRepository.findById(employeesDto.getEmpJobType().getJobCode()).get();
-        Employees employee = new Employees();
-        employee.setEmpEntityid(user.getUserEntityId());
-        employee.setEmpName(employeesDto.getEmpName());
-        employee.setEmpJoinDate(empJoinDate);
-        employee.setEmpGraduate(EnumClassHR.emp_graduate.valueOf(employeesDto.getEmpGraduate()));
-        employee.setEmpStatus(EnumClassHR.status.ACTIVE);
-        employee.setEmpNetSalary(employeesDto.getEmpSalary());
-        employee.setEmpAccountNumber(employeesDto.getUser().getUserAccounts().get(0).getUsac_accountno());
-        employee.setUser(user);
-        employee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
-        employee.setJobType(jobType);
-        user.setUserName(employeesDto.getUser().getUserEmail());
+        // JobType jobType = jobTypeRepository.findById(employeesDto.getEmpJobType().getJobCode()).get();
+        // Employees employee = new Employees();
+        // employee.setEmpEntityid(user.getUserEntityId());
+        // employee.setEmpName(employeesDto.getEmpName());
+        // employee.setEmpJoinDate(empJoinDate);
+        // employee.setEmpGraduate(EnumClassHR.emp_graduate.valueOf(employeesDto.getEmpGraduate()));
+        // employee.setEmpStatus(EnumClassHR.status.ACTIVE);
+        // employee.setEmpNetSalary(employeesDto.getEmpSalary());
+        // employee.setEmpAccountNumber(employeesDto.getUser().getUserAccounts().get(0).getUsac_accountno());
+        // employee.setUser(user);
+        // employee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
+        // employee.setJobType(jobType);
+        // user.setUserName(employeesDto.getUser().getUserEmail());
         // user.setUserPassword(employeesDto.getUser().getUserPhone().get();
 
         // user.setUserRoles(listRole);
@@ -168,7 +179,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         // user.setUserAddress(listuAddresses);
 
 
-        employeesRepository.save(employee);
+        // employeesRepository.save(employee);
 
         
     

@@ -9,6 +9,7 @@ import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import lombok.Data;
 
 @Data
+
 public class CreateUserDto {
   private ProfileRequestDto profile;
   private Long cityId;
