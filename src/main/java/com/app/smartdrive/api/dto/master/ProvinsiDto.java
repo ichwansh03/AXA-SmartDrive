@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +14,5 @@ public class ProvinsiDto {
     @Size(max = 85, message = "Province Name Length Exceeded !")
     private String provName;
 
-    private Long provZonesId;
-    private List<CitiesDto> citiesDto;
-    private List<RegionPlatDto> regionPlatDto;
+    private ZonesDto zones;
 }

@@ -2,7 +2,6 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.CategoryDto;
-import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.entities.master.Category;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.CateService;
@@ -14,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
@@ -26,33 +23,26 @@ public class CateController implements BaseController<CategoryDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<Category> cate = service.getAll();
-        List<CategoryDto> result = cate.stream().map(category -> {
-            return new CategoryDto(category.getCateId(), category.getCateName(), TransactionMapper.mapEntityListToDtoList(category.getTemplateInsurancePremis(), TemplateInsurancePremiDto.class));
-        }).toList();
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), CategoryDto.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        Category category = service.getById(id);
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(category, CategoryDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), CategoryDto.class));
     }
 
     @Override
     @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody CategoryDto request) {
-        Category result = new Category();
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new Category())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody CategoryDto request) {
-        Category result = service.getById(request.getCateId());
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getCateId()))), HttpStatus.CREATED);
     }
 }

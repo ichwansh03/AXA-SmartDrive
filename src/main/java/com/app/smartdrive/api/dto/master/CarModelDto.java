@@ -16,6 +16,5 @@ public class CarModelDto {
     @Size(max = 55, message = "Car Model Name Length Exceeded !")
     private String carmName;
 
-    private Long carmCarbId;
-    private List<CarSeriesDto> carSeriesDto;
+    private List<CarBrandDto> carBrand;
 }
