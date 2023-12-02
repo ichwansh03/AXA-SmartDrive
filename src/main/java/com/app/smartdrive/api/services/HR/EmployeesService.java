@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.app.smartdrive.api.dto.HR.request.CreateEmployeesDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.services.BaseService;
@@ -15,6 +16,7 @@ public interface EmployeesService extends BaseService<Employees, Long>  {
 //  public CreateEmployeesDto updateEmployee(Long employeeId, CreateEmployeesDto updatedEmployeeDto);
  public List<CreateEmployeesDto> getAllEmployeesDto();
  public List<Employees> getAllByEmployeeName(String employeeName);
+ public List<EmployeesDto> getAllDto();
  
  public Page<Employees> searchEmployees(String value, int page, int size) ;
  public CreateEmployeesDto addEmployee(CreateEmployeesDto employeesDto) throws Exception;
