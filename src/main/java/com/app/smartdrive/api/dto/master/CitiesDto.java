@@ -16,6 +16,5 @@ public class CitiesDto {
     @Size(max = 85, message = "City Name Length Exceeded !")
     private String cityName;
 
-    private Long cityProvId;
-    private List<AreaWorkGroupDto> areaWorkGroupDto;
+    private List<ProvinsiDto> provinsi;
 }

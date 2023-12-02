@@ -2,13 +2,12 @@ package com.app.smartdrive.api.services.service_order.servorder;
 
 import com.app.smartdrive.api.entities.service_order.Services;
 
+import java.util.Optional;
+
 public interface ServService {
 
     Services addService(Long creqId);
 
-    Services findServicesById(Long servId);
-
-
-
+    Optional<Services> findServicesById(Long servId);
 
 }

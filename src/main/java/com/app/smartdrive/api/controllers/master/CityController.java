@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.AreaWorkGroupDto;
 import com.app.smartdrive.api.dto.master.CitiesDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -14,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/cities")
@@ -26,33 +23,26 @@ public class CityController implements BaseController<CitiesDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<Cities> cities = service.getAll();
-        List<CitiesDto> result = cities.stream().map(city -> {
-            return new CitiesDto(city.getCityId(), city.getCityName(), city.getCityProvId(), TransactionMapper.mapEntityListToDtoList(city.getAreaWorkGroups(), AreaWorkGroupDto.class));
-        }).toList();
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), CitiesDto.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        Cities cities = service.getById(id);
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(cities, CitiesDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), CitiesDto.class));
     }
 
     @Override
     @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody CitiesDto request) {
-        Cities result = new Cities();
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new Cities())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody CitiesDto request) {
-        Cities result = service.getById(request.getCityId());
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getCityId()))), HttpStatus.CREATED);
     }
 }

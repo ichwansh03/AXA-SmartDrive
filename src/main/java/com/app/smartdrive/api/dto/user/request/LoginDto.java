@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.user;
+package com.app.smartdrive.api.dto.user.request;
 
 import lombok.Data;
 

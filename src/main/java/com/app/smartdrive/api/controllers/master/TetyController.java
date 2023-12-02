@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.TemplateServiceTaskDto;
 import com.app.smartdrive.api.dto.master.TemplateTypeDto;
 import com.app.smartdrive.api.entities.master.TemplateType;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -14,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/tety")
@@ -26,18 +23,13 @@ public class TetyController implements BaseController<TemplateTypeDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-//        List<TemplateType> templateTypes = service.getAll();
-//        List<TemplateTypeDto> result = templateTypes.stream().map(tety -> {
-//            return new TemplateTypeDto(tety.getTetyId(), tety.getTetyName(), tety.getTetyGroup(), TransactionMapper.mapEntityListToDtoList(tety.getTemplateServiceTasks(), TemplateServiceTaskDto.class));
-//        }).toList();
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), TemplateTypeDto.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        TemplateType testy = service.getById(id);
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(testy, TemplateTypeDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), TemplateTypeDto.class));
     }
 
     @Override

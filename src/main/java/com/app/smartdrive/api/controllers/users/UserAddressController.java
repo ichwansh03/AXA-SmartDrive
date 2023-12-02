@@ -31,7 +31,7 @@ public class UserAddressController {
 
   @PostMapping
   public ResponseEntity<?> createUserAddress(@PathVariable("id") Long id, UserAddressDto userPost){
-    UserAddress userAddress = userAddressService.createUserAddress(id, userPost);
+    UserAddress userAddress = userAddressService.addUserAddress(id, userPost);
     return ResponseEntity.status(HttpStatus.CREATED).body(userAddress);
   }
 

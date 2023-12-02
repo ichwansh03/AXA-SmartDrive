@@ -1,23 +1,27 @@
-package com.app.smartdrive.api.services.customer;
+package com.app.smartdrive.api.services.customer.impl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
+
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
-import com.app.smartdrive.api.dto.master.CitiesDto;
-import com.app.smartdrive.api.dto.user.BussinessEntityResponseDTO;
-import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
-import com.app.smartdrive.api.entities.hr.Employees;
+import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.master.*;
-import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
+import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
-import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.services.customer.CustomerRequestService;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +46,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CustomerRequestServiceImpl {
+public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
     private final BusinessEntityRepository businessEntityRepo;
@@ -53,21 +57,37 @@ public class CustomerRequestServiceImpl {
 
     private final CityRepository cityRepository;
 
-    private final SoRepository soRepository;
-
     private final UserRepository userRepository;
 
-    private final EmployeeAreaWorkgroupRepository eawagRepository;
-
-    private final ArwgRepository arwgRepository;
+    private final TemiRepository temiRepository;
 
     private final CustomerInscExtendRepository cuexRepository;
 
-    private final TemiRepository temiRepository;
+    private final CustomerInscDocRepository cadocRepository;
 
 
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
+    }
+
+    public Page<CustomerResponseDTO> getPaging(Pageable pageable){
+        Page<CustomerRequest> pageCustomerRequest = this.customerRequestRepository.findAll(pageable);
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return convert(customerRequest);
+            }
+        });
+
+        return pageCustomerResponseDTO;
+    }
+
+    public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer Request dengan id ${creqEntityId} tidak ditemukan")
+                );
+
+        return this.convert(existCustomerRequest);
     }
 
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
@@ -398,5 +418,121 @@ public class CustomerRequestServiceImpl {
 
         return totalPremi;
     }
+
+    @Override
+    public Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging, String type, String status) {
+        User user = this.userRepository.findById(custId).get();
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
+
+        Page<CustomerRequest> pageCustomerRequest;
+
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqStatus(user, paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqTypeAndCreqStatus(user, paging, creqType, creqStatus);
+        }
+
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return convert(customerRequest);
+            }
+        });
+
+        return pageCustomerResponseDTO;
+    }
+
+    @Override
+    public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer Request dengan id " + creqEntityId + " tidak ditemukan")
+                );
+
+        Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
+        CustomerInscAssets cias = existCustomerRequest.getCustomerInscAssets();
+
+        CiasDTO ciasUpdateDTO = updateCustomerRequestDTO.getCiasDTO();
+        Long[] cuexIds = ciasUpdateDTO.getCuexIds();
+
+
+        CarSeries carSeries = this.carsRepository.findById(ciasUpdateDTO.getCias_cars_id()).orElseThrow(
+                () -> new EntityNotFoundException("Car Series dengan id " + creqEntityId + " tidak ditemukan")
+        );
+        Cities existCity = this.cityRepository.findById(ciasUpdateDTO.getCias_city_id()).orElseThrow(
+                () -> new EntityNotFoundException("City dengan id " + creqEntityId + " tidak ditemukan")
+        );
+        InsuranceType existInty = this.intyRepository.findById(ciasUpdateDTO.getCias_inty_name()).orElseThrow(
+                () -> new EntityNotFoundException("Insurance type dengan id " + creqEntityId + " tidak ditemukan")
+        );
+
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
+
+        // update cias
+        cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+        cias.setCiasYear(ciasUpdateDTO.getCiasYear());
+        cias.setCiasStartdate(ciasStartdate);
+        cias.setCiasEnddate(ciasStartdate.plusYears(1));
+        cias.setCiasCurrentPrice(ciasUpdateDTO.getCurrentPrice());
+        cias.setCiasTotalPremi(ciasUpdateDTO.getCurrentPrice());
+        cias.setCiasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasUpdateDTO.getCiasPaidType()));
+        cias.setCiasIsNewChar(ciasUpdateDTO.getCiasIsNewChar());
+        cias.setCity(existCity);
+        cias.setCarSeries(carSeries);
+        cias.setInsuranceType(existInty);
+
+        // update cuex
+        this.cuexRepository.deleteAllByCuexCreqEntityid(entityId);
+
+        List<CustomerInscExtend> cuex = new ArrayList<>();
+
+        for (Long i: cuexIds) {
+            Double nominal;
+
+            TemplateInsurancePremi temi = this.temiRepository.findById(i).get();
+
+            if(Objects.nonNull(temi.getTemiRateMin())){
+                nominal = temi.getTemiRateMin() * temi.getTemiNominal();
+            }else{
+                nominal = temi.getTemiNominal();
+            }
+
+            CustomerInscExtend newCuex = CustomerInscExtend.builder()
+                    .cuexName(temi.getTemiName())
+                    .cuex_nominal(nominal)
+                    .cuexTotalItem(1)
+                    .customerInscAssets(cias)
+                    .cuexCreqEntityid(entityId)
+                    .build();
+
+            cuex.add(newCuex);
+        }
+
+        cias.setCustomerInscExtend(cuex);
+
+        // update cadoc
+        this.cadocRepository.deleteAllByCadocCreqEntityid(entityId);
+
+        List<CustomerInscDoc> newCiasDocs = this.fileCheck(files, entityId);
+        cias.setCustomerInscDoc(newCiasDocs);
+
+        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
+        return this.convert(savedCustomerRequest);
+    }
+
+    @Transactional
+    @Override
+    public void delete(Long creqEntityId) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + creqEntityId + " tidak ditemukan")
+        );
+
+        this.customerRequestRepository.delete(existCustomerRequest);
+    }
+
 
 }

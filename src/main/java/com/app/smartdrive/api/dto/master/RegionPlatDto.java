@@ -11,5 +11,5 @@ public class RegionPlatDto {
     @Size(max = 35, message = "Region Plat Desc Length Exceeded !")
     private String regpDesc;
 
-    private Long regpProvId;
+    private ProvinsiDto provinsi;
 }
