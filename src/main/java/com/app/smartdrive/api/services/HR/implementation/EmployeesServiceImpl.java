@@ -58,7 +58,7 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     @Override
     @Transactional
-    public CreateEmployeesDto addEmployee(CreateEmployeesDto employeesDto) throws Exception{
+    public CreateEmployeesDto addEmployee(CreateEmployeesDto employeesDto){
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
         User user = userService.createUser(employeesDto.getUser(), RoleName.EM);
     
