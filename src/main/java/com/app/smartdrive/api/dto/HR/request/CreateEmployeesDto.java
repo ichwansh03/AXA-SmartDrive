@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CreateEmployeesDto {
-    private CreateUserDto user;
+    private UserDto user;
     private String empName;
     private String empJoinDate;
     private String empGraduate;
