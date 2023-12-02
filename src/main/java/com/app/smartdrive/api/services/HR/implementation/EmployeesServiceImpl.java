@@ -73,7 +73,6 @@ public class EmployeesServiceImpl implements EmployeesService {
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
 
-<<<<<<< HEAD
         // Save the business entity and get the ID
         Long businessEntityId = businessEntityService.save(businessEntity); 
 
@@ -84,17 +83,16 @@ public class EmployeesServiceImpl implements EmployeesService {
             passwordBuilder.append(up.getUserPhoneId().getUsphPhoneNumber());
         }
         
-        // if(employeesDto.getGrantUserAccess()){
-        user.setUserBusinessEntity(businessEntity);
-        user.setUserEntityId(businessEntityId);
-        user.setUserName(employeesDto.getUser().getUserEmail());
-        user.setUserPassword(passwordBuilder.toString());
-        user.setUserFullName(employeesDto.getEmpName());
-        user.setUserEmail(employeesDto.getUser().getUserEmail());
-        user.setUserModifiedDate(LocalDateTime.now());
-        user.setUserNationalId("ind"+businessEntityId);
-        user.setUserNPWP("npwp"+businessEntityId);
-=======
+        // // if(employeesDto.getGrantUserAccess()){
+        // user.setUserBusinessEntity(businessEntity);
+        // user.setUserEntityId(businessEntityId);
+        // user.setUserName(employeesDto.getUser().getUserEmail());
+        // user.setUserPassword(passwordBuilder.toString());
+        // user.setUserFullName(employeesDto.getEmpName());
+        // user.setUserEmail(employeesDto.getUser().getUserEmail());
+        // user.setUserModifiedDate(LocalDateTime.now());
+        // user.setUserNationalId("ind"+businessEntityId);
+        // user.setUserNPWP("npwp"+businessEntityId);
         // // Save the business entity and get the ID
         // Long businessEntityId = businessEntityService.save(businessEntity); 
 
@@ -108,7 +106,6 @@ public class EmployeesServiceImpl implements EmployeesService {
         // user.setUserModifiedDate(LocalDateTime.now());
         // user.setUserNationalId("ind"+businessEntityId);
         // user.setUserNPWP("npwp"+businessEntityId);
->>>>>>> 8e25e58ede0b21749689a9150372dab761846515
     
         
         UserRolesId userRolesId = new UserRolesId(businessEntityId, RoleName.EM);
@@ -121,13 +118,10 @@ public class EmployeesServiceImpl implements EmployeesService {
         userRoles.setUsroModifiedDate(LocalDateTime.now());
         userRoles.setUser(user);
         
-<<<<<<< HEAD
         List<UserRoles> listRole = List.of(userRoles);
         
-=======
         // List<UserRoles> listRole = List.of(userRoles);
 
->>>>>>> 8e25e58ede0b21749689a9150372dab761846515
         // UserPhone userPhone = new UserPhone();
         // UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.get);
         // userPhone.setUserPhoneId(userPhoneId);
@@ -160,7 +154,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setUser(user);
         employee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
         employee.setJobType(jobType);
-        user.setUserName(employeesDto.getUser().getUserEmail());
+        // user.setUserName(employeesDto.getUser().getUserEmail());
         // user.setUserPassword(employeesDto.getUser().getUserPhone().get();
 
         // user.setUserRoles(listRole);
