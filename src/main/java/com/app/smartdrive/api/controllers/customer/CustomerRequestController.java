@@ -3,6 +3,7 @@ package com.app.smartdrive.api.controllers.customer;
 import java.util.List;
 import java.util.Objects;
 
+import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
@@ -126,6 +127,12 @@ public class CustomerRequestController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/claim")
+    public CustomerResponseDTO createClaim(@RequestBody ClaimRequestDTO claimRequestDTO){
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.createClaim(claimRequestDTO);
+
+        return customerResponseDTO;
+    }
 
 
 }

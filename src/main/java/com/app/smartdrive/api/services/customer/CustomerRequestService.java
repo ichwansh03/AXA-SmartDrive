@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.customer;
 
+import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
@@ -31,4 +32,6 @@ public interface CustomerRequestService {
     CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
     void delete(Long creqEntityId);
+
+    CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO);
 }

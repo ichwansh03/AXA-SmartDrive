@@ -37,4 +37,6 @@ public class CustomerResponseDTO {
     private CustomerUserResponseDTO employee;
 
     private EmployeeAreaWorkgroupDto employeeAreaWorkgroup;
+
+    private ClaimResponseDTO claimResponseDTO;
 }
