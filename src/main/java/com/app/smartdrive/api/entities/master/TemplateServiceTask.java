@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Data
 @AllArgsConstructor
@@ -25,7 +23,7 @@ public class TemplateServiceTask {
     private String testaName;
 
     @Column(name = "testa_tety_id")
-    private String testaTetyId;
+    private Integer testaTetyId;
 
     @Column(name = "testa_group")
     private String testaGroup;

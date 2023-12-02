@@ -1,7 +1,9 @@
-package com.app.smartdrive.api.dto.HR.response;
+package com.app.smartdrive.api.dto.HR.request;
 
 import java.io.Serializable;
 
+import com.app.smartdrive.api.dto.HR.response.EmployeesJobTypeResponseDto;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
@@ -14,16 +16,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateEmployeesDto extends CreateUserDto {
+public class CreateEmployeesDto {
+    private CreateUserDto user;
     private String empName;
     private String empJoinDate;
     private String empGraduate;
     private Double empSalary;
-    private String empAccountNumber;
     private EmployeesJobTypeResponseDto empJobType;
-    private UserDto user;
     // private CreateUserDto createUserDto;
-
-    
     
 }
