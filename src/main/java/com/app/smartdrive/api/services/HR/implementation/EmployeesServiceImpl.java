@@ -74,10 +74,10 @@ public class EmployeesServiceImpl implements EmployeesService {
         // if(employeesDto.getGrantUserAccess()){
         user.setUserBusinessEntity(businessEntity);
         user.setUserEntityId(businessEntityId);
-        user.setUserName(employeesDto.getEmail());
-        user.setUserPassword(employeesDto.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
+//        user.setUserName(employeesDto.getEmail());
+//        user.setUserPassword(employeesDto.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
         user.setUserFullName(employeesDto.getEmpName());
-        user.setUserEmail(employeesDto.getEmail());
+//        user.setUserEmail(employeesDto.getEmail());
         user.setUserModifiedDate(LocalDateTime.now());
         user.setUserNationalId("ind"+businessEntityId);
         user.setUserNPWP("npwp"+businessEntityId);
@@ -96,20 +96,20 @@ public class EmployeesServiceImpl implements EmployeesService {
         List<UserRoles> listRole = List.of(userRoles);
         
         UserPhone userPhone = new UserPhone();
-        UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
-        userPhone.setUserPhoneId(userPhoneId);
+//        UserPhoneId userPhoneId = new UserPhoneId(businessEntityId, employeesDto.getUserPhone().getUserPhoneId().getUsphPhoneNumber());
+//        userPhone.setUserPhoneId(userPhoneId);
         userPhone.setUsphPhoneType("HP");
         userPhone.setUsphModifiedDate(LocalDateTime.now());
         userPhone.setUser(user);
         List<UserPhone> listUserPhones = List.of(userPhone);
     
-        Cities empCityEntity = cityRepository.findByCityName(employeesDto.getUserAddress().getCity().getCityName());
+//        Cities empCityEntity = cityRepository.findByCityName(employeesDto.getUserAddress().getCity().getCityName());
     
         UserAddress userAddress = new UserAddress();
         userAddress.setUsdrEntityId(businessEntityId);
-        userAddress.setUsdrAddress1(employeesDto.getUserAddress().getUsdrAddress1());
-        userAddress.setUsdrAddress2(employeesDto.getUserAddress().getUsdrAddress2());
-        userAddress.setCity(empCityEntity);
+//        userAddress.setUsdrAddress1(employeesDto.getUserAddress().getUsdrAddress1());
+//        userAddress.setUsdrAddress2(employeesDto.getUserAddress().getUsdrAddress2());
+//        userAddress.setCity(empCityEntity);
         userAddress.setUser(user);
         
         List<UserAddress> listuAddresses = List.of(userAddress);
@@ -150,7 +150,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         User user = existingEmployee.getUser(); 
         
         UserAddress userAddress = userAddressRepository.findByUserUserEntityId(user.getUserEntityId());
-        userAddress.setCity(cityRepository.findByCityName(updatedEmployeeDto.getUserAddress().getCity().getCityName()));
+//        userAddress.setCity(cityRepository.findByCityName(updatedEmployeeDto.getUserAddress().getCity().getCityName()));
 
         LocalDateTime empJoinDate = LocalDateTime.parse(updatedEmployeeDto.getEmpJoinDate());
         EnumClassHR.emp_graduate empGraduate = EnumClassHR.emp_graduate.valueOf(updatedEmployeeDto.getEmpGraduate());
@@ -159,9 +159,9 @@ public class EmployeesServiceImpl implements EmployeesService {
         NullUtils.updateIfChanged(existingEmployee::setEmpGraduate, empGraduate, existingEmployee::getEmpGraduate);
         NullUtils.updateIfChanged(existingEmployee::setEmpNetSalary, updatedEmployeeDto.getEmpSalary(), existingEmployee::getEmpNetSalary);
         NullUtils.updateIfChanged(existingEmployee::setEmpAccountNumber, updatedEmployeeDto.getEmpAccountNumber(), existingEmployee::getEmpAccountNumber);
-        NullUtils.updateIfChanged(user::setUserEmail, updatedEmployeeDto.getEmail(), user::getUserEmail);
-        NullUtils.updateIfChanged(userAddress::setUsdrAddress1, updatedEmployeeDto.getUserAddress().getUsdrAddress1(), userAddress::getUsdrAddress1);
-        NullUtils.updateIfChanged(userAddress::setUsdrAddress2, updatedEmployeeDto.getUserAddress().getUsdrAddress2(), userAddress::getUsdrAddress2);
+//        NullUtils.updateIfChanged(user::setUserEmail, updatedEmployeeDto.getEmail(), user::getUserEmail);
+//        NullUtils.updateIfChanged(userAddress::setUsdrAddress1, updatedEmployeeDto.getUserAddress().getUsdrAddress1(), userAddress::getUsdrAddress1);
+//        NullUtils.updateIfChanged(userAddress::setUsdrAddress2, updatedEmployeeDto.getUserAddress().getUsdrAddress2(), userAddress::getUsdrAddress2);
         // // Update the employee details
         // existingEmployee.setEmpName(updatedEmployeeDto.getEmpName());
         // LocalDateTime empJoinDate = LocalDateTime.parse(updatedEmployeeDto.getEmpJoinDate());

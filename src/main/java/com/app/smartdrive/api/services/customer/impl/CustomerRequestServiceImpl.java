@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.services.customer;
+package com.app.smartdrive.api.services.customer.impl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,15 +8,15 @@ import java.util.Objects;
 import java.util.function.Function;
 
 
-import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
-import com.app.smartdrive.api.dto.HR.response.CreateEmployeesDto;
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.dto.user.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.master.*;
-import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
+import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
-import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +44,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CustomerRequestServiceImpl implements CustomerRequestService{
+public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
     private final BusinessEntityRepository businessEntityRepo;
@@ -58,6 +58,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService{
     private final UserRepository userRepository;
 
     private final TemiRepository temiRepository;
+
+    private final CustomerInscExtendRepository cuexRepository;
+
+    private final CustomerInscDocRepository cadocRepository;
 
 
     public List<CustomerRequest> get(){
@@ -74,6 +78,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService{
         });
 
         return pageCustomerResponseDTO;
+    }
+
+    public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer Request dengan id ${creqEntityId} tidak ditemukan")
+                );
+
+        return this.convert(existCustomerRequest);
     }
 
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
@@ -427,6 +439,87 @@ public class CustomerRequestServiceImpl implements CustomerRequestService{
         });
 
         return pageCustomerResponseDTO;
+    }
+
+    @Override
+    public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer Request dengan id " + creqEntityId + " tidak ditemukan")
+                );
+
+        Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
+        CustomerInscAssets cias = existCustomerRequest.getCustomerInscAssets();
+
+        CiasDTO ciasUpdateDTO = updateCustomerRequestDTO.getCiasDTO();
+        Long[] cuexIds = ciasUpdateDTO.getCuexIds();
+
+
+        CarSeries carSeries = this.carsRepository.findById(ciasUpdateDTO.getCias_cars_id()).orElseThrow(
+                () -> new EntityNotFoundException("Car Series dengan id " + creqEntityId + " tidak ditemukan")
+        );
+        Cities existCity = this.cityRepository.findById(ciasUpdateDTO.getCias_city_id()).orElseThrow(
+                () -> new EntityNotFoundException("City dengan id " + creqEntityId + " tidak ditemukan")
+        );
+        InsuranceType existInty = this.intyRepository.findById(ciasUpdateDTO.getCias_inty_name()).orElseThrow(
+                () -> new EntityNotFoundException("Insurance type dengan id " + creqEntityId + " tidak ditemukan")
+        );
+
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
+
+        // update cias
+        cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+        cias.setCiasYear(ciasUpdateDTO.getCiasYear());
+        cias.setCiasStartdate(ciasStartdate);
+        cias.setCiasEnddate(ciasStartdate.plusYears(1));
+        cias.setCiasCurrentPrice(ciasUpdateDTO.getCurrentPrice());
+        cias.setCiasTotalPremi(ciasUpdateDTO.getCurrentPrice());
+        cias.setCiasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasUpdateDTO.getCiasPaidType()));
+        cias.setCiasIsNewChar(ciasUpdateDTO.getCiasIsNewChar());
+        cias.setCity(existCity);
+        cias.setCarSeries(carSeries);
+        cias.setInsuranceType(existInty);
+
+        // update cuex
+        this.cuexRepository.deleteAllByCuexCreqEntityid(entityId);
+
+        List<CustomerInscExtend> cuex = new ArrayList<>();
+
+        for (Long i: cuexIds) {
+            Double nominal;
+
+            TemplateInsurancePremi temi = this.temiRepository.findById(i).get();
+
+            if(Objects.nonNull(temi.getTemiRateMin())){
+                nominal = temi.getTemiRateMin() * temi.getTemiNominal();
+            }else{
+                nominal = temi.getTemiNominal();
+            }
+
+            CustomerInscExtend newCuex = CustomerInscExtend.builder()
+                    .cuexName(temi.getTemiName())
+                    .cuex_nominal(nominal)
+                    .cuexTotalItem(1)
+                    .customerInscAssets(cias)
+                    .cuexCreqEntityid(entityId)
+                    .build();
+
+            cuex.add(newCuex);
+        }
+
+        cias.setCustomerInscExtend(cuex);
+
+        // update cadoc
+        this.cadocRepository.deleteAllByCadocCreqEntityid(entityId);
+
+        List<CustomerInscDoc> newCiasDocs = this.fileCheck(files, entityId);
+        cias.setCustomerInscDoc(newCiasDocs);
+
+        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
+        return this.convert(savedCustomerRequest);
     }
 
 
