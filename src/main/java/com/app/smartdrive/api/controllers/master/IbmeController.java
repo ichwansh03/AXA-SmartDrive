@@ -28,31 +28,28 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<InboxMessaging> inboxMessaging = service.getAll();
-        List<IbmeDto> result = TransactionMapper.mapEntityListToDtoList(inboxMessaging, IbmeDto.class);
+        List<IbmeDto> result = TransactionMapper.mapEntityListToDtoList(service.getAll(), IbmeDto.class);
         return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), IbmeDto.class));
     }
 
     @Override
     @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody IbmeDto request) {
-        InboxMessaging result = new InboxMessaging();
-        return getResponseEntity(request, result);
+        return getResponseEntity(request, new InboxMessaging());
     }
 
     @Override
     @Transactional
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody IbmeDto request) {
-        InboxMessaging result = service.getById(request.getIbmeId());
-        return getResponseEntity(request, result);
+        return getResponseEntity(request, service.getById(request.getIbmeId()));
     }
 
     private ResponseEntity<?> getResponseEntity(@RequestBody @Valid IbmeDto request, InboxMessaging result) {

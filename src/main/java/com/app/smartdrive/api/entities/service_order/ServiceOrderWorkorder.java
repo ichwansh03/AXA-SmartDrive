@@ -13,9 +13,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_workorder", schema = "so")
-@NamedQuery(
-        name = "ServiceOrderWorkorder.findBySowoId",
-        query = "SELECT sowo FROM ServiceOrderWorkorder sowo JOIN sowo.serviceOrderTasks seot WHERE sowo.sowoId = :sowoId")
+@NamedQueries({
+        @NamedQuery(
+                name = "ServiceOrderWorkorder.findSowoBySeotId",
+                query = "SELECT sowo FROM ServiceOrderWorkorder sowo WHERE sowo.serviceOrderTasks.seotId = :seotId"),
+        @NamedQuery(
+                name = "ServiceOrderWorkorder.updateSowoStatus",
+                query = "UPDATE ServiceOrderWorkorder sowo SET sowo.sowoStatus = :sowoStatus WHERE sowo.sowoId = :sowoId", lockMode = LockModeType.PESSIMISTIC_WRITE)
+})
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrderWorkorder {
@@ -34,19 +39,15 @@ public class ServiceOrderWorkorder {
     @Column(name = "sowo_status")
     private Boolean sowoStatus;
 
-    @Column(name = "sowo_order")
-    private Integer sowoOrder;
-
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "sowo_seot_id")
     private ServiceOrderTasks serviceOrderTasks;
 
-    public ServiceOrderWorkorder(String sowoName, LocalDateTime sowoModDate, Boolean sowoStatus, Integer sowoOrder, ServiceOrderTasks serviceOrderTasks) {
+    public ServiceOrderWorkorder(String sowoName, LocalDateTime sowoModDate, Boolean sowoStatus, ServiceOrderTasks serviceOrderTasks) {
         this.sowoName = sowoName;
         this.sowoModDate = sowoModDate;
         this.sowoStatus = sowoStatus;
-        this.sowoOrder = sowoOrder;
         this.serviceOrderTasks = serviceOrderTasks;
     }
 }

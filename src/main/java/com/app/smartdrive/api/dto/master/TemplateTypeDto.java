@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,6 +18,4 @@ public class TemplateTypeDto {
 
     @Enumerated(EnumType.STRING)
     private EnumModuleMaster.TetyGroup tetyGroup;
-
-    private List<TemplateServiceTaskDto> templateServiceTaskDto;
 }

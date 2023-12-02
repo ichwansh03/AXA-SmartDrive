@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/regp")
@@ -25,31 +23,26 @@ public class RegpController implements BaseController<RegionPlatDto, String> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<RegionPlat> regionPlat = service.getAll();
-        List<RegionPlatDto> result = TransactionMapper.mapEntityListToDtoList(regionPlat, RegionPlatDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), RegionPlatDto.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
-        RegionPlat regionPlat = service.getById(id);
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(regionPlat, RegionPlatDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), RegionPlatDto.class));
     }
 
     @Override
     @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody RegionPlatDto request) {
-        RegionPlat result = new RegionPlat();
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new RegionPlat())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
     @PutMapping
     public ResponseEntity<?> updateData(@Valid @RequestBody RegionPlatDto request) {
-        RegionPlat result = service.getById(request.getRegpName());
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getRegpName()))), HttpStatus.CREATED);
     }
 }

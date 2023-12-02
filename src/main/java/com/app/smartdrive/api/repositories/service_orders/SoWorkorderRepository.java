@@ -4,8 +4,12 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.util.stream.Stream;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Repository
 public interface SoWorkorderRepository extends JpaRepository<ServiceOrderWorkorder, Long> {
@@ -15,5 +19,9 @@ public interface SoWorkorderRepository extends JpaRepository<ServiceOrderWorkord
     ServiceOrderWorkorder save(ServiceOrderWorkorder entity);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    ServiceOrderWorkorder findBySowoId(Long sowoId);
+    List<ServiceOrderWorkorder> findSowoBySeotId(@Param("seotId") Long seotId);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    int updateSowoStatus(@Param("sowoStatus") Boolean sowoStatus, @Param("sowoId") Long sowoId);
 }

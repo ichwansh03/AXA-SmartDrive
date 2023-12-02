@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CustomerRequestDTO {
 
-    private Long creqEntityId;
-
     private Long creq_cust_entityid;
     
     private String arwg_code;

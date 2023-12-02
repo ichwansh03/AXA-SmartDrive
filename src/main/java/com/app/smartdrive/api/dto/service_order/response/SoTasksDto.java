@@ -20,6 +20,6 @@ public class SoTasksDto {
     private String seotName;
     private LocalDateTime seotStartDate;
     private LocalDateTime seotEndDate;
-    private EnumModuleServiceOrders.SeotStatus seotStatus;
+    private String seotStatus;
     private Stream<SoWorkorderDto> serviceOrderWorkorders;
 }

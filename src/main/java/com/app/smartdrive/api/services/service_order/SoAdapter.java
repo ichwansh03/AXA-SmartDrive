@@ -20,15 +20,15 @@ public class SoAdapter {
 
     private ServService servService;
 
-    public String formatServiceOrderId(Services services, Long userId, LocalDateTime endDate){
+    public String formatServiceOrderId(Services services){
 
         String servTypes = services.getServType().toString();
 
         log.info("Format ID for ServiceOrders has been created");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formatSeroId = String.format("%04d", userId);
-        String formatEndDate = endDate.format(formatter);
+        String formatSeroId = String.format("%04d", services.getUsers().getUserEntityId());
+        String formatEndDate = services.getServStartDate().format(formatter);
 
         return switch (servTypes) {
             case "POLIS" -> "PL" + formatSeroId + "-" + formatEndDate;

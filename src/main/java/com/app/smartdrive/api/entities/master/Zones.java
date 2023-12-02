@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 @Entity
 @Data
 @AllArgsConstructor
