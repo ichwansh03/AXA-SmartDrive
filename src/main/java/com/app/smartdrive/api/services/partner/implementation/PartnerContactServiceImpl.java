@@ -72,9 +72,9 @@ public class PartnerContactServiceImpl implements PartnerContactService {
 
         UserRoles userRoles = new UserRoles();
         userRoles.setUser(user);
-        userRoles.setRoles(rolesRepository.findById(EnumUsers.roleName.PR).get());
+        userRoles.setRoles(rolesRepository.findById(EnumUsers.RoleName.PR).get());
 
-        UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), EnumUsers.roleName.PR);
+        UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), EnumUsers.RoleName.PR);
         userRoles.setUserRolesId(userRolesId);
 
         userRoleRepository.save(userRoles);

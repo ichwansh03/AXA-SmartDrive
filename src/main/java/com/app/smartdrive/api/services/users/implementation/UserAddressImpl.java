@@ -1,14 +1,12 @@
 package com.app.smartdrive.api.services.users.implementation;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
-import com.app.smartdrive.api.dto.user.CreateUserDto;
+import com.app.smartdrive.api.dto.user.response.UserAddressDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserAddress;
-import com.app.smartdrive.api.entities.users.UserAdressId;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.users.UserAddressRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
@@ -28,17 +26,17 @@ public class UserAddressImpl implements UserAddressService {
 
   @Override
   @Transactional
-  public UserAddress updateUserAddress(Long id, Long idAddress, CreateUserDto userPost) {
+  public UserAddress updateUserAddress(Long id, Long idAddress, UserAddressDto userPost) {
     // TODO Auto-generated method stub
     Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(idAddress);
     if (userAddress.isPresent()
-        && userAddress.get().getUserAdressId().getUsdrEntityId().equals(id)) {
-      NullUtils.updateIfChanged(userAddress.get()::setUsdrAddress1, userPost.getAddress1(),
+        && userAddress.get().getUsdrEntityId().equals(id)) {
+      NullUtils.updateIfChanged(userAddress.get()::setUsdrAddress1, userPost.getUsdrAddress1(),
           userAddress.get()::getUsdrAddress1);
-      NullUtils.updateIfChanged(userAddress.get()::setUsdrAdress2, userPost.getAddress2(),
-          userAddress.get()::getUsdrAdress2);
-      Cities city = cityRepository.findByCityName(userPost.getCity());
-      userAddress.get().setCity(city);
+      NullUtils.updateIfChanged(userAddress.get()::setUsdrAddress2, userPost.getUsdrAddress2(),
+          userAddress.get()::getUsdrAddress2);
+      // Cities city = cityRepository.findByCityName(userPost.getCity());
+      // userAddress.get().setCity(city);
       userAddress.get().setUsdrModifiedDate(LocalDateTime.now());
       return userAddressRepository.save(userAddress.get());
     }
@@ -46,24 +44,25 @@ public class UserAddressImpl implements UserAddressService {
   }
 
   @Override
-  public UserAddress createUserAddress(Long id, CreateUserDto userPost) {
+  public UserAddress createUserAddress(Long id, UserAddressDto userPost) {
     UserAddress userAddress = new UserAddress();
-    Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
-    Long lastIndexUsdr;
-    if (findTopByOrderByIdDesc.isPresent()) {
-      lastIndexUsdr = findTopByOrderByIdDesc.get().getUserAdressId().getUsdrId();
-    } else {
-      lastIndexUsdr = 1L;
-    }
-    UserAdressId userAdressId = new UserAdressId(lastIndexUsdr+1, id);
-    userAddress.setUserAdressId(userAdressId);
+    // Optional<UserAddress> findTopByOrderByIdDesc = userAddressRepository.findLastOptional();
+    // Long lastIndexUsdr;
+    // if (findTopByOrderByIdDesc.isPresent()) {
+    //   lastIndexUsdr = findTopByOrderByIdDesc.get().getUsdrId();
+    // } else {
+    //   lastIndexUsdr = 1L;
+    // }
+    // UserAdressId userAdressId = new UserAdressId(lastIndexUsdr+1, id);
+    // userAddress.setUserAdressId(userAdressId);
+    userAddress.setUsdrEntityId(id);
     User user = userRepository.findById(id).get();
-    userAddress.setUsdrAddress1(userPost.getAddress1());
-    userAddress.setUsdrAdress2(userPost.getAddress2());
-    Cities cities = cityRepository.findByCityName(userPost.getCity());
-    userAddress.setCity(cities);
+    userAddress.setUsdrAddress1(userPost.getUsdrAddress1());
+    userAddress.setUsdrAddress2(userPost.getUsdrAddress2());
+    // Cities cities = cityRepository.findByCityName(userPost.getCity());
+    // userAddress.setCity(cities);
     userAddress.setUser(user);
-    userAddress.setUsdrCityId(cities.getCityId());
+    // userAddress.setUsdrCityId(cities.getCityId());
     userAddress.setUsdrModifiedDate(LocalDateTime.now());
 
     return userAddressRepository.save(userAddress);
@@ -74,8 +73,8 @@ public class UserAddressImpl implements UserAddressService {
   public void deleteAddressById(Long id, Long addressId){
     Optional<User> user = userRepository.findById(id);
     Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(addressId);
-    if(user.get().getUserEntityId().equals(userAddress.get().getUserAdressId().getUsdrEntityId())){
-      userAddressRepository.delete(userAddress.get());;
+    if(user.get().getUserEntityId().equals(userAddress.get().getUsdrEntityId())){
+      userAddressRepository.delete(userAddress.get());
     }
   }
 }

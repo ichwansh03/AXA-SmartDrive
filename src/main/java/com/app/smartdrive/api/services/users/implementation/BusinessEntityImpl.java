@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.users.implementation;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -24,12 +25,25 @@ public class BusinessEntityImpl implements BusinessEntityService{
     return repo.findAll();
   }
 
+  
+
   @Transactional
   public Long save(BusinessEntity businessEntity){
     entityManager.persist(businessEntity);
     Long id = businessEntity.getEntityId();
     entityManager.flush();
     return id;
+  }
+
+
+
+  @Override
+  public BusinessEntity createBusinessEntity() {
+    // TODO Auto-generated method stub
+    BusinessEntity businessEntity = new BusinessEntity();
+    businessEntity.setEntityModifiedDate(LocalDateTime.now());
+    entityManager.persist(businessEntity);
+    return businessEntity;
   }
   
 

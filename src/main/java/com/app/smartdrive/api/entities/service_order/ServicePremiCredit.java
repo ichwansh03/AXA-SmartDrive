@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@IdClass(ServicePremiCreditId.class)
+@IdClass(ServicePremiCredit.class)
 @Entity
 @Table(name = "service_premi_credit", schema = "so")
 public class ServicePremiCredit {
@@ -52,8 +51,7 @@ public class ServicePremiCredit {
     private String secrPatrTrxno;
 
     @ManyToOne
-    @MapsId("secrServId")
-    @JoinColumn(name = "secr_serv_id")
+    @JoinColumn(name = "secr_serv_id", referencedColumnName = "semi_serv_id", insertable = false, updatable = false)
     ServicePremi servicePremi;
 
     @ManyToOne(fetch = FetchType.LAZY)

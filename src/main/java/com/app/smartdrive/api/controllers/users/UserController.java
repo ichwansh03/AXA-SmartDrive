@@ -2,13 +2,13 @@ package com.app.smartdrive.api.controllers.users;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.app.smartdrive.api.dto.user.CreateUserDto;
 import com.app.smartdrive.api.dto.user.LoginDto;
-import com.app.smartdrive.api.dto.user.UserDto;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.users.UserService;
-import com.app.smartdrive.api.services.users.implementation.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -29,25 +29,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class UserController {
   private final UserService userService;
 
-  @PostMapping("/login")
+  @PostMapping("/signin")
   public ResponseEntity<?> login(@RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.login(login.getIden(), login.getPassword()));
+    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCu(login.getIden(), login.getPassword()));
+  }
+
+  @PostMapping("/emps/signin")
+  public ResponseEntity<?> loginEm(@RequestBody LoginDto login){
+    return ResponseEntity.status(HttpStatus.OK).body(userService.loginEm(login.getIden(), login.getPassword()));
   }
 
   @GetMapping
   public List<UserDto> getAllUsers() {
-    return userService.getAll();
+    return userService.getAllDto();
   }
 
   @GetMapping("/{id}")
   public UserDto getUser(@PathVariable("id") Long id) {
-    return userService.getById(id);
+    return userService.getByIdDto(id);
   }
 
   @PostMapping
-  public ResponseEntity<?> addUser(@ModelAttribute CreateUserDto userPost) throws Exception{
-    User userSaved = userService.create(userPost);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userSaved);
+  public ResponseEntity<?> addUserCustomer(@RequestBody CreateUserDto userPost) throws Exception{
+    User userSaved = userService.createUser(userPost, RoleName.CU);
+    UserDto userDto = TransactionMapper.mapEntityToDto(userSaved, UserDto.class);
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto); //pake dto
   }
 
   @PatchMapping("/{id}")
@@ -62,7 +68,7 @@ public class UserController {
   public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
     Optional<User> user = userService.getUserById(id);
     if(user.isPresent()){
-      userService.delete(id);
+      userService.deleteById(id);
       return ResponseEntity.status(HttpStatus.OK).body("User sudah dihapus");
     }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");

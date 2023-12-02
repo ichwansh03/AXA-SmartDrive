@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -48,7 +49,7 @@ public class User {
   @Column(name = "user_full_name", length = 85)
   private String userFullName;
 
-  @Column(name = "User_email", length = 25, nullable = false)
+  @Column(name = "user_email", length = 25, nullable = false)
   private String userEmail;
 
   @Column(name = "user_birth_place", length = 55)
@@ -64,18 +65,18 @@ public class User {
   private String userNPWP;
 
   @Column(name = "user_photo", length = 255)
-  private String userPhoto;
+  private String userPhoto; //nanti dulu
 
   @Column(name = "user_modified_date")
   private LocalDateTime userModifiedDate;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @MapsId
   @JoinColumn(name = "user_entityid")
   @JsonBackReference
   private BusinessEntity userBusinessEntity;
   
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   @JsonManagedReference
   @PrimaryKeyJoinColumn
   private List<UserPhone> userPhone;
@@ -101,10 +102,10 @@ public class User {
   private List<UserAccounts> userAccounts;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "customer")
+  @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
   List<CustomerRequest> customerRequest;
 
   @JsonIgnore
-  @OneToMany(mappedBy = "users")
+  @OneToMany(mappedBy = "users",cascade = CascadeType.ALL)
   List<Services> services;
 }

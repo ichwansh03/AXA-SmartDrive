@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 
+import com.app.smartdrive.api.dto.HR.request.CreateEmployeesDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
@@ -68,14 +69,14 @@ public class Employees {
     private String empJobCode;
     
 
+    // @MapsId("empJobCode")
     @ManyToOne
-    @MapsId("empJobCode")
-    @JoinColumn(name = "emp_job_code")
+    @JoinColumn(name = "emp_job_code",insertable = false, updatable = false)
     @JsonBackReference
     private JobType jobType;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @MapsId
+    @OneToOne(orphanRemoval = true,cascade = CascadeType.ALL)
+    @MapsId("empEntityid")
     @JoinColumn(name = "emp_entityid", referencedColumnName = "user_entityid")
     @JsonBackReference
     private User user;
@@ -94,11 +95,8 @@ public class Employees {
     @OneToMany(mappedBy="employees", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<CustomerRequest> customerRequests;
-
+    
+    
     @JsonIgnore
     @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrders;

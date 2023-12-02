@@ -1,7 +1,10 @@
 package com.app.smartdrive.api.entities.payment;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
 
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
@@ -36,12 +39,12 @@ import lombok.NoArgsConstructor;
 public class PaymentTransactions {
 
     @Id
-    @Column(name="patr_trxno", length = 55, updatable = false, insertable = false)
-    private String patr_trxno;
+    @Column(name="patr_trxno", length = 55)
+    private String patrTrxno;
 
+    @CreatedDate
     @Column(name = "patr_created_on")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date patr_created_on;
+    private LocalDateTime patr_created_on;
 
     @Column(name = "patr_debet")
     private Double patr_debet;
@@ -67,18 +70,18 @@ public class PaymentTransactions {
 
     
     @Column(name="patr_trxno_rev")
-    private String patr_trxno_rev;
+    private String patrTrxnoRev;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "paymentTransactions", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ServicePremiCredit> servicePremiCredits;
+ 
+    // @OneToMany(mappedBy = "paymentTransactions", cascade = CascadeType.ALL, orphanRemoval = true)
+    // List<ServicePremiCredit> servicePremiCredits;
 
     @ManyToOne
-    @JoinColumn(name = "patr_trxno")
+    @JoinColumn(name = "patr_trxno_rev", referencedColumnName = "patr_trxno" ,insertable = false, updatable = false)
     @JsonIgnore
-    PaymentTransactions paymentTransactions;
+    PaymentTransactions referencedTransaction;
 
-    // @OneToMany(mappedBy = "paymentTransactions")
-    // List<PaymentTransactions> paymentTransactionsRev;
+    @OneToMany(mappedBy = "referencedTransaction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PaymentTransactions> referencingTransactions;
     
 }

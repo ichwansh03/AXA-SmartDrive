@@ -2,11 +2,14 @@ package com.app.smartdrive.api.entities.partner;
 
 import com.app.smartdrive.api.dto.partner.PartnerContactDto;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.service_order.ClaimAssetEvidence;
 import com.app.smartdrive.api.entities.service_order.ClaimAssetSparepart;
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -52,6 +55,10 @@ public class Partner {
     @LastModifiedDate
     @Column(name = "part_modified_date")
     private LocalDateTime partModifiedDate;
+    @JsonBackReference
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "part_sero_id")
+    private ServiceOrders serviceOrders;
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "part_entityid")

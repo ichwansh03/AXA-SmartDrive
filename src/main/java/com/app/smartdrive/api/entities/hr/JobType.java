@@ -34,8 +34,17 @@ public class JobType {
     @Column(name="job_modified_date")
     private LocalDateTime jobModifiedDate;
 
+    @Column(name = "job_desc")
+    private String jobDesc;
+
+    @Column(name = "job_rate_min")
+    private Double jobRateMin;
+
+    @Column(name = "job_rate_max")
+    private Double jobRateMax;
+
+    // @PrimaryKeyJoinColumn
     @OneToMany(mappedBy = "jobType", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
     @JsonManagedReference
     private List<Employees> employees ;
 
