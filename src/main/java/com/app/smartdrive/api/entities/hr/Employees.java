@@ -65,6 +65,9 @@ public class Employees {
     @Column(name="emp_account_number", length = 35)
     private String empAccountNumber;
 
+    @Column(name = "emp_modified_date")
+    private LocalDateTime empModifiedDate;
+
     @Column(name="emp_job_code", length = 15)
     private String empJobCode;
     
