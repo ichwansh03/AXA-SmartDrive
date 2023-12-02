@@ -51,7 +51,7 @@ public class UserController {
 
   @PostMapping
   public ResponseEntity<?> addUserCustomer(@RequestBody CreateUserDto userPost){
-    User userSaved = userService.createUserCustomer(userPost, RoleName.CU);
+    User userSaved = userService.createUserCustomer(userPost);
     UserDto userDto = TransactionMapper.mapEntityToDto(userSaved, UserDto.class);
     return ResponseEntity.status(HttpStatus.CREATED).body(userDto); //pake dto
   }

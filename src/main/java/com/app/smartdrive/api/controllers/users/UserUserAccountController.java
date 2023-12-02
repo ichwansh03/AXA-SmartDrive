@@ -28,7 +28,7 @@ public class UserUserAccountController {
 
   @PostMapping
   public ResponseEntity<?> createUC(@PathVariable("id") Long id, UserUserAccountResponseDto userPost){
-    UserAccounts userAccounts= userAccountService.createUserAccounts(id, userPost);
+    UserAccounts userAccounts= userAccountService.addUserAccounts(id, userPost);
     return ResponseEntity.status(HttpStatus.CREATED).body(userAccounts);
   }
 
