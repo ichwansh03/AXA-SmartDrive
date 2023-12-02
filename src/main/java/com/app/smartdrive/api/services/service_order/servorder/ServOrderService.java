@@ -5,7 +5,7 @@ import com.app.smartdrive.api.entities.service_order.Services;
 
 public interface ServOrderService {
 
-    ServiceOrders addServiceOrders(Services services);
+    ServiceOrders addServiceOrders(Long servId);
 
     ServiceOrders findServiceOrdersById(String seroId);
 }

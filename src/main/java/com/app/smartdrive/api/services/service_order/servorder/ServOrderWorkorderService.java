@@ -9,5 +9,9 @@ public interface ServOrderWorkorderService {
 
     List<ServiceOrderWorkorder> generateSowo(List<ServiceOrderTasks> seotList);
 
-    ServiceOrderWorkorder findBySowoId(Long sowoId);
+    List<ServiceOrderWorkorder> findSowoBySeotId(Long seotId);
+
+    int updateSowoStatus(Boolean sowoStatus, Long sowoId);
+
+    List<ServiceOrderTasks> checkAllWorkComplete(List<ServiceOrderWorkorder> sowoList, ServiceOrderWorkorder sowo);
 }

@@ -1,12 +1,16 @@
 package com.app.smartdrive.api.dto.service_order.response;
 
+import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
+import com.app.smartdrive.api.entities.users.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Builder
@@ -21,7 +25,7 @@ public class ServiceRespDto {
     private String servVehicleNumber;
     private LocalDateTime servStartDate;
     private LocalDateTime servEndDate;
-    private Long servCustEntityid;
-    private Long servCreqEntityid;
-    private Stream<ServiceOrderRespDto> serviceOrderRespDtoStream;
+    private UserDto userDto;
+    private CustomerResponseDTO customerResponseDTO;
+    private List<ServiceOrderRespDto> serviceOrdersList;
 }

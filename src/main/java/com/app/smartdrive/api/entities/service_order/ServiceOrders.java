@@ -22,40 +22,22 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
-@NamedQuery(
-        name = "ServiceOrders.findServiceOrdersById",
-        query = "SELECT sero FROM ServiceOrders sero JOIN sero.services s JOIN sero.employees emp" +
-                " JOIN sero.areaWorkGroup arwg WHERE sero.seroId = :seroId")
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrders {
 
-    //format seroId (condition serv type)
     @Id
     @Column(name = "sero_id", unique = true)
     private String seroId;
 
-    @Transient
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long seroIden;
-
-    //Services.servType
     @Column(name = "sero_ordt_type")
     @Enumerated(EnumType.STRING)
-    private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
-    {
-        seroOrdtType = EnumModuleServiceOrders.SeroOrdtType.CREATE;
-    }
+    private EnumModuleServiceOrders.SeroOrdtType seroOrdtType = EnumModuleServiceOrders.SeroOrdtType.CREATE;;
 
-    //CustomerRequest.creqStatus
     @Column(name = "sero_status")
     @Enumerated(EnumType.STRING)
-    private EnumModuleServiceOrders.SeroStatus seroStatus;
-    {
-        seroStatus = EnumModuleServiceOrders.SeroStatus.OPEN;
-    }
+    private EnumModuleServiceOrders.SeroStatus seroStatus = EnumModuleServiceOrders.SeroStatus.OPEN;
 
-    //CustomerClaim.cuclReason
     @Column(name = "sero_reason")
     private String seroReason;
 
