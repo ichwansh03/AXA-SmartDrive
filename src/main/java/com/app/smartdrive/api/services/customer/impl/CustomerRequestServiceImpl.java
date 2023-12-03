@@ -405,7 +405,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
             ClaimResponseDTO claimResponseDTO = ClaimResponseDTO.builder()
                     .cuclCreqEntityId(customerClaim.getCuclCreqEntityid())
-                    .creqEntityId(customerRequest.getCreqEntityId())
                     .cuclCreateDate(customerClaim.getCuclCreateDate())
                     .cuclEventPrice(customerClaim.getCuclEventPrice())
                     .cuclReason(customerClaim.getCuclReason())
@@ -616,5 +615,31 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return this.convert(savedCustomerRequest);
     }
 
+    @Override
+    public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId) {
+        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
+                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
+        );
+
+
+       return ClaimResponseDTO.builder()
+               .cuclCreqEntityId(existCustomerClaim.getCuclCreqEntityid())
+               .cuclCreateDate(existCustomerClaim.getCuclCreateDate())
+               .cuclReason(existCustomerClaim.getCuclReason())
+               .cuclEventPrice(existCustomerClaim.getCuclEventPrice())
+               .cuclSubtotal(existCustomerClaim.getCuclSubtotal())
+               .build();
+
+    }
+
+
+
+
+
+
 
 }
+
+
+
+

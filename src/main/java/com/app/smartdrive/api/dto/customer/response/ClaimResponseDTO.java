@@ -15,8 +15,6 @@ public class ClaimResponseDTO {
 
     private Long cuclCreqEntityId;
 
-    private Long creqEntityId;
-
     private LocalDateTime cuclCreateDate;
 
     private Double cuclEventPrice;

@@ -38,4 +38,6 @@ public interface CustomerRequestService {
     CustomerClaim createNewClaim(CustomerRequest customerRequest);
 
     CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
+
+    ClaimResponseDTO getCustomerClaimById(Long creqEntityId);
 }

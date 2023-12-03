@@ -143,5 +143,14 @@ public class CustomerRequestController {
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
+    @GetMapping("/claim")
+    public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
+            @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
+    ){
+        ClaimResponseDTO existCustomerClaim = this.customerRequestService.getCustomerClaimById(cuclCreqEntityId);
+        return ResponseEntity.status(HttpStatus.OK).body(existCustomerClaim);
+
+    }
+
 
 }
