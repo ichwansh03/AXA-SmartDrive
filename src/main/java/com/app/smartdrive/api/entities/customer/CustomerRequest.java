@@ -50,7 +50,7 @@ public class CustomerRequest {
 
 
     @JsonManagedReference
-    @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     @PrimaryKeyJoinColumn
     private CustomerClaim customerClaim;
 

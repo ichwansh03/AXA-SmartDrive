@@ -152,5 +152,14 @@ public class CustomerRequestController {
 
     }
 
+    @DeleteMapping("/claim")
+    public ResponseEntity<Void> deleteCustomerClaim(
+            @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
+    ){
+        this.customerRequestService.deleteCustomerClaim(cuclCreqEntityId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 
 }

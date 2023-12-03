@@ -632,10 +632,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     }
 
+    @Override
+    public void deleteCustomerClaim(Long cuclCreqEntityId) {
+        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
+                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
+        );
 
-
-
-
+        this.customerClaimRepository.delete(existCustomerClaim);
+    }
 
 
 }

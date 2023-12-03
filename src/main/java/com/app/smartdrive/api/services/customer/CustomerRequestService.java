@@ -39,5 +39,7 @@ public interface CustomerRequestService {
 
     CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
 
-    ClaimResponseDTO getCustomerClaimById(Long creqEntityId);
+    ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId);
+
+    void deleteCustomerClaim(Long cuclCreqEntityId);
 }
