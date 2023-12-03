@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -132,6 +133,14 @@ public class CustomerRequestController {
         CustomerResponseDTO customerResponseDTO = this.customerRequestService.createClaim(claimRequestDTO);
 
         return customerResponseDTO;
+    }
+
+    @PutMapping("/claim")
+    public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
+            @RequestBody ClaimRequestDTO claimRequestDTO
+    ){
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerClaim(claimRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
 

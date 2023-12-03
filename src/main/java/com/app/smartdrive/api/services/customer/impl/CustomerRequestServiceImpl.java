@@ -15,6 +15,7 @@ import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.dto.user.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.entities.master.*;
+import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
@@ -60,6 +61,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerInscExtendRepository cuexRepository;
 
     private final CustomerInscDocRepository cadocRepository;
+
+    private final CustomerClaimRepository customerClaimRepository;
 
 
     public List<CustomerRequest> get(){
@@ -585,6 +588,32 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .build();
 
         return newCustomerClaim;
+    }
+
+    @Override
+    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
+        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Claim dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
+        );
+
+        LocalDateTime cuclCreateDate = existCustomerClaim.getCuclCreateDate();
+
+        if(Objects.isNull(cuclCreateDate)){
+            existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
+        }
+
+
+        Double cuclEventPrice = existCustomerClaim.getCuclEventPrice();
+        cuclEventPrice += claimRequestDTO.getCuclEventPrice();
+
+        Double cuclSubtotal = existCustomerClaim.getCuclSubtotal();
+        cuclSubtotal += claimRequestDTO.getCuclSubtotal();
+
+        existCustomerClaim.setCuclEventPrice(cuclEventPrice);
+        existCustomerClaim.setCuclSubtotal(cuclSubtotal);
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
+        return this.convert(savedCustomerRequest);
     }
 
 

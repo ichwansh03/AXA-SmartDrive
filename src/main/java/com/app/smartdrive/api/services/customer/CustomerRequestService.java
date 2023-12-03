@@ -36,4 +36,6 @@ public interface CustomerRequestService {
     CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO);
 
     CustomerClaim createNewClaim(CustomerRequest customerRequest);
+
+    CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
 }
