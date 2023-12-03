@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.CitiesDto;
+import com.app.smartdrive.api.dto.master.response.CitiesRes;
 import com.app.smartdrive.api.dto.master.request.CitiesReq;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -24,13 +24,13 @@ public class CityController implements BaseController<CitiesReq, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), CitiesDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), CitiesRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), CitiesDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), CitiesRes.class));
     }
 
     @Override

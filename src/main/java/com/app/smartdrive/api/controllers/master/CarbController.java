@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.CarBrandDto;
+import com.app.smartdrive.api.dto.master.response.CarbRes;
 import com.app.smartdrive.api.dto.master.request.CarbReq;
 import com.app.smartdrive.api.entities.master.CarBrand;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -24,13 +24,13 @@ public class CarbController implements BaseController<CarbReq, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), CarBrandDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), CarbRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), CarBrandDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), CarbRes.class));
     }
 
     @Override

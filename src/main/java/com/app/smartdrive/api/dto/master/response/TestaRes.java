@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.master;
+package com.app.smartdrive.api.dto.master.response;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TemplateServiceTaskDto {
+public class TestaRes {
     private Long testaId;
 
     @Size(max = 55, message = "Template Service Task Length Exceeded !")
@@ -17,5 +17,5 @@ public class TemplateServiceTaskDto {
     private String testaGroup;
     private String testaCallMethod;
     private Integer testaSeqOrder;
-    private TemplateTypeDto templateType;
+    private TetyRes templateType;
 }

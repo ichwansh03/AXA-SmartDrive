@@ -1,11 +1,11 @@
-package com.app.smartdrive.api.dto.master;
+package com.app.smartdrive.api.dto.master.response;
 
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-public class IbmeDto {
+public class IbmeRes {
     private Long ibmeId;
     private LocalDate ibmeDate;
     private int ibme_entityid_source;

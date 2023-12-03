@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.master;
+package com.app.smartdrive.api.dto.master.response;
 
 import com.app.smartdrive.api.entities.master.Enum.EnumModuleMaster;
 import jakarta.persistence.EnumType;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TemplateTypeDto {
+public class TetyRes {
     private Long tetyId;
 
     @Enumerated(EnumType.STRING)

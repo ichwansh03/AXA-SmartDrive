@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.CategoryDto;
+import com.app.smartdrive.api.dto.master.response.CateRes;
 import com.app.smartdrive.api.dto.master.request.CategoryReq;
 import com.app.smartdrive.api.entities.master.Category;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -24,13 +24,13 @@ public class CateController implements BaseController<CategoryReq, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), CategoryDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), CateRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), CategoryDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), CateRes.class));
     }
 
     @Override
