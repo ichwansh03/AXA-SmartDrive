@@ -53,9 +53,9 @@ public class ServOrderImpl implements ServOrderService {
         List<ServiceOrderTasks> seotList;
 
         switch (services.getServType().toString()){
-            case "FEASIBLITY" -> seotList = servOrderTask.generateSeotFeasiblity(seroSaved, services);
-            case "POLIS" -> seotList = servOrderTask.generateSeotPolis(seroSaved, services);
-            case "CLAIM" -> seotList = servOrderTask.generateSeotClaim(seroSaved, services);
+            case "FEASIBLITY" -> seotList = servOrderTask.addFeasiblityList(seroSaved, services);
+            case "POLIS" -> seotList = servOrderTask.addPolisList(seroSaved, services);
+            case "CLAIM" -> seotList = servOrderTask.addClaimList(seroSaved, services);
             default -> seotList = servOrderTask.closeAllTasks(seroSaved, services);
         }
 

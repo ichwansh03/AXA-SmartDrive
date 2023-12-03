@@ -5,7 +5,7 @@ import com.app.smartdrive.api.entities.service_order.Services;
 
 public interface ServOrderService {
 
-    ServiceOrders addServiceOrders(Long servId);
+    ServiceOrders addServiceOrders(Long servId) throws NoSuchMethodException;
 
     ServiceOrders findServiceOrdersById(String seroId);
 }
