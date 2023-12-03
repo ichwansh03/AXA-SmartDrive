@@ -184,6 +184,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         // set cias ke customer
         newCustomer.setCustomerInscAssets(cias);
 
+        CustomerClaim newClaim = this.createNewClaim(newCustomer);
+        newCustomer.setCustomerClaim(newClaim);
+
 
         CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomer);
         return this.convert(savedCreq);
@@ -570,6 +573,18 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.saveAndFlush(existCustomerRequest);
 
         return this.convert(savedCustomerRequest);
+    }
+
+    @Override
+    public CustomerClaim createNewClaim(CustomerRequest customerRequest) {
+        CustomerClaim newCustomerClaim = CustomerClaim.builder()
+                .cuclEventPrice(0.0)
+                .cuclSubtotal(0.0)
+                .cuclCreqEntityid(customerRequest.getCreqEntityId())
+                .customerRequest(customerRequest)
+                .build();
+
+        return newCustomerClaim;
     }
 
 

@@ -34,4 +34,6 @@ public interface CustomerRequestService {
     void delete(Long creqEntityId);
 
     CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO);
+
+    CustomerClaim createNewClaim(CustomerRequest customerRequest);
 }
