@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.TewoDto;
+import com.app.smartdrive.api.dto.master.request.TewoReq;
 import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TewoService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/tewo")
 @Tag(name = "Master Module")
-public class TewoController implements BaseController<TewoDto, Long> {
+public class TewoController implements BaseController<TewoReq, Long> {
     private final TewoService service;
 
     @Override
@@ -35,14 +36,14 @@ public class TewoController implements BaseController<TewoDto, Long> {
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody TewoDto request) {
+    public ResponseEntity<?> saveData(@Valid @RequestBody TewoReq request) {
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new TemplateTaskWorkOrder())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody TewoDto request) {
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getTewoId()))), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TewoReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
     }
 }

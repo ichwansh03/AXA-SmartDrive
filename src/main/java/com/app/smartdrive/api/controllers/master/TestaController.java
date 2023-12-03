@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.TemplateServiceTaskDto;
+import com.app.smartdrive.api.dto.master.request.TestaReq;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TestaService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/testa")
 @Tag(name = "Master Module")
-public class TestaController implements BaseController<TemplateServiceTaskDto, Long> {
+public class TestaController implements BaseController<TestaReq, Long> {
     private final TestaService service;
 
     @Override
@@ -35,14 +36,14 @@ public class TestaController implements BaseController<TemplateServiceTaskDto, L
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody TemplateServiceTaskDto request) {
+    public ResponseEntity<?> saveData(@Valid @RequestBody TestaReq request) {
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new TemplateServiceTask())), HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody TemplateServiceTaskDto request) {
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getTestaId()))), HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TestaReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.OK);
     }
 }

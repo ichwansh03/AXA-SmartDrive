@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.ProvinsiDto;
+import com.app.smartdrive.api.dto.master.request.ProvReq;
 import com.app.smartdrive.api.entities.master.Provinsi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ProvService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/provinsi")
 @Tag(name = "Master Module")
-public class ProvController implements BaseController<ProvinsiDto, Long> {
+public class ProvController implements BaseController<ProvReq, Long> {
     private final ProvService service;
 
     @Override
@@ -35,14 +36,14 @@ public class ProvController implements BaseController<ProvinsiDto, Long> {
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody ProvinsiDto request) {
+    public ResponseEntity<?> saveData(@Valid @RequestBody ProvReq request) {
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new Provinsi())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody ProvinsiDto request) {
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getProvId()))), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody ProvReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
     }
 }
