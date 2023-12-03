@@ -115,7 +115,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         .customer(entityUser)
         .creqCreateDate(LocalDateTime.now())
         .creqStatus(EnumCustomer.CreqStatus.OPEN)
-        .creqType(EnumCustomer.CreqType.POLIS)
+        .creqType(EnumCustomer.CreqType.FEASIBLITY)
         .creqEntityId(entityId)
         .build();
 
