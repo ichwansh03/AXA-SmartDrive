@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.CategoryDto;
+import com.app.smartdrive.api.dto.master.request.CategoryReq;
 import com.app.smartdrive.api.entities.master.Category;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.CateService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
 @Tag(name = "Master Module")
-public class CateController implements BaseController<CategoryDto, Long> {
+public class CateController implements BaseController<CategoryReq, Long> {
     private final CateService service;
 
     @Override
@@ -35,14 +36,14 @@ public class CateController implements BaseController<CategoryDto, Long> {
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody CategoryDto request) {
+    public ResponseEntity<?> saveData(@Valid @RequestBody CategoryReq request) {
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new Category())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody CategoryDto request) {
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getCateId()))), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CategoryReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
     }
 }

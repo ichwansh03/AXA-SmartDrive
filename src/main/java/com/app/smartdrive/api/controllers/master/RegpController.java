@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.RegionPlatDto;
+import com.app.smartdrive.api.dto.master.request.RegpReq;
 import com.app.smartdrive.api.entities.master.RegionPlat;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.RegpService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/regp")
 @Tag(name = "Master Module")
-public class RegpController implements BaseController<RegionPlatDto, String> {
+public class RegpController implements BaseController<RegpReq, String> {
     private final RegpService service;
 
     @Override
@@ -35,14 +36,14 @@ public class RegpController implements BaseController<RegionPlatDto, String> {
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody RegionPlatDto request) {
+    public ResponseEntity<?> saveData(@Valid @RequestBody RegpReq request) {
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new RegionPlat())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody RegionPlatDto request) {
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getRegpName()))), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable String id, @Valid @RequestBody RegpReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
     }
 }

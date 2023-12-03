@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
 import com.app.smartdrive.api.dto.master.IbmeDto;
+import com.app.smartdrive.api.dto.master.request.IbmeReq;
 import com.app.smartdrive.api.entities.master.InboxMessaging;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.IbmeService;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/master/ibme")
 @Tag(name = "Master Module")
-public class IbmeController implements BaseController<IbmeDto, Long> {
+public class IbmeController implements BaseController<IbmeReq, Long> {
     private final IbmeService service;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -41,18 +42,18 @@ public class IbmeController implements BaseController<IbmeDto, Long> {
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody IbmeDto request) {
+    public ResponseEntity<?> saveData(@Valid @RequestBody IbmeReq request) {
         return getResponseEntity(request, new InboxMessaging());
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody IbmeDto request) {
-        return getResponseEntity(request, service.getById(request.getIbmeId()));
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody IbmeReq request) {
+        return getResponseEntity(request, service.getById(id));
     }
 
-    private ResponseEntity<?> getResponseEntity(@RequestBody @Valid IbmeDto request, InboxMessaging result) {
+    private ResponseEntity<?> getResponseEntity(@RequestBody @Valid IbmeReq request, InboxMessaging result) {
         if(request.getIbmeDate() != null) {
             LocalDate localDate = LocalDate.parse(request.getIbmeDate().toString(), formatter);
             result.setIbmeDate(localDate);
