@@ -54,16 +54,19 @@ public class ServiceOrderTasks {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_arwg_code")
-    AreaWorkGroup areaWorkGroup;
+    private AreaWorkGroup areaWorkGroup;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_sero_id")
-    ServiceOrders serviceOrders;
+    private ServiceOrders serviceOrders;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL)
-    List<ServiceOrderWorkorder> serviceOrderWorkorders;
+    private List<ServiceOrderWorkorder> serviceOrderWorkorders;
+
+    @Transient
+    private Object generatePolisTasks;
 
     public ServiceOrderTasks(String seotName, LocalDateTime seotActualStartdate, LocalDateTime seotActualEnddate, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders) {
         this.seotName = seotName;

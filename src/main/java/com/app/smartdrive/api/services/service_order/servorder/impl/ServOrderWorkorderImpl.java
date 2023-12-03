@@ -6,8 +6,7 @@ import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jobrunr.scheduling.JobScheduler;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jobrunr.scheduling.BackgroundJob;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,18 +23,17 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
 
     @Transactional
     @Override
-    public List<ServiceOrderWorkorder> generateSowo(List<ServiceOrderTasks> seotList) {
+    public List<ServiceOrderWorkorder> addSowoList(List<ServiceOrderTasks> seotList) {
 
         List<ServiceOrderWorkorder> sowo = new ArrayList<>();
         sowo.add(new ServiceOrderWorkorder("CHECK UMUR", LocalDateTime.now(), false, seotList.get(0)));
         sowo.add(new ServiceOrderWorkorder("RELATE GOVERNMENT", LocalDateTime.now(), false, seotList.get(0)));
         sowo.add(new ServiceOrderWorkorder("PREMI SCHEMA", LocalDateTime.now(), false, seotList.get(2)));
-        sowo.add(new ServiceOrderWorkorder("LEGAL DOCUMENT SIGNED", LocalDateTime.now(), false, seotList.get(2)));
-        List<ServiceOrderWorkorder> workorders = soWorkorderRepository.saveAll(sowo);
+        sowo.add(new ServiceOrderWorkorder("DOCUMENT DISETUJUI", LocalDateTime.now(), false, seotList.get(2)));
 
-        //jobScheduler.schedule(LocalDateTime.now().plusMinutes(1), () -> updateSowoStatus("Completed", 1L));
 
-        return workorders;
+
+        return soWorkorderRepository.saveAll(sowo);
     }
 
     @Transactional(readOnly = true)
