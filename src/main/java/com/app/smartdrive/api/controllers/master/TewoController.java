@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.TewoDto;
+import com.app.smartdrive.api.dto.master.response.TewoRes;
 import com.app.smartdrive.api.dto.master.request.TewoReq;
 import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -30,7 +30,7 @@ public class TewoController implements BaseController<TewoReq, Long> {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), TewoDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), TewoRes.class));
     }
 
     @Override

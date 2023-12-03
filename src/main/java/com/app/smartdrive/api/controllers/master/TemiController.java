@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
+import com.app.smartdrive.api.dto.master.response.TemiRes;
 import com.app.smartdrive.api.dto.master.request.TemiReq;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -24,13 +24,13 @@ public class TemiController implements BaseController<TemiReq, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), TemplateInsurancePremiDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), TemiRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), TemplateInsurancePremiDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), TemiRes.class));
     }
 
     @Override

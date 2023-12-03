@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.ProvinsiDto;
+import com.app.smartdrive.api.dto.master.response.ProvRes;
 import com.app.smartdrive.api.dto.master.request.ProvReq;
 import com.app.smartdrive.api.entities.master.Provinsi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -24,13 +24,13 @@ public class ProvController implements BaseController<ProvReq, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), ProvinsiDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), ProvRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ProvinsiDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ProvRes.class));
     }
 
     @Override

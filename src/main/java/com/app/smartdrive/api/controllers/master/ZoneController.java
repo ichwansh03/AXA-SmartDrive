@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.ZonesDto;
+import com.app.smartdrive.api.dto.master.response.ZonesRes;
 import com.app.smartdrive.api.dto.master.request.ZoneReq;
 import com.app.smartdrive.api.entities.master.Zones;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -30,7 +30,7 @@ public class ZoneController implements BaseController<ZoneReq, Long> {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ZonesDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ZonesRes.class));
     }
 
     @Override

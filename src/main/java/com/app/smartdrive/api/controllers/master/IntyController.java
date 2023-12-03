@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.InsuranceTypeDto;
+import com.app.smartdrive.api.dto.master.response.IntyRes;
 import com.app.smartdrive.api.dto.master.request.IntyReq;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -24,13 +24,13 @@ public class IntyController implements BaseController<IntyReq, String> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(),InsuranceTypeDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), IntyRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), InsuranceTypeDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), IntyRes.class));
     }
 
     @Override

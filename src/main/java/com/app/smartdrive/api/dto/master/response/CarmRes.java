@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.master;
+package com.app.smartdrive.api.dto.master.response;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,11 +10,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CarModelDto {
+public class CarmRes {
     private Long carmId;
 
     @Size(max = 55, message = "Car Model Name Length Exceeded !")
     private String carmName;
 
-    private List<CarBrandDto> carBrand;
+    private List<CarbRes> carBrand;
 }

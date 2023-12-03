@@ -1,8 +1,6 @@
 package com.app.smartdrive.api.services.master.implementation;
 
-import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
 import com.app.smartdrive.api.entities.master.InsuranceType;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.IntyRepository;
 import com.app.smartdrive.api.services.master.IntyService;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,15 +21,6 @@ public class IntyServiceImpl implements IntyService {
 
     @Override
     public List<InsuranceType> getAll() {
-
-
-//        List<TemplateInsurancePremiDto> template = repository.findAll().
-//        return repository.findAll().stream().map(repo -> {
-//            return TransactionMapper.mapEntityListToDtoList(repo.getTemplateInsurancePremis(), TemplateInsurancePremiDto.class);
-//        });
-//        return repository.findAll().stream().map(repo -> {
-//            repo.setTemplateInsurancePremis(repo.getTemplateInsurancePremis());
-//        }).toList();
         return repository.findAll();
     }
 

@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.master;
+package com.app.smartdrive.api.dto.master.response;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AreaWorkGroupDto {
+public class ArwgRes {
     private String arwgCode;
 
     @Size(max = 55, message = "Area Work Group Description Length Exceeded !")
     private String arwgDesc;
 
-    private CitiesDto cities;
+    private CitiesRes cities;
 }

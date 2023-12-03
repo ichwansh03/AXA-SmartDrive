@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.IbmeDto;
+import com.app.smartdrive.api.dto.master.response.IbmeRes;
 import com.app.smartdrive.api.dto.master.request.IbmeReq;
 import com.app.smartdrive.api.entities.master.InboxMessaging;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -29,14 +29,14 @@ public class IbmeController implements BaseController<IbmeReq, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<IbmeDto> result = TransactionMapper.mapEntityListToDtoList(service.getAll(), IbmeDto.class);
+        List<IbmeRes> result = TransactionMapper.mapEntityListToDtoList(service.getAll(), IbmeRes.class);
         return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), IbmeDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), IbmeRes.class));
     }
 
     @Override

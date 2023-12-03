@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.master;
+package com.app.smartdrive.api.dto.master.response;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProvinsiDto {
+public class ProvRes {
     private Long provId;
 
     @Size(max = 85, message = "Province Name Length Exceeded !")
     private String provName;
 
-    private ZonesDto zones;
+    private ZonesRes zones;
 }

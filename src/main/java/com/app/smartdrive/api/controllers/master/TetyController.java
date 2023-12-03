@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.TemplateTypeDto;
+import com.app.smartdrive.api.dto.master.response.TetyRes;
 import com.app.smartdrive.api.dto.master.request.TetyReq;
 import com.app.smartdrive.api.entities.master.TemplateType;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -24,13 +24,13 @@ public class TetyController implements BaseController<TetyReq, Long> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), TemplateTypeDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), TetyRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), TemplateTypeDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), TetyRes.class));
     }
 
     @Override

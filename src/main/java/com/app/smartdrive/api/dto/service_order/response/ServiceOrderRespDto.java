@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.dto.service_order.response;
 
 import com.app.smartdrive.api.dto.HR.request.CreateEmployeesDto;
-import com.app.smartdrive.api.dto.master.AreaWorkGroupDto;
+import com.app.smartdrive.api.dto.master.response.ArwgRes;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import lombok.*;
 
@@ -22,6 +22,6 @@ public class ServiceOrderRespDto {
     private String servClaimStartDate;
     private String servClaimEndDate;
     private CreateEmployeesDto employees;
-    private AreaWorkGroupDto areaWorkGroupDto;
+    private ArwgRes arwgRes;
     private Stream<SoTasksDto> soTasksDtoStream;
 }

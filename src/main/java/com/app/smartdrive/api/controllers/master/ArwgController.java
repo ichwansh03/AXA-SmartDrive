@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.AreaWorkGroupDto;
+import com.app.smartdrive.api.dto.master.response.ArwgRes;
 import com.app.smartdrive.api.dto.master.request.ArwgReq;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -24,13 +24,13 @@ public class ArwgController implements BaseController<ArwgReq, String> {
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), AreaWorkGroupDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), ArwgRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), AreaWorkGroupDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ArwgRes.class));
     }
 
     @Override
