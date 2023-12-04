@@ -10,10 +10,13 @@ import java.util.function.Function;
 import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.master.*;
+import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
@@ -28,11 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.app.smartdrive.api.dto.customer.request.CiasDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
-import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
-import com.app.smartdrive.api.entities.customer.CustomerInscDoc;
-import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.customer.EnumCustomer.CadocCategory;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
@@ -64,6 +62,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerInscExtendRepository cuexRepository;
 
     private final CustomerInscDocRepository cadocRepository;
+
+    private final CustomerClaimRepository customerClaimRepository;
 
 
     public List<CustomerRequest> get(){
@@ -119,7 +119,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         .customer(entityUser)
         .creqCreateDate(LocalDateTime.now())
         .creqStatus(EnumCustomer.CreqStatus.OPEN)
-        .creqType(EnumCustomer.CreqType.POLIS)
+        .creqType(EnumCustomer.CreqType.FEASIBLITY)
         .creqEntityId(entityId)
         .build();
 
@@ -188,6 +188,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         // set cias ke customer
         newCustomer.setCustomerInscAssets(cias);
 
+        CustomerClaim newClaim = this.createNewClaim(newCustomer);
+        newCustomer.setCustomerClaim(newClaim);
+
 
         CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomer);
         return this.convert(savedCreq);
@@ -242,6 +245,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         User customer = customerRequest.getCustomer();
         InsuranceType insuranceType = cias.getInsuranceType();
         CarSeries carSeries = cias.getCarSeries();
+
 
 //        Employees employee = eawag.getEmployees();
 //        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
@@ -384,6 +388,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 //
 //                // .workGroup(eawag.getAreaWorkGroup().getArwgCode())
 
+
+
         CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
                 .creqEntityId(customerRequest.getCreqEntityId())
                 .bussinessEntity(bussinessEntityResponseDTO)
@@ -394,6 +400,20 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .customerInscAssets(ciasResponseDTO)
                 .customer(customerUserResponseDTO)
                 .build();
+
+
+            CustomerClaim customerClaim = customerRequest.getCustomerClaim();
+
+            ClaimResponseDTO claimResponseDTO = ClaimResponseDTO.builder()
+                    .cuclCreqEntityId(customerClaim.getCuclCreqEntityid())
+                    .cuclCreateDate(customerClaim.getCuclCreateDate())
+                    .cuclEventPrice(customerClaim.getCuclEventPrice())
+                    .cuclReason(customerClaim.getCuclReason())
+                    .cuclSubtotal(customerClaim.getCuclSubtotal())
+                    .build();
+
+            customerResponseDTO.setClaimResponseDTO(claimResponseDTO);
+
 
 //                .employee(agenUserResponseDTO)
 //                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
@@ -534,5 +554,97 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.delete(existCustomerRequest);
     }
 
+    @Override
+    public CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
+        );
+
+        CustomerClaim newCustomerClaim = CustomerClaim.builder()
+                .cuclCreateDate(LocalDateTime.now())
+                .cuclEventPrice(claimRequestDTO.getCuclEventPrice())
+                .cuclSubtotal(claimRequestDTO.getCuclSubtotal())
+                .cuclReason(claimRequestDTO.getCuclReason())
+                .cuclCreqEntityid(existCustomerRequest.getCreqEntityId())
+                .customerRequest(existCustomerRequest)
+                .build();
+
+
+        existCustomerRequest.setCustomerClaim(newCustomerClaim);
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.saveAndFlush(existCustomerRequest);
+
+        return this.convert(savedCustomerRequest);
+    }
+
+    @Override
+    public CustomerClaim createNewClaim(CustomerRequest customerRequest) {
+        CustomerClaim newCustomerClaim = CustomerClaim.builder()
+                .cuclEventPrice(0.0)
+                .cuclSubtotal(0.0)
+                .cuclCreqEntityid(customerRequest.getCreqEntityId())
+                .customerRequest(customerRequest)
+                .build();
+
+        return newCustomerClaim;
+    }
+
+    @Override
+    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
+        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Claim dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
+        );
+
+        LocalDateTime cuclCreateDate = existCustomerClaim.getCuclCreateDate();
+
+        if(Objects.isNull(cuclCreateDate)){
+            existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
+        }
+
+
+        Double cuclEventPrice = existCustomerClaim.getCuclEventPrice();
+        cuclEventPrice += claimRequestDTO.getCuclEventPrice();
+
+        Double cuclSubtotal = existCustomerClaim.getCuclSubtotal();
+        cuclSubtotal += claimRequestDTO.getCuclSubtotal();
+
+        existCustomerClaim.setCuclEventPrice(cuclEventPrice);
+        existCustomerClaim.setCuclSubtotal(cuclSubtotal);
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
+        return this.convert(savedCustomerRequest);
+    }
+
+    @Override
+    public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId) {
+        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
+                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
+        );
+
+
+       return ClaimResponseDTO.builder()
+               .cuclCreqEntityId(existCustomerClaim.getCuclCreqEntityid())
+               .cuclCreateDate(existCustomerClaim.getCuclCreateDate())
+               .cuclReason(existCustomerClaim.getCuclReason())
+               .cuclEventPrice(existCustomerClaim.getCuclEventPrice())
+               .cuclSubtotal(existCustomerClaim.getCuclSubtotal())
+               .build();
+
+    }
+
+    @Override
+    public void deleteCustomerClaim(Long cuclCreqEntityId) {
+        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
+                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
+        );
+
+        this.customerClaimRepository.delete(existCustomerClaim);
+    }
+
 
 }
+
+
+
+

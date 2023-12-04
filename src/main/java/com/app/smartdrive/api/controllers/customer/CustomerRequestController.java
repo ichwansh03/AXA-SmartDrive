@@ -3,6 +3,7 @@ package com.app.smartdrive.api.controllers.customer;
 import java.util.List;
 import java.util.Objects;
 
+import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -125,6 +127,38 @@ public class CustomerRequestController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/claim")
+    public CustomerResponseDTO createClaim(@RequestBody ClaimRequestDTO claimRequestDTO){
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.createClaim(claimRequestDTO);
+
+        return customerResponseDTO;
+    }
+
+    @PutMapping("/claim")
+    public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
+            @RequestBody ClaimRequestDTO claimRequestDTO
+    ){
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerClaim(claimRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+    }
+
+    @GetMapping("/claim")
+    public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
+            @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
+    ){
+        ClaimResponseDTO existCustomerClaim = this.customerRequestService.getCustomerClaimById(cuclCreqEntityId);
+        return ResponseEntity.status(HttpStatus.OK).body(existCustomerClaim);
+
+    }
+
+    @DeleteMapping("/claim")
+    public ResponseEntity<Void> deleteCustomerClaim(
+            @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
+    ){
+        this.customerRequestService.deleteCustomerClaim(cuclCreqEntityId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
 
 }
