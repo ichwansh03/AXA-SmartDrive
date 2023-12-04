@@ -11,6 +11,7 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,9 +56,8 @@ public class Partner {
     @LastModifiedDate
     @Column(name = "part_modified_date")
     private LocalDateTime partModifiedDate;
-    @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "part_sero_id")
+    @JsonManagedReference
+    @OneToOne(mappedBy = "partner")
     private ServiceOrders serviceOrders;
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId

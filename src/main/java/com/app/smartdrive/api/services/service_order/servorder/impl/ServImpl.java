@@ -8,6 +8,7 @@ import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
+import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +33,13 @@ public class ServImpl implements ServService {
     @Override
     public Services addService(Long creqId) {
 
+        SoAdapter soAdapter = new SoAdapter();
         CustomerRequest cr = customerRequestRepository.findById(creqId).get();
 
         Services serv = Services.builder()
                 .servType(cr.getCreqType())
                 .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
+                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
                 .servCreatedOn(cr.getCreqCreateDate())
                 .servStartDate(LocalDateTime.now())
                 .servEndDate(LocalDateTime.now().plusDays(7))

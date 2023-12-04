@@ -49,7 +49,7 @@ public class ServiceOrderTasks {
     private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
-    private String seotStatus = EnumModuleServiceOrders.SeotStatus.INPROGRESS.toString();
+    private EnumModuleServiceOrders.SeotStatus seotStatus;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -68,10 +68,11 @@ public class ServiceOrderTasks {
     @Transient
     private Object generatePolisTasks;
 
-    public ServiceOrderTasks(String seotName, LocalDateTime seotActualStartdate, LocalDateTime seotActualEnddate, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders) {
+    public ServiceOrderTasks(String seotName, LocalDateTime seotStartDate, LocalDateTime seotEndDate, EnumModuleServiceOrders.SeotStatus seotStatus, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders) {
         this.seotName = seotName;
-        this.seotActualStartdate = seotActualStartdate;
-        this.seotActualEnddate = seotActualEnddate;
+        this.seotStartDate = seotStartDate;
+        this.seotEndDate = seotEndDate;
+        this.seotStatus = seotStatus;
         this.areaWorkGroup = areaWorkGroup;
         this.serviceOrders = serviceOrders;
     }

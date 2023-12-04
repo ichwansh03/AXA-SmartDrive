@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,10 +19,12 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_premi", schema = "so")
+@DynamicInsert
+@DynamicUpdate
 public class ServicePremi {
 
     @Id
-    @Column(name = "semi_serv_id", unique = true)
+    @Column(name = "semi_serv_id")
     private Long semiServId;
 
     @Column(name = "semi_premi_debet")
@@ -43,7 +47,7 @@ public class ServicePremi {
 
     @ManyToOne
     @MapsId
-    @JoinColumn(name = "semi_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
+    @JoinColumn(name = "semi_serv_id")
     Services services;
 
     @JsonIgnore

@@ -74,4 +74,14 @@ public class ServOrderImpl implements ServOrderService {
         return serviceOrdersById;
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<ServiceOrders> findAllSeroByServId(Long servId) {
+        List<ServiceOrders> allSeroByServId = soOrderRepository.findAllSeroByServId(servId);
+
+        log.info("SoOrderServiceImpl::findAllSeroByServId in ID {} ",allSeroByServId);
+
+        return allSeroByServId;
+    }
+
 }

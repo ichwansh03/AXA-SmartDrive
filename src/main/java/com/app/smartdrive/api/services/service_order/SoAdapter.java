@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.service_order;
 
-import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -40,9 +42,16 @@ public class SoAdapter {
 
     }
 
-    public String generatePolis(Services services){
-        String formatEndDate = services.getServStartDate().format(formatter);
-        return "512-"+formatEndDate;
+    public String generatePolisNumber(CustomerRequest customerRequest){
+        String servTypes = customerRequest.getCreqType().toString();
+        String createdDate = customerRequest.getCreqCreateDate().format(formatter);
+        String formatPolisId = String.format("%03d", customerRequest.getCustomer().getUserEntityId());
+
+        return switch (servTypes) {
+            case "POLIS", "CLAIM" -> formatPolisId+"-"+createdDate;
+            default -> "-";
+        };
+
     }
 
 }
