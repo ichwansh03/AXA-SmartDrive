@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 
@@ -17,6 +19,8 @@ import java.time.LocalDate;
 @IdClass(ServicePremiCredit.class)
 @Entity
 @Table(name = "service_premi_credit", schema = "so")
+@DynamicInsert
+@DynamicUpdate
 public class ServicePremiCredit {
 
     //CREATE SEQUENCE serc_seq START WITH 1 INCREMENT BY 1;
