@@ -4,6 +4,7 @@ import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -22,6 +23,9 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
+@NamedQuery(
+        name = "ServiceOrders.findAllSeroByServId",
+        query = "SELECT sero FROM ServiceOrders sero WHERE sero.services.servId = :servId")
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrders {
@@ -51,8 +55,9 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
-    @JsonManagedReference
-    @OneToOne(mappedBy = "serviceOrders")
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sero_part_id")
     private Partner partner;
 
     @JsonIgnore
