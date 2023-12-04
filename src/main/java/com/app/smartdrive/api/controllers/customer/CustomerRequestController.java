@@ -7,7 +7,6 @@ import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

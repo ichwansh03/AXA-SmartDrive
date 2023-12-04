@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -16,11 +17,13 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_tasks", schema = "so")
-@NamedQuery(
-        name = "ServiceOrderTasks.findSeotById",
-        query = "SELECT seot FROM ServiceOrderTasks seot JOIN seot.serviceOrders sero " +
-                "JOIN seot.areaWorkGroup arwg WHERE seot.seotId = :seotId"
-)
+@NamedQueries({
+        @NamedQuery(
+                name = "ServiceOrderTasks.findSeotBySeroId",
+                query = "SELECT seot FROM ServiceOrderTasks seot WHERE seot.serviceOrders.seroId = :seroId"),
+        @NamedQuery(
+                name = "ServiceOrderTasks.updateTasksStatus",
+                query = "UPDATE ServiceOrderTasks seot SET seot.seotStatus = :seotStatus WHERE seot.seotId = :seotId", lockMode = LockModeType.PESSIMISTIC_WRITE)})
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrderTasks {
@@ -46,31 +49,29 @@ public class ServiceOrderTasks {
     private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
-    private String seotStatus;
-
-    @Column(name = "seot_order")
-    private Integer seotOrder;
+    private String seotStatus = EnumModuleServiceOrders.SeotStatus.INPROGRESS.toString();
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_arwg_code")
-    AreaWorkGroup areaWorkGroup;
+    private AreaWorkGroup areaWorkGroup;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_sero_id")
-    ServiceOrders serviceOrders;
+    private ServiceOrders serviceOrders;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL)
-    List<ServiceOrderWorkorder> serviceOrderWorkorders;
+    private List<ServiceOrderWorkorder> serviceOrderWorkorders;
 
-    public ServiceOrderTasks(String seotName, LocalDateTime seotActualStartdate, LocalDateTime seotActualEnddate, String seotStatus, Integer seotOrder, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders) {
+    @Transient
+    private Object generatePolisTasks;
+
+    public ServiceOrderTasks(String seotName, LocalDateTime seotActualStartdate, LocalDateTime seotActualEnddate, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders) {
         this.seotName = seotName;
         this.seotActualStartdate = seotActualStartdate;
         this.seotActualEnddate = seotActualEnddate;
-        this.seotStatus = seotStatus;
-        this.seotOrder = seotOrder;
         this.areaWorkGroup = areaWorkGroup;
         this.serviceOrders = serviceOrders;
     }

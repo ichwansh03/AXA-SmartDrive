@@ -7,13 +7,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
-import com.app.smartdrive.api.dto.user.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.customer.*;
+import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;

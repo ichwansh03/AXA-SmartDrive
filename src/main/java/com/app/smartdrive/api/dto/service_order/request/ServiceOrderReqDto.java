@@ -12,5 +12,4 @@ public class ServiceOrderReqDto {
     private String seroOrdtType;
     private String seroStatus;
     private String seroReason;
-    private String servClaimNo;
 }

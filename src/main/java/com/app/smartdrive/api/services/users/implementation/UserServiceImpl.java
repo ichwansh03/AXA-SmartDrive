@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import com.app.smartdrive.api.dto.user.ProfileDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
@@ -26,7 +28,11 @@ import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
+import com.app.smartdrive.api.services.users.UserAddressService;
+import com.app.smartdrive.api.services.users.UserPhoneService;
+import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
+import com.app.smartdrive.api.services.users.UserUserAccountService;
 import com.app.smartdrive.api.utils.NullUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,6 +49,22 @@ public class UserServiceImpl implements UserService {
   private final RolesRepository rolesRepository;
   private final BanksRepository banksRepository;
   private final FintechRepository fintechRepository;
+  private final UserRolesService userRolesService;
+  private final UserPhoneService userPhoneService;
+  private final UserAddressService userAddressService;
+  private final UserUserAccountService userAccountService;
+
+  @Override
+  public User createUser(ProfileRequestDto userPost) {
+    BusinessEntity businessEntity = businessEntityService.createBusinessEntity();
+    User newUser = new User();
+    User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
+    businessEntity.setUser(user);
+    user.setUserBusinessEntity(businessEntity);
+    user.setUserEntityId(businessEntity.getEntityId());
+    user.setUserModifiedDate(LocalDateTime.now());
+    return user;
+  }
 
   @Override
   public UserDto getByIdDto(Long id) {
@@ -67,59 +89,18 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User createUser(CreateUserDto userPost, RoleName roleName) throws Exception {
-    BusinessEntity businessEntity = businessEntityService.createBusinessEntity();
-
-    User newUser = new User();
-    User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
-
-    user.setUserBusinessEntity(businessEntity);
-    user.setUserEntityId(businessEntity.getEntityId());
-    user.setUserModifiedDate(LocalDateTime.now());
-
-    UserRolesId userRolesId = new UserRolesId(businessEntity.getEntityId(), roleName);
-
-    Roles roles = rolesRepository.findById(roleName).get();
-    UserRoles userRoles = new UserRoles();
-    userRoles.setRoles(roles);
-    userRoles.setUserRolesId(userRolesId);
-    userRoles.setUsroStatus("ACTIVE");
-    userRoles.setUsroModifiedDate(LocalDateTime.now());
-
-    List<UserRoles> listRole = List.of(userRoles);
-
-    List<UserPhone> userPhone = user.getUserPhone();
-    userPhone.forEach(phone -> {
-      phone.setUser(user);
-      phone.getUserPhoneId().setUsphEntityId(businessEntity.getEntityId());
-      phone.setUsphModifiedDate(LocalDateTime.now());
-    });
-
-    List<UserAddress> userAddress = user.getUserAddress();
-    userAddress.forEach(address -> {
-      Cities city = cityRepository.findByCityName(userPost.getCityName()); // nanti by id
-      address.setCity(city);
-      address.setUsdrEntityId(businessEntity.getEntityId());
-      address.setUsdrCityId(city.getCityId());
-      address.setUsdrModifiedDate(LocalDateTime.now());
-      address.setUser(user);
-    });
+  public User createUserCustomer(CreateUserDto userPost){
+    User user = createUser(userPost.getProfile());
     
-    List<UserAccounts> userAccounts = user.getUserAccounts();
-    for (int i = 0; i < userAccounts.size(); i++) {
-      if(userAccounts.get(i).getEnumPaymentType().toString().equals("BANK")){
-        Long idBank = userPost.getUserAccounts().get(i).getBankId();
-        userAccounts.get(i).setBanks(banksRepository.findById(idBank).orElse(null));
-        userAccounts.get(i).setUsacBankEntityid(idBank);
-      }
-      if(userAccounts.get(i).getEnumPaymentType().toString().equals("FINTECH")){
-        Long idFintech = userPost.getUserAccounts().get(i).getFintechId();
-        userAccounts.get(i).setFintech(fintechRepository.findById(idFintech).orElse(null));
-        userAccounts.get(i).setUsacFintEntityid(idFintech);
-      }
-      userAccounts.get(i).setUser(user);
-      userAccounts.get(i).setUsacUserEntityid(businessEntity.getEntityId());
-    }
+    userRolesService.createUserRole(RoleName.CU, user);
+
+    userPhoneService.createUserPhone(user, userPost.getUserPhone());
+
+    userAddressService.createUserAddress(user, userPost.getUserAddress(), userPost.getCityId());
+
+    Long paymentId = (userPost.getBankId() != null) ? userPost.getBankId() : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
+
+    userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
 
    
     // TODO USERPHOTO API
@@ -127,8 +108,6 @@ public class UserServiceImpl implements UserService {
     // userPost.getPhoto().transferTo(new
     // File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
 
-    user.setUserRoles(listRole);
-    userRoles.setUser(user);
     return save(user);
   }
 
@@ -222,5 +201,7 @@ public class UserServiceImpl implements UserService {
     List<User> users = userRepo.findAll();
     return users;
   }
+
+
 
 }

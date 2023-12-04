@@ -22,9 +22,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "services", schema = "so")
-@NamedQuery(
-        name = "Services.findServicesById",
-        query = "SELECT s FROM Services s JOIN s.users u JOIN s.customer c WHERE s.servId = :servId")
 @DynamicInsert
 @DynamicUpdate
 public class Services {
@@ -34,11 +31,9 @@ public class Services {
     @Column(name = "serv_id", updatable = false, nullable = false)
     private Long servId;
 
-    //CustomerRequest.creqCreateDate
     @Column(name = "serv_created_on")
     private LocalDateTime servCreatedOn;
 
-    //CustomerRequest.creqType
     @Column(name = "serv_type")
     @Enumerated(EnumType.STRING)
     private EnumCustomer.CreqType servType;
@@ -47,26 +42,19 @@ public class Services {
     @Size(max = 12, message = "insurance number can't more than 12 character")
     private String servInsuranceNo;
 
-    //CustomerInscAssets.ciasPoliceNumber
     @Column(name = "serv_vehicleno")
     @Size(max = 12, message = "vehicle number can't more than 12 character")
     private String servVehicleNumber;
 
-    //CustomerInscAssets.ciasStartDate
     @Column(name = "serv_startdate")
     private LocalDateTime servStartDate;
 
-    //CustomerInscAssets.ciasEndDate
     @Column(name = "serv_enddate")
     private LocalDateTime servEndDate;
 
-    //CustomerRequest.creqStatus
     @Column(name = "serv_status")
     @Enumerated(EnumType.STRING)
-    private EnumModuleServiceOrders.ServStatus servStatus;
-    {
-        servStatus = EnumModuleServiceOrders.ServStatus.ACTIVE;
-    }
+    private EnumModuleServiceOrders.ServStatus servStatus = EnumModuleServiceOrders.ServStatus.ACTIVE;;
 
     @ManyToOne
     @JoinColumn(name = "serv_serv_id")

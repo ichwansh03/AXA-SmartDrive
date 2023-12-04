@@ -1,7 +1,8 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.ZonesDto;
+import com.app.smartdrive.api.dto.master.response.ZonesRes;
+import com.app.smartdrive.api.dto.master.request.ZoneReq;
 import com.app.smartdrive.api.entities.master.Zones;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ZoneService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/zones")
 @Tag(name = "Master Module")
-public class ZoneController implements BaseController<ZonesDto, Long> {
+public class ZoneController implements BaseController<ZoneReq, Long> {
     private final ZoneService service;
 
     @Override
@@ -29,20 +30,20 @@ public class ZoneController implements BaseController<ZonesDto, Long> {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ZonesDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ZonesRes.class));
     }
 
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody ZonesDto request) {
+    public ResponseEntity<?> saveData(@Valid @RequestBody ZoneReq request) {
         return ResponseEntity.ok(service.save(TransactionMapper.mapDtoToEntity(request, new Zones())));
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody ZonesDto request) {
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(request.getZonesId()))), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody ZoneReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
     }
 }

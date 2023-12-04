@@ -54,14 +54,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     public EmployeeAreaWorkgroupDto addEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto) {
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
-
-        Optional<EmployeeAreaWorkgroup> findTopByOrderByIdDesc = employeeAreaWorkgroupRepository.findLastOptional(); 
-    Long lastIndexUsdr;
-    if(findTopByOrderByIdDesc.isPresent()){
-       lastIndexUsdr = findTopByOrderByIdDesc.get().getEawgId();
-    } else {
-      lastIndexUsdr = 1L;
-    }
     
         Employees existingEmployee = employeesRepository.findByEmpName(employeeAreaWorkgroupDto.getEmpName());
            

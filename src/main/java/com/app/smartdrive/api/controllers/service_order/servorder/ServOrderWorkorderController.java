@@ -1,17 +1,17 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
+import com.app.smartdrive.api.Exceptions.UserNotFoundException;
 import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/sowo")
@@ -19,19 +19,29 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class ServOrderWorkorderController {
 
-    private ServOrderWorkorderService servOrderWorkorderService;
+    private final ServOrderWorkorderService servOrderWorkorderService;
 
-    @Transactional
-    @GetMapping("/servorderworkorder")
+    @GetMapping()
     public ResponseEntity<?> getServiceOrderWorkorderById(@RequestParam("sowoid") Long sowoId){
-        ServiceOrderWorkorder serviceOrderWorkorder = servOrderWorkorderService.findBySowoId(sowoId);
-
-        SoWorkorderDto soWorkorderDto = SoWorkorderDto.builder()
-                .sowoName(serviceOrderWorkorder.getSowoName())
-                //.sowoStatus(serviceOrderWorkorder.getSowoStatus())
-                .sowoSeotId(serviceOrderWorkorder.getServiceOrderTasks().getSeotId()).build();
+        List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(sowoId);
 
         log.info("ServiceOrdersController::getServiceOrderTasksById successfully viewed");
+        return new ResponseEntity<>(sowoBySeotId, HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateSoWorkorderStatus(@Valid @RequestBody SoWorkorderDto soWorkorderDto){
+        int sowoStatus = servOrderWorkorderService.updateSowoStatus(soWorkorderDto.getSowoStatus(), soWorkorderDto.getSowoId());
+
+        if (sowoStatus == 0){
+            throw new UserNotFoundException("ID not found");
+        }
+
+        soWorkorderDto = SoWorkorderDto.builder()
+                .sowoId(soWorkorderDto.getSowoId())
+                .sowoStatus(soWorkorderDto.getSowoStatus())
+                .build();
+
         return new ResponseEntity<>(soWorkorderDto, HttpStatus.OK);
     }
 }

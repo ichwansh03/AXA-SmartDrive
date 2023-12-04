@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.dto.customer.response;
 
 import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
-import com.app.smartdrive.api.dto.user.BussinessEntityResponseDTO;
+import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import lombok.AllArgsConstructor;
