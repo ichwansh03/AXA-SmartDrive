@@ -1,12 +1,12 @@
 USE [master]
 GO
-/****** Object:  Database [SmartDrive]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Database [SmartDrive]    Script Date: 11/30/2023 2:13:06 PM ******/
 CREATE DATABASE [SmartDrive]
  CONTAINMENT = NONE
  ON  PRIMARY
-( NAME = N'SmartDrive', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQLEXPRESSCA\MSSQL\DATA\SmartDrive.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+( NAME = N'SmartDrive', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQLEXPRESS\MSSQL\DATA\SmartDrive.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON
-( NAME = N'SmartDrive_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQLEXPRESSCA\MSSQL\DATA\SmartDrive_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+( NAME = N'SmartDrive_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQLEXPRESS\MSSQL\DATA\SmartDrive_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
  WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
 GO
 ALTER DATABASE [SmartDrive] SET COMPATIBILITY_LEVEL = 160
@@ -82,28 +82,61 @@ ALTER DATABASE [SmartDrive] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANU
 GO
 USE [SmartDrive]
 GO
-/****** Object:  Schema [customer]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Schema [customer]    Script Date: 11/30/2023 2:13:07 PM ******/
 CREATE SCHEMA [customer]
 GO
-/****** Object:  Schema [hr]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Schema [hr]    Script Date: 11/30/2023 2:13:07 PM ******/
 CREATE SCHEMA [hr]
 GO
-/****** Object:  Schema [mtr]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Schema [mtr]    Script Date: 11/30/2023 2:13:07 PM ******/
 CREATE SCHEMA [mtr]
 GO
-/****** Object:  Schema [partners]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Schema [partners]    Script Date: 11/30/2023 2:13:07 PM ******/
 CREATE SCHEMA [partners]
 GO
-/****** Object:  Schema [payment]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Schema [payment]    Script Date: 11/30/2023 2:13:07 PM ******/
 CREATE SCHEMA [payment]
 GO
-/****** Object:  Schema [so]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Schema [so]    Script Date: 11/30/2023 2:13:07 PM ******/
 CREATE SCHEMA [so]
 GO
-/****** Object:  Schema [users]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Schema [users]    Script Date: 11/30/2023 2:13:07 PM ******/
 CREATE SCHEMA [users]
 GO
-/****** Object:  Table [customer].[customer_claim]    Script Date: 11/20/2023 10:08:54 AM ******/
+USE [SmartDrive]
+GO
+/****** Object:  Sequence [dbo].[cadoc_cuex_id]    Script Date: 11/30/2023 2:13:07 PM ******/
+CREATE SEQUENCE [dbo].[cadoc_cuex_id]
+ AS [bigint]
+ START WITH 1
+ INCREMENT BY 1
+ MINVALUE -9223372036854775808
+ MAXVALUE 9223372036854775807
+ CACHE
+GO
+USE [SmartDrive]
+GO
+/****** Object:  Sequence [hr].[employee_are_workgroup_seq]    Script Date: 11/30/2023 2:13:07 PM ******/
+CREATE SEQUENCE [hr].[employee_are_workgroup_seq]
+ AS [bigint]
+ START WITH 1
+ INCREMENT BY 1
+ MINVALUE 1
+ MAXVALUE 9223372036854775807
+ CACHE
+GO
+USE [SmartDrive]
+GO
+/****** Object:  Sequence [users].[user_address_seq]    Script Date: 11/30/2023 2:13:07 PM ******/
+CREATE SEQUENCE [users].[user_address_seq]
+ AS [bigint]
+ START WITH 2
+ INCREMENT BY 1
+ MINVALUE 2
+ MAXVALUE 9223372036854775807
+ CACHE
+GO
+/****** Object:  Table [customer].[customer_claim]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -120,7 +153,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [customer].[customer_insc_assets]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [customer].[customer_insc_assets]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -145,15 +178,13 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [customer].[customer_insc_doc]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [customer].[customer_insc_doc]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE SEQUENCE cadoc_cuex_id start with 1 increment by 1
-GO
 CREATE TABLE [customer].[customer_insc_doc](
-	[cadoc_id] [int]  NOT NULL,
+	[cadoc_id] [int] NOT NULL,
 	[cadoc_creq_entityid] [int] NOT NULL,
 	[cadoc_filename] [varchar](15) NULL,
 	[cadoc_filetype] [varchar](15) NULL,
@@ -167,7 +198,7 @@ CREATE TABLE [customer].[customer_insc_doc](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [customer].[customer_insc_extend]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [customer].[customer_insc_extend]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -185,7 +216,7 @@ CREATE TABLE [customer].[customer_insc_extend](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [customer].[customer_request]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [customer].[customer_request]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -204,7 +235,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [hr].[batch_employee_salary]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [hr].[batch_employee_salary]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -226,13 +257,13 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [hr].[employee_are_workgroup]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [hr].[employee_are_workgroup]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [hr].[employee_are_workgroup](
-	[eawag_id] [int] IDENTITY(1,1) NOT NULL,
+	[eawg_id] [int] NOT NULL,
 	[eawg_entityid] [int] NOT NULL,
 	[eawg_status] [varchar](15) NULL,
 	[eawg_arwg_code] [varchar](15) NULL,
@@ -240,17 +271,17 @@ CREATE TABLE [hr].[employee_are_workgroup](
 PRIMARY KEY CLUSTERED
 (
 	[eawg_entityid] ASC,
-	[eawag_id] ASC
+	[eawg_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [hr].[employee_salary_detail]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [hr].[employee_salary_detail]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [hr].[employee_salary_detail](
-	[emsa_id] [int] NOT NULL,
+	[emsa_id] [int] IDENTITY(1,1) NOT NULL,
 	[emsa_emp_entityid] [int] NOT NULL,
 	[emsa_create_date] [date] NOT NULL,
 	[emsa_name] [varchar](55) NULL,
@@ -263,7 +294,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [hr].[employees]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [hr].[employees]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -285,7 +316,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [hr].[job_type]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [hr].[job_type]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -293,19 +324,22 @@ GO
 CREATE TABLE [hr].[job_type](
 	[job_code] [varchar](15) NOT NULL,
 	[job_modified_date] [datetime] NULL,
+	[job_desc] [varchar](50) NULL,
+	[job_rate_min] [decimal](18, 0) NULL,
+	[job_rate_max] [decimal](18, 0) NULL,
 PRIMARY KEY CLUSTERED
 (
 	[job_code] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [hr].[template_salary]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [hr].[template_salary]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [hr].[template_salary](
-	[tesal_id] [int] NOT NULL,
+	[tesal_id] [int] IDENTITY(1,1) NOT NULL,
 	[tesal_name] [varchar](55) NULL,
 	[tesal_nominal] [money] NULL,
 	[tesal_rate_min] [float] NULL,
@@ -316,7 +350,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[area_workgroup]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[area_workgroup]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -331,7 +365,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[car_brands]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[car_brands]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -345,7 +379,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[car_models]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[car_models]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -360,7 +394,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[car_series]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[car_series]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -376,7 +410,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[category]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[category]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -390,7 +424,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[cities]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[cities]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -405,7 +439,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[insurance_type]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[insurance_type]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -419,7 +453,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[provinsi]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[provinsi]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -434,7 +468,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[region_plat]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[region_plat]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -449,7 +483,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[template_insurance_premi]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[template_insurance_premi]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -470,7 +504,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[template_service_task]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[template_service_task]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -478,17 +512,17 @@ GO
 CREATE TABLE [mtr].[template_service_task](
 	[testa_id] [int] IDENTITY(1,1) NOT NULL,
 	[testa_name] [varchar](55) NULL,
-	testa_tety_id int null,
-	[testa_group] varchar(50) NULL,
-	testa_callmethod varchar(100) null,
-	testa_seqorder int
+	[testa_tety_id] [int] NULL,
+	[testa_group] [varchar](50) NULL,
+	[testa_callmethod] [varchar](100) NULL,
+	[testa_seqorder] [int] NULL,
 PRIMARY KEY CLUSTERED
 (
 	[testa_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[template_task_workorder]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[template_task_workorder]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -496,7 +530,7 @@ GO
 CREATE TABLE [mtr].[template_task_workorder](
 	[tewo_id] [int] IDENTITY(1,1) NOT NULL,
 	[tewo_name] [varchar](55) NULL,
-	tewo_value varchar(50) null,
+	[tewo_value] [varchar](50) NULL,
 	[tewo_testa_id] [int] NULL,
 PRIMARY KEY CLUSTERED
 (
@@ -504,7 +538,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[template_type]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[template_type]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -519,7 +553,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [mtr].[zones]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [mtr].[zones]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -533,7 +567,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [partners].[batch_partner_invoice]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [partners].[batch_partner_invoice]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -555,7 +589,7 @@ CREATE TABLE [partners].[batch_partner_invoice](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [partners].[partner_area_workgroup]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [partners].[partner_area_workgroup]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -574,7 +608,7 @@ CREATE TABLE [partners].[partner_area_workgroup](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [partners].[partner_contacts]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [partners].[partner_contacts]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -590,7 +624,7 @@ CREATE TABLE [partners].[partner_contacts](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [partners].[partners]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [partners].[partners]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -611,7 +645,7 @@ CREATE TABLE [partners].[partners](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [payment].[banks]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [payment].[banks]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -626,7 +660,7 @@ CREATE TABLE [payment].[banks](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [payment].[fintech]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [payment].[fintech]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -641,7 +675,7 @@ CREATE TABLE [payment].[fintech](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [payment].[payment_transactions]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [payment].[payment_transactions]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -663,7 +697,7 @@ CREATE TABLE [payment].[payment_transactions](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [payment].[user_accounts]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [payment].[user_accounts]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -683,7 +717,7 @@ CREATE TABLE [payment].[user_accounts](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [so].[claim_asset_evidence]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [so].[claim_asset_evidence]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -696,14 +730,14 @@ CREATE TABLE [so].[claim_asset_evidence](
 	[caev_url] [varchar](255) NULL,
 	[caev_note] [varchar](15) NULL,
 	[caev_part_entityid] [int] NULL,
-	[caev_sero_id] [int] NULL,
+	[caev_sero_id] [varchar](25) NULL,
  CONSTRAINT [pk_caev_id] PRIMARY KEY CLUSTERED
 (
 	[caev_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [so].[claim_asset_sparepart]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [so].[claim_asset_sparepart]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -715,14 +749,14 @@ CREATE TABLE [so].[claim_asset_sparepart](
 	[casp_item_price] [money] NULL,
 	[casp_subtotal] [money] NULL,
 	[casp_part_entityid] [int] NULL,
-	[casp_sero_id] [int] NULL,
+	[casp_sero_id] [varchar](25) NULL,
  CONSTRAINT [pk_casp_id] PRIMARY KEY CLUSTERED
 (
 	[casp_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [so].[service_order_tasks]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [so].[service_order_tasks]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -736,14 +770,14 @@ CREATE TABLE [so].[service_order_tasks](
 	[seot_actual_enddate] [datetime] NULL,
 	[seot_status] [varchar](15) NULL,
 	[seot_arwg_code] [varchar](15) NULL,
-	[seot_sero_id] [int] NULL,
+	[seot_sero_id] [varchar](25) NULL,
  CONSTRAINT [pk_seot_id] PRIMARY KEY CLUSTERED
 (
 	[seot_id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [so].[service_order_workorder]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [so].[service_order_workorder]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -760,13 +794,13 @@ CREATE TABLE [so].[service_order_workorder](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [so].[service_orders]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [so].[service_orders]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [so].[service_orders](
-	[sero_id] [int] IDENTITY(1,1) NOT NULL,
+	[sero_id] [varchar](25) NOT NULL,
 	[sero_ordt_type] [varchar](15) NULL,
 	[sero_status] [varchar](15) NULL,
 	[sero_reason] [varchar](256) NULL,
@@ -774,7 +808,7 @@ CREATE TABLE [so].[service_orders](
 	[serv_claim_startdate] [datetime] NULL,
 	[serv_claim_enddate] [datetime] NULL,
 	[sero_serv_id] [int] NULL,
-	[sero_sero_id] [int] NULL,
+	[sero_sero_id] [varchar](25) NULL,
 	[sero_agent_entityid] [int] NULL,
 	[sero_arwg_code] [varchar](15) NULL,
  CONSTRAINT [pk_sero_id] PRIMARY KEY CLUSTERED
@@ -783,7 +817,7 @@ CREATE TABLE [so].[service_orders](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [so].[service_premi]    Script Date: 11/20/2023 10:08:54 AM ******/
+/****** Object:  Table [so].[service_premi]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -801,7 +835,7 @@ CREATE TABLE [so].[service_premi](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [so].[service_premi_credit]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Table [so].[service_premi_credit]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -822,7 +856,7 @@ CREATE TABLE [so].[service_premi_credit](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [so].[services]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Table [so].[services]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -845,7 +879,7 @@ CREATE TABLE [so].[services](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [users].[business_entity]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Table [users].[business_entity]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -859,7 +893,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [users].[roles]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Table [users].[roles]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -873,7 +907,7 @@ CREATE TABLE [users].[roles](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [users].[user_address]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Table [users].[user_address]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -892,7 +926,7 @@ CREATE TABLE [users].[user_address](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [users].[user_phone]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Table [users].[user_phone]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -911,7 +945,7 @@ CREATE TABLE [users].[user_phone](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [users].[user_roles]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Table [users].[user_roles]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -928,7 +962,7 @@ CREATE TABLE [users].[user_roles](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [users].[users]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Table [users].[users]    Script Date: 11/30/2023 2:13:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -951,10 +985,208 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+INSERT [customer].[customer_claim] ([cucl_creq_entityid], [cucl_create_date], [cucl_event_price], [cucl_subtotal], [cucl_reason]) VALUES (2, CAST(N'2023-10-10T00:00:00.000' AS DateTime), 100000.0000, 100000.0000, N'wkwkwkwk')
+GO
+INSERT [customer].[customer_request] ([creq_entityid], [creq_create_date], [creq_status], [creq_type], [creq_modified_date], [creq_cust_entityid], [creq_agen_entityid]) VALUES (2, CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'OPEN', N'POLIS', CAST(N'2023-10-10T00:00:00.000' AS DateTime), NULL, NULL)
+GO
+INSERT [hr].[employees] ([emp_entityid], [emp_name], [emp_join_date], [emp_type], [emp_status], [emp_graduate], [emp_net_salary], [emp_account_number], [emp_modified_date], [emp_job_code]) VALUES (1, N'BARA', CAST(N'2009-10-10T00:00:00.000' AS DateTime), N'PERMANENT', N'ACTIVE', N'S1', 2000000.0000, N'BARA123', CAST(N'2023-11-19T00:00:00.000' AS DateTime), N'1')
+GO
+INSERT [hr].[job_type] ([job_code], [job_modified_date], [job_desc], [job_rate_min], [job_rate_max]) VALUES (N'1', CAST(N'2008-10-10T00:00:00.000' AS DateTime), NULL, NULL, NULL)
+GO
+SET IDENTITY_INSERT [hr].[template_salary] ON
 
+INSERT [hr].[template_salary] ([tesal_id], [tesal_name], [tesal_nominal], [tesal_rate_min], [tesal_rate_max]) VALUES (1, N'net salary', NULL, NULL, NULL)
+INSERT [hr].[template_salary] ([tesal_id], [tesal_name], [tesal_nominal], [tesal_rate_min], [tesal_rate_max]) VALUES (2, N'komisi awal', NULL, 0.05, 0.1)
+INSERT [hr].[template_salary] ([tesal_id], [tesal_name], [tesal_nominal], [tesal_rate_min], [tesal_rate_max]) VALUES (3, N'komisi pemeliharaan', NULL, 0.02, 0.05)
+INSERT [hr].[template_salary] ([tesal_id], [tesal_name], [tesal_nominal], [tesal_rate_min], [tesal_rate_max]) VALUES (4, N'komisi persestensi', NULL, 0.02, 0.05)
+INSERT [hr].[template_salary] ([tesal_id], [tesal_name], [tesal_nominal], [tesal_rate_min], [tesal_rate_max]) VALUES (5, N'komisi bonus', NULL, 0.05, 0.1)
+INSERT [hr].[template_salary] ([tesal_id], [tesal_name], [tesal_nominal], [tesal_rate_min], [tesal_rate_max]) VALUES (6, N'komisi renewal', NULL, 0.02, 0.05)
+INSERT [hr].[template_salary] ([tesal_id], [tesal_name], [tesal_nominal], [tesal_rate_min], [tesal_rate_max]) VALUES (7, N'komisi overriding', NULL, 0.02, 0.05)
+SET IDENTITY_INSERT [hr].[template_salary] OFF
+GO
+INSERT [mtr].[area_workgroup] ([arwg_code], [arwg_desc], [arwg_city_id]) VALUES (N'BCI-0001', N'Bandung Cimahi', 1)
+INSERT [mtr].[area_workgroup] ([arwg_code], [arwg_desc], [arwg_city_id]) VALUES (N'BCY-0001', N'Bandung Cileunyi', 1)
+INSERT [mtr].[area_workgroup] ([arwg_code], [arwg_desc], [arwg_city_id]) VALUES (N'BPA-0001', N'Bandung Padalarang', 1)
+GO
+SET IDENTITY_INSERT [mtr].[car_brands] ON
+
+INSERT [mtr].[car_brands] ([cabr_id], [cabr_name]) VALUES (1, N'Honda')
+INSERT [mtr].[car_brands] ([cabr_id], [cabr_name]) VALUES (3, N'Mistubishi')
+INSERT [mtr].[car_brands] ([cabr_id], [cabr_name]) VALUES (4, N'Suzuki')
+INSERT [mtr].[car_brands] ([cabr_id], [cabr_name]) VALUES (2, N'Toyota')
+SET IDENTITY_INSERT [mtr].[car_brands] OFF
+GO
+SET IDENTITY_INSERT [mtr].[car_models] ON
+
+INSERT [mtr].[car_models] ([carm_id], [carm_name], [carm_cabr_id]) VALUES (1, N'HRV', 1)
+INSERT [mtr].[car_models] ([carm_id], [carm_name], [carm_cabr_id]) VALUES (2, N'BRIO', 1)
+INSERT [mtr].[car_models] ([carm_id], [carm_name], [carm_cabr_id]) VALUES (3, N'Mobilio', 1)
+SET IDENTITY_INSERT [mtr].[car_models] OFF
+GO
+SET IDENTITY_INSERT [mtr].[car_series] ON
+
+INSERT [mtr].[car_series] ([cars_id], [cars_name], [cars_passenger], [cars_carm_id]) VALUES (1, N'MT-A', 5, 1)
+SET IDENTITY_INSERT [mtr].[car_series] OFF
+GO
+SET IDENTITY_INSERT [mtr].[category] ON
+
+INSERT [mtr].[category] ([cate_id], [cate_name]) VALUES (1, N'Kategori 1')
+INSERT [mtr].[category] ([cate_id], [cate_name]) VALUES (2, N'Kategori 2')
+INSERT [mtr].[category] ([cate_id], [cate_name]) VALUES (3, N'Kategori 3')
+INSERT [mtr].[category] ([cate_id], [cate_name]) VALUES (4, N'Kategori 4')
+INSERT [mtr].[category] ([cate_id], [cate_name]) VALUES (5, N'Kategori Extend')
+SET IDENTITY_INSERT [mtr].[category] OFF
+GO
+SET IDENTITY_INSERT [mtr].[cities] ON
+
+INSERT [mtr].[cities] ([city_id], [city_name], [city_prov_id]) VALUES (1, N'Bandung', 2)
+INSERT [mtr].[cities] ([city_id], [city_name], [city_prov_id]) VALUES (2, N'Bogor', 2)
+INSERT [mtr].[cities] ([city_id], [city_name], [city_prov_id]) VALUES (3, N'Cianjur', 2)
+INSERT [mtr].[cities] ([city_id], [city_name], [city_prov_id]) VALUES (4, N'Cirebon', 2)
+INSERT [mtr].[cities] ([city_id], [city_name], [city_prov_id]) VALUES (5, N'Bekasi', 2)
+SET IDENTITY_INSERT [mtr].[cities] OFF
+GO
+INSERT [mtr].[insurance_type] ([inty_name], [inty_desc]) VALUES (N'Comprehensive', N'Jaminan Tambahan Komprehensive')
+INSERT [mtr].[insurance_type] ([inty_name], [inty_desc]) VALUES (N'Total Loss Only', N'Jaminan Tambahan Kerugian Total')
+GO
+SET IDENTITY_INSERT [mtr].[provinsi] ON
+
+INSERT [mtr].[provinsi] ([prov_id], [prov_name], [prov_zones_id]) VALUES (1, N'DKI Jakarta', 1)
+INSERT [mtr].[provinsi] ([prov_id], [prov_name], [prov_zones_id]) VALUES (2, N'Jawa Barat', 2)
+SET IDENTITY_INSERT [mtr].[provinsi] OFF
+GO
+INSERT [mtr].[region_plat] ([regp_name], [regp_desc], [regp_prov_id]) VALUES (N'B', NULL, 1)
+INSERT [mtr].[region_plat] ([regp_name], [regp_desc], [regp_prov_id]) VALUES (N'D', NULL, 2)
+INSERT [mtr].[region_plat] ([regp_name], [regp_desc], [regp_prov_id]) VALUES (N'E', NULL, 2)
+INSERT [mtr].[region_plat] ([regp_name], [regp_desc], [regp_prov_id]) VALUES (N'F', NULL, 2)
+INSERT [mtr].[region_plat] ([regp_name], [regp_desc], [regp_prov_id]) VALUES (N'T', NULL, 2)
+INSERT [mtr].[region_plat] ([regp_name], [regp_desc], [regp_prov_id]) VALUES (N'Z', NULL, 2)
+GO
+SET IDENTITY_INSERT [mtr].[template_insurance_premi] ON
+
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (1, N'0 s/d RP.125.000.00', 3.82, 4.2, NULL, NULL, 1, N'Comprehensive', 1)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (2, N'0 s/d RP.125.000.00', 3.26, 3.59, NULL, NULL, 2, N'Comprehensive', 1)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (3, N'0 s/d RP.125.000.00', 2.53, 2.78, NULL, NULL, 3, N'Comprehensive', 1)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (4, N'0 s/d RP.125.000.00', 0.47, 0.56, NULL, NULL, 1, N'Total Loss Only', 1)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (5, N'0 s/d RP.125.000.00', 0.65, 0.78, NULL, NULL, 2, N'Total Loss Only', 1)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (6, N'0 s/d RP.125.000.00', 0.51, 0.56, NULL, NULL, 3, N'Total Loss Only', 1)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (7, N'0 s/d RP.125.000.00', 0.2, NULL, 400, NULL, 2, N'Comprehensive', 5)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (8, N'0 s/d RP.125.000.00', NULL, NULL, 1, NULL, NULL, N'Comprehensive', 5)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (9, N'0 s/d RP.125.000.00', NULL, NULL, 100, NULL, NULL, N'Comprehensive', 5)
+INSERT [mtr].[template_insurance_premi] ([temi_id], [temi_name], [temi_rate_min], [temi_rate_max], [temi_nominal], [temi_type], [temi_zones_id], [temi_inty_name], [temi_cate_id]) VALUES (10, N'0 s/d RP.125.000.00', NULL, NULL, 750, NULL, NULL, N'Comprehensive', 5)
+SET IDENTITY_INSERT [mtr].[template_insurance_premi] OFF
+GO
+SET IDENTITY_INSERT [mtr].[template_service_task] ON
+
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (1, N'REVIEW & CHECK CUSTOMER REQUEST', 1, N'WORKGROUP', NULL, 1)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (2, N'PROSPEK CUSTOMER POTENTIAL', 1, N'WORKGROUP', NULL, 2)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (3, N'PREMI SCHEMA', 1, N'WORKGROUP', NULL, 3)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (4, N'LEGAL DOCUMENT SIGNED', 1, N'WORKGROUP', NULL, 4)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (5, N'CREATE POLIS', NULL, N'SYSTEM', NULL, NULL)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (6, N'CLOSE ORDER', NULL, N'SYSTEM', NULL, NULL)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (7, N'GENERATE POLIS NUMBER', 2, N'SYSTEM', NULL, 1)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (8, N'GENERATE PREMI', 2, N'SYSTEM', NULL, 2)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (9, N'GENERATE VIRTUAL ACCOUNT', 2, N'SYSTEM', NULL, 3)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (10, N'NOTIFY TO AGENT', 2, N'SYSTEM', NULL, 4)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (11, N'NOTIFY TO CUSTOMER', 2, N'SYSTEM', NULL, 5)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (12, N'CLOSE ORDER', 2, N'SYSTEM', NULL, 6)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (13, N'CHECK CUSTOMER PREMI', 3, N'WORKGROUP', NULL, 1)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (14, N'SETTLE CUSTOMER PREMI', 3, N'WORKGROUP', NULL, 2)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (15, N'CHECK VEHICLE CONDITION', 3, N'WORKGROUP', NULL, 3)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (16, N'CLAIM DOCUMENT APPROVED', 3, N'WORKGROUP', NULL, 4)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (17, N'NOTIFY PARTNER TO REPAIR', 3, N'SYSTEM', NULL, 5)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (18, N'CALCULATE SPARE PART', 3, N'WORKGROUP', NULL, 6)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (19, N'NOTIFY CUSTOMER VEHICLE REPAIRED', 3, N'WORKGROUP', NULL, 7)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (20, N'NOTIFY AGENT CLAIM', 3, N'SYSTEM', NULL, 8)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (21, N'FEEDBACK CUSTOMER', 3, N'WORKGROUP', NULL, 9)
+INSERT [mtr].[template_service_task] ([testa_id], [testa_name], [testa_tety_id], [testa_group], [testa_callmethod], [testa_seqorder]) VALUES (22, N'CLOSE ORDER', 3, N'SYSTEM', NULL, 10)
+SET IDENTITY_INSERT [mtr].[template_service_task] OFF
+GO
+SET IDENTITY_INSERT [mtr].[template_task_workorder] ON
+
+INSERT [mtr].[template_task_workorder] ([tewo_id], [tewo_name], [tewo_value], [tewo_testa_id]) VALUES (1, N'CHECK UMUR', NULL, NULL)
+INSERT [mtr].[template_task_workorder] ([tewo_id], [tewo_name], [tewo_value], [tewo_testa_id]) VALUES (2, N'RELATE GOVERNMENT', NULL, NULL)
+INSERT [mtr].[template_task_workorder] ([tewo_id], [tewo_name], [tewo_value], [tewo_testa_id]) VALUES (3, N'PREMI SCHEMA', N'COMPREHENSIVE', NULL)
+INSERT [mtr].[template_task_workorder] ([tewo_id], [tewo_name], [tewo_value], [tewo_testa_id]) VALUES (4, N'DOCUMENT DISETUJUI', N'OK', NULL)
+INSERT [mtr].[template_task_workorder] ([tewo_id], [tewo_name], [tewo_value], [tewo_testa_id]) VALUES (5, N'COPY VALUE', N'Y', NULL)
+SET IDENTITY_INSERT [mtr].[template_task_workorder] OFF
+GO
+SET IDENTITY_INSERT [mtr].[template_type] ON
+
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (1, N'FEASIBILITY', N'SERVICES')
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (2, N'CREATE POLIS', N'SERVICES')
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (3, N'CLAIM', N'SERVICES')
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (4, N'CREATE', N'ORDER TYPE')
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (5, N'MODIFY', N'ORDER TYPE')
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (6, N'OPEN', N'STATUS')
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (7, N'PENDING', N'STATUS')
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (8, N'CANCELLED', N'STATUS')
+INSERT [mtr].[template_type] ([tety_id], [tety_name], [tety_group]) VALUES (9, N'CLOSED', N'STATUS')
+SET IDENTITY_INSERT [mtr].[template_type] OFF
+GO
+SET IDENTITY_INSERT [mtr].[zones] ON
+
+INSERT [mtr].[zones] ([zones_id], [zones_name]) VALUES (1, N'Wilayah 1')
+INSERT [mtr].[zones] ([zones_id], [zones_name]) VALUES (2, N'Wilayah 2')
+INSERT [mtr].[zones] ([zones_id], [zones_name]) VALUES (3, N'Wilayah 3')
+SET IDENTITY_INSERT [mtr].[zones] OFF
+GO
+INSERT [partners].[batch_partner_invoice] ([bpin_invoiceNo], [bpin_created_on], [bpin_subtotal], [bpin_tax], [bpin_accountNo], [bpin_status], [bpin_paid_date], [bpin_serv_id], [bpin_patrn_entityid], [bpin_patr_trxno]) VALUES (N'1', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 100000.0000, 10000.0000, N'1', N'ACTIVE', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 1, 3, N'TRANSAKSI1')
+GO
+INSERT [partners].[partner_area_workgroup] ([pawo_patr_entityid], [pawo_arwg_code], [pawo_user_entityid], [pawo_status], [pawo_modified_date]) VALUES (3, N'BCI-0001', 3, N'status', CAST(N'2023-10-10T00:00:00.000' AS DateTime))
+GO
+INSERT [partners].[partner_contacts] ([paco_patrn_entityid], [paco_user_entityid], [paco_status]) VALUES (3, 3, N'status')
+GO
+INSERT [partners].[partners] ([part_entityid], [part_name], [part_address], [part_join_date], [part_accountNo], [part_npwp], [part_status], [part_modified_date], [part_city_id]) VALUES (3, N'tengku', N'jakarta', CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'082123456', N'1234', N'ACTIVE', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 2)
+GO
+INSERT [payment].[banks] ([bank_entityid], [bank_name], [bank_desc]) VALUES (1, N'BBARA', N'DESC')
+GO
+INSERT [payment].[fintech] ([fint_entityid], [fint_name], [fint_desc]) VALUES (2, N'FIADI', N'desc')
+GO
+INSERT [payment].[payment_transactions] ([patr_trxno], [patr_created_on], [patr_debet], [patr_credit], [patr_usac_accountNo_from], [patr_usac_accountNo_to], [patr_type], [patr_invoice_no], [patr_notes], [patr_trxno_rev]) VALUES (N'TRANSAKSI1', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 10000.0000, 1000.0000, 1, 2, N'SALARY', N'123', N'NOTES', N'TRANSAKSI1')
+GO
+SET IDENTITY_INSERT [payment].[user_accounts] ON
+
+INSERT [payment].[user_accounts] ([usac_id], [usac_accountno], [usac_debet], [usac_credit], [usac_type], [usac_bank_entityid], [usac_fint_entityid], [usac_user_entityid]) VALUES (1, N'ACC', 10000.0000, 1000.0000, N'BANK', 1, 2, 1)
+SET IDENTITY_INSERT [payment].[user_accounts] OFF
+GO
+SET IDENTITY_INSERT [so].[service_premi_credit] ON
+
+INSERT [so].[service_premi_credit] ([secr_id], [secr_serv_id], [secr_year], [secr_premi_debet], [secr_premi_credit], [secr_trx_date], [secr_duedate], [secr_patr_trxno]) VALUES (1, 1, CAST(N'2023-10-10T00:00:00.000' AS DateTime), 10000.0000, 10000.0000, CAST(N'2023-10-10T00:00:00.000' AS DateTime), CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'TRANSAKSI1')
+SET IDENTITY_INSERT [so].[service_premi_credit] OFF
+GO
+SET IDENTITY_INSERT [so].[services] ON
+
+INSERT [so].[services] ([serv_id], [serv_created_on], [serv_type], [serv_insuranceNo], [serv_vehicleNo], [serv_startdate], [serv_enddate], [serv_status], [serv_serv_id], [serv_cust_entityid], [serv_creq_entityid]) VALUES (1, CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'POLIS', N'D 123 AB', N'1', CAST(N'2023-10-10T00:00:00.000' AS DateTime), CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'ACTIVE', NULL, 2, 2)
+INSERT [so].[services] ([serv_id], [serv_created_on], [serv_type], [serv_insuranceNo], [serv_vehicleNo], [serv_startdate], [serv_enddate], [serv_status], [serv_serv_id], [serv_cust_entityid], [serv_creq_entityid]) VALUES (2, CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'POLIS', N'D 123 AB', N'1', CAST(N'2023-10-10T00:00:00.000' AS DateTime), CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'ACTIVE', 1, 2, 2)
+SET IDENTITY_INSERT [so].[services] OFF
+GO
+SET IDENTITY_INSERT [users].[business_entity] ON
+
+INSERT [users].[business_entity] ([entityid], [entity_modified_date]) VALUES (1, CAST(N'2023-05-07T00:00:00.000' AS DateTime))
+INSERT [users].[business_entity] ([entityid], [entity_modified_date]) VALUES (2, CAST(N'2023-10-10T00:00:00.000' AS DateTime))
+INSERT [users].[business_entity] ([entityid], [entity_modified_date]) VALUES (3, CAST(N'2023-10-10T00:00:00.000' AS DateTime))
+SET IDENTITY_INSERT [users].[business_entity] OFF
+GO
+INSERT [users].[roles] ([role_name], [role_description]) VALUES (N'CU', N'customers')
+INSERT [users].[roles] ([role_name], [role_description]) VALUES (N'EM', N'employees')
+INSERT [users].[roles] ([role_name], [role_description]) VALUES (N'PC', N'potential customer')
+INSERT [users].[roles] ([role_name], [role_description]) VALUES (N'PR', N'partner')
+GO
+INSERT [users].[user_address] ([usdr_id], [usdr_entityid], [usdr_address1], [usdr_address2], [usdr_modified_date], [usdr_city_id]) VALUES (1, 1, N'JAKARTA', N'JAKARTA', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 2)
+GO
+INSERT [users].[user_phone] ([usph_entityid], [usph_phone_number], [usph_phone_type], [usph_mime], [usph_status], [usph_modified_date]) VALUES (1, N'123455677', N'HOME', N'WKWKWK', N'NORMAL', CAST(N'2023-10-10T00:00:00.000' AS DateTime))
+GO
+INSERT [users].[user_roles] ([usro_entityid], [usro_role_name], [usro_status], [usro_modified_date]) VALUES (1, N'EM', N'ACTIVE', CAST(N'2023-11-19T00:00:00.000' AS DateTime))
+INSERT [users].[user_roles] ([usro_entityid], [usro_role_name], [usro_status], [usro_modified_date]) VALUES (2, N'CU', N'ACTIVE', CAST(N'2023-10-10T00:00:00.000' AS DateTime))
+GO
+INSERT [users].[users] ([user_entityid], [user_name], [user_password], [user_full_name], [user_email], [user_birth_place], [user_birth_date], [user_national_id], [user_npwp], [user_photo], [user_modified_date]) VALUES (1, N'bara', N'123', N'muhammadbara', N'bara@gmail.com', N'jakarta', CAST(N'2001-01-27T00:00:00.000' AS DateTime), N'malay', N'1234bara', NULL, CAST(N'2023-11-19T00:00:00.000' AS DateTime))
+INSERT [users].[users] ([user_entityid], [user_name], [user_password], [user_full_name], [user_email], [user_birth_place], [user_birth_date], [user_national_id], [user_npwp], [user_photo], [user_modified_date]) VALUES (2, N'adi', N'321', N'adiadi', N'adi@gmail.com', N'jakarta', CAST(N'2001-10-10T00:00:00.000' AS DateTime), N'indo', N'1234adi', NULL, CAST(N'2023-10-10T00:00:00.000' AS DateTime))
+INSERT [users].[users] ([user_entityid], [user_name], [user_password], [user_full_name], [user_email], [user_birth_place], [user_birth_date], [user_national_id], [user_npwp], [user_photo], [user_modified_date]) VALUES (3, N'tengku', N'231', N'tengkudev', N'tengku@gmail.com', N'jakarta', CAST(N'2002-10-10T00:00:00.000' AS DateTime), N'thai', N'3214tngku', NULL, CAST(N'2023-10-10T00:00:00.000' AS DateTime))
+GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__customer__E9035C58F49FEA92]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__customer__E9035C582CEBD193]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [customer].[customer_insc_assets] ADD UNIQUE NONCLUSTERED
 (
 	[cias_police_number] ASC
@@ -962,15 +1194,7 @@ ALTER TABLE [customer].[customer_insc_assets] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__template__F9F5660C40BC369F]    Script Date: 11/20/2023 10:08:55 AM ******/
-ALTER TABLE [hr].[template_salary] ADD UNIQUE NONCLUSTERED
-(
-	[tesal_name] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-GO
-SET ANSI_PADDING ON
-GO
-/****** Object:  Index [UQ__car_bran__750DD7D5836409DD]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__car_bran__750DD7D53FC5B5BD]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [mtr].[car_brands] ADD UNIQUE NONCLUSTERED
 (
 	[cabr_name] ASC
@@ -978,7 +1202,7 @@ ALTER TABLE [mtr].[car_brands] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__car_mode__D13ADFA240AD2754]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__car_mode__D13ADFA2D65A8CCF]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [mtr].[car_models] ADD UNIQUE NONCLUSTERED
 (
 	[carm_name] ASC
@@ -986,7 +1210,7 @@ ALTER TABLE [mtr].[car_models] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__car_seri__92361ED84E578612]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__car_seri__92361ED86403F9C7]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [mtr].[car_series] ADD UNIQUE NONCLUSTERED
 (
 	[cars_name] ASC
@@ -994,7 +1218,7 @@ ALTER TABLE [mtr].[car_series] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__cities__1AA4F7B57D40E212]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__cities__1AA4F7B5BFF5F69F]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [mtr].[cities] ADD UNIQUE NONCLUSTERED
 (
 	[city_name] ASC
@@ -1002,7 +1226,7 @@ ALTER TABLE [mtr].[cities] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__provinsi__85249846F6B13756]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__provinsi__852498461F4E2B81]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [mtr].[provinsi] ADD UNIQUE NONCLUSTERED
 (
 	[prov_name] ASC
@@ -1010,7 +1234,7 @@ ALTER TABLE [mtr].[provinsi] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__template__F5145B1231F1C760]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__template__F5145B120C8AADBC]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [mtr].[template_type] ADD UNIQUE NONCLUSTERED
 (
 	[tety_name] ASC
@@ -1018,7 +1242,7 @@ ALTER TABLE [mtr].[template_type] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__banks__AEBE09800508AB4A]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__banks__AEBE0980CB139021]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [payment].[banks] ADD UNIQUE NONCLUSTERED
 (
 	[bank_name] ASC
@@ -1026,7 +1250,7 @@ ALTER TABLE [payment].[banks] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__fintech__96EC427415626D74]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__fintech__96EC427444C847DA]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [payment].[fintech] ADD UNIQUE NONCLUSTERED
 (
 	[fint_name] ASC
@@ -1034,7 +1258,7 @@ ALTER TABLE [payment].[fintech] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__user_acc__87A4C64B3E97D05D]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__user_acc__87A4C64B6DA57024]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [payment].[user_accounts] ADD UNIQUE NONCLUSTERED
 (
 	[usac_accountno] ASC
@@ -1042,7 +1266,7 @@ ALTER TABLE [payment].[user_accounts] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__users__58883F86BA59D7DD]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__users__58883F8627CBD45D]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [users].[users] ADD UNIQUE NONCLUSTERED
 (
 	[user_npwp] ASC
@@ -1050,7 +1274,7 @@ ALTER TABLE [users].[users] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__users__60A5BA8F6581AE58]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__users__60A5BA8FC0EEDF16]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [users].[users] ADD UNIQUE NONCLUSTERED
 (
 	[user_national_id] ASC
@@ -1058,7 +1282,7 @@ ALTER TABLE [users].[users] ADD UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [UQ__users__7C9273C46E1A555F]    Script Date: 11/20/2023 10:08:55 AM ******/
+/****** Object:  Index [UQ__users__7C9273C4B7B5A88D]    Script Date: 11/30/2023 2:13:07 PM ******/
 ALTER TABLE [users].[users] ADD UNIQUE NONCLUSTERED
 (
 	[user_name] ASC
@@ -1156,7 +1380,7 @@ GO
 ALTER TABLE [mtr].[template_insurance_premi]  WITH CHECK ADD FOREIGN KEY([temi_cate_id])
 REFERENCES [mtr].[category] ([cate_id])
 GO
-ALTER TABLE [mtr].[template_service_task]  WITH CHECK ADD FOREIGN KEY(testa_tety_id)
+ALTER TABLE [mtr].[template_service_task]  WITH CHECK ADD FOREIGN KEY([testa_tety_id])
 REFERENCES [mtr].[template_type] ([tety_id])
 GO
 ALTER TABLE [mtr].[template_task_workorder]  WITH CHECK ADD FOREIGN KEY([tewo_testa_id])
@@ -1386,145 +1610,12 @@ ALTER TABLE [users].[user_phone]  WITH CHECK ADD CHECK  (([usph_phone_type]='HOM
 GO
 ALTER TABLE [users].[user_roles]  WITH CHECK ADD CHECK  (([usro_status]='INACTIVE' OR [usro_status]='ACTIVE'))
 GO
+ALTER TABLE so.service_orders ADD sero_part_id int
+GO
+ALTER TABLE so.service_orders ADD CONSTRAINT fk_sero_part_entityid
+FOREIGN KEY (sero_part_id) REFERENCES partners.partners(part_entityid)
+GO
 USE [master]
 GO
 ALTER DATABASE [SmartDrive] SET  READ_WRITE
 GO
-
-USE [SmartDrive]
-GO
-INSERT mtr.car_brands values('Honda')
-INSERT mtr.car_brands values('Toyota')
-INSERT mtr.car_brands values('Mistubishi')
-INSERT mtr.car_brands values('Suzuki')
-
-INSERT mtr.car_models values('HRV',1)
-INSERT mtr.car_models values('BRIO',1)
-INSERT mtr.car_models values('Mobilio',1)
-
-INSERT mtr.car_series values('MT-A',5,1)
-
-INSERT mtr.category values('Kategori 1')
-INSERT mtr.category values('Kategori 2')
-INSERT mtr.category values('Kategori 3')
-INSERT mtr.category values('Kategori 4')
-INSERT mtr.category values('Kategori Extend')
-
-INSERT mtr.zones values('Wilayah 1')
-INSERT mtr.zones values('Wilayah 2')
-INSERT mtr.zones values('Wilayah 3')
-
-INSERT [mtr].[provinsi] VALUES ('DKI Jakarta', 1)
-INSERT [mtr].[provinsi] VALUES ('Jawa Barat', 2)
-
-INSERT [mtr].[cities] VALUES ('Bandung', 2)
-INSERT [mtr].[cities] VALUES ('Bogor', 2)
-INSERT [mtr].[cities] VALUES ('Cianjur', 2)
-INSERT [mtr].[cities] VALUES ('Cirebon', 2)
-INSERT [mtr].[cities] VALUES ('Bekasi', 2)
-
-INSERT [mtr].[region_plat] (regp_name,regp_desc,regp_prov_id) VALUES ('D', null , 2)
-INSERT [mtr].[region_plat] (regp_name,regp_desc,regp_prov_id) VALUES ('E', null , 2)
-INSERT [mtr].[region_plat] (regp_name,regp_desc,regp_prov_id) VALUES ('F', null , 2)
-INSERT [mtr].[region_plat] (regp_name,regp_desc,regp_prov_id) VALUES ('Z', null , 2)
-INSERT [mtr].[region_plat] (regp_name,regp_desc,regp_prov_id) VALUES ('T', null , 2)
-INSERT [mtr].[region_plat] (regp_name,regp_desc,regp_prov_id) VALUES ('B', null , 1)
-
-INSERT [mtr].[area_workgroup] (arwg_code,arwg_desc,arwg_city_id) VALUES ('BCI-0001', 'Bandung Cimahi', 1)
-INSERT [mtr].[area_workgroup] (arwg_code,arwg_desc,arwg_city_id) VALUES ('BPA-0001', 'Bandung Padalarang', 1)
-INSERT [mtr].[area_workgroup] (arwg_code,arwg_desc,arwg_city_id) VALUES ('BCY-0001', 'Bandung Cileunyi', 1)
-
-INSERT mtr.insurance_type values('Comprehensive', 'Jaminan Tambahan Komprehensive')
-INSERT mtr.insurance_type values('Total Loss Only', 'Jaminan Tambahan Kerugian Total')
-
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('FEASIBILITY', N'SERVICES')
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('CREATE POLIS', N'SERVICES')
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('CLAIM', N'SERVICES')
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('CREATE', N'ORDER TYPE')
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('MODIFY', N'ORDER TYPE')
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('OPEN', N'STATUS')
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('PENDING', N'STATUS')
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('CANCELLED', N'STATUS')
-INSERT [mtr].[template_type] ([tety_name], [tety_group]) VALUES ('CLOSED', N'STATUS')
-
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('REVIEW & CHECK CUSTOMER REQUEST', 1,'WORKGROUP',null,1)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('PROSPEK CUSTOMER POTENTIAL', 1,'WORKGROUP',null,2)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('PREMI SCHEMA', 1,'WORKGROUP',null,3)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('LEGAL DOCUMENT SIGNED', 1,'WORKGROUP',null,4)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('CREATE POLIS', null,'SYSTEM',null,null)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('CLOSE ORDER', null,'SYSTEM',null,null)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('GENERATE POLIS NUMBER', 2,'SYSTEM',null,1)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('GENERATE PREMI', 2,'SYSTEM',null,2)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('GENERATE VIRTUAL ACCOUNT', 2,'SYSTEM',null,3)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('NOTIFY TO AGENT', 2,'SYSTEM',null,4)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('NOTIFY TO CUSTOMER', 2,'SYSTEM',null,5)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('CLOSE ORDER', 2,'SYSTEM',null,6)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('CHECK CUSTOMER PREMI',3,'WORKGROUP',null,1)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('SETTLE CUSTOMER PREMI',3,'WORKGROUP',null,2)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('CHECK VEHICLE CONDITION',3,'WORKGROUP',null,3)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('CLAIM DOCUMENT APPROVED',3,'WORKGROUP',null,4)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('NOTIFY PARTNER TO REPAIR',3,'SYSTEM',null,5)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('CALCULATE SPARE PART', 3,'WORKGROUP',null,6)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('NOTIFY CUSTOMER VEHICLE REPAIRED', 3,'WORKGROUP',null,7)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('NOTIFY AGENT CLAIM', 3,'SYSTEM',null,8)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('FEEDBACK CUSTOMER', 3,'WORKGROUP',null,9)
-INSERT [mtr].[template_service_task] (testa_name, testa_tety_id, testa_group, testa_callmethod, testa_seqorder) VALUES ('CLOSE ORDER',3,'SYSTEM',null,10)
-
-
-INSERT [mtr].[template_task_workorder] ([tewo_name], tewo_value) VALUES (N'CHECK UMUR', null)
-INSERT [mtr].[template_task_workorder] ([tewo_name], tewo_value) VALUES (N'RELATE GOVERNMENT', null)
-INSERT [mtr].[template_task_workorder] ([tewo_name], tewo_value) VALUES (N'PREMI SCHEMA', 'COMPREHENSIVE')
-INSERT [mtr].[template_task_workorder] ([tewo_name], tewo_value) VALUES (N'DOCUMENT DISETUJUI', 'OK')
-INSERT [mtr].[template_task_workorder] ([tewo_name], tewo_value) VALUES (N'COPY VALUE', 'Y')
-
-INSERT [users].[roles] ([role_name], [role_description]) VALUES (N'CU', N'customers')
-INSERT [users].[roles] ([role_name], [role_description]) VALUES (N'EM', N'employees')
-INSERT [users].[roles] ([role_name], [role_description]) VALUES (N'PC', N'potential customer')
-INSERT [users].[roles] ([role_name], [role_description]) VALUES (N'PR', N'partner')
-
-INSERT [users].[business_entity] ([entity_modified_date]) VALUES (CAST(N'2023-05-07T00:00:00.000' AS DateTime))
-INSERT [users].[business_entity] ([entity_modified_date]) VALUES (CAST(N'2023-10-10T00:00:00.000' AS DateTime))
-INSERT [users].[business_entity] ([entity_modified_date]) VALUES (CAST(N'2023-10-10T00:00:00.000' AS DateTime))
-
-INSERT [users].[users] ([user_entityid], [user_name], [user_password], [user_full_name], [user_email], [user_birth_place], [user_birth_date], [user_national_id], [user_npwp], [user_photo], [user_modified_date]) VALUES (1,'bara', N'123', N'muhammadbara', N'bara@gmail.com', N'jakarta', CAST(N'2001-01-27T00:00:00.000' AS DateTime), N'malay', N'1234bara', NULL, CAST(N'2023-11-19T00:00:00.000' AS DateTime))
-INSERT [users].[users] ([user_entityid], [user_name], [user_password], [user_full_name], [user_email], [user_birth_place], [user_birth_date], [user_national_id], [user_npwp], [user_photo], [user_modified_date]) VALUES (2,'adi', N'321', N'adiadi', N'adi@gmail.com', N'jakarta', CAST(N'2001-10-10T00:00:00.000' AS DateTime), N'indo', N'1234adi', NULL, CAST(N'2023-10-10T00:00:00.000' AS DateTime))
-INSERT [users].[users] ([user_entityid], [user_name], [user_password], [user_full_name], [user_email], [user_birth_place], [user_birth_date], [user_national_id], [user_npwp], [user_photo], [user_modified_date]) VALUES (3,'tengku', N'231', N'tengkudev', N'tengku@gmail.com', N'jakarta', CAST(N'2002-10-10T00:00:00.000' AS DateTime), N'thai', N'3214tngku', NULL, CAST(N'2023-10-10T00:00:00.000' AS DateTime))
-
-INSERT [users].[user_roles] ([usro_entityid], [usro_role_name], [usro_status], [usro_modified_date]) VALUES (1, N'EM', N'ACTIVE', CAST(N'2023-11-19T00:00:00.000' AS DateTime))
-INSERT [users].[user_roles] ([usro_entityid], [usro_role_name], [usro_status], [usro_modified_date]) VALUES (2, N'CU', N'ACTIVE', CAST(N'2023-10-10T00:00:00.000' AS DateTime))
-INSERT [users].[user_phone] ([usph_entityid], [usph_phone_number], [usph_phone_type], [usph_mime], [usph_status], [usph_modified_date]) VALUES (1, N'123455677', N'HOME', N'WKWKWK', N'NORMAL', CAST(N'2023-10-10T00:00:00.000' AS DateTime))
-
-INSERT [users].[user_address] ( [usdr_id],[usdr_entityid], [usdr_address1], [usdr_address2], [usdr_modified_date], [usdr_city_id]) VALUES (1,1, N'JAKARTA', N'JAKARTA', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 2)
-
-INSERT [payment].[payment_transactions] ([patr_trxno], [patr_created_on], [patr_debet], [patr_credit], [patr_usac_accountNo_from], [patr_usac_accountNo_to], [patr_type], [patr_invoice_no], [patr_notes], [patr_trxno_rev]) VALUES (N'TRANSAKSI1', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 10000.0000, 1000.0000, 1, 2, N'SALARY', N'123', N'NOTES', N'TRANSAKSI1')
-INSERT [payment].[fintech] ([fint_entityid], [fint_name], [fint_desc]) VALUES (2, N'FIADI', N'desc')
-INSERT [payment].[banks] ([bank_entityid], [bank_name], [bank_desc]) VALUES (1, N'BBARA', N'DESC')
-
-INSERT [partners].[partners] ([part_entityid], [part_name], [part_address], [part_join_date], [part_accountNo], [part_npwp], [part_status], [part_modified_date], [part_city_id]) VALUES (3, N'tengku', N'jakarta', CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'082123456', N'1234', N'ACTIVE', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 2)
-INSERT [partners].[partner_contacts] ([paco_patrn_entityid], [paco_user_entityid], [paco_status]) VALUES (3, 3, N'status')
-INSERT [partners].[partner_area_workgroup] ([pawo_patr_entityid], [pawo_arwg_code], [pawo_user_entityid], [pawo_status], [pawo_modified_date]) VALUES (3, N'BCI-0001', 3, N'status', CAST(N'2023-10-10T00:00:00.000' AS DateTime))
-
-INSERT [payment].[user_accounts] ([usac_accountno], [usac_debet], [usac_credit], [usac_type], [usac_bank_entityid], [usac_fint_entityid], [usac_user_entityid]) VALUES ('ACC', 10000.0000, 1000.0000, N'BANK', 1, 2, 1)
-
-INSERT [hr].[job_type] ([job_code], [job_modified_date]) VALUES (N'1', CAST(N'2008-10-10T00:00:00.000' AS DateTime))
-
-INSERT [hr].[employees] ([emp_entityid], [emp_name], [emp_join_date], [emp_type], [emp_status], [emp_graduate], [emp_net_salary], [emp_account_number], [emp_modified_date], [emp_job_code]) VALUES (1, N'BARA', CAST(N'2009-10-10T00:00:00.000' AS DateTime), N'PERMANENT', N'ACTIVE', N'S1', 2000000.0000, N'BARA123', CAST(N'2023-11-19T00:00:00.000' AS DateTime), N'1')
-
-INSERT [customer].[customer_request] ([creq_entityid], [creq_create_date], [creq_status], [creq_type], [creq_modified_date], [creq_cust_entityid], [creq_agen_entityid]) VALUES (2, CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'OPEN', N'POLIS', CAST(N'2023-10-10T00:00:00.000' AS DateTime), NULL, NULL)
-
--- INSERT [so].[services] ([serv_created_on], [serv_type], [serv_insuranceNo], [serv_vehicleNo], [serv_startdate], [serv_enddate], [serv_status], [serv_serv_id], [serv_cust_entityid], [serv_creq_entityid]) VALUES (CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'POLIS', N'D 123 AB', N'1', CAST(N'2023-10-10T00:00:00.000' AS DateTime), CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'ACTIVE', NULL, 2, 2)
--- INSERT [so].[services] VALUES (CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'POLIS', N'D 123 AB', N'1', CAST(N'2023-10-10T00:00:00.000' AS DateTime), CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'ACTIVE', 1, 2, 2)
-
-INSERT [partners].[batch_partner_invoice] ([bpin_invoiceNo],[bpin_created_on], [bpin_subtotal], [bpin_tax], [bpin_accountNo], [bpin_status], [bpin_paid_date], [bpin_serv_id], [bpin_patrn_entityid], [bpin_patr_trxno]) VALUES (N'1', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 100000.0000, 10000.0000, N'1', N'ACTIVE', CAST(N'2023-10-10T00:00:00.000' AS DateTime), 1, 3, N'TRANSAKSI1')
-
-INSERT [so].[service_premi_credit] VALUES (1, CAST(N'2023-10-10T00:00:00.000' AS DateTime), 10000.0000, 10000.0000, CAST(N'2023-10-10T00:00:00.000' AS DateTime), CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'TRANSAKSI1')
-
-INSERT [customer].[customer_claim] ([cucl_creq_entityid], [cucl_create_date], [cucl_event_price], [cucl_subtotal], [cucl_reason]) VALUES (2, CAST(N'2023-10-10T00:00:00.000' AS DateTime), 100000.0000, 100000.0000, N'wkwkwkwk')
-
--- INSERT [customer].[customer_insc_assets] ([cias_creq_entityid], [cias_police_number], [cias_year], [cias_startdate], [cias_enddate], [cias_current_price], [cias_insurance_price], [cias_total_premi], [cias_paid_type], [cias_isNewChar], [cias_cars_id], [cias_inty_name], [cias_city_id]) VALUES (2, N'D 1234 AB', N'2023', CAST(N'2010-10-10T00:00:00.000' AS DateTime), CAST(N'2015-10-10T00:00:00.000' AS DateTime), 200000.0000, 10000.0000, 10000.0000, N'CASH', N'Y', 1, N'medic', 2)
-
--- INSERT [customer].[customer_request] ([creq_entityid], [creq_create_date], [creq_status], [creq_type], [creq_modified_date], [creq_cust_entityid], [creq_agen_entityid]) VALUES (2, CAST(N'2023-10-10T00:00:00.000' AS DateTime), N'OPEN', N'POLIS', CAST(N'2023-10-10T00:00:00.000' AS DateTime), NULL, NULL)
-
--- INSERT [customer].[customer_insc_doc] ([cadoc_id], [cadoc_creq_entityid], [cadoc_filename], [cadoc_filetype], [cadoc_filesize], [cadoc_category], [cadoc_modified_date]) VALUES (1, 2, N'adi', N'PDF', 20, N'KTP', CAST(N'2023-10-10T00:00:00.000' AS DateTime))
-
--- INSERT [customer].[customer_insc_extend] ([cuex_id], [cuex_creq_entityid], [cuex_name], [cuex_total_item], [cuex_nominal]) VALUES (1, 2, N'adi', 3, 100000.0000)
