@@ -6,7 +6,6 @@ import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jobrunr.scheduling.BackgroundJob;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,9 +28,7 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
         sowo.add(new ServiceOrderWorkorder("CHECK UMUR", LocalDateTime.now(), false, seotList.get(0)));
         sowo.add(new ServiceOrderWorkorder("RELATE GOVERNMENT", LocalDateTime.now(), false, seotList.get(0)));
         sowo.add(new ServiceOrderWorkorder("PREMI SCHEMA", LocalDateTime.now(), false, seotList.get(2)));
-        sowo.add(new ServiceOrderWorkorder("DOCUMENT DISETUJUI", LocalDateTime.now(), false, seotList.get(2)));
-
-
+        sowo.add(new ServiceOrderWorkorder("DOCUMENT DISETUJUI", LocalDateTime.now(), false, seotList.get(3)));
 
         return soWorkorderRepository.saveAll(sowo);
     }
@@ -54,7 +51,11 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ServiceOrderTasks> checkAllWorkComplete(List<ServiceOrderWorkorder> sowoList, ServiceOrderWorkorder sowo) {
-        return null;
+    public boolean checkAllWorkComplete(List<ServiceOrderWorkorder> sowoList) {
+        boolean checkedAll = false;
+        for (ServiceOrderWorkorder item : sowoList) {
+            checkedAll = item.getSowoStatus();
+        }
+        return checkedAll;
     }
 }

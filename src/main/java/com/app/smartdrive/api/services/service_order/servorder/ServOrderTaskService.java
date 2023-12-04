@@ -17,7 +17,7 @@ public interface ServOrderTaskService {
 
     List<ServiceOrderTasks> closeAllTasks(ServiceOrders serviceOrders, Services services);
 
-    List<ServiceOrderTasks> checkAllTaskComplete(List<ServiceOrderTasks> seotList, ServiceOrderTasks seot);
+    boolean checkAllTaskComplete(List<ServiceOrderTasks> seotList);
 
     List<ServiceOrderTasks> findSeotBySeroId(String seroId);
 
