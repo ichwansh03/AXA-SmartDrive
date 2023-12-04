@@ -16,5 +16,5 @@ public class CitiesRes {
     @Size(max = 85, message = "City Name Length Exceeded !")
     private String cityName;
 
-    private List<ProvRes> provinsi;
+    private ProvRes provinsi;
 }
