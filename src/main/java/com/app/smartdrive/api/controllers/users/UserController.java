@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.LoginDto;
+import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
@@ -53,14 +54,14 @@ public class UserController {
   public ResponseEntity<?> addUserCustomer(@RequestBody CreateUserDto userPost){
     User userSaved = userService.createUserCustomer(userPost);
     UserDto userDto = TransactionMapper.mapEntityToDto(userSaved, UserDto.class);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userDto); //pake dto
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUser(@ModelAttribute CreateUserDto userPost,
+  public ResponseEntity<?> updateUser(@ModelAttribute UpdateUserRequestDto userPost,
       @PathVariable("id") Long id) {
 
-    User userUpdated = userService.save(userPost, id);
+    UpdateUserRequestDto userUpdated = userService.save(userPost, id);
     return ResponseEntity.status(HttpStatus.OK).body(userUpdated);
   }
 

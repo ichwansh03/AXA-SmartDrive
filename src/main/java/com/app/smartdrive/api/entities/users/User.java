@@ -65,7 +65,7 @@ public class User {
   private String userNPWP;
 
   @Column(name = "user_photo", length = 255)
-  private String userPhoto; //nanti dulu
+  private String userPhoto;
 
   @Column(name = "user_modified_date")
   private LocalDateTime userModifiedDate;
