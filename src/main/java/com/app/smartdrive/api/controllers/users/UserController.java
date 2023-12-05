@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
@@ -31,13 +32,13 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/signin")
-  public ResponseEntity<?> login(@RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCu(login.getIden(), login.getPassword()));
+  public ResponseEntity<?> loginCustomer(@RequestBody LoginDto login){
+    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCustomer(login.getIden(), login.getPassword()));
   }
 
   @PostMapping("/emps/signin")
-  public ResponseEntity<?> loginEm(@RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.loginEm(login.getIden(), login.getPassword()));
+  public ResponseEntity<?> loginEmployee(@RequestBody LoginDto login){
+    return ResponseEntity.status(HttpStatus.OK).body(userService.loginEmployee(login.getIden(), login.getPassword()));
   }
 
   @GetMapping
@@ -74,4 +75,9 @@ public class UserController {
     }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");
     }
+  @PostMapping("/{id}/changePassword")
+  public ResponseEntity<?> changePassword(@PathVariable("id") Long id, @RequestBody PasswordRequestDto passwordRequestDto){
+    return ResponseEntity.status(HttpStatus.OK).body(userService.changePassword(id, passwordRequestDto));
+  }
+
 }
