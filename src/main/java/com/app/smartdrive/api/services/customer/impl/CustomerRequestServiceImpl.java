@@ -98,15 +98,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+        // prep
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
 
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
-
         User entityUser = this.userService.getUserById(customerRequestDTO.getCreq_cust_entityid()).get();
-
-
         CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCias_cars_id()).get();
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
@@ -117,10 +115,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerInscAssets cias = this.createCustomerInscAssets(entityId, ciasDTO, carSeries, existCity, existInty, newCustomerRequest);
 
-
         List<CustomerInscDoc> ciasDocs = this.fileCheck(files, entityId);
         cias.setCustomerInscDoc(ciasDocs);
-
 
         List<CustomerInscExtend> ciasCuexs = this.getCustomerInscEtend(cuexIds, cias, entityId);
 
@@ -128,10 +124,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         cias.setCiasTotalPremi(premi);
         cias.setCustomerInscExtend(ciasCuexs);
 
-
         CustomerClaim newClaim = this.createNewClaim(newCustomerRequest);
 
-
+        // set and save
         newCustomerRequest.setCustomerClaim(newClaim);
         newCustomerRequest.setCustomerInscAssets(cias);
 
