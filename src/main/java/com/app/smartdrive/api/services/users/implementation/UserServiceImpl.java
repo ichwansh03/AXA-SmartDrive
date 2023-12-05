@@ -1,5 +1,8 @@
 package com.app.smartdrive.api.services.users.implementation;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.ProfileDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
+import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
@@ -89,20 +93,21 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User createUserCustomer(CreateUserDto userPost){
+  public User createUserCustomer(CreateUserDto userPost) {
     User user = createUser(userPost.getProfile());
-    
+
     userRolesService.createUserRole(RoleName.CU, user);
 
     userPhoneService.createUserPhone(user, userPost.getUserPhone());
 
     userAddressService.createUserAddress(user, userPost.getUserAddress(), userPost.getCityId());
 
-    Long paymentId = (userPost.getBankId() != null) ? userPost.getBankId() : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
+    Long paymentId = (userPost.getBankId() != null) ? userPost.getBankId()
+        : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
 
     userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
 
-   
+
     // TODO USERPHOTO API
     // user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
     // userPost.getPhoto().transferTo(new
@@ -121,30 +126,17 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User save(CreateUserDto userPost, Long id) {
-    User user =
-        userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found")); // protect
-                                                                                                // dto
-    // NullUtils.updateIfChanged(user::setUserName, userPost.getUserName(), user::getUserName);
-    // NullUtils.updateIfChanged(user::setUserFullName, userPost.getFullName(),
-    // user::getUserFullName);
-    // NullUtils.updateIfChanged(user::setUserBirthPlace, userPost.getBirthPlace(),
-    // user::getUserBirthPlace);
-    // NullUtils.updateIfChanged(user::setUserBirthDate,
-    // LocalDateTime.parse(userPost.getUserBirthDate()),
-    // user::getUserBirthDate);
-
-    // NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(),
-    // user::getUserPassword);
-
-    // NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
-    // TODO USERPHOTO API
-    // if(userPost.getPhoto() != null){
-    // user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
-    // }
-
-    User userSaved = save(user);
-    return userSaved;
+  public UpdateUserRequestDto save(UpdateUserRequestDto userPost, Long id){
+    User user = userRepo.findById(id).orElseThrow(
+      () -> new EntityNotFoundException("User not found")
+      );
+    TransactionMapper.mapDtoToEntity(userPost, user);
+    // String path = "src/test/resources/image/";
+    // Path filePath = Paths.get(path+user.getUserPhoto());
+    // Files.delete(filePath);
+    save(user);
+    UpdateUserRequestDto updated = TransactionMapper.mapEntityToDto(user, UpdateUserRequestDto.class);
+    return updated;
   }
 
   @Override

@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.dto.user.response;
 
 import java.util.List;
-
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.entities.users.UserPhone;
