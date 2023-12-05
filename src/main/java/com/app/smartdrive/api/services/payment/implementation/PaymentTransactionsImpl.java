@@ -175,90 +175,127 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
             }
         }
 
-        if(userId.isPresent()){
-            for (UserAccounts user : listUA) {
-                if(request.getUsac_accountno().equals(user.getUsac_accountno())){ 
-                    Double temp = 0.0;
-                    payment.setPatr_created_on(LocalDateTime.now());
+        
+
+
+        // if(userId.isPresent()){
+        //     for (UserAccounts user : listUA) {
+        //         if(request.getUsac_accountno().equals(user.getUsac_accountno())){ 
+        //             Double temp = 0.0;
+        //             payment.setPatr_created_on(LocalDateTime.now());
+
+                   
+                   
+
                     
-                    for (PaymentTransactions py : listPayment) {
+        //             for (PaymentTransactions py : listPayment) {
                         
                         
-                        if(py.getPatr_debet()==null && py.getPatr_credit()!=null) {
-                            payment.setPatr_debet(request.getTransfer());
-                            payment.setPatr_credit(null);
-                            // userAccounts.setUsac_debet(request.);
-                            payment.setPatr_usac_accountNo_from(user.getUsac_accountno());
-                            payment.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
-                            payment.setPatr_type(request.getEnumPayment());
-                            payment.setPatr_invoice_no(request.getPatr_invoice_no());
-                            payment.setPatr_notes(request.getPatr_notes());
-                            addaPY(payment);
+                        
+                        
+                        
+                        
+                        
+                        // if(py.getPatr_debet()==null && py.getPatr_credit()!=null) {
+                        //     payment.setPatr_debet(request.getTransfer());
+                        //     payment.setPatr_credit(null);
+                        //     // userAccounts.setUsac_debet(request.);
+                        //     payment.setPatr_usac_accountNo_from(user.getUsac_accountno());
+                        //     payment.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
+                        //     payment.setPatr_type(request.getEnumPayment());
+                        //     payment.setPatr_invoice_no(request.getPatr_invoice_no());
+                        //     payment.setPatr_notes(request.getPatr_notes());
+                        //     addaPY(payment);
                         
                             
 
                             
-                                if(py.getPatrTrxnoRev()==null){
-                                        int countThree = countTwo;
-                                        countThree++;
-                                        payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countThree ); 
-                                        payment2.setPatrTrxnoRev(payment.getPatrTrxno());
-                                }
-                                    Double usac_debet = user.getUsac_debet();
-                                     usac_debet = usac_debet - request.getTransfer();
-                                    payment2.setPatr_created_on(LocalDateTime.now());
-                                    payment2.setPatr_credit(usac_debet);
-                                    payment2.setPatr_debet(null);
-                                    payment2.setPatr_usac_accountNo_from(user.getUsac_accountno());
-                                    payment2.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
-                                    payment2.setPatr_type(request.getEnumPayment());
-                                    payment2.setPatr_invoice_no(request.getPatr_invoice_no());
-                                    payment2.setPatr_notes(request.getPatr_notes());
-                                    addaPY(payment2);
+                        //         if(py.getPatrTrxnoRev()==null){
+                        //                 int countThree = countTwo;
+                        //                 countThree++;
+                        //                 payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countThree ); 
+                        //                 payment2.setPatrTrxnoRev(payment.getPatrTrxno());
+                        //         }
+                        //             Double usac_debet = user.getUsac_debet();
+                        //              usac_debet = usac_debet - request.getTransfer();
+                        //             payment2.setPatr_created_on(LocalDateTime.now());
+                        //             payment2.setPatr_credit(usac_debet);
+                        //             payment2.setPatr_debet(null);
+                        //             payment2.setPatr_usac_accountNo_from(user.getUsac_accountno());
+                        //             payment2.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
+                        //             payment2.setPatr_type(request.getEnumPayment());
+                        //             payment2.setPatr_invoice_no(request.getPatr_invoice_no());
+                        //             payment2.setPatr_notes(request.getPatr_notes());
+                        //             addaPY(payment2);
                                 
                             
                             
 
-                        }else if(py.getPatr_debet() == null && py.getPatr_credit()!=null){
-                            payment.setPatr_debet(request.getTransfer());
-                            payment.setPatr_credit(null);
-                            // userAccounts.setUsac_debet(request.);
-                            payment.setPatr_usac_accountNo_from(user.getUsac_accountno());
-                            payment.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
-                            payment.setPatr_type(request.getEnumPayment());
-                            payment.setPatr_invoice_no(request.getPatr_invoice_no());
-                            payment.setPatr_notes(request.getPatr_notes());
-                            addaPY(payment);
+                        // }else if(py.getPatr_debet() == null && py.getPatr_credit()!=null){
+                        //     payment.setPatr_debet(request.getTransfer());
+                        //     payment.setPatr_credit(null);
+                        //     // userAccounts.setUsac_debet(request.);
+                        //     payment.setPatr_usac_accountNo_from(user.getUsac_accountno());
+                        //     payment.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
+                        //     payment.setPatr_type(request.getEnumPayment());
+                        //     payment.setPatr_invoice_no(request.getPatr_invoice_no());
+                        //     payment.setPatr_notes(request.getPatr_notes());
+                        //     addaPY(payment);
                         
                             
 
                             
-                                if(py.getPatrTrxnoRev()==null){
-                                        int countThree = countTwo;
-                                        countThree++;
-                                        payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countThree ); 
-                                        payment2.setPatrTrxnoRev(payment.getPatrTrxno());
-                                }
-                        }
-                        userAccounts.setUsac_debet(payment2.getPatr_credit());
-                        }
+                        //         if(py.getPatrTrxnoRev()==null){
+                        //                 int countThree = countTwo;
+                        //                 countThree++;
+                        //                 payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countThree ); 
+                        //                 payment2.setPatrTrxnoRev(payment.getPatrTrxno());
+                        //         }
+                        // }
+                        // userAccounts.setUsac_debet(payment2.getPatr_credit());
+                        // }
                         
                         
-                       
-                            
-
-                        
-                        
-                    }
+                    // }
             
+                // if(rev < 2)
                     
-                    userAccountsRepository.save(userAccounts);
+                    int countThree = countTwo;
+
+                     countThree++;
+                     
+                     
+                     payment.setPatr_credit(null);
+                     payment.setPatr_debet(request.getTransfer());
+                     payment.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to());
+                     // payment.setPatr_usac_accountNo_from(user.getUsac_accountno());
+                     
+                     PaymentTransactions savedPayment = this.repository.saveAndFlush(payment);
+                     
+                     Double total = userAccounts.getUsac_debet();
+                     total = total - request.getTransfer();
+                     
+
+                     payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countThree ); 
+                   payment2.setPatr_credit(total);
+                   payment2.setPatr_debet(null);
+                   payment2.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to());
+                   payment2.setPatrTrxnoRev(savedPayment.getPatrTrxno());
+
+                   userAccounts.setUsac_debet(total);
+                    // payment2.setPatr_usac_accountNo_from(user.getUsac_accountno());
+
+                    // userAccountsRepository.save(userAccounts);
+                    // this.repository.saveAll(List.of(payment, payment2));
+                    this.repository.save(payment2);
+                    this.userAccountsRepository.save(userAccounts);
                     dto = TransferTransactionsMapper.convertDtoRequestToResponse(request);
-                }
-            }
+                
+            
         
         return dto;
     }
+
 
     @Override
     public List<PaymentTransactions> getAll() {
