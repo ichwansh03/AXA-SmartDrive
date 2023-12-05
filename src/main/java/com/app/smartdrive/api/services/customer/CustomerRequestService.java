@@ -28,19 +28,21 @@ public interface CustomerRequestService {
 
     public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs);
 
-    Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging, String type, String status);
+    public Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging, String type, String status);
 
-    CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
-    void delete(Long creqEntityId);
+    public void delete(Long creqEntityId);
 
-    CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO);
+    public CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO);
 
-    CustomerClaim createNewClaim(CustomerRequest customerRequest);
+    public CustomerClaim createNewClaim(CustomerRequest customerRequest);
 
-    CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
+    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
 
-    ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId);
+    public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId);
 
-    void deleteCustomerClaim(Long cuclCreqEntityId);
+    public void deleteCustomerClaim(Long cuclCreqEntityId);
+
+
 }
