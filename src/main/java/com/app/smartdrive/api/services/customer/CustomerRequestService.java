@@ -1,11 +1,17 @@
 package com.app.smartdrive.api.services.customer;
 
+import com.app.smartdrive.api.dto.customer.request.CiasDTO;
 import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.customer.*;
+import com.app.smartdrive.api.entities.master.CarSeries;
+import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.master.InsuranceType;
+import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.entities.users.User;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,19 +34,25 @@ public interface CustomerRequestService {
 
     public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs);
 
-    Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging, String type, String status);
+    public Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging, String type, String status);
 
-    CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
-    void delete(Long creqEntityId);
+    public void delete(Long creqEntityId);
 
-    CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO);
+    public CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO);
 
-    CustomerClaim createNewClaim(CustomerRequest customerRequest);
+    public CustomerClaim createNewClaim(CustomerRequest customerRequest);
 
-    CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
+    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
 
-    ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId);
+    public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId);
 
-    void deleteCustomerClaim(Long cuclCreqEntityId);
+    public void deleteCustomerClaim(Long cuclCreqEntityId);
+
+    public CustomerRequest createCustomerRequest(BusinessEntity newEntity, User customer, Long entityId);
+
+    public CustomerInscAssets createCustomerInscAssets(Long entityId, CiasDTO ciasDTO, CarSeries carSeries, Cities existCity, InsuranceType existInty, CustomerRequest newCustomerRequest);
+
+    public List<CustomerInscExtend> getCustomerInscEtend(Long[] cuexIds, CustomerInscAssets cias, Long entityId);
 }

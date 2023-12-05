@@ -17,6 +17,8 @@ public class ClaimResponseDTO {
 
     private LocalDateTime cuclCreateDate;
 
+    private int cuclEvents;
+
     private Double cuclEventPrice;
 
     private Double cuclSubtotal;
