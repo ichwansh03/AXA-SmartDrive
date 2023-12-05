@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
@@ -24,7 +25,7 @@ public class ServOrderImpl implements ServOrderService {
     private final SoRepository soRepository;
     private final SoOrderRepository soOrderRepository;
     private final SoTasksRepository soTasksRepository;
-    private final SoWorkorderRepository workorderRepository;
+    private final SoWorkorderRepository soWorkorderRepository;
     SoAdapter soAdapter = new SoAdapter();
 
     @Transactional
@@ -49,14 +50,14 @@ public class ServOrderImpl implements ServOrderService {
         ServiceOrders seroSaved = soOrderRepository.save(serviceOrders);
         log.info("SoOrderServiceImpl::addServiceOrders in ID {}",formatSeroId);
 
-        ServOrderTaskImpl servOrderTask = new ServOrderTaskImpl(soTasksRepository, workorderRepository);
+        ServOrderTaskImpl servOrderTask = new ServOrderTaskImpl(soTasksRepository, soWorkorderRepository);
         List<ServiceOrderTasks> seotList;
 
         switch (services.getServType().toString()){
-            case "FEASIBLITY" -> seotList = servOrderTask.addFeasiblityList(seroSaved, services);
-            case "POLIS" -> seotList = servOrderTask.addPolisList(seroSaved, services);
-            case "CLAIM" -> seotList = servOrderTask.addClaimList(seroSaved, services);
-            default -> seotList = servOrderTask.closeAllTasks(seroSaved, services);
+            case "FEASIBLITY" -> seotList = servOrderTask.addFeasiblityList(seroSaved);
+            case "POLIS" -> seotList = servOrderTask.addPolisList(seroSaved);
+            case "CLAIM" -> seotList = servOrderTask.addClaimList(seroSaved);
+            default -> seotList = servOrderTask.closeAllTasks(seroSaved);
         }
 
         List<ServiceOrderTasks> serviceOrderTasks = seotList;
@@ -82,6 +83,25 @@ public class ServOrderImpl implements ServOrderService {
         log.info("SoOrderServiceImpl::findAllSeroByServId in ID {} ",allSeroByServId);
 
         return allSeroByServId;
+    }
+
+    @Override
+    public boolean checkAllTaskComplete(String seroId, Long seotId) {
+        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findSeotBySeroId(seroId);
+
+        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotId);
+        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository);
+        boolean allWorkComplete = servOrderWorkorder.checkAllWorkComplete(sowoBySeotId);
+
+        boolean checkedAll = false;
+        for (ServiceOrderTasks item : seotBySeroId) {
+            if (item.getSeotStatus().toString().equals("COMPLETED") && allWorkComplete){
+                checkedAll = true;
+            }
+        }
+
+        log.info("ServOrderTaskImpl::checkAllTaskComplete the results is {}",checkedAll);
+        return checkedAll;
     }
 
 }

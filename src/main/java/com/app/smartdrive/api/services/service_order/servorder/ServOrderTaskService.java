@@ -9,15 +9,13 @@ import java.util.List;
 
 public interface ServOrderTaskService {
 
-    List<ServiceOrderTasks> addFeasiblityList(ServiceOrders serviceOrders, Services services);
+    List<ServiceOrderTasks> addFeasiblityList(ServiceOrders serviceOrders);
 
-    List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders, Services services) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException;
+    List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders);
 
-    List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders, Services services);
+    List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders);
 
-    List<ServiceOrderTasks> closeAllTasks(ServiceOrders serviceOrders, Services services);
-
-    boolean checkAllTaskComplete(List<ServiceOrderTasks> seotList);
+    List<ServiceOrderTasks> closeAllTasks(ServiceOrders serviceOrders);
 
     List<ServiceOrderTasks> findSeotBySeroId(String seroId);
 

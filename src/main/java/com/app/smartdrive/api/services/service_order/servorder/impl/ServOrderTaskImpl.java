@@ -1,10 +1,8 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
-import com.app.smartdrive.api.dto.service_order.request.ServiceTasksReqDto;
+import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
@@ -32,78 +30,69 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
     @Transactional
     @Override
-    public List<ServiceOrderTasks> addFeasiblityList(ServiceOrders serviceOrders, Services services) {
+    public List<ServiceOrderTasks> addFeasiblityList(ServiceOrders serviceOrders) {
 
-        List<ServiceOrderTasks> seot = new ArrayList<>();
-        seot.add(new ServiceOrderTasks("REVIEW & CHECK CUSTOMER REQUEST", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("PROSPEK CUSTOMER POTENTIAL", services.getServStartDate().plusDays(2), services.getServStartDate().plusDays(3), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("PREMI SCHEMA", services.getServStartDate().plusDays(4), services.getServStartDate().plusDays(5), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("LEGAL DOCUMENT SIGNED", services.getServStartDate().plusDays(6), services.getServStartDate().plusDays(7), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
+        List<ServiceTaskReqDto> seot = new ArrayList<>();
+        seot.add(new ServiceTaskReqDto("REVIEW & CHECK CUSTOMER REQUEST", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("PROSPEK CUSTOMER POTENTIAL", serviceOrders.getServices().getServStartDate().plusDays(2), serviceOrders.getServices().getServStartDate().plusDays(3), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("PREMI SCHEMA", serviceOrders.getServices().getServStartDate().plusDays(4), serviceOrders.getServices().getServStartDate().plusDays(5), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("LEGAL DOCUMENT SIGNED", serviceOrders.getServices().getServStartDate().plusDays(6), serviceOrders.getServices().getServStartDate().plusDays(7), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
 
-        List<ServiceOrderTasks> tasksList = soTasksRepository.saveAll(seot);
+        List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
+
+        List<ServiceOrderTasks> serviceOrderTasks = soTasksRepository.saveAll(mapperTaskList);
 
         ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository);
-        servOrderWorkorder.addSowoList(seot);
-
-        return tasksList;
+        servOrderWorkorder.addSowoList(serviceOrderTasks);
+        log.info("ServOrderTaskImpl::addFeasiblityList successfully saved {} ",serviceOrderTasks);
+        return serviceOrderTasks;
     }
 
     @SneakyThrows({NoSuchMethodException.class, IllegalAccessException.class, InvocationTargetException.class})
     @Override
-    public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders, Services services) {
+    public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) {
 
-        List<ServiceTasksReqDto> seotListDto = new ArrayList<>();
+        List<ServiceTaskReqDto> seotList = new ArrayList<>();
 
         Method generatePolis = SoAdapter.class.getMethod("generatePolisNumber", ServiceOrders.class);
         SoAdapter soAdapter = new SoAdapter();
         String polisNumber = (String) generatePolis.invoke(soAdapter, serviceOrders);
 
-        seotListDto.add(new ServiceTasksReqDto("GENERATE POLIS NUMBER", services.getServStartDate(), services.getServStartDate().plusDays(1), serviceOrders, serviceOrders.getAreaWorkGroup(), polisNumber));
-        seotListDto.add(new ServiceTasksReqDto("GENERATE PREMI", services.getServStartDate(), services.getServStartDate().plusDays(1), serviceOrders, serviceOrders.getAreaWorkGroup(), polisNumber));
-        seotListDto.add(new ServiceTasksReqDto("GENERATE VIRTUAL ACCOUNT", services.getServStartDate(), services.getServStartDate().plusDays(1), serviceOrders, serviceOrders.getAreaWorkGroup(), polisNumber));
-        seotListDto.add(new ServiceTasksReqDto("NOTIFY TO AGENT", services.getServStartDate(), services.getServStartDate().plusDays(1), serviceOrders, serviceOrders.getAreaWorkGroup(), polisNumber));
-        seotListDto.add(new ServiceTasksReqDto("NOTIFY TO CUSTOMER", services.getServStartDate(), services.getServStartDate().plusDays(1), serviceOrders, serviceOrders.getAreaWorkGroup(), polisNumber));
+        seotList.add(new ServiceTaskReqDto("GENERATE POLIS NUMBER", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, polisNumber));
+        seotList.add(new ServiceTaskReqDto("GENERATE PREMI", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seotList.add(new ServiceTaskReqDto("GENERATE VIRTUAL ACCOUNT", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seotList.add(new ServiceTaskReqDto("NOTIFY TO AGENT", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seotList.add(new ServiceTaskReqDto("NOTIFY TO CUSTOMER", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
 
-        List<ServiceOrderTasks> seotList = TransactionMapper.mapListDtoToListEntity(seotListDto, ServiceOrderTasks.class);
+        log.info("ServOrderTaskImpl::addPolisList the result of number polis is {} ", seotList.get(0).getGeneratePolisTasks());
 
-        return soTasksRepository.saveAll(seotList);
+        List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seotList, ServiceOrderTasks.class);
+
+        return soTasksRepository.saveAll(mapperTaskList);
     }
 
     @Override
-    public List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders, Services services) {
-        List<ServiceOrderTasks> seot = new ArrayList<>();
-        seot.add(new ServiceOrderTasks("CHECK CUSTOMER PREMI", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("SETTLE CUSTOMER PREMI", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("CHECK VEHICLE CONDITION", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("CLAIM DOCUMENT APPROVED", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("NOTIFY PARTNER TO REPAIR", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("CALCULATE SPARE PART", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("NOTIFY CUSTOMER VEHICLE REPAIRED", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("NOTIFY AGENT CLAIM", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        seot.add(new ServiceOrderTasks("FEEDBACK CUSTOMER", services.getServStartDate(), services.getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders));
-        return soTasksRepository.saveAll(seot);
+    public List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders) {
+        List<ServiceTaskReqDto> seot = new ArrayList<>();
+        seot.add(new ServiceTaskReqDto("CHECK CUSTOMER PREMI", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("SETTLE CUSTOMER PREMI", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("CHECK VEHICLE CONDITION", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("CLAIM DOCUMENT APPROVED", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("NOTIFY PARTNER TO REPAIR", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("CALCULATE SPARE PART", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("NOTIFY CUSTOMER VEHICLE REPAIRED", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("NOTIFY AGENT CLAIM", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+        seot.add(new ServiceTaskReqDto("FEEDBACK CUSTOMER", serviceOrders.getServices().getServStartDate(), serviceOrders.getServices().getServStartDate().plusDays(1), EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+
+        List<ServiceOrderTasks> serviceOrderTasks = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
+
+        return soTasksRepository.saveAll(serviceOrderTasks);
     }
 
     @Override
-    public List<ServiceOrderTasks> closeAllTasks(ServiceOrders serviceOrders, Services services) {
+    public List<ServiceOrderTasks> closeAllTasks(ServiceOrders serviceOrders) {
 
         return null;
-    }
-
-    @Override
-    public boolean checkAllTaskComplete(List<ServiceOrderTasks> seotList) {
-
-        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository);
-        List<ServiceOrderWorkorder> workorders = servOrderWorkorder.addSowoList(seotList);
-        boolean allWorkComplete = servOrderWorkorder.checkAllWorkComplete(workorders);
-
-        boolean checkedAll = false;
-        for (ServiceOrderTasks item : seotList) {
-            if (item.getSeotStatus().toString().equals("COMPLETED") && allWorkComplete){
-                checkedAll = true;
-            }
-        }
-        return checkedAll;
     }
 
     @Transactional(readOnly = true)

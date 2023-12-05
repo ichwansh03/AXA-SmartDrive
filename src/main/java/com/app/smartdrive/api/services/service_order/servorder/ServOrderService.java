@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder;
 
+import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 
@@ -12,4 +13,7 @@ public interface ServOrderService {
     ServiceOrders findServiceOrdersById(String seroId);
 
     List<ServiceOrders> findAllSeroByServId(Long servId);
+
+    boolean checkAllTaskComplete(String seroId, Long seotId);
+
 }

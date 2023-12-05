@@ -1,11 +1,9 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
-import com.app.smartdrive.api.dto.service_order.response.ServSeroDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
-import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
@@ -42,19 +40,7 @@ public class ServOrderController {
 
         ServiceOrders seroById = servOrderService.findServiceOrdersById(seroId);
 
-        Services servicesById = servService.findServicesById(seroById.getServices().getServId()).get();
-        ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);
-
-        AreaWorkGroup arwgByCode = arwgService.getById(seroById.getAreaWorkGroup().getArwgCode());
-        ArwgRes arwgRes = TransactionMapper.mapEntityToDto(arwgByCode, ArwgRes.class);
-
-        List<ServiceOrderTasks> serviceOrderTasks = servOrderTaskService.findSeotBySeroId(seroId);
-        List<SoTasksDto> soTasksDtos = TransactionMapper.mapListDtoToListEntity(serviceOrderTasks, SoTasksDto.class);
-
-        ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(seroById, ServiceOrderRespDto.class);
-        serviceOrderRespDto.setServices(serviceRespDto);
-        serviceOrderRespDto.setArwgRes(arwgRes);
-        serviceOrderRespDto.setSoTasksDtoList(soTasksDtos);
+        ServiceOrderRespDto serviceOrderRespDto = responseServiceOrders(seroById);
 
         log.info("ServiceOrdersController::getServiceOrderById successfully viewed");
         return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
@@ -64,13 +50,26 @@ public class ServOrderController {
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId){
         ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(seroId);
 
-        ServSeroDto servSeroDto = ServSeroDto.builder()
-                .seroId(seroId)
-                .servCreatedOn(serviceOrders.getServices().getServCreatedOn())
-                .seroStatus(serviceOrders.getSeroStatus())
-                .userName(serviceOrders.getServices().getUsers().getUserName())
-                .empName(serviceOrders.getEmployees().getEmpName()).build();
+        ServiceOrderRespDto serviceOrderRespDto = responseServiceOrders(serviceOrders);
 
-        return new ResponseEntity<>(servSeroDto, HttpStatus.OK);
+        return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
+    }
+
+    private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders){
+        Services servicesById = servService.findServicesById(serviceOrders.getServices().getServId()).get();
+        ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);
+
+        AreaWorkGroup arwgByCode = arwgService.getById(serviceOrders.getAreaWorkGroup().getArwgCode());
+        ArwgRes arwgRes = TransactionMapper.mapEntityToDto(arwgByCode, ArwgRes.class);
+
+        List<ServiceOrderTasks> serviceOrderTasks = servOrderTaskService.findSeotBySeroId(serviceOrders.getSeroId());
+        List<SoTasksDto> soTasksDtos = TransactionMapper.mapListDtoToListEntity(serviceOrderTasks, SoTasksDto.class);
+
+        ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
+        serviceOrderRespDto.setServices(serviceRespDto);
+        serviceOrderRespDto.setArwgRes(arwgRes);
+        serviceOrderRespDto.setSoTasksDtoList(soTasksDtos);
+
+        return serviceOrderRespDto;
     }
 }

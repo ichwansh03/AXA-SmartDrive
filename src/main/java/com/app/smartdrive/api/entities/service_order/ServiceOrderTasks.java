@@ -65,15 +65,4 @@ public class ServiceOrderTasks {
     @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL)
     private List<ServiceOrderWorkorder> serviceOrderWorkorders;
 
-    @Transient
-    private Object generatePolisTasks;
-
-    public ServiceOrderTasks(String seotName, LocalDateTime seotStartDate, LocalDateTime seotEndDate, EnumModuleServiceOrders.SeotStatus seotStatus, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders) {
-        this.seotName = seotName;
-        this.seotStartDate = seotStartDate;
-        this.seotEndDate = seotEndDate;
-        this.seotStatus = seotStatus;
-        this.areaWorkGroup = areaWorkGroup;
-        this.serviceOrders = serviceOrders;
-    }
 }
