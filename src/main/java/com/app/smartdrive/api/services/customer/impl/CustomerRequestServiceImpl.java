@@ -21,6 +21,8 @@ import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
+import com.app.smartdrive.api.services.users.BusinessEntityService;
+import com.app.smartdrive.api.services.users.UserService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -65,6 +67,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final CustomerClaimRepository customerClaimRepository;
 
+    private final BusinessEntityService businessEntityService;
+
+    private final UserService userService;
+
 
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
@@ -90,17 +96,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return this.convert(existCustomerRequest);
     }
 
+    @Transactional
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
 
-        // create new businessEntity
-        BusinessEntity newEntity = new BusinessEntity();
-        newEntity.setEntityModifiedDate(LocalDateTime.now());
+//        // create new businessEntity
+        BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
 
-        BusinessEntity existEntity = this.businessEntityRepo.saveAndFlush(newEntity);
-        log.info("BusinessEntity created {}",existEntity);
+        log.info("BusinessEntity created {}",newEntity);
         User entityUser = this.userRepository.findById(customerRequestDTO.getCreq_cust_entityid()).get();
-        Long entityId = existEntity.getEntityId();
+        Long entityId = newEntity.getEntityId();
 
         // get from table master
         CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCias_cars_id()).get();
@@ -115,7 +120,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         // new customer
         CustomerRequest newCustomer = CustomerRequest.builder()
-        .businessEntity(existEntity)
+        .businessEntity(newEntity)
         .customer(entityUser)
         .creqCreateDate(LocalDateTime.now())
         .creqStatus(EnumCustomer.CreqStatus.OPEN)
@@ -407,6 +412,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             ClaimResponseDTO claimResponseDTO = ClaimResponseDTO.builder()
                     .cuclCreqEntityId(customerClaim.getCuclCreqEntityid())
                     .cuclCreateDate(customerClaim.getCuclCreateDate())
+                    .cuclEvents(customerClaim.getCuclEvents())
                     .cuclEventPrice(customerClaim.getCuclEventPrice())
                     .cuclReason(customerClaim.getCuclReason())
                     .cuclSubtotal(customerClaim.getCuclSubtotal())
@@ -562,6 +568,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerClaim newCustomerClaim = CustomerClaim.builder()
                 .cuclCreateDate(LocalDateTime.now())
+                .cuclEvents(0)
                 .cuclEventPrice(claimRequestDTO.getCuclEventPrice())
                 .cuclSubtotal(claimRequestDTO.getCuclSubtotal())
                 .cuclReason(claimRequestDTO.getCuclReason())
@@ -583,6 +590,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CustomerClaim newCustomerClaim = CustomerClaim.builder()
                 .cuclEventPrice(0.0)
                 .cuclSubtotal(0.0)
+                .cuclEvents(0)
                 .cuclCreqEntityid(customerRequest.getCreqEntityId())
                 .customerRequest(customerRequest)
                 .build();
@@ -609,8 +617,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Double cuclSubtotal = existCustomerClaim.getCuclSubtotal();
         cuclSubtotal += claimRequestDTO.getCuclSubtotal();
 
+        int cuclEvents = existCustomerClaim.getCuclEvents();
+        cuclEvents += 1;
+
         existCustomerClaim.setCuclEventPrice(cuclEventPrice);
         existCustomerClaim.setCuclSubtotal(cuclSubtotal);
+        existCustomerClaim.setCuclEvents(cuclEvents);
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
         return this.convert(savedCustomerRequest);

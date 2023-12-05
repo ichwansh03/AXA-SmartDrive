@@ -29,6 +29,9 @@ public class CustomerClaim {
     @Column(name = "cucl_create_date")
     private LocalDateTime cuclCreateDate;
 
+    @Column(name = "cucl_events")
+    private int cuclEvents;
+
     @Column(name = "cucl_event_price")
     private Double cuclEventPrice;
 
