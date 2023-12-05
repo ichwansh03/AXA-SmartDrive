@@ -6,6 +6,8 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
+import com.app.smartdrive.api.repositories.master.TestaRepository;
+import com.app.smartdrive.api.repositories.master.TewoRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
@@ -31,6 +33,8 @@ public class ServImpl implements ServService {
     private final SoTasksRepository soTasksRepository;
     private final SoWorkorderRepository soWorkorderRepository;
     private final CustomerRequestRepository customerRequestRepository;
+    private final TestaRepository testaRepository;
+    private final TewoRepository tewoRepository;
 
     SoAdapter soAdapter = new SoAdapter();
 
@@ -53,7 +57,7 @@ public class ServImpl implements ServService {
         Services saved = soRepository.save(serv);
         log.info("ServOrderServiceImpl::addService created service");
 
-        ServOrderImpl servOrder = new ServOrderImpl(soRepository, soOrderRepository, soTasksRepository, soWorkorderRepository);
+        ServOrderImpl servOrder = new ServOrderImpl(soRepository, soOrderRepository, soTasksRepository, soWorkorderRepository, testaRepository, tewoRepository);
         servOrder.addServiceOrders(saved.getServId());
 
         log.info("ServOrderServiceImpl::addService created Service Orders");
@@ -68,7 +72,7 @@ public class ServImpl implements ServService {
         List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findSeotBySeroId(seroId);
 
         List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
-        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository);
+        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository, tewoRepository);
         boolean allWorkComplete = servOrderWorkorder.checkAllWorkComplete(sowoBySeotId);
 
         boolean checkedAll = false;
@@ -97,7 +101,6 @@ public class ServImpl implements ServService {
                 .servCreatedOn(cr.getCreqCreateDate())
                 .servStartDate(LocalDateTime.now())
                 .servEndDate(LocalDateTime.now().plusDays(7))
-                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
                 .users(cr.getCustomer())
                 .customer(cr)
                 .build();
@@ -108,15 +111,14 @@ public class ServImpl implements ServService {
         return Services.builder()
                 .servType(cr.getCreqType())
                 .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                //insurance number still null
-                .servInsuranceNo(soAdapter.generatePolisNumber(cr.getServices().getServiceOrdersSet().get(0)))
+                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
                 .servCreatedOn(cr.getCreqCreateDate())
                 .servStartDate(LocalDateTime.now())
                 .servEndDate(LocalDateTime.now().plusDays(7))
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
                 .users(cr.getCustomer())
                 .customer(cr)
-                //this result is null, how to generate this parent services automatically after execute FS
+                //this result is null, how to generate this parent services automatically after execute FS to get servId FS
                 //.parentServices(generateFeasiblity(cr))
                 .build();
     }
@@ -125,7 +127,7 @@ public class ServImpl implements ServService {
         return Services.builder()
                 .servType(cr.getCreqType())
                 .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servInsuranceNo(soAdapter.generatePolisNumber(cr.getServices().getServiceOrdersSet().get(0)))
+                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
                 .servCreatedOn(cr.getCreqCreateDate())
                 .servStatus(EnumModuleServiceOrders.ServStatus.INACTIVE)
                 .users(cr.getCustomer())
