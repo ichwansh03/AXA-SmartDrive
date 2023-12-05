@@ -81,7 +81,7 @@ public class Employees {
     @OneToOne(orphanRemoval = true,cascade = CascadeType.ALL)
     @MapsId("empEntityid")
     @JoinColumn(name = "emp_entityid", referencedColumnName = "user_entityid")
-    @JsonBackReference
+    @JsonManagedReference
     private User user;
 
     @JsonManagedReference

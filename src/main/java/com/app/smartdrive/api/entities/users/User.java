@@ -93,7 +93,7 @@ public class User {
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn
-  @JsonManagedReference
+  @JsonBackReference
   private Employees employees;
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
