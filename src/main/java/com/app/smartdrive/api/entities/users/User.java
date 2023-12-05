@@ -40,7 +40,7 @@ public class User {
   @Column(name = "user_entityid")
   private Long userEntityId;
 
-  @Column(name = "user_name", nullable = false, length = 15)
+  @Column(name = "user_name", nullable = false, length = 15, unique = true)
   private String userName;
 
   @Column(name = "user_password", length = 256)
@@ -49,7 +49,7 @@ public class User {
   @Column(name = "user_full_name", length = 85)
   private String userFullName;
 
-  @Column(name = "user_email", length = 25, nullable = false)
+  @Column(name = "user_email", length = 25, nullable = false, unique = true)
   private String userEmail;
 
   @Column(name = "user_birth_place", length = 55)
@@ -58,10 +58,10 @@ public class User {
   @Column(name =  "user_birth_date")
   private LocalDateTime userBirthDate;
 
-  @Column(name = "user_national_id", length = 20, nullable = false)
+  @Column(name = "user_national_id", length = 20, nullable = false, unique = true)
   private String userNationalId;
 
-  @Column(name = "user_npwp", length = 35)
+  @Column(name = "user_npwp", length = 35, unique = true)
   private String userNPWP;
 
   @Column(name = "user_photo", length = 255)

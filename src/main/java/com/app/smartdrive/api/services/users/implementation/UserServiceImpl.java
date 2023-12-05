@@ -1,47 +1,34 @@
 package com.app.smartdrive.api.services.users.implementation;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.stereotype.Service;
-import com.app.smartdrive.api.dto.user.ProfileDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
-import com.app.smartdrive.api.entities.master.Cities;
-import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.entities.users.Roles;
-import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.entities.users.UserAddress;
-import com.app.smartdrive.api.entities.users.UserPhone;
-import com.app.smartdrive.api.entities.users.UserPhoneId;
-import com.app.smartdrive.api.entities.users.UserRoles;
-import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
+import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.payment.BanksRepository;
 import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
-import com.app.smartdrive.api.services.users.BusinessEntityService;
-import com.app.smartdrive.api.services.users.UserAddressService;
-import com.app.smartdrive.api.services.users.UserPhoneService;
-import com.app.smartdrive.api.services.users.UserRolesService;
-import com.app.smartdrive.api.services.users.UserService;
-import com.app.smartdrive.api.services.users.UserUserAccountService;
-import com.app.smartdrive.api.utils.NullUtils;
+import com.app.smartdrive.api.services.users.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,20 +38,24 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepo;
   private final BusinessEntityService businessEntityService;
   private final RolesRepository rolesRepository;
-  private final BanksRepository banksRepository;
   private final FintechRepository fintechRepository;
   private final UserRolesService userRolesService;
   private final UserPhoneService userPhoneService;
   private final UserAddressService userAddressService;
   private final UserUserAccountService userAccountService;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
-  public User createUser(ProfileRequestDto userPost) {
+  public User createUser(@Valid ProfileRequestDto userPost) {
     BusinessEntity businessEntity = businessEntityService.createBusinessEntity();
     User newUser = new User();
     User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
     businessEntity.setUser(user);
     user.setUserBusinessEntity(businessEntity);
+    if(userPost.getUserPassword() != null){
+      String hashedPw = passwordEncoder.encode(userPost.getUserPassword());
+      user.setUserPassword(hashedPw);
+    }
     user.setUserEntityId(businessEntity.getEntityId());
     user.setUserModifiedDate(LocalDateTime.now());
     return user;
@@ -78,10 +69,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<UserDto> getAllDto() {
     List<User> users = userRepo.findAll();
-    List<UserDto> userDto = new ArrayList<>();
-    for (User user : users) {
-      userDto.add(UserMapper.convertUserToDto(user));
-    }
+    List<UserDto> userDto = TransactionMapper.mapEntityListToDtoList(users, UserDto.class);
     return userDto;
   }
 
@@ -93,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User createUserCustomer(CreateUserDto userPost) {
+  public User createUserCustomer(@Valid  CreateUserDto userPost) {
     User user = createUser(userPost.getProfile());
 
     userRolesService.createUserRole(RoleName.CU, user);
@@ -106,12 +94,6 @@ public class UserServiceImpl implements UserService {
         : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
 
     userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
-
-
-    // TODO USERPHOTO API
-    // user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
-    // userPost.getPhoto().transferTo(new
-    // File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
 
     return save(user);
   }
@@ -126,7 +108,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public UpdateUserRequestDto save(UpdateUserRequestDto userPost, Long id){
+  public UpdateUserRequestDto save(@Valid  UpdateUserRequestDto userPost, Long id){
     User user = userRepo.findById(id).orElseThrow(
       () -> new EntityNotFoundException("User not found")
       );
@@ -135,8 +117,7 @@ public class UserServiceImpl implements UserService {
     // Path filePath = Paths.get(path+user.getUserPhoto());
     // Files.delete(filePath);
     save(user);
-    UpdateUserRequestDto updated = TransactionMapper.mapEntityToDto(user, UpdateUserRequestDto.class);
-    return updated;
+    return TransactionMapper.mapEntityToDto(user, UpdateUserRequestDto.class);
   }
 
   @Override
@@ -145,15 +126,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public String loginCu(String identity, String password) {
+  public String loginUser(String identity, String password, List<RoleName> roleName) {
     Optional<User> user = userRepo.findUserByIden(identity);
     if (user.isPresent()) {
-      List<String> listRole = new ArrayList<>();
-      for (UserRoles role : user.get().getUserRoles()) {
-        listRole.add(role.getRoles().getRoleName().toString());
-      }
-      if (listRole.contains("PC") || listRole.contains("CU")) {
-        if (user.get().getUserPassword().equals(password)) {
+      List<RoleName> listRole = user.get().getUserRoles().stream().map(role -> role.getRoles().getRoleName()).collect(Collectors.toList());
+      if (listRole.stream().anyMatch(roleName::contains)) {
+        if (passwordEncoder.matches(password,user.get().getUserPassword())) {
           return "Access Granted";
         }
         return "Wrong Password";
@@ -164,23 +142,30 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public String loginEm(String identity, String password) {
-    Optional<User> user = userRepo.findUserByIden(identity);
-    if (user.isPresent()) {
-      List<String> listRole = new ArrayList<>();
-      for (UserRoles role : user.get().getUserRoles()) {
-        listRole.add(role.getRoles().getRoleName().toString());
-      }
-      if (listRole.contains("EM")) {
-        if (user.get().getUserPassword().equals(password)) {
-          return "Access Granted";
-        }
-        return "Wrong Password";
-      }
-      return "Access Denied";
-    }
-    return "Input email atau username atau phoneNumber salah";
+  public String loginCustomer(String identity, String password) {
+    return loginUser(identity, password, Arrays.asList(RoleName.PC, RoleName.CU));
   }
+
+  @Override
+  public String loginEmployee(String identity, String password) {
+    return loginUser(identity, password, Collections.singletonList(RoleName.EM));
+  }
+
+  @Override
+  @Transactional
+  public String changePassword(Long id, @Valid PasswordRequestDto passwordRequestDto) {
+    User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    if(passwordEncoder.matches(passwordRequestDto.getCurrentPassword(),user.getUserPassword())){
+      if(passwordRequestDto.getNewPassword().equals(passwordRequestDto.getConfirmPassword())){
+        user.setUserPassword(passwordEncoder.encode(passwordRequestDto.getNewPassword()));
+        save(user);
+        return "password has been changed";
+      }
+      return "Confirm password must be the same as the new password";
+    }
+    return "Current password is wrong";
+  }
+
 
   @Override
   public User getById(Long id) {

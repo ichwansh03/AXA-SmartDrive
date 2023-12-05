@@ -33,8 +33,8 @@ public class UserUserAccountController {
   }
 
   @DeleteMapping("/{ucId}")
-  public ResponseEntity<?> deleteUC(@PathVariable("id")Long id, @PathVariable("ucId") Long ucId){
-    userAccountService.deleteUserAccounts(id, ucId);
+  public ResponseEntity<?> deleteUC(@PathVariable("id")Long id, @PathVariable("ucId") Long accountId){
+    userAccountService.deleteUserAccounts(id, accountId);
     return ResponseEntity.status(HttpStatus.OK).body("UserAccount has been deleted");
   }
 }
