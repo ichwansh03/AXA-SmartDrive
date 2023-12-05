@@ -1,4 +1,4 @@
-    package com.app.smartdrive.api.dto.payment.Response;
+    package com.app.smartdrive.api.dto.payment.Response.Banks;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,9 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class BanksIdForUserDto {
+public class BanksIdForUserDtoResponse {
     private Long bank_entity_id;
 }

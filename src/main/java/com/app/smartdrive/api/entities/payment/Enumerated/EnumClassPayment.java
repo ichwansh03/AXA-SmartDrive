@@ -11,8 +11,13 @@ public class EnumClassPayment {
         SALARY,
         PREMI,
         CLAIM_EVENT,
-        PAID_PARTNER
+        PAID_PARTNER,
+        TOPUP_FINTECH,
+        TRANSFER,
+        TOPUP_BANK
     }
+
+    
 
     
 

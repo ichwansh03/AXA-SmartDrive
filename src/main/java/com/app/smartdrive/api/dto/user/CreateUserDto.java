@@ -24,5 +24,5 @@ public class CreateUserDto {
   private String accNumber;
   private String userPhoto;
   private String phoneType;
-  private MultipartFile photo; //terpisah
+  // private MultipartFile photo; //terpisah
 }

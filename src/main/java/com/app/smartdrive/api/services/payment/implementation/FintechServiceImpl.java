@@ -11,11 +11,12 @@ import org.apache.catalina.mapper.Mapper;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
-import com.app.smartdrive.api.dto.payment.Response.FintechDto;
-import com.app.smartdrive.api.dto.payment.Response.FintechIdForUserDto;
+import com.app.smartdrive.api.dto.payment.Request.Fintech.FintechDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechDtoResponse;
+import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechIdForUserDtoResponse;
 import com.app.smartdrive.api.entities.payment.Fintech;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.mapper.payment.FintechMapper;
+import com.app.smartdrive.api.mapper.payment.Fintech.FintechMapper;
 import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
 import com.app.smartdrive.api.services.payment.FintechService;
@@ -34,13 +35,32 @@ public class FintechServiceImpl implements FintechService {
     private final BusinessEntityService businessEntityService;
     private final BusinessEntityRepository businessRepository;
 
-   
     public Fintech addFintech(Fintech fintech){
         entityManager.persist(fintech);
         return fintech;
     }
    
+    
    
+    @Override
+    public FintechDtoResponse addFintech(FintechDtoRequests fintechDtoRequests) {
+        BusinessEntity businessEntity = new BusinessEntity();
+        businessEntity.setEntityModifiedDate(LocalDateTime.now());
+        Long businessEntityId = businessEntityService.save(businessEntity);
+
+        Fintech fintech = new Fintech();
+        fintech.setBusinessEntity(businessEntity);
+        fintech.setFint_entityid(businessEntityId);
+        fintech.setFint_name(fintechDtoRequests.getFint_name());
+        fintech.setFint_desc(fintechDtoRequests.getFint_desc());
+        addFintech(fintech);
+
+        FintechDtoResponse dto = FintechMapper.convertEntityToDto(fintech);
+        return dto;
+    }
+
+
+
     @Override
     public Boolean deleteFintech(Long fintech_entityid) {
         Optional<Fintech> findId = fintechRepository.findById(fintech_entityid);
@@ -60,7 +80,7 @@ public class FintechServiceImpl implements FintechService {
 
 
     @Override
-    public Boolean updateFintech(Long fint_entityid,String fint_name, String fint_desc) {
+    public Boolean updateFintech(Long fint_entityid,FintechDtoRequests requests) {
         Optional<Fintech> fintechId = fintechRepository.findById(fint_entityid);
         List<BusinessEntity> businessData = businessRepository.findAll();
         Fintech fintech = fintechId.get();
@@ -69,20 +89,20 @@ public class FintechServiceImpl implements FintechService {
         if(fintechId.isPresent()){
             for (BusinessEntity bisnis : businessData) {
                 if(fint_entityid.equals(bisnis.getEntityId())){
-                    if(fint_name!=null && fint_desc!=null){
+                    if(requests.getFint_name()!=null && requests.getFint_desc()!=null){
                         bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        fintech.setFint_name(fint_name);
-                        fintech.setFint_desc(fint_desc);
+                        fintech.setFint_name(requests.getFint_name());
+                        fintech.setFint_desc(requests.getFint_desc());
                         businessRepository.save(bisnis);
                         fintechRepository.save(fintech);
-                    }else if(fint_name!=null){
+                    }else if(requests.getFint_name()!=null){
                         bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        fintech.setFint_name(fint_name);
+                        fintech.setFint_name(requests.getFint_name());
                         businessRepository.save(bisnis);
                         fintechRepository.save(fintech);
-                    }else if(fint_desc!=null){
+                    }else if(requests.getFint_desc()!=null){
                         bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        fintech.setFint_desc(fint_desc);
+                        fintech.setFint_desc(requests.getFint_desc());
                         businessRepository.save(bisnis);
                         fintechRepository.save(fintech);
                     }else{
@@ -99,20 +119,25 @@ public class FintechServiceImpl implements FintechService {
 
 
     @Override
-    public FintechIdForUserDto getUserFintId(String fint_name) {
+    public FintechIdForUserDtoResponse getUserFintId(String fint_name) {
         Optional<Fintech> getName = fintechRepository.findByFintNameOptional(fint_name);
-        List<Fintech> fintData = fintechRepository.findAll();
+        FintechIdForUserDtoResponse dto = new FintechIdForUserDtoResponse();
 
-        return null;
+        if(getName.isPresent()){
+            Fintech fintech = getName.get();
+            dto.setFint_entityid(fintech.getFint_entityid());
+        }
+
+        return dto;
     }
 
 
     @Override
-    public List<FintechDto> getAll() {
+    public List<FintechDtoResponse> getAll() {
         List<Fintech> listFintech = fintechRepository.findAll();
-        List<FintechDto> listDto = new ArrayList<>();
+        List<FintechDtoResponse> listDto = new ArrayList<>();
         for (Fintech fint : listFintech) {
-            FintechDto fintechDto = FintechMapper.convertEntityToDto(fint);
+            FintechDtoResponse fintechDto = FintechMapper.convertEntityToDto(fint);
             listDto.add(fintechDto);
         }
         return listDto;
@@ -120,9 +145,9 @@ public class FintechServiceImpl implements FintechService {
 
 
     @Override
-    public FintechDto getById(Long id) {
+    public FintechDtoResponse getById(Long id) {
         Optional<Fintech> idFintech = fintechRepository.findById(id);
-        FintechDto fintechDto = new FintechDto();
+        FintechDtoResponse fintechDto = new FintechDtoResponse();
         if(idFintech.isPresent()){
             Fintech fint = idFintech.get();
             fintechDto = FintechMapper.convertEntityToDto(fint);
@@ -133,21 +158,9 @@ public class FintechServiceImpl implements FintechService {
 
     
     @Override
-    public FintechDto save(FintechDto fintechDto) {
-        BusinessEntity businessEntity = new BusinessEntity();
-        businessEntity.setEntityModifiedDate(LocalDateTime.now());
-        Long businessEntityId = businessEntityService.save(businessEntity);
+    public FintechDtoResponse save(FintechDtoResponse fintechDto) {
 
-        Fintech fintech = new Fintech();
-        fintech.setBusinessEntity(businessEntity);
-        fintech.setFint_entityid(businessEntityId);
-        fintech.setFint_name(fintechDto.getFint_name());
-        fintech.setFint_desc(fintechDto.getFint_desc());
-        addFintech(fintech);
-
-        FintechDto fintechDtoo = FintechMapper.convertEntityToDto(fintech);
-
-        return fintechDtoo;
+        return null;
     }
 
     

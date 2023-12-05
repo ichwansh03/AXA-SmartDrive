@@ -162,8 +162,8 @@ public class UserServiceImpl implements UserService {
     userAccounts.setUsacUserEntityid(businessEntityId);
     List<UserAccounts> listUserAccountuserAccounts = List.of(userAccounts);
 
-    user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
-    userPost.getPhoto().transferTo(new File("C:\\Izhar\\SmartDrive-AXA\\src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
+    // user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
+    // userPost.getPhoto().transferTo(new File("src\\main\\resources\\image\\"+userPost.getPhoto().getOriginalFilename()));
 
     user.setUserPhone(listPhone);
     user.setUserRoles(listRole);
@@ -198,9 +198,9 @@ public class UserServiceImpl implements UserService {
     NullUtils.updateIfChanged(user::setUserPassword, userPost.getUserPassword(), user::getUserPassword);
 
     NullUtils.updateIfChanged(user::setUserEmail, userPost.getEmail(), user::getUserEmail);
-    if(userPost.getPhoto() != null){
-      user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
-    }
+    // if(userPost.getPhoto() != null){
+    //   user.setUserPhoto(userPost.getPhoto().getOriginalFilename());
+    // }
 
     User userSaved = save(user);
     return userSaved;
