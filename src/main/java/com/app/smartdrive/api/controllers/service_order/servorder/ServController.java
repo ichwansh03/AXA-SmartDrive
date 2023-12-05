@@ -36,30 +36,37 @@ public class ServController {
     public ResponseEntity<?> getServiceById(@RequestParam("servid") Long servId){
 
         Services servicesById = servService.findServicesById(servId).get();
-        User userById = userService.getUserById(servicesById.getUsers().getUserEntityId()).get();
-        List<ServiceOrders> serviceOrders = servOrderService.findAllSeroByServId(servId);
-        List<ServiceOrderRespDto> serviceOrderRespDtoClass = TransactionMapper.mapListDtoToListEntity(serviceOrders, ServiceOrderRespDto.class);
 
-        UserDto userDto = TransactionMapper.mapEntityToDto(userById, UserDto.class);
-        CustomerResponseDTO creqDto = customerRequestService.getCustomerRequestById(servicesById.getCustomer().getCreqEntityId());
-
-        ServiceRespDto serviceDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);
-        serviceDto.setUserDto(userDto);
-        serviceDto.setCustomerResponseDTO(creqDto);
-        serviceDto.setServiceOrdersList(serviceOrderRespDtoClass);
+        ServiceRespDto serviceRespDto = responseService(servicesById);
 
         log.info("ServiceOrdersController::getServiceById successfully viewed");
-        return new ResponseEntity<>(serviceDto, HttpStatus.OK);
+        return new ResponseEntity<>(serviceRespDto, HttpStatus.OK);
     }
 
     @GetMapping("/addserv")
     public ResponseEntity<?> generateService(@RequestParam("creqId") Long creqId){
         Services services = servService.addService(creqId);
 
-        ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
+        ServiceRespDto serviceRespDto = responseService(services);
 
         log.info("ServiceOrdersController::generateService successfully viewed");
         return new ResponseEntity<>(serviceRespDto, HttpStatus.OK);
     }
 
+    private ServiceRespDto responseService(Services services){
+
+        User userById = userService.getUserById(services.getUsers().getUserEntityId()).get();
+        List<ServiceOrders> serviceOrders = servOrderService.findAllSeroByServId(services.getServId());
+        List<ServiceOrderRespDto> serviceOrderRespDtoClass = TransactionMapper.mapListDtoToListEntity(serviceOrders, ServiceOrderRespDto.class);
+
+        UserDto userDto = TransactionMapper.mapEntityToDto(userById, UserDto.class);
+        CustomerResponseDTO creqDto = customerRequestService.getCustomerRequestById(services.getCustomer().getCreqEntityId());
+
+        ServiceRespDto serviceDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
+        serviceDto.setUserDto(userDto);
+        serviceDto.setCustomerResponseDTO(creqDto);
+        serviceDto.setServiceOrdersList(serviceOrderRespDtoClass);
+
+        return serviceDto;
+    }
 }

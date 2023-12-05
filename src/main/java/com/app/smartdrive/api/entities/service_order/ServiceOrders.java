@@ -46,7 +46,6 @@ public class ServiceOrders {
     private String seroReason;
 
     @Column(name = "serv_claim_no")
-    @Size(max = 12, message = "claim number can't more than 12 characters")
     private String servClaimNo;
 
     @Column(name = "serv_claim_startdate")

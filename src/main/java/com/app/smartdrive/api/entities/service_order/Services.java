@@ -39,11 +39,9 @@ public class Services {
     private EnumCustomer.CreqType servType;
 
     @Column(name = "serv_insuranceno")
-    @Size(max = 12, message = "insurance number can't more than 12 character")
     private String servInsuranceNo;
 
     @Column(name = "serv_vehicleno")
-    @Size(max = 12, message = "vehicle number can't more than 12 character")
     private String servVehicleNumber;
 
     @Column(name = "serv_startdate")
@@ -70,7 +68,7 @@ public class Services {
 
     @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "serv_creq_entityid")
+    @JoinColumn(name = "serv_creq_entityid", unique = true)
     private CustomerRequest customer;
 
     @JsonIgnore

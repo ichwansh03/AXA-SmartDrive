@@ -44,10 +44,4 @@ public class ServiceOrderWorkorder {
     @JoinColumn(name = "sowo_seot_id")
     private ServiceOrderTasks serviceOrderTasks;
 
-    public ServiceOrderWorkorder(String sowoName, LocalDateTime sowoModDate, Boolean sowoStatus, ServiceOrderTasks serviceOrderTasks) {
-        this.sowoName = sowoName;
-        this.sowoModDate = sowoModDate;
-        this.sowoStatus = sowoStatus;
-        this.serviceOrderTasks = serviceOrderTasks;
-    }
 }
