@@ -99,105 +99,43 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
+        Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
 
-//        // create new businessEntity
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
-
-        log.info("BusinessEntity created {}",newEntity);
-        User entityUser = this.userRepository.findById(customerRequestDTO.getCreq_cust_entityid()).get();
         Long entityId = newEntity.getEntityId();
 
-        // get from table master
+        User entityUser = this.userService.getUserById(customerRequestDTO.getCreq_cust_entityid()).get();
+
+
         CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCias_cars_id()).get();
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
 
-//        EmployeeAreaWorkgroup eawag = this.eawagRepository.findByAgenAndArwgCode(customerRequestDTO.getAgen_id(), customerRequestDTO.getArwg_code());
+        // new customerRequest
+        // belum set eawag
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
+
+        CustomerInscAssets cias = this.createCustomerInscAssets(entityId, ciasDTO, carSeries, existCity, existInty, newCustomerRequest);
 
 
-        Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
-
-
-        // new customer
-        CustomerRequest newCustomer = CustomerRequest.builder()
-        .businessEntity(newEntity)
-        .customer(entityUser)
-        .creqCreateDate(LocalDateTime.now())
-        .creqStatus(EnumCustomer.CreqStatus.OPEN)
-        .creqType(EnumCustomer.CreqType.FEASIBLITY)
-        .creqEntityId(entityId)
-        .build();
-
-//        .employeeAreaWorkgroup(eawag)
-//        eawag.setCustomerRequests(List.of(newCustomer));
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasDTO.getCiasStartdate(), formatter);
-
-
-
-        // new cias
-        CustomerInscAssets cias = CustomerInscAssets.builder()
-        .ciasCreqEntityid(entityId)
-        .ciasPoliceNumber(ciasDTO.getCiasPoliceNumber())
-        .ciasYear(ciasDTO.getCiasYear())
-        .ciasStartdate(ciasStartdate)
-        .ciasEnddate(ciasStartdate.plusYears(1))
-        .ciasCurrentPrice(ciasDTO.getCurrentPrice())
-                .ciasInsurancePrice(ciasDTO.getCurrentPrice())
-        .ciasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasDTO.getCiasPaidType()))
-        .ciasIsNewChar('Y')
-        .carSeries(carSeries)
-        .city(existCity)
-        .insuranceType(existInty)
-        .customerRequest(newCustomer)
-        .build();
-
-
-        // pengecekan dan covert file upload ke cadocList
         List<CustomerInscDoc> ciasDocs = this.fileCheck(files, entityId);
         cias.setCustomerInscDoc(ciasDocs);
 
-        // set cias ke creq
-        List<CustomerInscExtend> ciasCuexs = new ArrayList<>();
 
-        for (Long i: cuexIds) {
-            Double nominal;
+        List<CustomerInscExtend> ciasCuexs = this.getCustomerInscEtend(cuexIds, cias, entityId);
 
-            TemplateInsurancePremi temi = this.temiRepository.findById(i).get();
-
-            if(Objects.nonNull(temi.getTemiRateMin())){
-                nominal = temi.getTemiRateMin() * temi.getTemiNominal();
-            }else{
-                nominal = temi.getTemiNominal();
-            }
-
-            CustomerInscExtend cuex = CustomerInscExtend.builder()
-                    .cuexName(temi.getTemiName())
-                    .cuex_nominal(nominal)
-                    .cuexTotalItem(1)
-                    .customerInscAssets(cias)
-                    .cuexCreqEntityid(entityId)
-                    .build();
-
-//                    .cuexId(temi.getTemiId())
-            ciasCuexs.add(cuex);
-        }
-
-//        Double premi = this.getPremiPrice(existInty.getIntyName(), "bruh", eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesId(), ciasDTO.getCurrentPrice(), ciasCuexs);
-
-        Double premi = customerRequestDTO.getCiasDTO().getCurrentPrice();
+        Double premi = ciasDTO.getCurrentPrice();
         cias.setCiasTotalPremi(premi);
         cias.setCustomerInscExtend(ciasCuexs);
 
-        // set cias ke customer
-        newCustomer.setCustomerInscAssets(cias);
 
-        CustomerClaim newClaim = this.createNewClaim(newCustomer);
-        newCustomer.setCustomerClaim(newClaim);
+        CustomerClaim newClaim = this.createNewClaim(newCustomerRequest);
 
 
-        CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomer);
+        newCustomerRequest.setCustomerClaim(newClaim);
+        newCustomerRequest.setCustomerInscAssets(cias);
+
+        CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
         return this.convert(savedCreq);
     }
 
@@ -652,6 +590,86 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         );
 
         this.customerClaimRepository.delete(existCustomerClaim);
+    }
+
+    @Override
+    public CustomerRequest createCustomerRequest(
+            BusinessEntity newEntity,
+            User customer,
+            Long entityId
+            ){
+
+        return CustomerRequest.builder()
+                .businessEntity(newEntity)
+                .customer(customer)
+                .creqCreateDate(LocalDateTime.now())
+                .creqStatus(EnumCustomer.CreqStatus.OPEN)
+                .creqType(EnumCustomer.CreqType.FEASIBLITY)
+                .creqEntityId(entityId)
+                .build();
+    }
+
+    @Override
+    public CustomerInscAssets createCustomerInscAssets(
+            Long entityId,
+            CiasDTO ciasDTO,
+            CarSeries carSeries,
+            Cities existCity,
+            InsuranceType existInty,
+            CustomerRequest newCustomerRequest
+    ) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasDTO.getCiasStartdate(), formatter);
+
+        // new cias
+
+        return CustomerInscAssets.builder()
+                .ciasCreqEntityid(entityId).ciasPoliceNumber(ciasDTO.getCiasPoliceNumber())
+                .ciasYear(ciasDTO.getCiasYear())
+                .ciasStartdate(ciasStartdate)
+                .ciasEnddate(ciasStartdate.plusYears(1))
+                .ciasCurrentPrice(ciasDTO.getCurrentPrice())
+                .ciasInsurancePrice(ciasDTO.getCurrentPrice())
+                .ciasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasDTO.getCiasPaidType()))
+                .ciasIsNewChar(ciasDTO.getCiasIsNewChar())
+                .carSeries(carSeries)
+                .city(existCity)
+                .insuranceType(existInty)
+                .customerRequest(newCustomerRequest)
+                .build();
+    }
+
+    @Override
+    public List<CustomerInscExtend> getCustomerInscEtend(
+            Long[] cuexIds,
+            CustomerInscAssets cias,
+            Long entityId
+            ) {
+        List<CustomerInscExtend> ciasCuexs = new ArrayList<>();
+
+        for (Long i: cuexIds) {
+            Double nominal;
+
+            TemplateInsurancePremi temi = this.temiRepository.findById(i).get();
+
+            if(Objects.nonNull(temi.getTemiRateMin())){
+                nominal = temi.getTemiRateMin() * temi.getTemiNominal();
+            }else{
+                nominal = temi.getTemiNominal();
+            }
+
+            CustomerInscExtend cuex = CustomerInscExtend.builder()
+                    .cuexName(temi.getTemiName())
+                    .cuex_nominal(nominal)
+                    .cuexTotalItem(1)
+                    .customerInscAssets(cias)
+                    .cuexCreqEntityid(entityId)
+                    .build();
+
+            ciasCuexs.add(cuex);
+        }
+        return ciasCuexs;
     }
 
 
