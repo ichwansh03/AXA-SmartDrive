@@ -3,6 +3,7 @@ package com.app.smartdrive.api.controllers.partners;
 import com.app.smartdrive.api.dto.partner.PartnerAreaWorkgroupDto;
 import com.app.smartdrive.api.dto.partner.request.PartnerAreaWorkgroupRequest;
 import com.app.smartdrive.api.entities.partner.PartnerAreaWorkgroup;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.partner.PartnerAreaWorkgroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class PartnerAreaWorkgroupController {
     public ResponseEntity<PartnerAreaWorkgroupDto> addPartnerAreaWorkGroup(@RequestBody PartnerAreaWorkgroupRequest request){
 
         PartnerAreaWorkgroup pawo = pawoService.save(request);
-        return ResponseEntity.status(201).body(pawo.convertToDto());
+        return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(pawo, PartnerAreaWorkgroupDto.class));
 
     }
 }

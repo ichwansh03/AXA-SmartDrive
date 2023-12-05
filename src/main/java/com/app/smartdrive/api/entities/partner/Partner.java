@@ -55,44 +55,23 @@ public class Partner {
     @LastModifiedDate
     @Column(name = "part_modified_date")
     private LocalDateTime partModifiedDate;
-    @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "part_sero_id")
-    private ServiceOrders serviceOrders;
+
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "part_entityid")
     private BusinessEntity businessEntity;
+
     @ManyToOne
     @JoinColumn(name = "part_city_id", nullable = false)
     private Cities city;
+
     @OneToMany(mappedBy = "partner", fetch = FetchType.LAZY)
     private List<PartnerContact> partnerContacts;
-    @JsonIgnore
+
     @OneToMany(mappedBy = "caevPartners", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ClaimAssetEvidence> claimAssetEvidence;
-    @JsonIgnore
+
     @OneToMany(mappedBy = "caspPartners", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ClaimAssetSparepart> claimAssetSparepart;
-    public PartnerDto convertToDto(){
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        List<PartnerContactDto> partnerContactDtoList = null;
-
-        if(Objects.nonNull(partnerContacts)){
-            partnerContactDtoList = partnerContacts.stream().map(data -> data.convertToDto()).toList();
-        }
-        return PartnerDto.builder()
-                .partEntityid(partEntityid)
-                .businessEntity(businessEntity.getEntityId())
-                .partName(partName)
-                .partAddress(partAddress)
-                .partJoinDate(partJoinDate.format(dateTimeFormatter))
-                .partNpwp(partNpwp)
-                .partStatus(partStatus.name())
-                .partModifiedDate(partModifiedDate.format(dateTimeFormatter))
-                .city(city.getCityName())
-                .partnerContactsDto(partnerContactDtoList)
-                .build();
-    }
 }

@@ -51,10 +51,6 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
-    @JsonManagedReference
-    @OneToOne(mappedBy = "serviceOrders")
-    private Partner partner;
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "sero_sero_id")
