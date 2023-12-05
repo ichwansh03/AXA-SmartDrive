@@ -14,18 +14,16 @@ import org.hibernate.validator.constraints.UniqueElements;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfileRequestDto {
-  @NotBlank(message = "Username may not be blank")
   private String userName;
-  @NotBlank(message = "password may not be blank")
   private String userPassword;
   @NotBlank(message = "Name may not be blank")
   private String userFullName;
   @Email(message = "email must be valid")
   @NotBlank(message = "Username may not be blank")
   private String userEmail;
-  @NotBlank(message = "Birthplace may not be blank")
+
   private String userBirthPlace;
-  @NotNull(message = "birthDate may not be null")
+
   private LocalDateTime userBirthDate;
   @NotBlank(message = "NationalId may not be blank")
   private String userNationalId;

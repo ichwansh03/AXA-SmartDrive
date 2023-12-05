@@ -3,6 +3,8 @@ package com.app.smartdrive.api.services.users.implementation;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
@@ -27,7 +29,7 @@ public class UserPhoneImpl implements UserPhoneService {
 
   @Override
   @Transactional
-  public UserPhone updateUserPhone(Long userId, String phoneNumber, UserPhoneRequestDto userPost) {
+  public UserPhone updateUserPhone(Long userId, String phoneNumber, @Valid UserPhoneRequestDto userPost) {
     // TODO Auto-generated method stub
     // User user = userRepository.findById(userId).get();
     // List<UserPhone> listUserPhones = user.getUserPhone();
@@ -58,7 +60,7 @@ public class UserPhoneImpl implements UserPhoneService {
   }
 
   @Override
-  public UserPhone addUserPhone(Long id, UserPhoneDto userPost) {
+  public UserPhone addUserPhone(Long id, @Valid UserPhoneDto userPost) {
     User user = userRepository.findById(id).get();
     UserPhoneId userPhoneId = new UserPhoneId(user.getUserEntityId(), userPost.getUserPhoneId().getUsphPhoneNumber());
     UserPhone userPhone = new UserPhone();

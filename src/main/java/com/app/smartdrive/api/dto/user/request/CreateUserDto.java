@@ -14,6 +14,7 @@ import lombok.Data;
 @Data
 public class CreateUserDto {
 
+  @NotNull
   private ProfileRequestDto profile;
   @NotNull(message = "City may not be null")
   private Long cityId;

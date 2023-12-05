@@ -3,6 +3,8 @@ package com.app.smartdrive.api.services.users.implementation;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserAddressDto;
@@ -28,7 +30,7 @@ public class UserAddressImpl implements UserAddressService {
   private final CityRepository cityRepository;
 
   @Override
-  public UserAddress updateUserAddress(User user, UserAddress address, UserAddressRequestDto userPost) {
+  public UserAddress updateUserAddress(User user, UserAddress address, @Valid UserAddressRequestDto userPost) {
     // Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(idAddress);
     // User user = userRepository.findById(id).get();
 
@@ -47,7 +49,7 @@ public class UserAddressImpl implements UserAddressService {
 
   @Override
   @Transactional
-  public UserAddress updateUserAddress(Long id, Long addressId, UserAddressRequestDto userPost) {
+  public UserAddress updateUserAddress(Long id, Long addressId, @Valid UserAddressRequestDto userPost) {
     Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(addressId, id);
     User user = userRepository.findById(id).get();
     if (userAddress.isPresent()) {
@@ -58,7 +60,7 @@ public class UserAddressImpl implements UserAddressService {
   }
 
   @Override
-  public UserAddress addUserAddress(Long id, UserAddressRequestDto userPost) {
+  public UserAddress addUserAddress(Long id, @Valid UserAddressRequestDto userPost) {
     UserAddress userAddress = new UserAddress();
     userAddress.setUsdrEntityId(id);
     User user = userRepository.findById(id).get();
