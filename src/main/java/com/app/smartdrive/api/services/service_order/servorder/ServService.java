@@ -10,4 +10,5 @@ public interface ServService {
 
     Optional<Services> findServicesById(Long servId);
 
+    boolean checkAllTaskComplete(String seroId);
 }
