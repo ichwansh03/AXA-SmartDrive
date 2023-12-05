@@ -54,13 +54,19 @@ public class EmployeesController {
             return new ResponseEntity<>("Employees deleted successfully", HttpStatus.OK);
     }
 
-//     @PutMapping("/update/{employeeId}")
-//     public ResponseEntity<CreateEmployeesDto> updateEmployee(
-//             @PathVariable Long employeeId,
-//             @RequestBody CreateEmployeesDto updatedEmployeeDto) {
-//         CreateEmployeesDto updatedEmployee = employeesService.updateEmployee(employeeId, updatedEmployeeDto);
-//         return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
-//     }
+    @PutMapping("/update/{employeeId}")
+    public ResponseEntity<CreateEmployeesDto> updateEmployee(
+            @PathVariable Long employeeId,
+            @RequestBody CreateEmployeesDto updatedEmployeeDto) {
+        CreateEmployeesDto updatedEmployee = employeesService.editEmployee(employeeId, updatedEmployeeDto);
+        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+    }
+
+@PostMapping("/create")
+public ResponseEntity<?> createEmployee(@RequestBody CreateEmployeesDto employeesDto) {
+        CreateEmployeesDto createdEmployee = employeesService.createEmployee(employeesDto);
+        return new ResponseEntity<>(createdEmployee, HttpStatus.OK);
+}
 
     @GetMapping("/search")
     public Page<Employees> searchEmployees(

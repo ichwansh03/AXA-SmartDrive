@@ -20,4 +20,7 @@ public interface EmployeesService extends BaseService<Employees, Long>  {
  
  public Page<Employees> searchEmployees(String value, int page, int size) ;
  public CreateEmployeesDto addEmployee(CreateEmployeesDto employeesDto) throws Exception;
+ public CreateEmployeesDto createEmployee(CreateEmployeesDto employeesDto);
+ public void createUser();
+ public CreateEmployeesDto editEmployee(Long employeeId, CreateEmployeesDto employeesDto); 
 }

@@ -11,11 +11,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.dto.HR.request.CreateEmployeesDto;
+
 import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
+import com.app.smartdrive.api.dto.master.CitiesDto;
+import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
+import com.app.smartdrive.api.dto.user.response.UserAddressDto;
+import com.app.smartdrive.api.dto.user.response.UserCityDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
+import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
+import com.app.smartdrive.api.dto.user.response.UserPhoneIdDto;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.hr.JobType;
+import com.app.smartdrive.api.entities.hr.EnumClassHR.emp_type;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
@@ -26,6 +34,7 @@ import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
 import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.mapper.hr.EmployeesMapper;
 import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
@@ -38,7 +47,9 @@ import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserAddressRepository;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
+import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
+import com.app.smartdrive.api.services.payment.UserAccountsService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserAddressService;
 import com.app.smartdrive.api.services.users.UserPhoneService;
@@ -64,13 +75,17 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     private final UserPhoneService userPhoneService;
 
-    private final UserRolesService userRolesService;
+    private final UserAccountsService userAccountsService;
 
-    private final UserService userService2;
+    private final UserPhoneRepository userPhoneRepository;
+
+    private final UserRolesService userRolesService;
 
     private final EmployeesRepository employeesRepository;
 
     private final RolesRepository rolesRepository;
+
+    private final UserRoleRepository userRoleRepository;
     
     private final UserService userService;
 
@@ -81,6 +96,8 @@ public class EmployeesServiceImpl implements EmployeesService {
     @Transactional
     public CreateEmployeesDto addEmployee(CreateEmployeesDto employeesDto){
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
+
+
 
     
 
@@ -194,6 +211,148 @@ public class EmployeesServiceImpl implements EmployeesService {
         return employeesDto;
     }
 
+    @Override
+    @Transactional
+    public CreateEmployeesDto createEmployee(CreateEmployeesDto employeesDto) {
+    
+        LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
+
+        ProfileRequestDto profileRequestDto = new ProfileRequestDto();
+        
+        User user = userService.createUser(profileRequestDto);
+        if(employeesDto.getGrantAccessUser()==true){
+        user.setUserEmail(employeesDto.getEmail());
+        user.setUserName(employeesDto.getEmail());
+        user.setUserPassword(employeesDto.getEmpPhone());
+        user.setUserFullName(employeesDto.getEmpName());
+        user.setUserNationalId("idn"+user.getUserFullName());
+        user.setUserNPWP("npwp"+user.getUserFullName());
+    
+        userRolesService.createUserRole(RoleName.EM, user);
+
+        UserPhoneDto userPhoneDto = new UserPhoneDto();
+        UserPhoneIdDto userPhoneIdDto = new UserPhoneIdDto();
+        userPhoneIdDto.setUsphPhoneNumber(employeesDto.getEmpPhone());
+        userPhoneDto.setUserPhoneId(userPhoneIdDto);
+        List<UserPhoneDto> listPhone = new ArrayList<>();
+        listPhone.add(userPhoneDto);
+        
+        userPhoneService.createUserPhone(user, listPhone);
+    
+        UserAddressDto userAddressDto = new UserAddressDto();
+        userAddressDto.setUsdrAddress1(employeesDto.getEmpAddress());
+        userAddressDto.setUsdrAddress2(employeesDto.getEmpAddress2());
+        List<UserAddressDto> listAddress = new ArrayList<>();
+        listAddress.add(userAddressDto);
+        userAddressService.createUserAddress(user, listAddress, employeesDto.getEmpCity());
+        }
+        
+    
+        Employees employee = new Employees();
+        employee.setUser(user);
+        employee.setEmpEntityid(user.getUserEntityId());
+        employee.setEmpName(employeesDto.getEmpName());
+        employee.setEmpJoinDate(empJoinDate);
+        employee.setEmpStatus(EnumClassHR.status.ACTIVE);
+        employee.setEmpType(emp_type.PERMANENT);
+        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
+        employee.setEmpGraduate(employeesDto.getEmpGraduate());
+        employee.setEmpNetSalary(employeesDto.getEmpSalary());
+        employee.setEmpJobCode(employeesDto.getEmpJobRole());
+        employee.setEmpModifiedDate(LocalDateTime.now());
+
+        employeesRepository.save(employee);
+        
+
+        return employeesDto;
+    }
+
+    @Override
+    @Transactional
+    public CreateEmployeesDto editEmployee(Long employeeId, CreateEmployeesDto employeesDto) {
+    
+    Employees existingEmployee = employeesRepository.findById(employeeId)
+            .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + employeeId));
+
+    LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
+
+    User user = existingEmployee.getUser();
+    user.setUserEmail(employeesDto.getEmail());
+    user.setUserName(employeesDto.getEmail());
+    user.setUserPassword(employeesDto.getEmpPhone());
+    user.setUserFullName(employeesDto.getEmpName());
+
+    String empPhone = employeesDto.getEmpPhone();
+    if (empPhone != null && !empPhone.isEmpty()) {
+        userPhoneService.updateUserPhone(user.getUserEntityId(), empPhone, null);
+    }
+    // UserPhoneIdDto userPhoneIdDto = new UserPhoneIdDto();
+    // userPhoneIdDto.setUsphPhoneNumber(employeesDto.getEmpPhone());
+    // userPhoneDto.setUserPhoneId(userPhoneIdDto);
+    // List<UserPhoneDto> listPhone = new ArrayList<>();
+    // listPhone.add(userPhoneDto);
+
+    List<UserAddressDto> listAddress = new ArrayList<>();
+    UserAddressDto userAddressDto = new UserAddressDto();
+    userAddressDto.setUsdrAddress1(employeesDto.getEmpAddress());
+    userAddressDto.setUsdrAddress2(employeesDto.getEmpAddress2());
+    listAddress.add(userAddressDto);
+    userAddressService.createUserAddress(user, listAddress, employeesDto.getEmpCity());
+
+    
+    existingEmployee.setEmpName(employeesDto.getEmpName());
+    existingEmployee.setEmpJoinDate(empJoinDate);
+    existingEmployee.setEmpStatus(EnumClassHR.status.ACTIVE);
+    existingEmployee.setEmpType(emp_type.PERMANENT);
+    existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
+    existingEmployee.setEmpGraduate(employeesDto.getEmpGraduate());
+    existingEmployee.setEmpNetSalary(employeesDto.getEmpSalary());
+    existingEmployee.setEmpJobCode(employeesDto.getEmpJobRole());
+    existingEmployee.setEmpModifiedDate(LocalDateTime.now());
+
+    
+    employeesRepository.save(existingEmployee);
+
+    
+    return employeesDto;
+}
+    // @Override
+    // public void createUser(){
+    //     User user = new User();
+    //     BusinessEntity businessEntity = new BusinessEntity();
+    //     businessEntity.setEntityModifiedDate(LocalDateTime.now());
+    //     // Save the business entity and get the ID
+    //     Long businessEntityId = businessEntityService.save(businessEntity); 
+
+        
+    //     // if(employeesDto.getGrantUserAccess()){
+    //     user.setUserBusinessEntity(businessEntity);
+    //     user.setUserEntityId(businessEntityId);
+    //     user.setUserName("eada");
+    //     user.setUserPassword("adad");
+    //     user.setUserFullName("dasas adosd");
+    //     user.setUserEmail("adsa@gmail.com");
+    //     user.setUserModifiedDate(LocalDateTime.now());
+    //     user.setUserNationalId("iyynd");
+    //     user.setUserNPWP("npwp");
+        
+    //     UserRolesId userRolesId = new UserRolesId(businessEntityId, RoleName.EM);
+    //     Roles roles = rolesRepository.findById(RoleName.EM).get();
+        
+    //     UserRoles userRoles = new UserRoles();
+    //     userRoles.setUserRolesId(userRolesId);
+    //     userRoles.setRoles(roles);
+    //     userRoles.setUsroStatus("ACTIVE");
+    //     userRoles.setUsroModifiedDate(LocalDateTime.now());
+    //     userRoles.setUser(user);
+    //     List<UserRoles> listRole = List.of(userRoles);
+    //     user.setUserRoles(listRole);
+
+        
+    // }
+
+    
+
     // @Override
     // @Transactional
     // public CreateEmployeesDto updateEmployee(Long employeeId, CreateEmployeesDto updatedEmployeeDto) {
@@ -269,7 +428,7 @@ public List<EmployeesDto> getAllDto() {
     List<Employees> employees = employeesRepository.findAll();
     List<EmployeesDto> employeesDtos = new ArrayList<>();
     for (Employees em : employees) {
-        employeesDtos.add(EmployeesMapper.convertEntityToDto(em));  // Corrected this line
+        employeesDtos.add(EmployeesMapper.convertEntityToDto(em));  
     }
     return employeesDtos;
 }
@@ -329,6 +488,12 @@ public List<EmployeesDto> getAllDto() {
     public List<CreateEmployeesDto> getAllEmployeesDto() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllEmployeesDto'");
+    }
+
+    @Override
+    public void createUser() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createUser'");
     }
     
 }
