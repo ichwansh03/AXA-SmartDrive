@@ -33,12 +33,12 @@ public class UserController {
 
   @PostMapping("/signin")
   public ResponseEntity<?> loginCustomer(@RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCustomer(login.getIden(), login.getPassword()));
+    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCustomer(login.getIdentity(), login.getPassword()));
   }
 
   @PostMapping("/emps/signin")
   public ResponseEntity<?> loginEmployee(@RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.loginEmployee(login.getIden(), login.getPassword()));
+    return ResponseEntity.status(HttpStatus.OK).body(userService.loginEmployee(login.getIdentity(), login.getPassword()));
   }
 
   @GetMapping
