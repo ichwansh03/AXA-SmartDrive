@@ -9,6 +9,6 @@ public interface BusinessEntityService {
 
   BusinessEntity createBusinessEntity();
 
-  Long save(BusinessEntity businessEntity);
+  BusinessEntity save(BusinessEntity businessEntity);
 
 }

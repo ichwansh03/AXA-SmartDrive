@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
 
   @Override
-  public User createUser(@Valid ProfileRequestDto userPost) {
+  public User createUser(ProfileRequestDto userPost) {
     BusinessEntity businessEntity = businessEntityService.createBusinessEntity();
     User newUser = new User();
     User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User createUserCustomer(@Valid  CreateUserDto userPost) {
+  public User createUserCustomer(CreateUserDto userPost) {
     User user = createUser(userPost.getProfile());
 
     userRolesService.createUserRole(RoleName.CU, user);
@@ -101,14 +101,14 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public User save(User user) {
-    entityManager.persist(user);
-    entityManager.flush();
-    return user;
+    User newUser = userRepo.save(user);
+//    userRepo.flush();
+    return newUser;
   }
 
   @Override
   @Transactional
-  public UpdateUserRequestDto save(@Valid  UpdateUserRequestDto userPost, Long id){
+  public UpdateUserRequestDto save(UpdateUserRequestDto userPost, Long id){
     User user = userRepo.findById(id).orElseThrow(
       () -> new EntityNotFoundException("User not found")
       );
@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public String changePassword(Long id, @Valid PasswordRequestDto passwordRequestDto) {
+  public String changePassword(Long id,PasswordRequestDto passwordRequestDto) {
     User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
     if(passwordEncoder.matches(passwordRequestDto.getCurrentPassword(),user.getUserPassword())){
       if(passwordRequestDto.getNewPassword().equals(passwordRequestDto.getConfirmPassword())){
