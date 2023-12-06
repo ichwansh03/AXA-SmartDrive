@@ -68,10 +68,10 @@ public class Partner {
     @OneToMany(mappedBy = "partner", fetch = FetchType.LAZY)
     private List<PartnerContact> partnerContacts;
 
-    @OneToMany(mappedBy = "caevPartners", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "caevPartners", cascade = CascadeType.ALL)
     List<ClaimAssetEvidence> claimAssetEvidence;
 
-    @OneToMany(mappedBy = "caspPartners", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "caspPartners", cascade = CascadeType.ALL)
     List<ClaimAssetSparepart> claimAssetSparepart;
 
 }

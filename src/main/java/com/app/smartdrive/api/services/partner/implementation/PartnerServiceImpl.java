@@ -55,30 +55,37 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    @Transactional
     public Partner save(Partner partner) {
-        if(Objects.isNull(partner.getBusinessEntity())){
-            ProfileRequestDto userDto = new ProfileRequestDto();
-            userDto.setUserEmail(partner.getPartName());
-            userDto.setUserNpwp(partner.getPartNpwp());
-            userDto.setUserFullName(partner.getPartName());
-            userDto.setUserNationalId(partner.getPartNpwp());
-            userDto.setUserName(partner.getPartName());
+        partner.getBusinessEntity().setEntityModifiedDate(LocalDateTime.now());
+        return partnerRepository.save(partner);
+    }
 
-            User user = userService.createUser(userDto);
-
-            userRolesService.createUserRole(EnumUsers.RoleName.PR, user);
-
-            userService.save(user);
-            log.info("id user for partner {}", user.getUserEntityId());
-            log.info("role user {}", user.getUserRoles().stream().map(userRoles -> userRoles.getRoles().getRoleDescription()).toList().toString());
-            partner.setBusinessEntity(user.getUserBusinessEntity());
+    @Transactional
+    private User createUser(Partner partner, boolean grantUserAccess){
+        ProfileRequestDto userDto = new ProfileRequestDto();
+        userDto.setUserEmail(partner.getPartName());
+        userDto.setUserNpwp(partner.getPartNpwp());
+        userDto.setUserFullName(partner.getPartName());
+        userDto.setUserNationalId(partner.getPartNpwp());
+        userDto.setUserName(String.format("%15s", partner.getPartName().replaceAll(" ", ""))
+                .replaceAll(" ", "0"));
+        if (grantUserAccess){
+            userDto.setUserPassword(partner.getPartNpwp());
         }
 
-        partner.getBusinessEntity().setEntityModifiedDate(LocalDateTime.now());
+        User user = userService.createUser(userDto);
+        userRolesService.createUserRole(EnumUsers.RoleName.PR, user);
+
+        return userService.save(user);
+
+    }
+    @Override
+    @Transactional
+    public Partner save(PartnerRequest partnerRequest) {
+        Partner partner = create(partnerRequest);
+        User user = createUser(partner, partnerRequest.isGrantUserAccess());
+        partner.setBusinessEntity(user.getUserBusinessEntity());
         partnerRepository.save(partner);
-        log.info("id partner {}", partner.getPartEntityid());
-        log.info("id businessEntity {}", partner.getBusinessEntity().getEntityId());
         return partner;
     }
 

@@ -47,19 +47,19 @@ public class GlobalExceptions {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(
-            HttpServletRequest request, Exception ex, Locale locale) {
-
-        Error error = ErrorUtils.createError(
-                        ex.getMessage(),
-                        ex.getLocalizedMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .setUrl(request.getRequestURL().toString())
-                .setReqMethod(request.getMethod())
-                .setTimestamp(LocalDateTime.now());
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<?> handleException(
+//            HttpServletRequest request, Exception ex, Locale locale) {
+//
+//        Error error = ErrorUtils.createError(
+//                        ex.getMessage(),
+//                        ex.getLocalizedMessage(),
+//                        HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                .setUrl(request.getRequestURL().toString())
+//                .setReqMethod(request.getMethod())
+//                .setTimestamp(LocalDateTime.now());
+//        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler(UserExistException.class)
     public ResponseEntity<?> userExistException(UserExistException ex) {

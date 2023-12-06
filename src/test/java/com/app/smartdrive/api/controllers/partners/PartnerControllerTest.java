@@ -95,7 +95,7 @@ class PartnerControllerTest {
         request.setPartAddress("JL BENGKEL");
         request.setPartAccountNo("123");
 
-        Partner partner = partnerService.create(request);
+        Partner partner = partnerService.save(request);
         return partnerService.save(partner);
     }
     @Test
@@ -199,5 +199,5 @@ class PartnerControllerTest {
             String prettyJson = objectMapper.writeValueAsString(partnerDto);
             log.info("Response {}", prettyJson);
         });
-    }
+     }
 }

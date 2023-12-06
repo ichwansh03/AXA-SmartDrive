@@ -33,8 +33,7 @@ public class PartnerController {
 
     @PostMapping
     public ResponseEntity<PartnerDto> createPartner(@Valid @RequestBody PartnerRequest request){
-        Partner partner = partnerService.create(request);
-        partnerService.save(partner);
+        Partner partner = partnerService.save(request);
         return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(partner, PartnerDto.class));
     }
     @PutMapping("/{id}")

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,12 +42,11 @@ public class PartnerContactServiceImpl implements PartnerContactService {
     private final UserService userService;
     private final UserRolesService userRolesService;
     private final UserPhoneService userPhoneService;
-    private final UserRepository userRepository;
-    private final UserPhoneRepository userPhoneRepository;
+
 
     @Override
     public PartnerContact getById(PartnerContactEntityId partnerContactEntityId) {
-        return partnerContactRepository.findById(partnerContactEntityId).get();
+        return partnerContactRepository.findById(partnerContactEntityId).orElseThrow(()->new EntityNotFoundException("Partner Contact Not Found"));
     }
 
     @Override
@@ -76,13 +76,10 @@ public class PartnerContactServiceImpl implements PartnerContactService {
         userDto.setUserFullName(request.getName());
         userDto.setUserNpwp(request.getPhone());
         userDto.setUserNationalId(request.getPhone());
-
-        User user = userService.createUser(userDto);
-
-        userRolesService.createUserRole(EnumUsers.RoleName.PR, user);
-        userService.save(user);
-        log.info("user id" + user.getUserEntityId());
-        return user;
+        if(request.isGrantUserAccess()){
+            userDto.setUserPassword(request.getPhone());
+        }
+        return userService.createUser(userDto);
     }
 
     private UserPhoneDto createUserPhoneDto(String phoneNumber){
@@ -91,59 +88,60 @@ public class PartnerContactServiceImpl implements PartnerContactService {
         userPhoneDto.setUserPhoneId(new UserPhoneIdDto(phoneNumber));
         return userPhoneDto;
     }
+
+    private void createUserPhoneDtoList(String phoneNumber, User user){
+        List<UserPhoneDto> userPhoneDtoList = new ArrayList<>();
+        UserPhoneDto userPhoneDto = new UserPhoneDto();
+        UserPhoneIdDto userPhoneIdDto = new UserPhoneIdDto(phoneNumber);
+        userPhoneDto.setUserPhoneId(userPhoneIdDto);
+        userPhoneDtoList.add(userPhoneDto);
+        userPhoneService.createUserPhone(user, userPhoneDtoList);
+    }
     @Transactional
     public PartnerContact create(PartnerContactRequest request) {
-        User user = userService.getUserById(request.getPartnerId()).orElseThrow(()->new EntityNotFoundException("User not found by id "+request.getPartnerId()));
         Partner partner = partnerService.getById(request.getPartnerId());
+        User user = createUser(request);
 
-        log.info("CheckUserAccess");
-        if(request.isGrantUserAccess()){
-            user = createUser(request);
-        }
-        log.info("user id after create {}", user.getUserEntityId());
+        userRolesService.createUserRole(EnumUsers.RoleName.PR, user);
+        createUserPhoneDtoList(request.getPhone(), user);
+        user = userService.save(user);
 
         PartnerContact partnerContact = new PartnerContact();
         partnerContact.setUser(user);
         partnerContact.setPartner(partner);
-        UserPhone userPhone = new UserPhone();
-        userPhone.setUser(user);
-        userPhone.setUsphModifiedDate(LocalDateTime.now());
-        userPhone.setUsphPhoneType("HP");
-        UserPhoneId userPhoneId = new UserPhoneId();
-        userPhoneId.setUsphEntityId(user.getUserEntityId());
-        userPhoneId.setUsphPhoneNumber("123456");
-        userPhone.setUserPhoneId(userPhoneId);
-
-        userPhoneRepository.save(userPhone);
-
-        //UserPhone userPhone = userPhoneService.addUserPhone(user.getUserEntityId(), createUserPhoneDto(request.getPhone()));
-        log.info("Userphone {}", userPhone.getUserPhoneId().getUsphPhoneNumber());
-
         PartnerContactEntityId partnerContactEntityId = new PartnerContactEntityId(partner.getPartEntityid(), user.getUserEntityId());
         partnerContact.setId(partnerContactEntityId);
         partnerContactRepository.save(partnerContact);
-        log.info("partner COntact id {}", partnerContact.getId());
-        return partnerContact;
 
+        return partnerContact;
     }
 
     @Transactional
     public PartnerContact edit(PartnerContactRequest request, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));
-        if(Objects.nonNull(request.getPhone())){
+        User user = userService.getUserById(userId).orElseThrow(() -> new EntityNotFoundException("Partner Contact Not Found"));
+        Partner partner = partnerService.getById(request.getPartnerId());
+        UserPhone userPhone = user.getUserPhone().get(0);
+         if(!userPhone.getUserPhoneId().getUsphPhoneNumber().equals(request.getPhone())){
             user.getUserPhone().clear();
-            UserPhone userPhone = new UserPhone();
-            UserPhoneId userPhoneId = new UserPhoneId();
-            userPhoneId.setUsphEntityId(user.getUserEntityId());
-            userPhoneId.setUsphPhoneNumber(request.getPhone());
-            userPhone.setUserPhoneId(userPhoneId);
-            user.getUserPhone().add(userPhone);
+
+            createUserPhoneDtoList(request.getPhone(), user);
+            user = userService.save(user);
+
+            PartnerContact partnerContact = new PartnerContact();
+            partnerContact.setUser(user);
+            partnerContact.setPartner(partner);
+
+            PartnerContactEntityId partnerContactEntityId = new PartnerContactEntityId(partner.getPartEntityid(), user.getUserEntityId());
+            partnerContact.setId(partnerContactEntityId);
+            partnerContactRepository.save(partnerContact);
         }
         user.setUserFullName(request.getName());
-        userRepository.save(user);
+        userService.save(user);
 
-        PartnerContactEntityId id = new PartnerContactEntityId(request.getPartnerId(), userId);
+        PartnerContactEntityId id = new PartnerContactEntityId();
+        id.setPartnerId(partner.getPartEntityid());
+        id.setUserId(user.getUserEntityId());
 
-        return partnerContactRepository.findById(id).get();
+        return partnerContactRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Partner Contact Not Found"));
     }
 }

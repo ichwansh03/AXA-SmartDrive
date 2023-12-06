@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.partners;
 
+import com.app.smartdrive.api.controllers.users.UserController;
 import com.app.smartdrive.api.dto.partner.PartnerContactDto;
 import com.app.smartdrive.api.dto.partner.request.PartnerContactRequest;
 import com.app.smartdrive.api.entities.partner.PartnerContact;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 public class PartnerContactController {
 
     private final PartnerContactService partnerContactService;
+    private final UserController userController;
+
 
     @PostMapping
     public ResponseEntity<PartnerContactDto> addPartnerContact(@Valid @RequestBody PartnerContactRequest request){
@@ -25,19 +28,15 @@ public class PartnerContactController {
         return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(partnerContact, PartnerContactDto.class));
     }
 
-    @PutMapping("/{id}/partner-contacts/{userId}")
-    public ResponseEntity<PartnerContactDto> addPartnerContact(@RequestBody PartnerContactRequest request, @PathVariable("id") Long id, @PathVariable("userId") Long userId){
-        request.setPartnerId(id);
+    @PutMapping("/{userId}")
+    public ResponseEntity<PartnerContactDto> addPartnerContact(@Valid @RequestBody PartnerContactRequest request, @PathVariable("userId") Long userId){
         PartnerContact partnerContact = partnerContactService.edit(request,userId);
         return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(partnerContact, PartnerContactDto.class));
     }
 
-    @DeleteMapping("/{id}/partner-contacts/{userId}")
-    public ResponseEntity<String> deletePartnerContact(@PathVariable("id") Long id, @PathVariable("userId") Long userId){
-        PartnerContactEntityId partnerContactEntityId = new PartnerContactEntityId();
-        partnerContactEntityId.setPartnerId(id);
-        partnerContactEntityId.setUserId(userId);
-        partnerContactService.deleteById(partnerContactEntityId);
-        return ResponseEntity.status(201).body("DELETE SUCCESS");
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> deletePartnerContact(@PathVariable("userId") Long userId){
+        userController.deleteUser(userId);
+        return ResponseEntity.status(204).build();
     }
 }

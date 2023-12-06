@@ -31,8 +31,9 @@ public class PartnerContact {
     @JoinColumn(name = "paco_patrn_entityid", insertable = false, updatable = false)
     private Partner partner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paco_user_entityid", insertable = false, updatable = false)
+    @MapsId("userId")
     private User user;
 
     @OneToMany(mappedBy = "partnerContact", fetch = FetchType.LAZY)

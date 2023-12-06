@@ -1,14 +1,13 @@
 package com.app.smartdrive.api.dto.partner.request;
 
+import com.app.smartdrive.api.entities.partner.PartnerContactEntityId;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class PartnerAreaWorkgroupRequest {
-
-    private String city;
-    private String workgroup;
-    private String partnerContactName;
-
+    private Long cityId;
+    private String areaWorkgroupId;
+    private PartnerContactEntityId partnerContactId;
 }
