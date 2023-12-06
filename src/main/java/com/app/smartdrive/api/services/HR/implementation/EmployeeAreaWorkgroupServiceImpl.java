@@ -64,11 +64,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     
         Employees existingEmployee = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElse(null);
     
-        if (existingEmployee == null) {
-            // Handle the case where the employee is not found
-            return null;
-        }
-    
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
     
         employeeAreaWorkgroup.setEawgEntityid(existingEmployee.getEmpEntityid());
@@ -83,7 +78,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
                 Zones zones = provinsi.getZones();
                 String zonesName = zones.getZonesName();
     
-                // Set additional properties to DTO
                 employeeAreaWorkgroupDto.setProvinsi(provName);
                 employeeAreaWorkgroupDto.setZoneName(zonesName);
                 employeeAreaWorkgroupDto.setCityId(city.getCityId());
@@ -106,7 +100,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
         employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
     
-        // Set other properties to DTO as needed
         employeeAreaWorkgroupDto.setArwgCode(employeeAreaWorkgroupDto.getArwgCode());
     
         return employeeAreaWorkgroupDto;
