@@ -7,14 +7,10 @@ import org.jobrunr.storage.InMemoryStorageProvider;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableScheduling
 public class SmartDriveAppApplication implements CommandLineRunner {
 
 	@Resource
@@ -26,7 +22,7 @@ public class SmartDriveAppApplication implements CommandLineRunner {
 		JobRunr.configure()
 				.useStorageProvider(new InMemoryStorageProvider())
 				.useBackgroundJobServer()
-				.useDashboard()
+				.useDashboard(8080)
 				.initialize();
 	}
 
