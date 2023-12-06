@@ -10,13 +10,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Repository
 public interface SoTasksRepository extends JpaRepository<ServiceOrderTasks, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<ServiceOrderTasks> findSeotBySeroId(@Param("seroId") String seroId);
+    List<ServiceOrderTasks> findByServiceOrders_SeroId(String seroId);
 
     @Modifying(clearAutomatically = true)
     @Transactional

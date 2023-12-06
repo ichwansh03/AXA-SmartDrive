@@ -11,7 +11,7 @@ public interface ServOrderTaskService {
 
     List<ServiceOrderTasks> addFeasiblityList(ServiceOrders serviceOrders);
 
-    List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders);
+    List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) throws Exception;
 
     List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders);
 

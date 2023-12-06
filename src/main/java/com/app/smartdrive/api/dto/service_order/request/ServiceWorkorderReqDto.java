@@ -12,10 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ServiceWorkorderReqDto {
 
-    @NotBlank
     private String sowoName;
     private LocalDateTime sowoModDate;
-    @NotNull
     private Boolean sowoStatus;
     private ServiceOrderTasks serviceOrderTasks;
 
