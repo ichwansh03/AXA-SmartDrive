@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
@@ -35,11 +37,11 @@ public class ServOrderImpl implements ServOrderService {
 
     @Transactional
     @Override
-    public ServiceOrders addServiceOrders(Long servId) {
+    public ServiceOrders addServiceOrders(Long servId) throws Exception {
 
         Services services = soRepository.findById(servId).get();
 
-        String formatSeroId = soAdapter.formatServiceOrderId(services);
+        String formatSeroId = soAdapter.formatServiceOrderId(services.getCustomer());
 
         ServiceOrders serviceOrders = new ServiceOrders();
         serviceOrders = ServiceOrders.builder()
@@ -88,11 +90,28 @@ public class ServOrderImpl implements ServOrderService {
     @Transactional(readOnly = true)
     @Override
     public List<ServiceOrders> findAllSeroByServId(Long servId) {
-        List<ServiceOrders> allSeroByServId = soOrderRepository.findAllSeroByServId(servId);
+        List<ServiceOrders> allSeroByServId = soOrderRepository.findByServices_ServId(servId);
 
         log.info("SoOrderServiceImpl::findAllSeroByServId in ID {} ",allSeroByServId);
 
         return allSeroByServId;
+    }
+
+    @Override
+    @Transactional
+    public ServiceOrderReqDto updateServiceOrders(ServiceOrderReqDto serviceOrderReqDto, String seroId) {
+        ServiceOrders serviceOrders = soOrderRepository.findById(seroId)
+                .orElseThrow(() -> new  EntityNotFoundException("ID not found"));
+
+        serviceOrders.setSeroOrdtType(serviceOrderReqDto.getSeroOrdtType());
+        serviceOrders.setSeroStatus(serviceOrderReqDto.getSeroStatus());
+        serviceOrders.setSeroReason(serviceOrderReqDto.getSeroReason());
+        serviceOrders.setServClaimNo(serviceOrderReqDto.getServClaimNo());
+        serviceOrders.setServClaimStartdate(serviceOrderReqDto.getServClaimStartdate());
+        serviceOrders.setServClaimEnddate(serviceOrderReqDto.getServClaimEnddate());
+        soOrderRepository.save(serviceOrders);
+
+        return serviceOrderReqDto;
     }
 
 }

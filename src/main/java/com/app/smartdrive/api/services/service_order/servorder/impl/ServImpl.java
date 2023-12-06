@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
@@ -40,18 +42,25 @@ public class ServImpl implements ServService {
 
     @Transactional
     @Override
-    public Services addService(Long creqId) {
+    public Services addService(Long creqId) throws Exception {
 
         CustomerRequest cr = customerRequestRepository.findById(creqId).get();
+        Services existingCreqId = soRepository.findByCustomer_CreqEntityId(creqId);
 
-        Services serv;
+        Services serv = new Services();
 
-        if (cr.getCreqType().toString().equals("FEASIBLITY")){
-            serv = generateFeasiblity(cr);
-        } else if (cr.getCreqType().toString().equals("POLIS") || cr.getCreqType().toString().equals("CLAIM")) {
+        if (existingCreqId != null){
+            ServiceReqDto serviceReqDto = new ServiceReqDto();
+            updateServices(serviceReqDto, serv.getServId());
             serv = generatePolisAndClaim(cr);
         } else {
-            serv = generateTypeInactive(cr);
+            if (cr.getCreqType().toString().equals("FEASIBLITY")){
+                serv = generateFeasiblity(cr);
+            } else if (cr.getCreqType().toString().equals("POLIS") || cr.getCreqType().toString().equals("CLAIM")) {
+                serv = generatePolisAndClaim(cr);
+            } else {
+                serv = generateTypeInactive(cr);
+            }
         }
 
         Services saved = soRepository.save(serv);
@@ -69,7 +78,7 @@ public class ServImpl implements ServService {
     @Override
     public boolean checkAllTaskComplete(String seroId) {
 
-        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findSeotBySeroId(seroId);
+        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
 
         List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
         ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository, tewoRepository);
@@ -84,6 +93,23 @@ public class ServImpl implements ServService {
 
         log.info("ServOrderTaskImpl::checkAllTaskComplete the results is {}",checkedAll);
         return checkedAll;
+    }
+
+    @Transactional
+    @Override
+    public ServiceReqDto updateServices(ServiceReqDto serviceReqDto, Long servId) {
+        Services services = soRepository.findById(servId).orElseThrow(() -> new EntityNotFoundException("ID not found"));
+
+        services.setServCreatedOn(serviceReqDto.getServCreatedOn());
+        services.setServType(serviceReqDto.getServType());
+        services.setServVehicleNumber(serviceReqDto.getServVehicleNumber());
+        services.setServStartDate(serviceReqDto.getServStartDate());
+        services.setServEndDate(serviceReqDto.getServEndDate());
+        services.setServStatus(serviceReqDto.getServStatus());
+
+        soRepository.save(services);
+
+        return serviceReqDto;
     }
 
     @Transactional(readOnly = true)

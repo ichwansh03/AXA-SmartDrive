@@ -21,9 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
-@NamedQuery(
-        name = "ServiceOrders.findAllSeroByServId",
-        query = "SELECT sero FROM ServiceOrders sero WHERE sero.services.servId = :servId")
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrders {
@@ -83,9 +80,11 @@ public class ServiceOrders {
     @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
     private List<ServiceOrderTasks> serviceOrderTasks;
 
+    //should be one to one
     @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetEvidence> claimAssetEvidence;
 
+    //should be one to one
     @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetSparepart> claimAssetSparepart;
 }

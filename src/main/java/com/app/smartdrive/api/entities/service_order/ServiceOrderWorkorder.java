@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
                 query = "UPDATE ServiceOrderWorkorder sowo SET sowo.sowoStatus = :sowoStatus WHERE sowo.sowoId = :sowoId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 })
 @DynamicInsert
-@DynamicUpdate
 public class ServiceOrderWorkorder {
 
     @Id

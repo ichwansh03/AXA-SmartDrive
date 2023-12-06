@@ -25,14 +25,14 @@ public class SoAdapter {
     private ServService servService;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    public String formatServiceOrderId(Services services){
+    public String formatServiceOrderId(CustomerRequest customerRequest){
 
-        String servTypes = services.getServType().toString();
+        String servTypes = customerRequest.getCreqType().toString();
 
         log.info("Format ID for ServiceOrders has been created");
 
-        String formatSeroId = String.format("%04d", services.getUsers().getUserEntityId());
-        String formatEndDate = services.getServStartDate().format(formatter);
+        String formatSeroId = String.format("%04d", customerRequest.getCustomer().getUserEntityId());
+        String formatEndDate = customerRequest.getCreqCreateDate().format(formatter);
 
         return switch (servTypes) {
             case "POLIS" -> "PL" + formatSeroId + "-" + formatEndDate;

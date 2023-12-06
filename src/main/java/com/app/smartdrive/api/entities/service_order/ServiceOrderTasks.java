@@ -17,13 +17,9 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_tasks", schema = "so")
-@NamedQueries({
-        @NamedQuery(
-                name = "ServiceOrderTasks.findSeotBySeroId",
-                query = "SELECT seot FROM ServiceOrderTasks seot WHERE seot.serviceOrders.seroId = :seroId"),
-        @NamedQuery(
-                name = "ServiceOrderTasks.updateTasksStatus",
-                query = "UPDATE ServiceOrderTasks seot SET seot.seotStatus = :seotStatus WHERE seot.seotId = :seotId", lockMode = LockModeType.PESSIMISTIC_WRITE)})
+@NamedQuery(
+        name = "ServiceOrderTasks.updateTasksStatus",
+        query = "UPDATE ServiceOrderTasks seot SET seot.seotStatus = :seotStatus WHERE seot.seotId = :seotId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrderTasks {
