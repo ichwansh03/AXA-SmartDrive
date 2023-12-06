@@ -31,26 +31,12 @@ public class PartnerContact {
     @JoinColumn(name = "paco_patrn_entityid", insertable = false, updatable = false)
     private Partner partner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paco_user_entityid", insertable = false, updatable = false)
+    @MapsId("userId")
     private User user;
 
     @OneToMany(mappedBy = "partnerContact", fetch = FetchType.LAZY)
     private List<PartnerAreaWorkgroup> partnerAreaWorkgroupList;
-
-    public PartnerContactDto convertToDto(){
-        List<PartnerAreaWorkgroupDto> partnerAreaWorkgroupDtoList = null;
-        if(Objects.nonNull(partnerAreaWorkgroupList)){
-            partnerAreaWorkgroupDtoList = partnerAreaWorkgroupList.stream().map(data -> data.convertToDto()).toList();
-        }
-
-        return PartnerContactDto.builder()
-                .id(id)
-                .status(status.name())
-                .partnerName(partner.getPartName())
-                .user(user)
-                .partnerAreaWorkgroupList(partnerAreaWorkgroupDtoList)
-                .build();
-    }
 
 }

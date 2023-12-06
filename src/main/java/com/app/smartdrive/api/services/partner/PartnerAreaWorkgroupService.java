@@ -6,6 +6,6 @@ import com.app.smartdrive.api.services.BaseService;
 
 public interface PartnerAreaWorkgroupService extends BaseService<PartnerAreaWorkgroup, Long> {
 
-    PartnerAreaWorkgroup save(PartnerAreaWorkgroupRequest request);
+    PartnerAreaWorkgroup create(PartnerAreaWorkgroupRequest request);
 
 }

@@ -76,7 +76,7 @@ public class User {
   @JsonBackReference
   private BusinessEntity userBusinessEntity;
   
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JsonManagedReference
   @PrimaryKeyJoinColumn
   private List<UserPhone> userPhone;

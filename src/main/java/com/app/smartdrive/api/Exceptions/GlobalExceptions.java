@@ -14,10 +14,11 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptions {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptions.class);
 
@@ -46,23 +47,29 @@ public class GlobalExceptions {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(
-            HttpServletRequest request, Exception ex, Locale locale) {
-
-        Error error = ErrorUtils.createError(
-                        ex.getMessage(),
-                        ex.getLocalizedMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .setUrl(request.getRequestURL().toString())
-                .setReqMethod(request.getMethod())
-                .setTimestamp(LocalDateTime.now());
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<?> handleException(
+//            HttpServletRequest request, Exception ex, Locale locale) {
+//
+//        Error error = ErrorUtils.createError(
+//                        ex.getMessage(),
+//                        ex.getLocalizedMessage(),
+//                        HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                .setUrl(request.getRequestURL().toString())
+//                .setReqMethod(request.getMethod())
+//                .setTimestamp(LocalDateTime.now());
+//        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler(UserExistException.class)
     public ResponseEntity<?> userExistException(UserExistException ex) {
 
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> entityNotFoundException(EntityNotFoundException ex){
         Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.NOT_FOUND.value());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }

@@ -1,15 +1,25 @@
 package com.app.smartdrive.api.services.partner.implementation;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
+import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.Provinsi;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.entities.users.EnumUsers;
+import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
+import com.app.smartdrive.api.services.master.CityService;
 import com.app.smartdrive.api.services.partner.PartnerService;
+import com.app.smartdrive.api.services.users.BusinessEntityService;
+import com.app.smartdrive.api.services.users.UserRolesService;
+import com.app.smartdrive.api.services.users.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,16 +31,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PartnerServiceImpl implements PartnerService {
 
     private final PartnerRepository partnerRepository;
-    private final CityRepository cityRepository;
+    private final CityService cityService;
+    private final UserService userService;
+    private final UserRolesService userRolesService;
     @Override
     @Transactional
     public Partner getById(Long entityId) {
-        return partnerRepository.findById(entityId).get();
+        return partnerRepository.findById(entityId).orElseThrow(() -> {
+            throw new EntityNotFoundException("Partner not found by id "+entityId);
+        });
     }
 
     @Override
@@ -40,30 +55,52 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
+    public Partner save(Partner partner) {
+        partner.getBusinessEntity().setEntityModifiedDate(LocalDateTime.now());
+        return partnerRepository.save(partner);
+    }
+
     @Transactional
-    public Partner save(Partner entity) {
-        if(Objects.isNull(entity.getBusinessEntity())){
-            BusinessEntity businessEntity = new BusinessEntity();
-            entity.setBusinessEntity(businessEntity);
+    private User createUser(Partner partner, boolean grantUserAccess){
+        ProfileRequestDto userDto = new ProfileRequestDto();
+        userDto.setUserEmail(partner.getPartName());
+        userDto.setUserNpwp(partner.getPartNpwp());
+        userDto.setUserFullName(partner.getPartName());
+        userDto.setUserNationalId(partner.getPartNpwp());
+        userDto.setUserName(String.format("%15s", partner.getPartName().replaceAll(" ", ""))
+                .replaceAll(" ", "0"));
+        if (grantUserAccess){
+            userDto.setUserPassword(partner.getPartNpwp());
         }
-        entity.getBusinessEntity().setEntityModifiedDate(LocalDateTime.now());
-        return partnerRepository.save(entity);
+
+        User user = userService.createUser(userDto);
+        userRolesService.createUserRole(EnumUsers.RoleName.PR, user);
+
+        return userService.save(user);
+
+    }
+    @Override
+    @Transactional
+    public Partner save(PartnerRequest partnerRequest) {
+        Partner partner = create(partnerRequest);
+        User user = createUser(partner, partnerRequest.isGrantUserAccess());
+        partner.setBusinessEntity(user.getUserBusinessEntity());
+        partnerRepository.save(partner);
+        return partner;
     }
 
     @Override
     @Transactional
     public void deleteById(Long id) {
-        partnerRepository.deleteById(id);
-
+        partnerRepository.delete(getById(id));
     }
 
     @Override
-    public Partner convertToEntity(PartnerRequest request) {
-        Cities city = cityRepository.findByCityName(request.getCity());
+    public Partner create(PartnerRequest request) {
+        Cities city = cityService.getById(request.getCityId());
         Partner partner = new Partner();
-        partner.setPartName(request.getName());
-        partner.setPartAddress(request.getAddress());
-        partner.setPartNpwp(request.getNpwp());
+        partner = TransactionMapper.mapDtoToEntity(request, partner);
+        partner.setPartAccountNo(request.getPartAccountNo());
         partner.setCity(city);
         return partner;
     }
