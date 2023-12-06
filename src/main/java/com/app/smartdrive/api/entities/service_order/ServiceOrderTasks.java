@@ -49,7 +49,7 @@ public class ServiceOrderTasks {
     private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
-    private String seotStatus = EnumModuleServiceOrders.SeotStatus.INPROGRESS.toString();
+    private EnumModuleServiceOrders.SeotStatus seotStatus;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -65,14 +65,4 @@ public class ServiceOrderTasks {
     @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL)
     private List<ServiceOrderWorkorder> serviceOrderWorkorders;
 
-    @Transient
-    private Object generatePolisTasks;
-
-    public ServiceOrderTasks(String seotName, LocalDateTime seotActualStartdate, LocalDateTime seotActualEnddate, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders) {
-        this.seotName = seotName;
-        this.seotActualStartdate = seotActualStartdate;
-        this.seotActualEnddate = seotActualEnddate;
-        this.areaWorkGroup = areaWorkGroup;
-        this.serviceOrders = serviceOrders;
-    }
 }

@@ -4,8 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+
 import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserPhone;
@@ -29,7 +32,7 @@ public class UserPhoneImpl implements UserPhoneService {
 
   @Override
   @Transactional
-  public UserPhone updateUserPhone(Long userId, String phoneNumber, UserPhoneDto userPost) {
+  public UserPhone updateUserPhone(Long userId, String phoneNumber, UserPhoneRequestDto userPost) {
     // TODO Auto-generated method stub
     // User user = userRepository.findById(userId).get();
     // List<UserPhone> listUserPhones = user.getUserPhone();
@@ -51,9 +54,10 @@ public class UserPhoneImpl implements UserPhoneService {
     Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(phoneNumber, userId);
     if(userPhone.isPresent()){
       userPhone.get().setUsphModifiedDate(LocalDateTime.now());
+      userPhone.get().setUsphPhoneType(userPost.getUsphPhoneType());
       userPhoneRepository.save(userPhone.get());
-      userPhoneRepository.setPhoneNumber(userPost.getUserPhoneId().getUsphPhoneNumber(), phoneNumber);
-      return userPhoneRepository.findByUsphPhoneNumber(userPost.getUserPhoneId().getUsphPhoneNumber(), userId).get();
+      userPhoneRepository.setPhoneNumber(userPost.getUsphPhoneNumber(), phoneNumber);
+      return userPhoneRepository.findByUsphPhoneNumber(userPost.getUsphPhoneNumber(), userId).get();
     }
     throw new EntityNotFoundException("Phone Number is not exist or you are not granted access to this phone number");
   }

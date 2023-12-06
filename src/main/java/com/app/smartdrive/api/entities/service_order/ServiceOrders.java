@@ -4,10 +4,9 @@ import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -22,6 +21,9 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
+@NamedQuery(
+        name = "ServiceOrders.findAllSeroByServId",
+        query = "SELECT sero FROM ServiceOrders sero WHERE sero.services.servId = :servId")
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrders {
@@ -32,7 +34,7 @@ public class ServiceOrders {
 
     @Column(name = "sero_ordt_type")
     @Enumerated(EnumType.STRING)
-    private EnumModuleServiceOrders.SeroOrdtType seroOrdtType = EnumModuleServiceOrders.SeroOrdtType.CREATE;;
+    private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
 
     @Column(name = "sero_status")
     @Enumerated(EnumType.STRING)
@@ -42,7 +44,6 @@ public class ServiceOrders {
     private String seroReason;
 
     @Column(name = "serv_claim_no")
-    @Size(max = 12, message = "claim number can't more than 12 characters")
     private String servClaimNo;
 
     @Column(name = "serv_claim_startdate")
@@ -50,6 +51,11 @@ public class ServiceOrders {
 
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
+
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sero_part_id")
+    private Partner partner;
 
     @JsonIgnore
     @ManyToOne

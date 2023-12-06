@@ -2,6 +2,8 @@ package com.app.smartdrive.api.services.users.implementation;
 
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.UserUserAccountDto;
 import com.app.smartdrive.api.entities.payment.Banks;
@@ -76,9 +78,9 @@ public class UserUserAccountImpl implements UserUserAccountService {
 
   @Override
   @Transactional
-  public void deleteUserAccounts(Long id, Long ucId) {
+  public void deleteUserAccounts(Long id, Long accountId) {
     Optional<User> user = userRepository.findById(id);
-    Optional<UserAccounts> userAccount = userAccountsRepository.findById(ucId);
+    Optional<UserAccounts> userAccount = userAccountsRepository.findById(accountId);
     if(user.get().getUserEntityId().equals(userAccount.get().getUsacUserEntityid())){
       userAccountsRepository.delete(userAccount.get());
     }

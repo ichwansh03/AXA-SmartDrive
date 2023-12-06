@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.users.implementation;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
@@ -29,7 +30,8 @@ public class UserRolesImpl implements UserRolesService{
     userRoles.setUsroModifiedDate(LocalDateTime.now());
     userRoles.setUser(user);
     
-    List<UserRoles> listRole = List.of(userRoles);
+    List<UserRoles> listRole = new ArrayList<>();
+    listRole.add(userRoles);
     user.setUserRoles(listRole);
     return listRole;
   }

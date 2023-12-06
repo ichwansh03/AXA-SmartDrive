@@ -5,6 +5,7 @@ package com.app.smartdrive.api.controllers.HR;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -22,12 +23,15 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.app.smartdrive.api.dto.HR.request.CreateEmployeesDto;
+import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.partner.Partner;
+import com.app.smartdrive.api.mapper.hr.EmployeesMapper;
 import com.app.smartdrive.api.repositories.HR.JobTypeRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 
@@ -42,11 +46,6 @@ import lombok.RequiredArgsConstructor;
 public class EmployeesController {
      private final EmployeesService employeesService;
 
-     @PostMapping("/add")
-     public ResponseEntity<?> addEmployee(@RequestBody CreateEmployeesDto employeesDto)throws Exception {
-            CreateEmployeesDto addedEmployee = employeesService.addEmployee(employeesDto);
-            return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
-    }
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteEmployeesById (@RequestParam Long emp_entityid) {
@@ -54,13 +53,19 @@ public class EmployeesController {
             return new ResponseEntity<>("Employees deleted successfully", HttpStatus.OK);
     }
 
-//     @PutMapping("/update/{employeeId}")
-//     public ResponseEntity<CreateEmployeesDto> updateEmployee(
-//             @PathVariable Long employeeId,
-//             @RequestBody CreateEmployeesDto updatedEmployeeDto) {
-//         CreateEmployeesDto updatedEmployee = employeesService.updateEmployee(employeeId, updatedEmployeeDto);
-//         return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
-//     }
+    @PutMapping("/update/{employeeId}")
+    public ResponseEntity<EmployeesRequestDto> updateEmployee(
+            @PathVariable Long employeeId,
+            @RequestBody EmployeesRequestDto updatedEmployeeDto) {
+        EmployeesRequestDto updatedEmployee = employeesService.editEmployee(employeeId, updatedEmployeeDto);
+        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+    }
+
+        @PostMapping("/create")
+        public ResponseEntity<?> createEmployee(@RequestBody EmployeesRequestDto employeesDto) {
+        EmployeesRequestDto createdEmployee = employeesService.createEmployee(employeesDto);
+        return new ResponseEntity<>(createdEmployee, HttpStatus.OK);
+}
 
     @GetMapping("/search")
     public Page<Employees> searchEmployees(
@@ -70,6 +75,16 @@ public class EmployeesController {
     ) {
         return employeesService.searchEmployees(value, page, size);
     }
+
+    @GetMapping()
+    public ResponseEntity<List<EmployeesDto>> getAll() {
+    List<Employees> employees = employeesService.getAll();
+
+    List<EmployeesDto> employeeDtos = employees.stream()
+            .map(EmployeesMapper::convertEntityToDto)
+            .collect(Collectors.toList());
+    return ResponseEntity.ok(employeeDtos);
+}
 
     
 

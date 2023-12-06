@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 
-import com.app.smartdrive.api.dto.HR.request.CreateEmployeesDto;
+import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
@@ -81,7 +81,7 @@ public class Employees {
     @OneToOne(orphanRemoval = true,cascade = CascadeType.ALL)
     @MapsId("empEntityid")
     @JoinColumn(name = "emp_entityid", referencedColumnName = "user_entityid")
-    @JsonBackReference
+    @JsonManagedReference
     private User user;
 
     @JsonManagedReference
