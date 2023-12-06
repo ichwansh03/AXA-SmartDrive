@@ -31,7 +31,7 @@ public class UserUserAccountImpl implements UserUserAccountService {
   private final UserRepository userRepository;
 
   @Override
-  public UserAccounts updateUserAccounts(Long id, Long accountId, @Valid UserUserAccountDto userPost) {
+  public UserAccounts updateUserAccounts(Long id, Long accountId, UserUserAccountDto userPost) {
     // Optional<UserAccounts> userAccounts = userAccountsRepository.findById(accountId);
     // if (userAccounts.isPresent() && userAccounts.get().getUsacUserEntityid().equals(id)) {
     //   if (userAccounts.get().getEnumPaymentType().toString().equals("BANK")) {
@@ -55,7 +55,7 @@ public class UserUserAccountImpl implements UserUserAccountService {
   }
 
   @Override
-  public UserAccounts addUserAccounts(Long id, @Valid UserUserAccountDto userPost) {
+  public UserAccounts addUserAccounts(Long id, UserUserAccountDto userPost) {
     UserAccounts userAccounts = new UserAccounts();
     // userAccounts.setUsac_accountno(userPost.getUsac_accountno());
     // if (userPost.getEnumPaymentType().equals("BANK")) {

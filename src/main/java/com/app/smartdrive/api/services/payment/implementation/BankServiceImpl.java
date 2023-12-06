@@ -62,11 +62,11 @@ public class BankServiceImpl implements BankService {
     public BanksDto save(BanksDto banksDto) {
        BusinessEntity busines = new BusinessEntity();
         busines.setEntityModifiedDate(LocalDateTime.now());
-        Long businessEntityId = businessEntityService.save(busines);
+        busines = businessEntityService.save(busines);
         
         Banks banks = new Banks();
         banks.setBusinessEntity(busines);
-        banks.setBank_entityid(businessEntityId);
+        banks.setBank_entityid(busines.getEntityId());
         banks.setBank_name(banksDto.getBank_name());
         banks.setBank_desc(banksDto.getBank_desc());
         addaBanks(banks);
