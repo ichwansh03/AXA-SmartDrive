@@ -8,8 +8,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
-import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
@@ -30,8 +29,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import com.app.smartdrive.api.dto.customer.request.CiasDTO;
-import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.entities.customer.EnumCustomer.CadocCategory;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
@@ -532,9 +529,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Override
     public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
-        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
                 () -> new EntityNotFoundException("Customer Claim dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
         );
+
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
+        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
+
+        CustomerClaim existCustomerClaim = existCustomerRequest.getCustomerClaim();
 
         LocalDateTime cuclCreateDate = existCustomerClaim.getCuclCreateDate();
 
@@ -664,6 +666,18 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             ciasCuexs.add(cuex);
         }
         return ciasCuexs;
+    }
+
+    @Override
+    public CustomerResponseDTO openPolis(UpdateRequestTypeRequestDTO updateTypeDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(updateTypeDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer request dengan id " + updateTypeDTO.getCreqEntityId() + " tidak ada")
+        );
+
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.POLIS);
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
+        return this.convert(savedCustomerRequest);
     }
 
 

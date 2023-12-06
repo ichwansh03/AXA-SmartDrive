@@ -95,4 +95,9 @@ public class ServOrderImpl implements ServOrderService {
         return allSeroByServId;
     }
 
+    @Override
+    public boolean checkAllTaskComplete(String seroId, Long seotId) {
+        return false;
+    }
+
 }

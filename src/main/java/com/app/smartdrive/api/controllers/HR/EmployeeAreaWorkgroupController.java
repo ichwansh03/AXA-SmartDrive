@@ -64,4 +64,5 @@ public class EmployeeAreaWorkgroupController {
         return employeeAreaWorkgroupService.searchEawg(value, page, size);
     }
 
+
 }
