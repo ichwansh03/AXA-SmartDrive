@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.dto.HR.request;
 
-import java.io.Serializable;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +15,6 @@ public class EmployeeAreaWorkgroupDto {
     private String zoneName;
     private String provinsi;
     private Long cityId;
-    private String areaworkGroup;
-    private Long empEntityId;
+    private String arwgCode;
+    private Long empEntityid;
 }

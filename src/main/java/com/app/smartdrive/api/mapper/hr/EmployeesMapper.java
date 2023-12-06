@@ -10,6 +10,7 @@ import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 
+
 public class EmployeesMapper {
     public static EmployeesDto convertEntityToDto(Employees employees){
         EmployeesDto employeesDto = EmployeesDto.builder()
@@ -22,7 +23,7 @@ public class EmployeesMapper {
         .empNetSalary(employees.getEmpNetSalary())
         .empAccountNumber(employees.getEmpAccountNumber())
         .empModifiedDate(employees.getEmpModifiedDate())
-        .empJobCode(TransactionMapper.mapEntityToDto(employees.getJobType(), EmployeesJobTypeResponseDto.class))
+        .empJobCode(employees.getEmpJobCode())
             .build();
         return employeesDto;
     }
