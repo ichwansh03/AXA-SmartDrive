@@ -52,10 +52,10 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_part_id")
-    private Partner partner;
+    // @JsonBackReference
+    // @OneToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "sero_part_id")
+    // private Partner partner;
 
     @JsonIgnore
     @ManyToOne

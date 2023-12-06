@@ -7,6 +7,8 @@ import com.app.smartdrive.api.dto.HR.response.EmployeesJobTypeResponseDto;
 import com.app.smartdrive.api.dto.user.ProfileDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
+import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
+import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.response.UserAddressDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
@@ -24,19 +26,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateEmployeesDto {
+public class EmployeesRequestDto {
     private String empName;
     private String email;
-    private String empPhone;
+    private UserPhoneRequestDto empPhone;
     private String empJoinDate;
     @Enumerated(EnumType.STRING)
     private EnumClassHR.emp_graduate empGraduate;
     private Double empSalary;
     private String empAccountNumber;
-    private Long empCity;
-    private String empAddress;
-    private String empAddress2;
-    private String empJobRole;
+    private UserAddressRequestDto empAddress;
+    private EmployeesJobTypeResponseDto empJobRole;
     private Boolean grantAccessUser;
     // private String empAddress2;
     // private CreateUserDto createUserDto;

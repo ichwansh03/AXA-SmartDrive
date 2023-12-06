@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.dto.service_order.response;
 
-import com.app.smartdrive.api.dto.HR.request.CreateEmployeesDto;
+import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
@@ -23,7 +23,7 @@ public class ServiceOrderRespDto {
     private String servClaimStartDate;
     private String servClaimEndDate;
     private ServiceRespDto services;
-    private CreateEmployeesDto employees;
+    private EmployeesRequestDto employees;
     private ArwgRes arwgRes;
     private Partner partner;
     private List<SoTasksDto> soTasksDtoList;
