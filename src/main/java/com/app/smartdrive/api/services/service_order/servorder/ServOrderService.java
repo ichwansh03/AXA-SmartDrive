@@ -14,6 +14,5 @@ public interface ServOrderService {
 
     List<ServiceOrders> findAllSeroByServId(Long servId);
 
-    boolean checkAllTaskComplete(String seroId, Long seotId);
 
 }

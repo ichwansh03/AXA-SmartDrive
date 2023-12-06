@@ -62,7 +62,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
     
-        Employees existingEmployee = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityId()).orElse(null);
+        Employees existingEmployee = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElse(null);
     
         if (existingEmployee == null) {
             // Handle the case where the employee is not found
@@ -88,7 +88,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
                 employeeAreaWorkgroupDto.setZoneName(zonesName);
                 employeeAreaWorkgroupDto.setCityId(city.getCityId());
     
-                AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findById(employeeAreaWorkgroupDto.getAreaworkGroup()).orElse(null);
+                AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findById(employeeAreaWorkgroupDto.getArwgCode()).orElse(null);
     
                 if (areaWorkGroup != null) {
                     employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
@@ -107,46 +107,54 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
     
         // Set other properties to DTO as needed
-        employeeAreaWorkgroupDto.setAreaworkGroup(employeeAreaWorkgroupDto.getAreaworkGroup());
+        employeeAreaWorkgroupDto.setArwgCode(employeeAreaWorkgroupDto.getArwgCode());
     
+        return employeeAreaWorkgroupDto;
+    }
+
+    @Override
+    @Transactional
+    public EmployeeAreaWorkgroupDto updateEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, Long id) {
+        Optional<Cities> cities = cityRepository.findById(employeeAreaWorkgroupDto.getCityId());
+        Provinsi provinsi = cities.get().getProvinsi();
+        String provName = provinsi.getProvName();
+        Zones zones = provinsi.getZones();
+        String zonesName = zones.getZonesName();
+        employeeAreaWorkgroupDto.setProvinsi(provName);
+        employeeAreaWorkgroupDto.setZoneName(zonesName);
+        employeeAreaWorkgroupDto.setCityId(cities.get().getCityId());
+
+        List<AreaWorkGroup> listAreaWorkGroup = cities.get().getAreaWorkGroups();
+        AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findByArwgCode(employeeAreaWorkgroupDto.getArwgCode());
+        for (AreaWorkGroup arwg : listAreaWorkGroup) {
+            if (arwg.getArwgCode().equals(employeeAreaWorkgroupDto.getArwgCode())) {
+                areaWorkGroup = arwg;
+            }
+        }
+
+        Optional<EmployeeAreaWorkgroup> optionalEmployeeAreaWorkgroup = employeeAreaWorkgroupRepository.findByEawgId(id);
+        if (optionalEmployeeAreaWorkgroup.isPresent()) {
+            EmployeeAreaWorkgroup employeeAreaWorkgroup = optionalEmployeeAreaWorkgroup.get();
+            Employees employees = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElse(null);
+
+            if (!employeeAreaWorkgroupDto.getArwgCode().equals(employeeAreaWorkgroup.getEawgArwgCode())) {
+                employeeAreaWorkgroup.setEawgArwgCode(employeeAreaWorkgroupDto.getArwgCode());
+            }
+            if (!employeeAreaWorkgroupDto.getEmpEntityid().equals(employees.getEmpEntityid())) {
+                employeeAreaWorkgroup.setEawgEntityid(employeeAreaWorkgroupDto.getEmpEntityid());
+            }
+
+            employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
+            employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
+            employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
+            employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
+        }
+
         return employeeAreaWorkgroupDto;
     }
     
      
-    @Override
-    @Transactional
-    public EmployeeAreaWorkgroupDto updateEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, Long id) {
-    //     Cities cities = cityRepository.findById(employeeAreaWorkgroupDto.getCityName());
-    //     Provinsi provinsi = cities.getProvinsi();
-    //             String provName = provinsi.getProvName();
-    //             Zones zones = provinsi.getZones();
-    //             String zonesName = zones.getZonesName();
-    //             employeeAreaWorkgroupDto.setProvinsi(provName);
-    //             employeeAreaWorkgroupDto.setZoneName(zonesName);
-    //             employeeAreaWorkgroupDto.setCityName(cities.getCityName());
-
-    //     List<AreaWorkGroup> listAreaWorkGroup = cities.getAreaWorkGroups();
-    //     AreaWorkGroup areaWorkGroup= areaWorkGroupRepository.findByArwgCode(employeeAreaWorkgroupDto.getAreaworkGroup());
-    //     for (AreaWorkGroup arwg : listAreaWorkGroup) {
-    //         if(arwg.getArwgCode().equals(employeeAreaWorkgroupDto.getAreaworkGroup())){
-    //             areaWorkGroup = arwg;
-    //         }
-    //     }
-    //     EmployeeAreaWorkgroup employeeAreaWorkgroup = employeeAreaWorkgroupRepository.findByEawgId(id).get();
-    //     Employees employees = employeesRepository.findByEmpName(employeeAreaWorkgroupDto.getEmpName());
-    //         NullUtils.updateIfChanged(employeeAreaWorkgroup::setEawgArwgCode, employeeAreaWorkgroupDto.getAreaworkGroup(),employeeAreaWorkgroup::getEawgArwgCode);
-    //         NullUtils.updateIfChanged(employees::setEmpName, employeeAreaWorkgroupDto.getEmpName(), employees::getEmpName);
-
-    //         employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
-
-    //         employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
-    //         employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
-    //         employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
-
-
-    return employeeAreaWorkgroupDto;
-    
-    }
+   
 
     @Override
     public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size) {
@@ -163,14 +171,17 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
     private EmployeesAreaWorkgroupResponseDto convertToDto(EmployeeAreaWorkgroup employeeAreaWorkgroup) {
         EmployeesAreaWorkgroupResponseDto dto = new EmployeesAreaWorkgroupResponseDto();
-        dto.setAreaworkGroup(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getAreaWorkGroup(), ArwgRes.class));
+        dto.setAreaWorkGroup(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getAreaWorkGroup(), ArwgRes.class));
         dto.setEmployees(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getEmployees(), EmployeesDto.class));
         return dto;
     }
 
-
-
-    
+    @Override
+    public List<EmployeesAreaWorkgroupResponseDto> getAllDto() {
+      List<EmployeeAreaWorkgroup> employeeAreaWorkgroups = employeeAreaWorkgroupRepository.findAll();
+      List<EmployeesAreaWorkgroupResponseDto> empDto = TransactionMapper.mapEntityListToDtoList(employeeAreaWorkgroups, EmployeesAreaWorkgroupResponseDto.class);
+      return empDto;
+    }
     
     
     @Override
@@ -197,9 +208,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
          employeeAreaWorkgroupRepository.deleteEawgById(eawg_id);
     }
 
-    public EmployeeAreaWorkgroup findByEawgById(Long eawg_id){
-        Optional<EmployeeAreaWorkgroup> findByEawgId = employeeAreaWorkgroupRepository.findByEawgId(eawg_id);
-        return findByEawgId.get();
-    }
+
     
 }

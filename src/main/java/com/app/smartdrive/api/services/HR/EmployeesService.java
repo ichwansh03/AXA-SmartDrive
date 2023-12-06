@@ -16,11 +16,9 @@ public interface EmployeesService extends BaseService<Employees, Long>  {
 //  public CreateEmployeesDto updateEmployee(Long employeeId, CreateEmployeesDto updatedEmployeeDto);
  public List<EmployeesRequestDto> getAllEmployeesDto();
  public List<Employees> getAllByEmployeeName(String employeeName);
-
-
  
  public Page<Employees> searchEmployees(String value, int page, int size) ;
  public EmployeesRequestDto createEmployee(EmployeesRequestDto employeesDto);
  public EmployeesRequestDto editEmployee(Long employeeId, EmployeesRequestDto employeesDto); 
-
+ public List<EmployeesDto> getAllDto();
 }

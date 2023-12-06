@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -89,6 +90,9 @@ public class EmployeesServiceImpl implements EmployeesService {
 
 
 
+
+
+
     @Override
     @Transactional
     public EmployeesRequestDto createEmployee(EmployeesRequestDto employeesDto) {
@@ -104,7 +108,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         employee.setEmpGraduate(employeesDto.getEmpGraduate());
         employee.setEmpNetSalary(employeesDto.getEmpSalary());
-        employee.setEmpJobCode(employeesDto.getEmpJobRole().getJobCode());
+        employee.setEmpJobCode(employeesDto.getEmpJobRole());
         employee.setEmpModifiedDate(LocalDateTime.now());
 
         ProfileRequestDto profileRequestDto = new ProfileRequestDto();
@@ -189,7 +193,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
     existingEmployee.setEmpGraduate(employeesDto.getEmpGraduate());
     existingEmployee.setEmpNetSalary(employeesDto.getEmpSalary());
-    existingEmployee.setEmpJobCode(employeesDto.getEmpJobRole().getJobCode());
+    existingEmployee.setEmpJobCode(employeesDto.getEmpJobRole());
     existingEmployee.setEmpModifiedDate(LocalDateTime.now());
 
     
@@ -225,19 +229,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         return employeesRepository.findAllByEmpName(employeeName);
     }
 
-    @Override
-    public Employees getById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
-    }
-
     
-
-    @Override
-    public Employees save(Employees entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
 
     @Override
     public List<EmployeesRequestDto> getAllEmployeesDto() {
@@ -246,15 +238,32 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
 
     @Override
-    public List<Employees> getAll() {
-        List<Employees> empList = employeesRepository.findAll();
-        List<EmployeesDto> empDto = new ArrayList<>();
-        for (Employees emp : empList) {
-            EmployeesDto dto = EmployeesMapper.convertEntityToDto(emp);
-            empDto.add(dto);
-        }
-        return empList;
+    public List<EmployeesDto> getAllDto() {
+      List<Employees> employees = employeesRepository.findAll();
+      List<EmployeesDto> empDto = TransactionMapper.mapEntityListToDtoList(employees, EmployeesDto.class);
+      return empDto;
     }
+
+    @Override
+    public Employees getById(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+    }
+
+    @Override
+    public List<Employees> getAll() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+    }
+
+    @Override
+    public Employees save(Employees entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    
+
     
 
     

@@ -21,8 +21,8 @@ public interface EmployeeAreaWorkgroupService extends BaseService<EmployeeAreaWo
 
      public EmployeeAreaWorkgroupDto updateEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, Long id);
 
+     public List<EmployeesAreaWorkgroupResponseDto> getAllDto();
 
-      public EmployeeAreaWorkgroup findByEawgById(Long eawg_id);
 
     
 

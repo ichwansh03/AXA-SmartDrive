@@ -24,7 +24,6 @@ public interface EmployeesRepository  extends JpaRepository<Employees, Long>{
 
     Employees findByEmpName(String empName);
 
-
     Page<Employees> findByEmpGraduate(EnumClassHR.emp_graduate empGraduate, Pageable pageable);
 
     Page<Employees> findByEmpNameContaining(String empName, Pageable pageable);
