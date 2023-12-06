@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.controllers.users;
 
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
@@ -32,12 +33,12 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/signin")
-  public ResponseEntity<?> loginCustomer(@RequestBody LoginDto login){
+  public ResponseEntity<?> loginCustomer(@Valid @RequestBody LoginDto login){
     return ResponseEntity.status(HttpStatus.OK).body(userService.loginCustomer(login.getIdentity(), login.getPassword()));
   }
 
   @PostMapping("/emps/signin")
-  public ResponseEntity<?> loginEmployee(@RequestBody LoginDto login){
+  public ResponseEntity<?> loginEmployee(@Valid @RequestBody LoginDto login){
     return ResponseEntity.status(HttpStatus.OK).body(userService.loginEmployee(login.getIdentity(), login.getPassword()));
   }
 
@@ -52,14 +53,14 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<?> addUserCustomer(@RequestBody CreateUserDto userPost){
+  public ResponseEntity<?> addUserCustomer(@Valid @RequestBody CreateUserDto userPost){
     User userSaved = userService.createUserCustomer(userPost);
     UserDto userDto = TransactionMapper.mapEntityToDto(userSaved, UserDto.class);
     return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUser(@ModelAttribute UpdateUserRequestDto userPost,
+  public ResponseEntity<?> updateUser(@Valid @ModelAttribute UpdateUserRequestDto userPost,
       @PathVariable("id") Long id) {
 
     UpdateUserRequestDto userUpdated = userService.save(userPost, id);
@@ -76,7 +77,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");
     }
   @PostMapping("/{id}/changePassword")
-  public ResponseEntity<?> changePassword(@PathVariable("id") Long id, @RequestBody PasswordRequestDto passwordRequestDto){
+  public ResponseEntity<?> changePassword(@PathVariable("id") Long id, @Valid @RequestBody PasswordRequestDto passwordRequestDto){
     return ResponseEntity.status(HttpStatus.OK).body(userService.changePassword(id, passwordRequestDto));
   }
 

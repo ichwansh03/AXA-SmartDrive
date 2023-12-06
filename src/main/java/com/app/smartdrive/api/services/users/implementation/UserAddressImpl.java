@@ -30,7 +30,7 @@ public class UserAddressImpl implements UserAddressService {
   private final CityRepository cityRepository;
 
   @Override
-  public UserAddress updateUserAddress(User user, UserAddress address, @Valid UserAddressRequestDto userPost) {
+  public UserAddress updateUserAddress(User user, UserAddress address, UserAddressRequestDto userPost) {
     // Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(idAddress);
     // User user = userRepository.findById(id).get();
 
@@ -49,7 +49,7 @@ public class UserAddressImpl implements UserAddressService {
 
   @Override
   @Transactional
-  public UserAddress updateUserAddress(Long id, Long addressId, @Valid UserAddressRequestDto userPost) {
+  public UserAddress updateUserAddress(Long id, Long addressId, UserAddressRequestDto userPost) {
     Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(addressId, id);
     User user = userRepository.findById(id).get();
     if (userAddress.isPresent()) {
@@ -60,7 +60,7 @@ public class UserAddressImpl implements UserAddressService {
   }
 
   @Override
-  public UserAddress addUserAddress(Long id, @Valid UserAddressRequestDto userPost) {
+  public UserAddress addUserAddress(Long id, UserAddressRequestDto userPost) {
     UserAddress userAddress = new UserAddress();
     userAddress.setUsdrEntityId(id);
     User user = userRepository.findById(id).get();

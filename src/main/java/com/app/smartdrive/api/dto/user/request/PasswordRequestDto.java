@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PasswordRequestDto {
-  @NotBlank
+  @NotBlank(message = "current Password must not be blank")
   String currentPassword;
-  @NotBlank
+  @NotBlank(message = "new Password must not be blank")
   String newPassword;
-  @NotBlank
+  @NotBlank(message = "confirm Password must not be blank")
   String confirmPassword;
 }

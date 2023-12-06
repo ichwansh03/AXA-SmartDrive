@@ -29,7 +29,7 @@ public class UserPhoneImpl implements UserPhoneService {
 
   @Override
   @Transactional
-  public UserPhone updateUserPhone(Long userId, String phoneNumber, @Valid UserPhoneRequestDto userPost) {
+  public UserPhone updateUserPhone(Long userId, String phoneNumber, UserPhoneRequestDto userPost) {
     // TODO Auto-generated method stub
     // User user = userRepository.findById(userId).get();
     // List<UserPhone> listUserPhones = user.getUserPhone();
@@ -60,7 +60,7 @@ public class UserPhoneImpl implements UserPhoneService {
   }
 
   @Override
-  public UserPhone addUserPhone(Long id, @Valid UserPhoneDto userPost) {
+  public UserPhone addUserPhone(Long id, UserPhoneDto userPost) {
     User user = userRepository.findById(id).get();
     UserPhoneId userPhoneId = new UserPhoneId(user.getUserEntityId(), userPost.getUserPhoneId().getUsphPhoneNumber());
     UserPhone userPhone = new UserPhone();

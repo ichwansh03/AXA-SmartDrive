@@ -3,6 +3,7 @@ package com.app.smartdrive.api.services.users.implementation;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.entities.users.BusinessEntity;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BusinessEntityImpl implements BusinessEntityService{
   private final BusinessEntityRepository repo;
   private final EntityManager entityManager;
@@ -28,11 +30,11 @@ public class BusinessEntityImpl implements BusinessEntityService{
   
 
   @Transactional
-  public Long save(BusinessEntity businessEntity){
-    entityManager.persist(businessEntity);
-    Long id = businessEntity.getEntityId();
-    entityManager.flush();
-    return id;
+  public BusinessEntity save(BusinessEntity businessEntity){
+    BusinessEntity business = repo.save(businessEntity);
+    log.info("business entity id ini cuy "+business.getEntityId().toString());
+//    repo.flush();
+    return business;
   }
 
 
@@ -42,9 +44,7 @@ public class BusinessEntityImpl implements BusinessEntityService{
     // TODO Auto-generated method stub
     BusinessEntity businessEntity = new BusinessEntity();
     businessEntity.setEntityModifiedDate(LocalDateTime.now());
-    entityManager.persist(businessEntity);
-    return businessEntity;
+    BusinessEntity newBusiness = save(businessEntity);
+    return newBusiness;
   }
-  
-
 }

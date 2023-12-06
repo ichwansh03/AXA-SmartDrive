@@ -22,7 +22,7 @@ public class UserPhotoController {
   private final UserPhotoService userPhotoService;
 
   @PostMapping
-  public ResponseEntity<?> addUserPhone(@RequestParam MultipartFile photo, @PathVariable("userId") Long userId)throws Exception{
+  public ResponseEntity<?> addUserPhone(@RequestParam MultipartFile photo, @PathVariable("userId") Long userId) throws Exception{
     String userphoto = userPhotoService.addPhoto(photo,userId);
     return ResponseEntity.status(HttpStatus.CREATED).body(userphoto);
   }
