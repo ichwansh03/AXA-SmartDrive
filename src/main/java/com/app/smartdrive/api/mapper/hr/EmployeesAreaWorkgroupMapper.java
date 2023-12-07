@@ -18,12 +18,4 @@ public class EmployeesAreaWorkgroupMapper {
         return dto;
      }
 
-     public static EmployeeAreaWorkgroupDto converttodto(EmployeeAreaWorkgroup employeeAreaWorkgroup){
-        EmployeeAreaWorkgroupDto dto = EmployeeAreaWorkgroupDto.builder()
-        .cityId(employeeAreaWorkgroup.getAreaWorkGroup().getArwgCityId())
-        .arwgCode(employeeAreaWorkgroup.getEawgArwgCode())
-        .empEntityid(employeeAreaWorkgroup.getEmployees().getEmpEntityid())
-        .build();
-        return dto;
-     }
 }

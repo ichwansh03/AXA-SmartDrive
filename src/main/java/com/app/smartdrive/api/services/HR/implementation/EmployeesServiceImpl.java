@@ -61,6 +61,7 @@ import com.app.smartdrive.api.services.users.UserAddressService;
 import com.app.smartdrive.api.services.users.UserPhoneService;
 import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
+import com.app.smartdrive.api.services.users.UserUserAccountService;
 import com.app.smartdrive.api.services.users.implementation.UserAddressImpl;
 import com.app.smartdrive.api.services.users.implementation.UserPhoneImpl;
 import com.app.smartdrive.api.services.users.implementation.UserRolesImpl;
@@ -75,7 +76,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeesServiceImpl implements EmployeesService {
     
-    private final BusinessEntityService businessEntityService;
 
     private final UserAddressService userAddressService;
 
@@ -84,6 +84,8 @@ public class EmployeesServiceImpl implements EmployeesService {
     private final UserRolesService userRolesService;
 
     private final EmployeesRepository employeesRepository;
+
+    private final UserUserAccountService userAccountService;
   
     private final UserService userService;
 
@@ -112,16 +114,19 @@ public class EmployeesServiceImpl implements EmployeesService {
         
         User user = userService.createUser(profileRequestDto);
         
-        if(employeesDto.getGrantAccessUser()==true){
+        
             user.setUserEmail(employeesDto.getEmail());
+            if(employeesDto.getGrantAccessUser()==true){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(employeesDto.getEmpPhone().getUsphPhoneNumber());
+            }
             user.setUserFullName(employeesDto.getEmpName());
             user.setUserNationalId("idn"+user.getUserEntityId());
             user.setUserNPWP("npwp"+user.getUserEntityId());
         
             
             userRolesService.createUserRole(RoleName.EM, user);
+            
             
 
             UserPhoneDto userPhoneDto = new UserPhoneDto();
@@ -130,7 +135,6 @@ public class EmployeesServiceImpl implements EmployeesService {
             userPhoneDto.setUserPhoneId(userPhoneIdDto);
             List<UserPhoneDto> listPhone = new ArrayList<>();
             listPhone.add(userPhoneDto);
-            
             userPhoneService.createUserPhone(user, listPhone);
         
             UserAddressDto userAddressDto = new UserAddressDto();
@@ -139,7 +143,7 @@ public class EmployeesServiceImpl implements EmployeesService {
             List<UserAddressDto> listAddress = new ArrayList<>();
             listAddress.add(userAddressDto);
             userAddressService.createUserAddress(user, listAddress, employeesDto.getEmpAddress().getCityId());
-        }
+        
         
         employee.setEmpEntityid(user.getUserEntityId());
         employee.setUser(user);
@@ -179,6 +183,8 @@ public class EmployeesServiceImpl implements EmployeesService {
     userAddressRequestDto.setUsdrAddress2(employeesDto.getEmpAddress().getUsdrAddress2());
     userAddressRequestDto.setCityId(employeesDto.getEmpAddress().getCityId());
     userAddressService.updateUserAddress(employeeId, userAddress.getUsdrId(), userAddressRequestDto);
+
+
 
     
     existingEmployee.setEmpName(employeesDto.getEmpName());
