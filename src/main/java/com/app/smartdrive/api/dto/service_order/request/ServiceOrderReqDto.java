@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ServiceOrderReqDto {
 
-    @NotNull @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
     @NotNull @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroStatus seroStatus;
