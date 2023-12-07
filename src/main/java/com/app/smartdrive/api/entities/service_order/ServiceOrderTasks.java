@@ -45,6 +45,7 @@ public class ServiceOrderTasks {
     private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
+    @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeotStatus seotStatus;
 
     @JsonIgnore

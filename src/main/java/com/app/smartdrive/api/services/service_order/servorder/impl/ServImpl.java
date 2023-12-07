@@ -3,8 +3,6 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,22 +42,15 @@ public class ServImpl implements ServService {
     public Services addService(Long creqId) throws Exception {
 
         CustomerRequest cr = customerRequestRepository.findById(creqId).get();
-        Services existingCreqId = soRepository.findByCustomer_CreqEntityId(creqId);
 
-        Services serv = new Services();
+        Services serv;
 
-        if (existingCreqId != null){
-            ServiceReqDto serviceReqDto = new ServiceReqDto();
-            updateServices(serviceReqDto, serv.getServId());
+        if (cr.getCreqType().toString().equals("FEASIBLITY")){
+            serv = generateFeasiblity(cr);
+        } else if (cr.getCreqType().toString().equals("POLIS") || cr.getCreqType().toString().equals("CLAIM")) {
             serv = generatePolisAndClaim(cr);
         } else {
-            if (cr.getCreqType().toString().equals("FEASIBLITY")){
-                serv = generateFeasiblity(cr);
-            } else if (cr.getCreqType().toString().equals("POLIS") || cr.getCreqType().toString().equals("CLAIM")) {
-                serv = generatePolisAndClaim(cr);
-            } else {
-                serv = generateTypeInactive(cr);
-            }
+            serv = generateTypeInactive(cr);
         }
 
         Services saved = soRepository.save(serv);
@@ -73,26 +63,6 @@ public class ServImpl implements ServService {
         soRepository.flush();
 
         return saved;
-    }
-
-    @Override
-    public boolean checkAllTaskComplete(String seroId) {
-
-        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
-
-        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
-        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository, tewoRepository);
-        boolean allWorkComplete = servOrderWorkorder.checkAllWorkComplete(sowoBySeotId);
-
-        boolean checkedAll = false;
-        for (ServiceOrderTasks item : seotBySeroId) {
-            if (item.getSeotStatus().toString().equals("COMPLETED") && allWorkComplete){
-                checkedAll = true;
-            }
-        }
-
-        log.info("ServOrderTaskImpl::checkAllTaskComplete the results is {}",checkedAll);
-        return checkedAll;
     }
 
     @Transactional

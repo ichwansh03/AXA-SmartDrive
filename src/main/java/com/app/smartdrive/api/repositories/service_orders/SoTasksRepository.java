@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.repositories.service_orders;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -19,7 +20,7 @@ public interface SoTasksRepository extends JpaRepository<ServiceOrderTasks, Long
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    int updateTasksStatus(@Param("seotStatus") String seotStatus, @Param("seotId") Long seotId);
+    int updateTasksStatus(@Param("seotStatus") EnumModuleServiceOrders.SeotStatus seotStatus, @Param("seotId") Long seotId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Override

@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -39,16 +41,16 @@ public class ServicePremiCredit {
     private String secrYear;
 
     @Column(name = "secr_premi_debet")
-    private Double secrPremiDebet;
+    private BigDecimal secrPremiDebet;
 
     @Column(name = "secr_premi_credit")
-    private Double secrPremiCredit;
+    private BigDecimal secrPremiCredit;
 
     @Column(name = "secr_trx_date")
-    private LocalDate secrTrxDate;
+    private LocalDateTime secrTrxDate;
 
     @Column(name = "secr_duedate")
-    private LocalDate secrDuedate;
+    private LocalDateTime secrDuedate;
 
     @Column(name = "secr_patr_trxno")
     @Size(max = 55)
