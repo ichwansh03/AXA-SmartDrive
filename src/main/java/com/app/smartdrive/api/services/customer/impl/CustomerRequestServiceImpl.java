@@ -681,13 +681,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
 
     @Override
-    public CustomerResponseDTO closePolis(ClaimRequestDTO claimRequestDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ada")
+    public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(closeRequestDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + closeRequestDTO.getCreqEntityId() + " tidak ada")
         );
 
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
+
         CustomerClaim customerClaim = existCustomerRequest.getCustomerClaim();
-        customerClaim.setCuclReason(claimRequestDTO.getCuclReason());
+        customerClaim.setCuclReason(closeRequestDTO.getCuclReason());
+        customerClaim.setCuclCreateDate(LocalDateTime.now());
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         return this.convert(savedCustomerRequest);

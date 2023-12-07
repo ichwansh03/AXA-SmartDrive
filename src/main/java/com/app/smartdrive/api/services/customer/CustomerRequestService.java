@@ -59,7 +59,7 @@ public interface CustomerRequestService {
 
     public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO);
 
-    public CustomerResponseDTO closePolis(ClaimRequestDTO claimRequestDTO);
+    public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO);
 
     public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO);
 
