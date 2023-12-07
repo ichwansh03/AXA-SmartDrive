@@ -489,30 +489,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.delete(existCustomerRequest);
     }
 
-    @Override
-    public CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
-        );
 
-        CustomerClaim newCustomerClaim = CustomerClaim.builder()
-                .cuclCreateDate(LocalDateTime.now())
-                .cuclEvents(0)
-                .cuclEventPrice(claimRequestDTO.getCuclEventPrice())
-                .cuclSubtotal(claimRequestDTO.getCuclSubtotal())
-                .cuclReason(claimRequestDTO.getCuclReason())
-                .cuclCreqEntityid(existCustomerRequest.getCreqEntityId())
-                .customerRequest(existCustomerRequest)
-                .build();
-
-
-        existCustomerRequest.setCustomerClaim(newCustomerClaim);
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
-
-        CustomerRequest savedCustomerRequest = this.customerRequestRepository.saveAndFlush(existCustomerRequest);
-
-        return this.convert(savedCustomerRequest);
-    }
 
     @Override
     public CustomerClaim createNewClaim(CustomerRequest customerRequest) {
@@ -527,40 +504,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return newCustomerClaim;
     }
 
-    @Override
-    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
-        );
 
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
-        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
-
-        CustomerClaim existCustomerClaim = existCustomerRequest.getCustomerClaim();
-
-        LocalDateTime cuclCreateDate = existCustomerClaim.getCuclCreateDate();
-
-        if(Objects.isNull(cuclCreateDate)){
-            existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
-        }
-
-
-        Double cuclEventPrice = existCustomerClaim.getCuclEventPrice();
-        cuclEventPrice += claimRequestDTO.getCuclEventPrice();
-
-        Double cuclSubtotal = existCustomerClaim.getCuclSubtotal();
-        cuclSubtotal += claimRequestDTO.getCuclSubtotal();
-
-        int cuclEvents = existCustomerClaim.getCuclEvents();
-        cuclEvents += 1;
-
-        existCustomerClaim.setCuclEventPrice(cuclEventPrice);
-        existCustomerClaim.setCuclSubtotal(cuclSubtotal);
-        existCustomerClaim.setCuclEvents(cuclEvents);
-
-        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
-        return this.convert(savedCustomerRequest);
-    }
 
     @Override
     public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId) {
@@ -674,11 +618,67 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 () -> new EntityNotFoundException("Customer request dengan id " + updateTypeDTO.getCreqEntityId() + " tidak ada")
         );
 
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.POLIS);
-
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         return this.convert(savedCustomerRequest);
     }
+
+    @Override
+    public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + customerRequestTypeDTO.getCreqEntityId() + " tidak ada")
+        );
+
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.POLIS);
+
+        this.customerRequestRepository.save(existCustomerRequest);
+    }
+
+    @Override
+    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Claim dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
+        );
+
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
+        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
+
+        CustomerClaim existCustomerClaim = existCustomerRequest.getCustomerClaim();
+
+        LocalDateTime cuclCreateDate = existCustomerClaim.getCuclCreateDate();
+
+        if(Objects.isNull(cuclCreateDate)){
+            existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
+        }
+
+
+        Double cuclEventPrice = existCustomerClaim.getCuclEventPrice();
+        cuclEventPrice += claimRequestDTO.getCuclEventPrice();
+
+        Double cuclSubtotal = existCustomerClaim.getCuclSubtotal();
+        cuclSubtotal += claimRequestDTO.getCuclSubtotal();
+
+        int cuclEvents = existCustomerClaim.getCuclEvents();
+        cuclEvents += 1;
+
+        existCustomerClaim.setCuclEventPrice(cuclEventPrice);
+        existCustomerClaim.setCuclSubtotal(cuclSubtotal);
+        existCustomerClaim.setCuclEvents(cuclEvents);
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
+        return this.convert(savedCustomerRequest);
+    }
+
+    @Override
+    public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + customerRequestTypeDTO.getCreqEntityId() + " tidak ada")
+        );
+
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
+
+        this.customerRequestRepository.save(existCustomerRequest);
+    }
+
 
     @Override
     public CustomerResponseDTO closePolis(ClaimRequestDTO claimRequestDTO) {
@@ -691,6 +691,17 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         return this.convert(savedCustomerRequest);
+    }
+
+    @Override
+    public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + customerRequestTypeDTO.getCreqEntityId() + " tidak ada")
+        );
+
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
+
+        this.customerRequestRepository.save(existCustomerRequest);
     }
 
 

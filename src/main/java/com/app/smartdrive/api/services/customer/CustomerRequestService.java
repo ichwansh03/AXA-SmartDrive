@@ -38,11 +38,8 @@ public interface CustomerRequestService {
 
     public void delete(Long creqEntityId);
 
-    public CustomerResponseDTO createClaim(ClaimRequestDTO claimRequestDTO);
-
     public CustomerClaim createNewClaim(CustomerRequest customerRequest);
 
-    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
 
     public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId);
 
@@ -56,5 +53,14 @@ public interface CustomerRequestService {
 
     public CustomerResponseDTO openPolis(UpdateRequestTypeRequestDTO updateRequestTypeRequestDTO);
 
+    public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO);
+
+    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
+
+    public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO);
+
     public CustomerResponseDTO closePolis(ClaimRequestDTO claimRequestDTO);
+
+    public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO);
+
 }

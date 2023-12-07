@@ -127,13 +127,6 @@ public class CustomerRequestController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/claim")
-    public CustomerResponseDTO createClaim(@RequestBody ClaimRequestDTO claimRequestDTO){
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.createClaim(claimRequestDTO);
-
-        return customerResponseDTO;
-    }
-
     @PutMapping("/claim")
     public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
             @RequestBody ClaimRequestDTO claimRequestDTO
