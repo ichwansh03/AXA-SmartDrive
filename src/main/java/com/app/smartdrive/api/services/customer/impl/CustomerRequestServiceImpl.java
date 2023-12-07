@@ -490,7 +490,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
 
-
     @Override
     public CustomerClaim createNewClaim(CustomerRequest customerRequest) {
         CustomerClaim newCustomerClaim = CustomerClaim.builder()
@@ -503,7 +502,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         return newCustomerClaim;
     }
-
 
 
     @Override
