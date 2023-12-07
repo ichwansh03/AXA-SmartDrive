@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupFintechBankRequests;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupBankRequests;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupFintechRequests;
 import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransferTransactionsRequest;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactionsDto;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupBanksFintechResponse;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupBanksResponse;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupFintechResponse;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransferTransactionsResponse;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.services.payment.PaymentTransactionsService;
@@ -53,17 +55,23 @@ public class PaymentTransactionsController {
 
     @PostMapping("/transactions/{usac_id}/topupBank")
     public ResponseEntity<?> topupBank(@Valid @PathVariable("usac_id") Long usac_id,
-     @RequestBody TopupFintechBankRequests requests){
-        TopupBanksFintechResponse topupBanks = service.topupBanksFintech(usac_id, requests);
+     @RequestBody TopupBankRequests requests){
+        TopupBanksResponse topupBanks = service.topupBanks(usac_id, requests);
         return new ResponseEntity<>(topupBanks, HttpStatus.OK);
     }
     
     @PostMapping("/transactions/{usac_id}/transfer")
-    public ResponseEntity<?> topupFintech(@Valid @PathVariable("usac_id") Long usac_id,
+    public ResponseEntity<?> transfer(@Valid @PathVariable("usac_id") Long usac_id,
     @RequestBody TransferTransactionsRequest request){
         TransferTransactionsResponse transfer = service.transfer(usac_id, request);
         return new ResponseEntity<>(transfer, HttpStatus.OK);
     }
 
+    @PostMapping("/transactions/{usac_id}/topupFintech")
+    public ResponseEntity<?> topupFintech(@Valid @PathVariable("usac_id") Long usac_id,
+    @RequestBody TopupFintechRequests requests){
+        TopupFintechResponse topupFintech = service.topupFintech(usac_id, requests);
+        return new ResponseEntity<>(topupFintech, HttpStatus.OK);
+    }
 
 }

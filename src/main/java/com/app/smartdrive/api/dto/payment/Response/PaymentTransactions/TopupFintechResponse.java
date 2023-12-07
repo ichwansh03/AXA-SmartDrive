@@ -2,7 +2,6 @@ package com.app.smartdrive.api.dto.payment.Response.PaymentTransactions;
 
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
 
-
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
@@ -11,10 +10,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TopupBanksFintechResponse {
+@Builder
+public class TopupFintechResponse {
     private String usac_accountno;
     private String patr_usac_accountNo_to;
     private Double nominall;

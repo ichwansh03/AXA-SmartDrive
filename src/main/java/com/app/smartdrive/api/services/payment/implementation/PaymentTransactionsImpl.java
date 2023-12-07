@@ -10,15 +10,19 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupFintechBankRequests;
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupBankRequests;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupFintechRequests;
 import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransferTransactionsRequest;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactionsDto;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupBanksFintechResponse;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupBanksResponse;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupFintechResponse;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransferTransactionsResponse;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPayment;
-import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TopupBanksFintechMapper;
+import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TopupBanksMapper;
+import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TopupFintechMapper;
 import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TransferTransactionsMapper;
 import com.app.smartdrive.api.repositories.payment.PaymentTransactionsRepository;
 import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
@@ -75,15 +79,19 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
         return formattedDate;
     }
     
+
+    
+
     @Override
-    public TopupBanksFintechResponse topupBanksFintech(Long usac_id, TopupFintechBankRequests request) {
+    public TopupFintechResponse topupFintech(Long usac_id, TopupFintechRequests request) {
         List<UserAccounts> listAcc = userAccountsRepository.findAll();
         Optional<UserAccounts> idUA = userAccountsRepository.findById(usac_id);
-        TopupBanksFintechResponse dto = new TopupBanksFintechResponse();
+        TopupFintechResponse dto = new TopupFintechResponse();
         PaymentTransactions transactions = new PaymentTransactions();
         List<PaymentTransactions> listPayment = repository.findAll();
+        PaymentTransactions transactions2 = new PaymentTransactions();
         
-       
+        int countt = 1;
         if(listPayment.isEmpty()){
             int con = 1;
             transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + con );
@@ -93,7 +101,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
             for (UserAccounts userAccounts : listAcc) {
                 if(request.getUsac_accountno().equals(userAccounts.getUsac_accountno())){
                     UserAccounts userAcc = idUA.get();
-                    int countt = 1;
+                    
                     for (PaymentTransactions py : listPayment) {
                         if(py.getPatrTrxnoRev()==null){
                             countt++;
@@ -101,21 +109,129 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
                             transactions.setPatrTrxnoRev(py.getPatrTrxno());
                         }else{
                             countt++;
+                            int newC = countt;
+                            newC--;
                             transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt );
-                            transactions.setPatrTrxnoRev(py.getPatrTrxno());
+                            transactions.setPatrTrxnoRev("trx" + dateTimeFormatter() + "000" + newC );
                         }
                     }
+                    countt++;
+
                     transactions.setPatr_created_on(LocalDateTime.now());
-                    transactions.setPatr_credit(request.getNominall());
-                    transactions.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to());
+                    transactions.setPatr_debet(request.getNominall());
+                    transactions.setPatr_credit(null);
+                    transactions.setPatr_usac_accountNo_to(null);
+                    transactions.setPatr_usac_accountNo_from(request.getUsac_accountno());
+                    
+                    if(request.getPatr_usac_accountNo_to().equals(userAcc.getUsac_accountno())){
+                        if(userAcc.getUsac_debet()==null){
+                            userAcc.setUsac_debet(request.getNominall());
+                        }else{
+                            Double saldo = userAcc.getUsac_debet();
+                            Double newSaldo = saldo + request.getNominall();
+                            userAcc.setUsac_debet(newSaldo);
+                        }
+                        
+                    }
+
                     transactions.setPatr_type(request.getEnumPayment());
                     transactions.setPatr_invoice_no(request.getPatr_invoice_no());
                     transactions.setPatr_notes(request.getPatr_notes());
                     addaPY(transactions);
 
-                    userAcc.setUsac_debet(request.getNominall());
+                    transactions2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt);
+                    transactions2.setPatr_created_on(LocalDateTime.now());
+                    transactions2.setPatr_debet(null);
+                    transactions2.setPatr_credit(request.getNominall());
+                    transactions2.setPatr_usac_accountNo_from(null);
+                    transactions2.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to());
+                    transactions2.setPatr_type(request.getEnumPayment());
+                    transactions2.setPatr_invoice_no(request.getPatr_invoice_no());
+                    transactions2.setPatr_notes(request.getPatr_notes());
+                    transactions2.setPatrTrxnoRev(transactions.getPatrTrxno());
+                    addaPY(transactions2);
+
+
+                    // userAcc.setUsac_debet(request.getNominall());
                     userAccountsRepository.save(userAcc);
-                    dto = TopupBanksFintechMapper.mapperTransactionsDto(request);
+                    dto = TopupFintechMapper.mapperTopupFintech(request);
+                }
+            
+            }
+        }
+        return dto;
+    }
+
+    @Override
+    public TopupBanksResponse topupBanks(Long usac_id, TopupBankRequests request) {
+        List<UserAccounts> listAcc = userAccountsRepository.findAll();
+        Optional<UserAccounts> idUA = userAccountsRepository.findById(usac_id);
+        TopupBanksResponse dto = new TopupBanksResponse();
+        PaymentTransactions transactions = new PaymentTransactions();
+        List<PaymentTransactions> listPayment = repository.findAll();
+        PaymentTransactions transactions2 = new PaymentTransactions();
+        
+       
+        if(listPayment.isEmpty()){
+            int con = 1;
+            transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + con );
+            transactions.setPatrTrxnoRev(transactions.getPatrTrxno()); 
+            addaPY(transactions);
+        }
+        int countt = 1;
+        if(idUA.isPresent()){
+            for (UserAccounts userAccounts : listAcc) {
+                if(request.getUsac_accountno().equals(userAccounts.getUsac_accountno())){
+                    UserAccounts userAcc = idUA.get();
+                    for (PaymentTransactions py : listPayment) {
+                        if(py.getPatrTrxnoRev()==null){
+                            countt++;
+                            transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt ); 
+                            transactions.setPatrTrxnoRev(transactions.getPatrTrxno());
+                        }else{
+                            countt++;
+                            int newC = countt;
+                            newC--;
+                            transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt );
+                            transactions.setPatrTrxnoRev("trx" + dateTimeFormatter() + "000" + newC);
+                        }
+                    }
+                    countt++;
+                    transactions.setPatr_created_on(LocalDateTime.now());
+                    transactions.setPatr_debet(request.getNominall());
+                    transactions.setPatr_credit(null);
+                    transactions.setPatr_usac_accountNo_from(request.getUsac_accountno());
+                    transactions.setPatr_usac_accountNo_to(null);
+                    
+                    if(request.getPatr_usac_accountNo_to().equals(userAcc.getUsac_accountno())){
+                        if(userAcc.getUsac_debet()==null){
+                            userAcc.setUsac_debet(request.getNominall());
+                        }else{
+                            Double saldo = userAcc.getUsac_debet();
+                            Double newSaldo = saldo + request.getNominall();
+                            userAcc.setUsac_debet(newSaldo);
+                        }
+                    }
+
+                    transactions.setPatr_type(request.getEnumPayment());
+                    transactions.setPatr_invoice_no(request.getPatr_invoice_no());
+                    transactions.setPatr_notes(request.getPatr_notes());
+                    addaPY(transactions);
+
+                    transactions2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt);
+                    transactions2.setPatr_created_on(LocalDateTime.now());
+                    transactions2.setPatr_debet(null);
+                    transactions2.setPatr_credit(request.getNominall());
+                    transactions2.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to());
+                    transactions2.setPatr_type(request.getEnumPayment());
+                    transactions2.setPatr_invoice_no(request.getPatr_invoice_no());
+                    transactions2.setPatr_notes(request.getPatr_notes());
+                    transactions2.setPatrTrxnoRev(transactions.getPatrTrxno());
+                    addaPY(transactions2);
+                    
+
+                    userAccountsRepository.save(userAcc);
+                    dto = TopupBanksMapper.mapperTransactionsDto(request);
                 }
             
             }
@@ -129,10 +245,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
         int countFirst = 1;
         if(listPayment.isEmpty()){
             payment.setPatrTrxno("trx" + dateTimeFormatter() + countFirst );
-        }
-        
-        
-        else{
+        }else{
             for (PaymentTransactions paymentData : listPayment) {
                 if(paymentData.getPatrTrxnoRev()==null){
                     countFirst++;
@@ -149,12 +262,14 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
 
     @Override
     public TransferTransactionsResponse transfer(Long usac_id,TransferTransactionsRequest request) {
-        Optional<UserAccounts> userId = userAccountsRepository.findById(usac_id);
         List<UserAccounts> listUA = userAccountsRepository.findAll();
         List<PaymentTransactions> listPayment = repository.findAll();
         PaymentTransactions payment = new PaymentTransactions();
         TransferTransactionsResponse dto = new TransferTransactionsResponse();
-        UserAccounts userAccounts = userId.get();
+        
+        UserAccounts userAccount = userAccountsRepository.findById(usac_id).orElseThrow(() -> new 
+        EntityNotFoundException("User account with id " + usac_id + " Not Found"));
+        
         PaymentTransactions payment2 = new PaymentTransactions();
       
         int countTwo = 1;
@@ -163,136 +278,57 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
             int contOne = 1;
             payment.setPatrTrxno("trx" + dateTimeFormatter() + "000" + contOne);
             addaPY(payment);
-        }for (PaymentTransactions b : listPayment) {
-            if(b.getPatrTrxnoRev()==null){
-                countTwo++;
-                payment.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countTwo ); 
-                payment.setPatrTrxnoRev(b.getPatrTrxno());
-            }else{
-                countTwo++;
-                payment.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countTwo );
-                payment.setPatrTrxnoRev(b.getPatrTrxno());
+        }else{
+            for (PaymentTransactions b : listPayment) {
+                if(b.getPatrTrxnoRev()==null){
+                    countTwo++;
+                    payment.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countTwo ); 
+                    payment.setPatrTrxnoRev(payment2.getPatrTrxno());
+                }else{
+                    countTwo++;
+                    int newC = countTwo;
+                    newC--;
+                    String generatedValue = "trx" + dateTimeFormatter() + "000" + countTwo;
+                    payment.setPatrTrxno(generatedValue );
+                    payment.setPatrTrxnoRev("trx" + dateTimeFormatter() + "000" + newC );
+                    
+                }
             }
         }
-
+        countTwo++;
+    
+       
+        payment.setPatr_credit(null);
+        payment.setPatr_created_on(LocalDateTime.now());
+        payment.setPatr_debet(request.getTransfer());
+        payment.setPatr_usac_accountNo_from(userAccount.getUsac_accountno());
+        payment.setPatr_type(request.getEnumPayment());
+        payment.setPatr_invoice_no(request.getPatr_invoice_no());
+        payment.setPatr_notes(request.getPatr_notes());
         
-
-
-        // if(userId.isPresent()){
-        //     for (UserAccounts user : listUA) {
-        //         if(request.getUsac_accountno().equals(user.getUsac_accountno())){ 
-        //             Double temp = 0.0;
-        //             payment.setPatr_created_on(LocalDateTime.now());
-
-                   
-                   
-
-                    
-        //             for (PaymentTransactions py : listPayment) {
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        // if(py.getPatr_debet()==null && py.getPatr_credit()!=null) {
-                        //     payment.setPatr_debet(request.getTransfer());
-                        //     payment.setPatr_credit(null);
-                        //     // userAccounts.setUsac_debet(request.);
-                        //     payment.setPatr_usac_accountNo_from(user.getUsac_accountno());
-                        //     payment.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
-                        //     payment.setPatr_type(request.getEnumPayment());
-                        //     payment.setPatr_invoice_no(request.getPatr_invoice_no());
-                        //     payment.setPatr_notes(request.getPatr_notes());
-                        //     addaPY(payment);
-                        
-                            
-
-                            
-                        //         if(py.getPatrTrxnoRev()==null){
-                        //                 int countThree = countTwo;
-                        //                 countThree++;
-                        //                 payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countThree ); 
-                        //                 payment2.setPatrTrxnoRev(payment.getPatrTrxno());
-                        //         }
-                        //             Double usac_debet = user.getUsac_debet();
-                        //              usac_debet = usac_debet - request.getTransfer();
-                        //             payment2.setPatr_created_on(LocalDateTime.now());
-                        //             payment2.setPatr_credit(usac_debet);
-                        //             payment2.setPatr_debet(null);
-                        //             payment2.setPatr_usac_accountNo_from(user.getUsac_accountno());
-                        //             payment2.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
-                        //             payment2.setPatr_type(request.getEnumPayment());
-                        //             payment2.setPatr_invoice_no(request.getPatr_invoice_no());
-                        //             payment2.setPatr_notes(request.getPatr_notes());
-                        //             addaPY(payment2);
-                                
-                            
-                            
-
-                        // }else if(py.getPatr_debet() == null && py.getPatr_credit()!=null){
-                        //     payment.setPatr_debet(request.getTransfer());
-                        //     payment.setPatr_credit(null);
-                        //     // userAccounts.setUsac_debet(request.);
-                        //     payment.setPatr_usac_accountNo_from(user.getUsac_accountno());
-                        //     payment.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to()); 
-                        //     payment.setPatr_type(request.getEnumPayment());
-                        //     payment.setPatr_invoice_no(request.getPatr_invoice_no());
-                        //     payment.setPatr_notes(request.getPatr_notes());
-                        //     addaPY(payment);
-                        
-                            
-
-                            
-                        //         if(py.getPatrTrxnoRev()==null){
-                        //                 int countThree = countTwo;
-                        //                 countThree++;
-                        //                 payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countThree ); 
-                        //                 payment2.setPatrTrxnoRev(payment.getPatrTrxno());
-                        //         }
-                        // }
-                        // userAccounts.setUsac_debet(payment2.getPatr_credit());
-                        // }
-                        
-                        
-                    // }
-            
-                // if(rev < 2)
-                    
-                    int countThree = countTwo;
-
-                     countThree++;
+        PaymentTransactions savedPayment = this.repository.saveAndFlush(payment);
+        Double total = userAccount.getUsac_debet();
+        total = total - request.getTransfer();
                      
-                     
-                     payment.setPatr_credit(null);
-                     payment.setPatr_debet(request.getTransfer());
-                     payment.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to());
-                     // payment.setPatr_usac_accountNo_from(user.getUsac_accountno());
-                     
-                     PaymentTransactions savedPayment = this.repository.saveAndFlush(payment);
-                     
-                     Double total = userAccounts.getUsac_debet();
-                     total = total - request.getTransfer();
-                     
-
-                     payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countThree ); 
-                   payment2.setPatr_credit(total);
-                   payment2.setPatr_debet(null);
-                   payment2.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to());
-                   payment2.setPatrTrxnoRev(savedPayment.getPatrTrxno());
-
-                   userAccounts.setUsac_debet(total);
-                    // payment2.setPatr_usac_accountNo_from(user.getUsac_accountno());
-
-                    // userAccountsRepository.save(userAccounts);
-                    // this.repository.saveAll(List.of(payment, payment2));
-                    this.repository.save(payment2);
-                    this.userAccountsRepository.save(userAccounts);
-                    dto = TransferTransactionsMapper.convertDtoRequestToResponse(request);
+        payment2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countTwo );
+        payment2.setPatr_created_on(LocalDateTime.now()); 
+        payment2.setPatr_credit(request.getTransfer());
+        payment2.setPatr_debet(null);
+        for (UserAccounts user : listUA) {
+            if(request.getPatr_usac_accountNo_to().equals(user.getUsac_accountno())){
+                payment2.setPatr_usac_accountNo_to(user.getUsac_accountno());
+                user.setUsac_debet(user.getUsac_debet() + request.getTransfer());
+            }
+        }
+        payment2.setPatr_type(request.getEnumPayment());
+        payment2.setPatr_invoice_no(request.getPatr_invoice_no());
+        payment2.setPatr_notes(request.getPatr_notes());
+        payment2.setPatrTrxnoRev(savedPayment.getPatrTrxno());
+        userAccount.setUsac_debet(total);
+        this.repository.save(payment2);
+        this.userAccountsRepository.save(userAccount);
+        dto = TransferTransactionsMapper.convertDtoRequestToResponse(request);
                 
-            
-        
         return dto;
     }
 

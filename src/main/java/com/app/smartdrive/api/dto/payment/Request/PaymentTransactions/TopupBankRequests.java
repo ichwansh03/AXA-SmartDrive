@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @NotBlank(message = "Can Not Be Empty")
-public class TopupFintechBankRequests {
+public class TopupBankRequests {
     
     private String usac_accountno;
-    
+
     private String patr_usac_accountNo_to;
    
     private Double nominall;

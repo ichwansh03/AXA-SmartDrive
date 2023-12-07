@@ -35,15 +35,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Data
 @Table(name = "payment_transactions", schema  = "payment")
 public class PaymentTransactions {
-
-    @Id
-    @Column(name="patr_trxno", length = 55,nullable = false)
     // @GeneratedValue(strategy = GenerationType.TABLE,
     //  generator = "id_generator")
     // @SequenceGenerator(
@@ -51,6 +49,8 @@ public class PaymentTransactions {
     //     sequenceName = "payment.payment_transactions_seq",
     //     allocationSize = 1
     // )
+    @Id
+    @Column(name="patr_trxno", length = 55,nullable = false)
     private String patrTrxno;
 
     @CreatedDate
@@ -95,5 +95,7 @@ public class PaymentTransactions {
     @OneToMany(mappedBy = "referencedTransaction", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<PaymentTransactions> referencingTransactions;
+
+    
     
 }
