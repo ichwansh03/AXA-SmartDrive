@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
 
 import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
-import com.app.smartdrive.api.dto.payment.Response.BanksDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
@@ -41,7 +40,6 @@ import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.mapper.hr.EmployeesMapper;
-import com.app.smartdrive.api.mapper.payment.BanksMapper;
 import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.Roles;
