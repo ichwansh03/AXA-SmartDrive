@@ -1,7 +1,8 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.IbmeDto;
+import com.app.smartdrive.api.dto.master.response.IbmeRes;
+import com.app.smartdrive.api.dto.master.request.IbmeReq;
 import com.app.smartdrive.api.entities.master.InboxMessaging;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.IbmeService;
@@ -21,41 +22,38 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/master/ibme")
 @Tag(name = "Master Module")
-public class IbmeController implements BaseController<IbmeDto, Long> {
+public class IbmeController implements BaseController<IbmeReq, Long> {
     private final IbmeService service;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<InboxMessaging> inboxMessaging = service.getAll();
-        List<IbmeDto> result = TransactionMapper.mapEntityListToDtoList(inboxMessaging, IbmeDto.class);
+        List<IbmeRes> result = TransactionMapper.mapEntityListToDtoList(service.getAll(), IbmeRes.class);
         return ResponseEntity.ok(result);
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), IbmeRes.class));
     }
 
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody IbmeDto request) {
-        InboxMessaging result = new InboxMessaging();
-        return getResponseEntity(request, result);
+    public ResponseEntity<?> saveData(@Valid @RequestBody IbmeReq request) {
+        return getResponseEntity(request, new InboxMessaging());
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody IbmeDto request) {
-        InboxMessaging result = service.getById(request.getIbmeId());
-        return getResponseEntity(request, result);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody IbmeReq request) {
+        return getResponseEntity(request, service.getById(id));
     }
 
-    private ResponseEntity<?> getResponseEntity(@RequestBody @Valid IbmeDto request, InboxMessaging result) {
+    private ResponseEntity<?> getResponseEntity(@RequestBody @Valid IbmeReq request, InboxMessaging result) {
         if(request.getIbmeDate() != null) {
             LocalDate localDate = LocalDate.parse(request.getIbmeDate().toString(), formatter);
             result.setIbmeDate(localDate);

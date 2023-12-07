@@ -1,14 +1,14 @@
 package com.app.smartdrive.api.entities.users;
 
 public class EnumUsers {
-  public enum roleName{
+  public enum RoleName{
     CU("Customer"), //Customer
     EM("Employee"), //Employee
     PC("Potential Customer"), //Potential Customer
     PR("Partner"); //Partner
 
     private final String value;
-    private roleName(String value){
+    private RoleName(String value){
       this.value = value;
     }
     public String getValue(){

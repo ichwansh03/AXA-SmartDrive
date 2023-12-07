@@ -42,14 +42,23 @@ public class BankServiceImpl implements BankService {
 
 
     @Override
+    public BanksDtoResponse save(BanksDtoResponse entity) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+
+
+    @Override
     public BanksDtoResponse addBankss(BanksDtoRequests requests) {
         BusinessEntity busines = new BusinessEntity();
         busines.setEntityModifiedDate(LocalDateTime.now());
-        Long businessEntityId = businessEntityService.save(busines);
+        BusinessEntity businessEntityId = businessEntityService.save(busines);
 
         Banks banks = new Banks();
         banks.setBusinessEntity(busines);
-        banks.setBank_entityid(businessEntityId);
+        banks.setBank_entityid(businessEntityId.getEntityId());
         banks.setBank_name(requests.getBank_name());
         banks.setBank_desc(requests.getBank_desc());
         addaBanks(banks);
@@ -82,10 +91,7 @@ public class BankServiceImpl implements BankService {
         return banksDtos;
     }
 
-    @Override
-    public BanksDtoResponse save(BanksDtoResponse banksDto) {
-        return null;
-    }
+   
 
     @Override
     public Boolean updateBanks(Long bank_entityid,BanksDtoResponse banksDto) {

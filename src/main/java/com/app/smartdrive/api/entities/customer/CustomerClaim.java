@@ -3,12 +3,14 @@ package com.app.smartdrive.api.entities.customer;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "customer_claim", schema = "customer")
@@ -26,6 +28,9 @@ public class CustomerClaim {
 
     @Column(name = "cucl_create_date")
     private LocalDateTime cuclCreateDate;
+
+    @Column(name = "cucl_events")
+    private int cuclEvents;
 
     @Column(name = "cucl_event_price")
     private Double cuclEventPrice;

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Builder
 @Data
@@ -21,5 +20,5 @@ public class SoTasksDto {
     private LocalDateTime seotStartDate;
     private LocalDateTime seotEndDate;
     private EnumModuleServiceOrders.SeotStatus seotStatus;
-    private Stream<SoWorkorderDto> serviceOrderWorkorders;
+    private List<SoWorkorderDto> serviceOrderWorkorders;
 }

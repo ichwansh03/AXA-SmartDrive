@@ -1,12 +1,15 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.app.smartdrive.api.dto.user.CreateUserDto;
-import com.app.smartdrive.api.dto.user.LoginDto;
-import com.app.smartdrive.api.dto.user.UserDto;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.LoginDto;
+import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.users.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +33,13 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/signin")
-  public ResponseEntity<?> login(@RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCu(login.getIden(), login.getPassword()));
+  public ResponseEntity<?> loginCustomer(@Valid @RequestBody LoginDto login){
+    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCustomer(login.getIdentity(), login.getPassword()));
   }
 
   @PostMapping("/emps/signin")
-  public ResponseEntity<?> loginEm(@RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.loginEm(login.getIden(), login.getPassword()));
+  public ResponseEntity<?> loginEmployee(@Valid @RequestBody LoginDto login){
+    return ResponseEntity.status(HttpStatus.OK).body(userService.loginEmployee(login.getIdentity(), login.getPassword()));
   }
 
   @GetMapping
@@ -50,17 +53,17 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<?> addUser(@ModelAttribute CreateUserDto userPost) throws Exception{
-    User userSaved = userService.create(userPost);
+  public ResponseEntity<?> addUserCustomer(@Valid @RequestBody CreateUserDto userPost){
+    User userSaved = userService.createUserCustomer(userPost);
     UserDto userDto = TransactionMapper.mapEntityToDto(userSaved, UserDto.class);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userDto); //pake dto
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateUser(@ModelAttribute CreateUserDto userPost,
+  public ResponseEntity<?> updateUser(@Valid @ModelAttribute UpdateUserRequestDto userPost,
       @PathVariable("id") Long id) {
 
-    User userUpdated = userService.save(userPost, id);
+    UpdateUserRequestDto userUpdated = userService.save(userPost, id);
     return ResponseEntity.status(HttpStatus.OK).body(userUpdated);
   }
 
@@ -73,4 +76,9 @@ public class UserController {
     }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");
     }
+  @PostMapping("/{id}/changePassword")
+  public ResponseEntity<?> changePassword(@PathVariable("id") Long id, @Valid @RequestBody PasswordRequestDto passwordRequestDto){
+    return ResponseEntity.status(HttpStatus.OK).body(userService.changePassword(id, passwordRequestDto));
+  }
+
 }

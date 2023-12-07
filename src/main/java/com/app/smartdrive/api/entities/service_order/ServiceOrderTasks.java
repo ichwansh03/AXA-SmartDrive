@@ -5,25 +5,23 @@ import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServic
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_tasks", schema = "so")
 @NamedQuery(
-        name = "ServiceOrderTasks.findSeotById",
-        query = "SELECT seot FROM ServiceOrderTasks seot JOIN seot.serviceOrders sero " +
-                "JOIN seot.areaWorkGroup arwg WHERE seot.seotId = :seotId"
-)
+        name = "ServiceOrderTasks.updateTasksStatus",
+        query = "UPDATE ServiceOrderTasks seot SET seot.seotStatus = :seotStatus WHERE seot.seotId = :seotId", lockMode = LockModeType.PESSIMISTIC_WRITE)
+@DynamicInsert
+@DynamicUpdate
 public class ServiceOrderTasks {
 
     @Id
@@ -47,22 +45,21 @@ public class ServiceOrderTasks {
     private LocalDateTime seotActualEnddate;
 
     @Column(name = "seot_status")
+    @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeotStatus seotStatus;
-    {
-        seotStatus = EnumModuleServiceOrders.SeotStatus.INPORGRESS;
-    }
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_arwg_code")
-    AreaWorkGroup areaWorkGroup;
+    private AreaWorkGroup areaWorkGroup;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_sero_id")
-    ServiceOrders serviceOrders;
+    private ServiceOrders serviceOrders;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "serviceOrderTasks", cascade = CascadeType.ALL)
-    List<ServiceOrderWorkorder> serviceOrderWorkorders;
+    private List<ServiceOrderWorkorder> serviceOrderWorkorders;
+
 }

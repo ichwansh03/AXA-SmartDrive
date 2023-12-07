@@ -50,7 +50,7 @@ public class CustomerRequest {
 
 
     @JsonManagedReference
-    @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     @PrimaryKeyJoinColumn
     private CustomerClaim customerClaim;
 
@@ -59,10 +59,10 @@ public class CustomerRequest {
     @PrimaryKeyJoinColumn
     private CustomerInscAssets customerInscAssets;
 
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id")
-    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
+    //    @JsonBackReference
+    //    @ManyToOne
+    //    @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id")
+    //    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
     @JsonManagedReference
     @OneToOne(mappedBy = "customer")

@@ -1,8 +1,13 @@
 package com.app.smartdrive.api.dto.partner;
 
+import com.app.smartdrive.api.dto.master.response.CitiesRes;
+import com.app.smartdrive.api.dto.user.response.BusinessEntityDto;
+import com.app.smartdrive.api.entities.hr.EnumClassHR;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -10,7 +15,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PartnerDto {
+public class  PartnerDto {
 
     private Long partEntityid;
 
@@ -20,7 +25,7 @@ public class PartnerDto {
     @Size(max = 255)
     private String partAddress;
 
-    private String partJoinDate;
+    private LocalDateTime partJoinDate;
 
     @Size(max = 35)
     private String partAccountNo;
@@ -28,14 +33,15 @@ public class PartnerDto {
     @Size(max = 25)
     private String partNpwp;
 
-    private String partStatus;
+    private EnumClassHR.status partStatus;
 
-    private String partModifiedDate;
+    private LocalDateTime partModifiedDate;
 
-    private Long businessEntity;
+    private BusinessEntityDto businessEntity;
 
-    private String city;
+    private CitiesRes city;
 
-    private List<PartnerContactDto> partnerContactsDto;
+    @JsonManagedReference
+    private List<PartnerContactDto> partnerContacts;
 }
 

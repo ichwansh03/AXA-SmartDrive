@@ -1,11 +1,17 @@
 package com.app.smartdrive.api.services.users;
 
-import com.app.smartdrive.api.dto.user.CreateUserDto;
+import java.util.List;
+import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
+import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserPhone;
 
 public interface UserPhoneService {
-  UserPhone updateUserPhone(Long id, String phoneNumber, CreateUserDto userPost);
-  UserPhone addUserPhone(Long id, CreateUserDto userPost);
+  UserPhone updateUserPhone(Long id, String phoneNumber, UserPhoneRequestDto userPost);
+
+  UserPhone addUserPhone(Long id, UserPhoneDto userPost);
+
+  List<UserPhone> createUserPhone(User user, List<UserPhoneDto> userPost);
+
   void deleteUserPhone(Long id, String number);
 }

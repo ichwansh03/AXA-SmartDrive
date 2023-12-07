@@ -1,7 +1,8 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.RegionPlatDto;
+import com.app.smartdrive.api.dto.master.response.RegpRes;
+import com.app.smartdrive.api.dto.master.request.RegpReq;
 import com.app.smartdrive.api.entities.master.RegionPlat;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.RegpService;
@@ -13,43 +14,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/regp")
 @Tag(name = "Master Module")
-public class RegpController implements BaseController<RegionPlatDto, String> {
+public class RegpController implements BaseController<RegpReq, String> {
     private final RegpService service;
 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<RegionPlat> regionPlat = service.getAll();
-        List<RegionPlatDto> result = TransactionMapper.mapEntityListToDtoList(regionPlat, RegionPlatDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), RegpRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable String id) {
-        RegionPlat regionPlat = service.getById(id);
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(regionPlat, RegionPlatDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), RegpRes.class));
     }
 
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody RegionPlatDto request) {
-        RegionPlat result = new RegionPlat();
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+    public ResponseEntity<?> saveData(@Valid @RequestBody RegpReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new RegionPlat())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody RegionPlatDto request) {
-        RegionPlat result = service.getById(request.getRegpName());
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable String id, @Valid @RequestBody RegpReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
     }
 }

@@ -63,7 +63,7 @@ public class EmployeeAreaWorkgroup {
     private String eawgArwgCode;
 
 
-    @MapsId("eawgArwgCode")
+//    @MapsId("eawgArwgCode")
     @ManyToOne
     @JoinColumn(name = "eawg_arwg_code",insertable = false, updatable = false)
     @JsonBackReference
@@ -76,10 +76,10 @@ public class EmployeeAreaWorkgroup {
     @JsonIgnore
     private Employees employees;
 
-    @MapsId("eawgId")
-    @JsonManagedReference
-    @OneToMany(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CustomerRequest> customerRequests;
+    // @MapsId("eawgId")
+    // @JsonManagedReference
+    // @OneToMany(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<CustomerRequest> customerRequests;
 
 
 

@@ -2,23 +2,26 @@ package com.app.smartdrive.api.entities.service_order;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
-@Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_workorder", schema = "so")
-@NamedQuery(
-        name = "ServiceOrderWorkorder.findBySowoId",
-        query = "SELECT sowo FROM ServiceOrderWorkorder sowo JOIN sowo.serviceOrderTasks seot WHERE sowo.sowoId = :sowoId")
+@NamedQueries({
+        @NamedQuery(
+                name = "ServiceOrderWorkorder.findSowoBySeotId",
+                query = "SELECT sowo FROM ServiceOrderWorkorder sowo WHERE sowo.serviceOrderTasks.seotId = :seotId"),
+        @NamedQuery(
+                name = "ServiceOrderWorkorder.updateSowoStatus",
+                query = "UPDATE ServiceOrderWorkorder sowo SET sowo.sowoStatus = :sowoStatus WHERE sowo.sowoId = :sowoId", lockMode = LockModeType.PESSIMISTIC_WRITE)
+})
+@DynamicInsert
 public class ServiceOrderWorkorder {
 
     @Id
@@ -33,11 +36,11 @@ public class ServiceOrderWorkorder {
     private LocalDateTime sowoModDate;
 
     @Column(name = "sowo_status")
-    @Size(max = 15, message = "work order status can't more than 15 characters")
-    private String sowoStatus;
+    private Boolean sowoStatus;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "sowo_seot_id")
     private ServiceOrderTasks serviceOrderTasks;
+
 }

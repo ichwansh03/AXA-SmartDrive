@@ -46,11 +46,11 @@ public class FintechServiceImpl implements FintechService {
     public FintechDtoResponse addFintech(FintechDtoRequests fintechDtoRequests) {
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
-        Long businessEntityId = businessEntityService.save(businessEntity);
+        BusinessEntity businessEntityId = businessEntityService.save(businessEntity);
 
         Fintech fintech = new Fintech();
         fintech.setBusinessEntity(businessEntity);
-        fintech.setFint_entityid(businessEntityId);
+        fintech.setFint_entityid(businessEntityId.getEntityId());
         fintech.setFint_name(fintechDtoRequests.getFint_name());
         fintech.setFint_desc(fintechDtoRequests.getFint_desc());
         addFintech(fintech);

@@ -25,5 +25,5 @@ public class UserRolesId implements Serializable{
 
   @Enumerated(EnumType.STRING)
   @Column(name = "usro_role_name", nullable = false)
-  private EnumUsers.roleName usroRoleName;
+  private EnumUsers.RoleName usroRoleName;
 }

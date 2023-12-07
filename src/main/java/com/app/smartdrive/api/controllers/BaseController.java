@@ -8,7 +8,7 @@ public interface BaseController<T, ID> {
     ResponseEntity<?> findDataById(ID id);
 
     ResponseEntity<?> saveData(T request);
-    ResponseEntity<?> updateData(T request);
+    ResponseEntity<?> updateData(ID id ,T request);
 
     default ResponseEntity<?> destroyData(ID id) {
         return null;

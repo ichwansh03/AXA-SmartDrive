@@ -1,9 +1,12 @@
 package com.app.smartdrive.api.dto.partner;
 
-import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.dto.master.response.ArwgRes;
+import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.partner.PartnerAreaWorkGroupId;
-import com.app.smartdrive.api.entities.partner.PartnerContact;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,8 +16,9 @@ import lombok.*;
 public class PartnerAreaWorkgroupDto {
 
     private PartnerAreaWorkGroupId id;
-    private String status;
-    private String modifiedDate;
-    private AreaWorkGroup areaWorkGroup;
-    private String partnerContact;
+    private EnumClassHR.status status;
+    private LocalDateTime modifiedDate;
+    private ArwgRes areaWorkGroup;
+    @JsonBackReference
+    private PartnerContactDto partnerContact;
 }

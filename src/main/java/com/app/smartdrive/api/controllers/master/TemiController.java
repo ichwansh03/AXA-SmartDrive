@@ -1,7 +1,8 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
+import com.app.smartdrive.api.dto.master.response.TemiRes;
+import com.app.smartdrive.api.dto.master.request.TemiReq;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.TemiService;
@@ -13,43 +14,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/temi")
 @Tag(name = "Master Module")
-public class TemiController implements BaseController<TemplateInsurancePremiDto, Long> {
+public class TemiController implements BaseController<TemiReq, Long> {
     private final TemiService service;
 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<TemplateInsurancePremi> temi = service.getAll();
-        List<TemplateInsurancePremiDto> result = TransactionMapper.mapEntityListToDtoList(temi, TemplateInsurancePremiDto.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), TemiRes.class));
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        TemplateInsurancePremi temi = service.getById(id);
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(temi, TemplateInsurancePremiDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), TemiRes.class));
     }
 
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody TemplateInsurancePremiDto request) {
-        TemplateInsurancePremi result = new TemplateInsurancePremi();
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+    public ResponseEntity<?> saveData(@Valid @RequestBody TemiReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new TemplateInsurancePremi())), HttpStatus.CREATED);
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody TemplateInsurancePremiDto request) {
-        TemplateInsurancePremi result = service.getById(request.getTemiId());
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TemiReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
     }
 }

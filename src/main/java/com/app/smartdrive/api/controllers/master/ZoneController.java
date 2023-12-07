@@ -1,9 +1,8 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.ProvinsiDto;
-import com.app.smartdrive.api.dto.master.TemplateInsurancePremiDto;
-import com.app.smartdrive.api.dto.master.ZonesDto;
+import com.app.smartdrive.api.dto.master.response.ZonesRes;
+import com.app.smartdrive.api.dto.master.request.ZoneReq;
 import com.app.smartdrive.api.entities.master.Zones;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.ZoneService;
@@ -15,45 +14,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/zones")
 @Tag(name = "Master Module")
-public class ZoneController implements BaseController<ZonesDto, Long> {
+public class ZoneController implements BaseController<ZoneReq, Long> {
     private final ZoneService service;
 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<Zones> zones = service.getAll();
-        List<ZonesDto> result = zones.stream().map(zone -> {
-            return new ZonesDto(zone.getZonesId(), zone.getZonesName(), TransactionMapper.mapEntityListToDtoList(zone.getTemplateInsurancePremis(), TemplateInsurancePremiDto.class), TransactionMapper.mapEntityListToDtoList(zone.getProvinsi(), ProvinsiDto.class));
-        }).toList();
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(service.getAll());
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        Zones zones = service.getById(id);
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(zones, ZonesDto.class));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ZonesRes.class));
     }
 
     @Override
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody ZonesDto request) {
-        Zones result = new Zones();
-        return ResponseEntity.ok(service.save(TransactionMapper.mapDtoToEntity(request, result)));
+    public ResponseEntity<?> saveData(@Valid @RequestBody ZoneReq request) {
+        return ResponseEntity.ok(service.save(TransactionMapper.mapDtoToEntity(request, new Zones())));
     }
 
     @Override
     @Transactional
-    @PutMapping
-    public ResponseEntity<?> updateData(@Valid @RequestBody ZonesDto request) {
-        Zones result = service.getById(request.getZonesId());
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody ZoneReq request) {
+        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
     }
 }

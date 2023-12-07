@@ -3,37 +3,36 @@ package com.app.smartdrive.api.services.users.implementation;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.jpa.repository.Modifying;
+
+
+import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
-import com.app.smartdrive.api.dto.user.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
+import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserPhoneId;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.UserPhoneService;
 import com.app.smartdrive.api.services.users.UserService;
-import com.app.smartdrive.api.utils.NullUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserPhoneImpl implements UserPhoneService {
   private final UserRepository userRepository;
   private final UserPhoneRepository userPhoneRepository;
-  private final UserService userService;
-  private final EntityManager entityManager;
-  private final Logger logger = LoggerFactory.getLogger(UserPhoneImpl.class);
 
   @Override
   @Transactional
-  public UserPhone updateUserPhone(Long userId, String phoneNumber, CreateUserDto userPost) {
+  public UserPhone updateUserPhone(Long userId, String phoneNumber, UserPhoneRequestDto userPost) {
     // TODO Auto-generated method stub
     // User user = userRepository.findById(userId).get();
     // List<UserPhone> listUserPhones = user.getUserPhone();
@@ -55,20 +54,22 @@ public class UserPhoneImpl implements UserPhoneService {
     Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(phoneNumber, userId);
     if(userPhone.isPresent()){
       userPhone.get().setUsphModifiedDate(LocalDateTime.now());
+      userPhone.get().setUsphPhoneType(userPost.getUsphPhoneType());
       userPhoneRepository.save(userPhone.get());
-      userPhoneRepository.setPhoneNumber(userPost.getUserPhoneNumber(), phoneNumber);
-      return userPhoneRepository.findByUsphPhoneNumber(userPost.getUserPhoneNumber(), userId).get();
+      userPhoneRepository.setPhoneNumber(userPost.getUsphPhoneNumber(), phoneNumber);
+      return userPhoneRepository.findByUsphPhoneNumber(userPost.getUsphPhoneNumber(), userId).get();
     }
     throw new EntityNotFoundException("Phone Number is not exist or you are not granted access to this phone number");
   }
 
   @Override
-  public UserPhone addUserPhone(Long id, CreateUserDto userPost) {
+  public UserPhone addUserPhone(Long id, UserPhoneDto userPost) {
+
     User user = userRepository.findById(id).get();
-    UserPhoneId userPhoneId = new UserPhoneId(user.getUserEntityId(), userPost.getUserPhoneNumber());
+    UserPhoneId userPhoneId = new UserPhoneId(user.getUserEntityId(), userPost.getUserPhoneId().getUsphPhoneNumber());
     UserPhone userPhone = new UserPhone();
     userPhone.setUserPhoneId(userPhoneId);
-    userPhone.setUsphPhoneType(userPost.getPhoneType());
+    userPhone.setUsphPhoneType(userPost.getUsphPhoneType());
     userPhone.setUsphModifiedDate(LocalDateTime.now());
     userPhone.setUser(user);
     return userPhoneRepository.save(userPhone);
@@ -80,5 +81,17 @@ public class UserPhoneImpl implements UserPhoneService {
     if(userPhone.isPresent()){
       userPhoneRepository.delete(userPhone.get());
     }
+  }
+
+  @Override
+  public List<UserPhone> createUserPhone(User user, List<UserPhoneDto> userPost) {
+    List<UserPhone> userPhone = TransactionMapper.mapListDtoToListEntity(userPost, UserPhone.class);
+    userPhone.forEach(phone -> {
+      phone.setUser(user);
+      phone.getUserPhoneId().setUsphEntityId(user.getUserEntityId());
+      phone.setUsphModifiedDate(LocalDateTime.now());
+    });
+    user.setUserPhone(userPhone);
+    return userPhone;
   }
 }

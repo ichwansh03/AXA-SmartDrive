@@ -7,8 +7,9 @@ import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,9 +21,8 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "services", schema = "so")
-@NamedQuery(
-        name = "Services.findServicesById",
-        query = "SELECT s FROM Services s JOIN s.users u JOIN s.customer c WHERE s.servId = :servId")
+@DynamicInsert
+@DynamicUpdate
 public class Services {
 
     @Id
@@ -30,39 +30,28 @@ public class Services {
     @Column(name = "serv_id", updatable = false, nullable = false)
     private Long servId;
 
-    //CustomerRequest.creqCreateDate
     @Column(name = "serv_created_on")
     private LocalDateTime servCreatedOn;
 
-    //CustomerRequest.creqType
     @Column(name = "serv_type")
     @Enumerated(EnumType.STRING)
     private EnumCustomer.CreqType servType;
 
     @Column(name = "serv_insuranceno")
-    @Size(max = 12, message = "insurance number can't more than 12 character")
     private String servInsuranceNo;
 
-    //CustomerInscAssets.ciasPoliceNumber
     @Column(name = "serv_vehicleno")
-    @Size(max = 12, message = "vehicle number can't more than 12 character")
     private String servVehicleNumber;
 
-    //CustomerInscAssets.ciasStartDate
     @Column(name = "serv_startdate")
     private LocalDateTime servStartDate;
 
-    //CustomerInscAssets.ciasEndDate
     @Column(name = "serv_enddate")
     private LocalDateTime servEndDate;
 
-    //CustomerRequest.creqStatus
     @Column(name = "serv_status")
     @Enumerated(EnumType.STRING)
-    private EnumModuleServiceOrders.ServStatus servStatus;
-    {
-        servStatus = EnumModuleServiceOrders.ServStatus.ACTIVE;
-    }
+    private EnumModuleServiceOrders.ServStatus servStatus = EnumModuleServiceOrders.ServStatus.ACTIVE;;
 
     @ManyToOne
     @JoinColumn(name = "serv_serv_id")
@@ -77,8 +66,8 @@ public class Services {
     private User users;
 
     @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "serv_creq_entityid")
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "serv_creq_entityid", unique = true)
     private CustomerRequest customer;
 
     @JsonIgnore
