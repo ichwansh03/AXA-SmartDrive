@@ -45,7 +45,7 @@ public class PartnerAreaWorkgroup {
     public PartnerAreaWorkgroupDto convertToDto(){
         return PartnerAreaWorkgroupDto.builder()
                 .id(id)
-                .partnerContact(partnerContact.getUser().getUserName())
+                .partnerContact(partnerContact.getUser().getUsername())
                 .areaWorkGroup(areaWorkGroup)
                 .status(status.name())
                 .modifiedDate(modifiedDate.toString())

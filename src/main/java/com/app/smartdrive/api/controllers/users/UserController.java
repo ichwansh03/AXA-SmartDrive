@@ -1,6 +1,8 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
+import com.app.smartdrive.api.services.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,10 +33,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/user")
 public class UserController {
   private final UserService userService;
+  private final AuthenticationService authenticationService;
 
   @PostMapping("/signin")
-  public ResponseEntity<?> loginCustomer(@Valid @RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCustomer(login.getIdentity(), login.getPassword()));
+  public ResponseEntity<?> loginCustomer(@Valid @RequestBody SignInRequest login){
+    return ResponseEntity.status(HttpStatus.OK).body(authenticationService.signin(login));
   }
 
   @PostMapping("/emps/signin")

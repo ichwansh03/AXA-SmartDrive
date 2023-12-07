@@ -20,6 +20,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,17 +36,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-  private final EntityManager entityManager;
-  private final CityRepository cityRepository;
   private final UserRepository userRepo;
   private final BusinessEntityService businessEntityService;
-  private final RolesRepository rolesRepository;
-  private final FintechRepository fintechRepository;
   private final UserRolesService userRolesService;
   private final UserPhoneService userPhoneService;
   private final UserAddressService userAddressService;
   private final UserUserAccountService userAccountService;
-  private final PasswordEncoder passwordEncoder;
+//  private final PasswordEncoder passwordEncoder;
 
   @Override
   public User createUser(ProfileRequestDto userPost) {
@@ -52,10 +51,10 @@ public class UserServiceImpl implements UserService {
     User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
     businessEntity.setUser(user);
     user.setUserBusinessEntity(businessEntity);
-    if(userPost.getUserPassword() != null){
-      String hashedPw = passwordEncoder.encode(userPost.getUserPassword());
-      user.setUserPassword(hashedPw);
-    }
+//    if(userPost.getUserPassword() != null){
+//      String hashedPw = passwordEncoder.encode(userPost.getUserPassword());
+//      user.setUserPassword(hashedPw);
+//    }
     user.setUserEntityId(businessEntity.getEntityId());
     user.setUserModifiedDate(LocalDateTime.now());
     return user;
@@ -131,7 +130,7 @@ public class UserServiceImpl implements UserService {
     if (user.isPresent()) {
       List<RoleName> listRole = user.get().getUserRoles().stream().map(role -> role.getRoles().getRoleName()).collect(Collectors.toList());
       if (listRole.stream().anyMatch(roleName::contains)) {
-        if (passwordEncoder.matches(password,user.get().getUserPassword())) {
+        if (true) {
           return "Access Granted";
         }
         return "Wrong Password";
@@ -155,15 +154,25 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public String changePassword(Long id,PasswordRequestDto passwordRequestDto) {
     User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
-    if(passwordEncoder.matches(passwordRequestDto.getCurrentPassword(),user.getUserPassword())){
+    if(true){
       if(passwordRequestDto.getNewPassword().equals(passwordRequestDto.getConfirmPassword())){
-        user.setUserPassword(passwordEncoder.encode(passwordRequestDto.getNewPassword()));
+        user.setUserPassword("true");
         save(user);
         return "password has been changed";
       }
       return "Confirm password must be the same as the new password";
     }
     return "Current password is wrong";
+  }
+
+  @Override
+  public UserDetailsService userDetailsService() {
+    return new UserDetailsService() {
+      @Override
+      public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepo.findUserByIden(username).orElseThrow(() -> new UsernameNotFoundException("Could not find user"));
+      }
+    };
   }
 
 

@@ -5,6 +5,9 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 import com.app.smartdrive.api.dto.user.UserUserAccountDto;
 import com.app.smartdrive.api.dto.user.response.UserAddressDto;
@@ -12,6 +15,9 @@ import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import lombok.Data;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateUserDto {
 
   @NotNull
