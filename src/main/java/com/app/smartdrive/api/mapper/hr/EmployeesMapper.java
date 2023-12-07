@@ -2,7 +2,6 @@ package com.app.smartdrive.api.mapper.hr;
 
 import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesJobTypeResponseDto;
-import com.app.smartdrive.api.dto.payment.Response.BanksDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.entities.hr.Employees;
