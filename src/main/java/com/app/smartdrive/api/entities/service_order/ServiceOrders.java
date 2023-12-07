@@ -80,11 +80,11 @@ public class ServiceOrders {
     @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
     private List<ServiceOrderTasks> serviceOrderTasks;
 
-    //should be one to one
+    //directly to partner (many to one)
     @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetEvidence> claimAssetEvidence;
 
-    //should be one to one
+    //directly to partner (many to one)
     @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetSparepart> claimAssetSparepart;
 }

@@ -115,7 +115,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
     @Transactional
     @Override
-    public int updateTasksStatus(String seotStatus, Long seotId) {
+    public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
         int serviceOrderTasks = soTasksRepository.updateTasksStatus(seotStatus, seotId);
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
         return serviceOrderTasks;

@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
-import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;

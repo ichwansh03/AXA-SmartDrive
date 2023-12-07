@@ -56,9 +56,15 @@ public class ServOrderController {
     }
 
     @PutMapping("/{seroId}")
-    public ResponseEntity<?> updateServiceOrders(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId) {
+    public ResponseEntity<?> updateServiceOrders(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId) throws Exception {
 
         return new ResponseEntity<>(servOrderService.updateServiceOrders(serviceOrderReqDto, seroId), HttpStatus.OK);
+    }
+
+    @GetMapping("/check/{seroId}")
+    public ResponseEntity<?> checkTask(@PathVariable("seroId") String seroId){
+
+        return new ResponseEntity<>(servOrderService.checkAllTaskComplete(seroId), HttpStatus.OK);
     }
 
     private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders){

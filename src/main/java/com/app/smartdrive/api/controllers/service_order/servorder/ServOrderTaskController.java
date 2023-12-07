@@ -28,19 +28,10 @@ public class ServOrderTaskController {
         return new ResponseEntity<>(seotBySeroId, HttpStatus.OK);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SoTasksDto soTasksDto){
-        int updated = servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), soTasksDto.getSeotId());
+    @PutMapping("/update/{seotId}")
+    public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SoTasksDto soTasksDto, @PathVariable("seotId") Long seotId){
+        int updated = servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
 
-        if (updated == 0){
-            throw new UserNotFoundException("ID Not Found");
-        }
-
-        soTasksDto = SoTasksDto.builder()
-                .seotName(soTasksDto.getSeotName())
-                .seotStatus(soTasksDto.getSeotStatus())
-                .seotId(soTasksDto.getSeotId()).build();
-
-        return new ResponseEntity<>(soTasksDto, HttpStatus.OK);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 }

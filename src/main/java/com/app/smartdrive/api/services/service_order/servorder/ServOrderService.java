@@ -16,5 +16,7 @@ public interface ServOrderService {
 
     List<ServiceOrders> findAllSeroByServId(Long servId);
 
-    ServiceOrderReqDto updateServiceOrders(ServiceOrderReqDto serviceOrderReqDto, String seroId);
+    boolean checkAllTaskComplete(String seroId);
+
+    ServiceOrderReqDto updateServiceOrders(ServiceOrderReqDto serviceOrderReqDto, String seroId) throws Exception;
 }
