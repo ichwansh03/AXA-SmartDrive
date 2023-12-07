@@ -160,5 +160,12 @@ public class CustomerRequestController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PutMapping("/close")
+    public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody ClaimRequestDTO claimRequestDTO){
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.closePolis(claimRequestDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+    }
+
 
 }

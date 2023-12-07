@@ -55,4 +55,6 @@ public interface CustomerRequestService {
     public List<CustomerInscExtend> getCustomerInscEtend(Long[] cuexIds, CustomerInscAssets cias, Long entityId);
 
     public CustomerResponseDTO openPolis(UpdateRequestTypeRequestDTO updateRequestTypeRequestDTO);
+
+    public CustomerResponseDTO closePolis(ClaimRequestDTO claimRequestDTO);
 }

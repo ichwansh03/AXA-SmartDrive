@@ -680,6 +680,19 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return this.convert(savedCustomerRequest);
     }
 
+    @Override
+    public CustomerResponseDTO closePolis(ClaimRequestDTO claimRequestDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ada")
+        );
+
+        CustomerClaim customerClaim = existCustomerRequest.getCustomerClaim();
+        customerClaim.setCuclReason(claimRequestDTO.getCuclReason());
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
+        return this.convert(savedCustomerRequest);
+    }
+
 
 }
 
