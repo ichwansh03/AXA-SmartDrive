@@ -57,10 +57,7 @@ public class Partner {
     @Column(name = "part_modified_date")
     private LocalDateTime partModifiedDate;
 
-<<<<<<< HEAD
-    @JsonManagedReference
-=======
->>>>>>> development
+
     @OneToMany(mappedBy = "partner")
     private List<ServiceOrders> serviceOrders;
 
