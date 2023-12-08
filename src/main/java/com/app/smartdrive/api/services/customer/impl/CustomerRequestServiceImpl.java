@@ -397,8 +397,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         cias.setCustomerInscExtend(updatedCustomerInscExtend);
 
         // update cadoc
-        this.cust
-        this.cadocRepository.deleteAllByCadocCreqEntityid(entityId);
+        this.customerInscDocService.deleteAllCustomerInscDocInCustomerRequest(entityId);
 
         List<CustomerInscDoc> newCiasDocs = this.customerInscDocService.fileCheck(files, entityId);
         cias.setCustomerInscDoc(newCiasDocs);

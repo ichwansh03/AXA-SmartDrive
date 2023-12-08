@@ -1,14 +1,23 @@
 package com.app.smartdrive.api.controllers.customerService.customer;
 
+import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.CloseRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Objects;
 
@@ -51,8 +60,58 @@ public class CustomerServiceController {
 
     }
 
+    @PostMapping("/request")
+    public CustomerResponseDTO create(
+            @Valid @RequestParam("client") String client,
+            @RequestParam("file") MultipartFile[] files
+    ) throws Exception{
+
+        ObjectMapper mapper = new ObjectMapper();
+        CustomerRequestDTO customerRequestDTO = mapper.readValue(client, CustomerRequestDTO.class);
+
+        CustomerResponseDTO customerRequest = this.customerRequestService.create(customerRequestDTO, files);
+
+        return customerRequest;
+    }
+
+    @PutMapping("/request")
+    public CustomerResponseDTO update(
+            @RequestParam("creqEntityId") Long creqEntityId,
+            @Valid @RequestParam("client") String client,
+            @RequestParam("file") MultipartFile[] files
+    ) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        UpdateCustomerRequestDTO updateCustomerRequestDTO = mapper.readValue(client, UpdateCustomerRequestDTO.class);
+
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerRequest(creqEntityId, updateCustomerRequestDTO, files);
+
+        return customerResponseDTO;
+    }
 
 
+    @PutMapping("/request/claim")
+    public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
+            @RequestBody ClaimRequestDTO claimRequestDTO
+    ){
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerClaim(claimRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+    }
+
+    @GetMapping("/request/claim")
+    public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
+            @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
+    ){
+        ClaimResponseDTO existCustomerClaim = this.customerRequestService.getCustomerClaimById(cuclCreqEntityId);
+        return ResponseEntity.status(HttpStatus.OK).body(existCustomerClaim);
+
+    }
+
+    @PutMapping("/request/close")
+    public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.closePolis(closeRequestDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+    }
 
 
 
