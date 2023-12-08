@@ -16,7 +16,4 @@ public interface SecrRepository extends JpaRepository<ServicePremiCredit, Servic
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<ServicePremiCredit> findAllBySecrServId(Long servId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Override
-    ServicePremiCredit save(ServicePremiCredit entity);
 }

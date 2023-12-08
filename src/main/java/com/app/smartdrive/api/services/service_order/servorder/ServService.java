@@ -12,5 +12,4 @@ public interface ServService {
 
     Optional<Services> findServicesById(Long servId);
 
-    Services updateService(Long servId, Services services) throws Exception;
 }

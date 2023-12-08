@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class ServPremiImpl implements ServPremiService {
     @Transactional
     @Override
     public ServicePremi addSemi(ServicePremi servicePremi, Long servId) {
-        Services services = soRepository.findById(1L).get();
+        Services services = soRepository.findById(servId).get();
 
         ServicePremi premi = ServicePremi.builder()
                 .semiServId(services.getServId())
@@ -44,15 +43,12 @@ public class ServPremiImpl implements ServPremiService {
                 .semiStatus(servicePremi.getSemiStatus())
                 .semiPaidType(servicePremi.getSemiPaidType())
                 .semiModifiedDate(LocalDateTime.now())
-                //.services(services)
                 .build();
 
         ServicePremi save = semiRepository.save(premi);
 
-        ServPremiCreditImpl servPremiCredit = new ServPremiCreditImpl(semiRepository, secrRepository, soRepository);
+        ServPremiCreditImpl servPremiCredit = new ServPremiCreditImpl(secrRepository);
         servPremiCredit.addSecr(premi);
-
-        //semiRepository.flush();
 
         return save;
     }
