@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.HR.response;
+package com.app.smartdrive.api.dto.customer.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmployeesJobTypeResponseDto {
-    private String jobCode;
-    private String jobDesc;
+public class CloseRequestDTO {
+    private Long creqEntityId;
+    private String cuclReason;
 }

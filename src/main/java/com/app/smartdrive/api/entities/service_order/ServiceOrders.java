@@ -49,8 +49,9 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "sero_part_id")
     private Partner partner;
 

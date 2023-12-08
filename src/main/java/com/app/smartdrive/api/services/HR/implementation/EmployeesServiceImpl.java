@@ -103,7 +103,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         employee.setEmpGraduate(employeesDto.getEmpGraduate());
         employee.setEmpNetSalary(employeesDto.getEmpSalary());
-        employee.setEmpJobCode(employeesDto.getEmpJobRole());
+        employee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
         employee.setEmpModifiedDate(LocalDateTime.now());
 
         ProfileRequestDto profileRequestDto = new ProfileRequestDto();
@@ -192,7 +192,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
     existingEmployee.setEmpGraduate(employeesDto.getEmpGraduate());
     existingEmployee.setEmpNetSalary(employeesDto.getEmpSalary());
-    existingEmployee.setEmpJobCode(employeesDto.getEmpJobRole());
+    existingEmployee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
     existingEmployee.setEmpModifiedDate(LocalDateTime.now());
 
     
