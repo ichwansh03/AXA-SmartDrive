@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.payment.Request;
+package com.app.smartdrive.api.dto.payment.Request.UserAccounts;
 
 import lombok.Data;
 

@@ -9,12 +9,12 @@ import javax.swing.text.html.Option;
 import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.stereotype.Service;
 
-import com.app.smartdrive.api.dto.payment.Request.UserAccountsDtoRequests;
-import com.app.smartdrive.api.dto.payment.Response.UserAccountsDtoResponse;
+import com.app.smartdrive.api.dto.payment.Request.UserAccounts.UserAccountsDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.UserAccounts.UserAccountsDtoResponse;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.mapper.payment.UserAccounts.UserAccountsMapperResponse;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
-import com.app.smartdrive.api.mapper.payment.UserAccountsMapperResponse;
 import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
 import com.app.smartdrive.api.services.payment.UserAccountsService;
 

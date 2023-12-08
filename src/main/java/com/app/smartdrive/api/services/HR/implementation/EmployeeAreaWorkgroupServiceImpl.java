@@ -3,6 +3,7 @@ package com.app.smartdrive.api.services.HR.implementation;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
+import com.app.smartdrive.api.dto.partner.request.PartnerAreaWorkgroupRequest;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.hr.Employees;
@@ -24,9 +26,11 @@ import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.Provinsi;
 import com.app.smartdrive.api.entities.master.Zones;
+import com.app.smartdrive.api.entities.partner.PartnerAreaWorkGroupId;
+import com.app.smartdrive.api.entities.partner.PartnerAreaWorkgroup;
+import com.app.smartdrive.api.entities.partner.PartnerContact;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.entities.users.UserAddress;
+
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
@@ -35,6 +39,8 @@ import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.master.ProvRepository;
 import com.app.smartdrive.api.repositories.master.ZonesRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
+import com.app.smartdrive.api.services.HR.EmployeesService;
+import com.app.smartdrive.api.services.master.ArwgService;
 import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.utils.NullUtils;
@@ -57,17 +63,10 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
  
     
 
+    @Override
     @Transactional
     public EmployeeAreaWorkgroupDto addEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto) {
-        BusinessEntity businessEntity = new BusinessEntity();
-        businessEntity.setEntityModifiedDate(LocalDateTime.now());
-    
-        Employees existingEmployee = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityId()).orElse(null);
-    
-        if (existingEmployee == null) {
-            // Handle the case where the employee is not found
-            return null;
-        }
+        Employees existingEmployee = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElse(null);
     
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
     
@@ -82,21 +81,17 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
                 String provName = provinsi.getProvName();
                 Zones zones = provinsi.getZones();
                 String zonesName = zones.getZonesName();
-    
-                // Set additional properties to DTO
+                
                 employeeAreaWorkgroupDto.setProvinsi(provName);
                 employeeAreaWorkgroupDto.setZoneName(zonesName);
                 employeeAreaWorkgroupDto.setCityId(city.getCityId());
     
-                AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findById(employeeAreaWorkgroupDto.getAreaworkGroup()).orElse(null);
-    
+                AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findById(employeeAreaWorkgroupDto.getArwgCode()).orElse(null);
                 if (areaWorkGroup != null) {
                     employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
                     employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
                 }
-    
                 Cities cityInAreaWorkGroup = areaWorkGroup != null ? areaWorkGroup.getCities() : null;
-    
                 if (cityInAreaWorkGroup != null) {
                     employeeAreaWorkgroupDto.setCityId(cityInAreaWorkGroup.getCityId());
                 }
@@ -105,48 +100,39 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     
         employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
         employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
-    
-        // Set other properties to DTO as needed
-        employeeAreaWorkgroupDto.setAreaworkGroup(employeeAreaWorkgroupDto.getAreaworkGroup());
-    
+
         return employeeAreaWorkgroupDto;
     }
     
-     
     @Override
     @Transactional
     public EmployeeAreaWorkgroupDto updateEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, Long id) {
-    //     Cities cities = cityRepository.findById(employeeAreaWorkgroupDto.getCityName());
-    //     Provinsi provinsi = cities.getProvinsi();
-    //             String provName = provinsi.getProvName();
-    //             Zones zones = provinsi.getZones();
-    //             String zonesName = zones.getZonesName();
-    //             employeeAreaWorkgroupDto.setProvinsi(provName);
-    //             employeeAreaWorkgroupDto.setZoneName(zonesName);
-    //             employeeAreaWorkgroupDto.setCityName(cities.getCityName());
+        Optional<EmployeeAreaWorkgroup> optionalEmployeeAreaWorkgroup = employeeAreaWorkgroupRepository.findByEawgId(id);
+        if (optionalEmployeeAreaWorkgroup.isPresent()) {
+            EmployeeAreaWorkgroup employeeAreaWorkgroup = optionalEmployeeAreaWorkgroup.get();
 
-    //     List<AreaWorkGroup> listAreaWorkGroup = cities.getAreaWorkGroups();
-    //     AreaWorkGroup areaWorkGroup= areaWorkGroupRepository.findByArwgCode(employeeAreaWorkgroupDto.getAreaworkGroup());
-    //     for (AreaWorkGroup arwg : listAreaWorkGroup) {
-    //         if(arwg.getArwgCode().equals(employeeAreaWorkgroupDto.getAreaworkGroup())){
-    //             areaWorkGroup = arwg;
-    //         }
-    //     }
-    //     EmployeeAreaWorkgroup employeeAreaWorkgroup = employeeAreaWorkgroupRepository.findByEawgId(id).get();
-    //     Employees employees = employeesRepository.findByEmpName(employeeAreaWorkgroupDto.getEmpName());
-    //         NullUtils.updateIfChanged(employeeAreaWorkgroup::setEawgArwgCode, employeeAreaWorkgroupDto.getAreaworkGroup(),employeeAreaWorkgroup::getEawgArwgCode);
-    //         NullUtils.updateIfChanged(employees::setEmpName, employeeAreaWorkgroupDto.getEmpName(), employees::getEmpName);
+            if (!Objects.equals(employeeAreaWorkgroupDto.getArwgCode(), employeeAreaWorkgroup.getEawgArwgCode())) {
+                AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findByArwgCode(employeeAreaWorkgroupDto.getArwgCode());
+                if (areaWorkGroup != null) {
+                    employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
+                    employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
+                }
+            }
 
-    //         employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
+            if (!Objects.equals(employeeAreaWorkgroupDto.getEmpEntityid(), employeeAreaWorkgroup.getEawgEntityid())) {
+                Employees employees = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElse(null);
+                if (employees != null) {
+                    employeeAreaWorkgroup.setEawgEntityid(employeeAreaWorkgroupDto.getEmpEntityid());
+                }
+            }
+            employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
+            employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
+        }
 
-    //         employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
-    //         employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
-    //         employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
+            return employeeAreaWorkgroupDto;
+        }
 
-
-    return employeeAreaWorkgroupDto;
-    
-    }
+   
 
     @Override
     public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size) {
@@ -163,20 +149,23 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
     private EmployeesAreaWorkgroupResponseDto convertToDto(EmployeeAreaWorkgroup employeeAreaWorkgroup) {
         EmployeesAreaWorkgroupResponseDto dto = new EmployeesAreaWorkgroupResponseDto();
-        dto.setAreaworkGroup(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getAreaWorkGroup(), ArwgRes.class));
+        dto.setAreaWorkGroup(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getAreaWorkGroup(), ArwgRes.class));
         dto.setEmployees(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getEmployees(), EmployeesDto.class));
         return dto;
     }
 
-
-
-    
+    @Override
+    public List<EmployeesAreaWorkgroupResponseDto> getAllDto() {
+      List<EmployeeAreaWorkgroup> employeeAreaWorkgroups = employeeAreaWorkgroupRepository.findAll();
+      List<EmployeesAreaWorkgroupResponseDto> empDto = TransactionMapper.mapEntityListToDtoList(employeeAreaWorkgroups, EmployeesAreaWorkgroupResponseDto.class);
+      return empDto;
+    }
     
     
     @Override
     public EmployeeAreaWorkgroup getById(Long id) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+        return null;
     }
 
     @Override
@@ -197,9 +186,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
          employeeAreaWorkgroupRepository.deleteEawgById(eawg_id);
     }
 
-    public EmployeeAreaWorkgroup findByEawgById(Long eawg_id){
-        Optional<EmployeeAreaWorkgroup> findByEawgId = employeeAreaWorkgroupRepository.findByEawgId(eawg_id);
-        return findByEawgId.get();
-    }
+
     
 }

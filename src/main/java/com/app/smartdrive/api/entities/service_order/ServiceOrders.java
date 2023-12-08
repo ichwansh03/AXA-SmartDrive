@@ -21,9 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
-@NamedQuery(
-        name = "ServiceOrders.findAllSeroByServId",
-        query = "SELECT sero FROM ServiceOrders sero WHERE sero.services.servId = :servId")
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrders {
@@ -52,10 +49,10 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
-    // @JsonBackReference
-    // @OneToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "sero_part_id")
-    // private Partner partner;
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sero_part_id")
+    private Partner partner;
 
     @JsonIgnore
     @ManyToOne
@@ -83,9 +80,11 @@ public class ServiceOrders {
     @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
     private List<ServiceOrderTasks> serviceOrderTasks;
 
+    //directly to partner (many to one)
     @OneToMany(mappedBy = "caevServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetEvidence> claimAssetEvidence;
 
+    //directly to partner (many to one)
     @OneToMany(mappedBy = "caspServiceOrders", cascade = CascadeType.ALL)
     private List<ClaimAssetSparepart> claimAssetSparepart;
 }

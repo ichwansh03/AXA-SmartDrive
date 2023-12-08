@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.payment.Response.BanksDto;
-import com.app.smartdrive.api.dto.payment.Response.BanksIdForUserDto;
+import com.app.smartdrive.api.dto.payment.Request.Banks.BanksDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.Banks.BanksDtoResponse;
+import com.app.smartdrive.api.dto.payment.Response.Banks.BanksIdForUserDtoResponse;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
@@ -44,24 +45,24 @@ public class BanksController {
 
     @GetMapping("/banks/all")
     public ResponseEntity<?> getAllBanks(){
-        List<BanksDto> resultDto = service.getAll();
+        List<BanksDtoResponse> resultDto = service.getAll();
         return new ResponseEntity<>(resultDto,HttpStatus.OK);
     }
     @GetMapping("/banks/{bank_entityid}")
     public ResponseEntity<?> getBanksById(@Valid @PathVariable("bank_entityid") Long bank_entityid){
-       BanksDto resultDto = service.getById(bank_entityid);
+       BanksDtoResponse resultDto = service.getById(bank_entityid);
        return new ResponseEntity<>(resultDto,HttpStatus.OK);
     }
 
     @PostMapping("/banks/add")
-    public ResponseEntity<?> addBanks(@Valid @RequestBody BanksDto banksDto){
-       BanksDto resultDto = service.save(banksDto);
+    public ResponseEntity<?> addBanks(@Valid @RequestBody BanksDtoRequests requests){
+       BanksDtoResponse resultDto = service.addBankss(requests);
        return new ResponseEntity<>(resultDto,HttpStatus.CREATED);
     }
 
     @PutMapping("/banks/update/{bank_entityid}")
     public ResponseEntity<?> updateBanks(@Valid @PathVariable("bank_entityid") Long bank_entityid, 
-    @RequestBody BanksDto banksDto){
+    @RequestBody BanksDtoResponse banksDto){
         Boolean newBank = service.updateBanks(bank_entityid,banksDto);
         return new ResponseEntity<>(newBank, HttpStatus.OK);
     }
@@ -74,7 +75,7 @@ public class BanksController {
     }   
     @GetMapping("/banks/user/{bank_name}")
     public ResponseEntity<?> getUserBanks(@Valid @PathVariable("bank_name") String bank_name){
-        BanksIdForUserDto getUser = service.getBanksUser(bank_name);
+        BanksIdForUserDtoResponse getUser = service.getBanksUser(bank_name);
         return new ResponseEntity<>(getUser, HttpStatus.OK);
 
     } 

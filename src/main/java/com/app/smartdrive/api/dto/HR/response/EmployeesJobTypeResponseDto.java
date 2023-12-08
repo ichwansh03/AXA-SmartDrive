@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EmployeesJobTypeResponseDto {
     private String jobCode;
+    private String jobDesc;
 }

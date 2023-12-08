@@ -99,8 +99,7 @@ public class Employees {
     @PrimaryKeyJoinColumn
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
     
-    
-    @JsonIgnore
+
     @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrders;
 }

@@ -46,11 +46,11 @@ public class ClaimAssetEvidence {
     @Column(name = "caev_sero_id")
     private String caevSeroId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "caev_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
     Partner caevPartners;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "caev_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
     ServiceOrders caevServiceOrders;
 }

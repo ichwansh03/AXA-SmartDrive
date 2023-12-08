@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
 
 import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
-import com.app.smartdrive.api.dto.payment.Response.BanksDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
@@ -40,7 +40,6 @@ import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.mapper.hr.EmployeesMapper;
-import com.app.smartdrive.api.mapper.payment.BanksMapper;
 import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.Roles;
@@ -60,6 +59,7 @@ import com.app.smartdrive.api.services.users.UserAddressService;
 import com.app.smartdrive.api.services.users.UserPhoneService;
 import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
+import com.app.smartdrive.api.services.users.UserUserAccountService;
 import com.app.smartdrive.api.services.users.implementation.UserAddressImpl;
 import com.app.smartdrive.api.services.users.implementation.UserPhoneImpl;
 import com.app.smartdrive.api.services.users.implementation.UserRolesImpl;
@@ -74,7 +74,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeesServiceImpl implements EmployeesService {
     
-    private final BusinessEntityService businessEntityService;
 
     private final UserAddressService userAddressService;
 
@@ -83,10 +82,10 @@ public class EmployeesServiceImpl implements EmployeesService {
     private final UserRolesService userRolesService;
 
     private final EmployeesRepository employeesRepository;
+
+    private final UserUserAccountService userAccountService;
   
     private final UserService userService;
-
-
 
 
     @Override
@@ -104,7 +103,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         employee.setEmpGraduate(employeesDto.getEmpGraduate());
         employee.setEmpNetSalary(employeesDto.getEmpSalary());
-        employee.setEmpJobCode(employeesDto.getEmpJobRole().getJobCode());
+        employee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
         employee.setEmpModifiedDate(LocalDateTime.now());
 
         ProfileRequestDto profileRequestDto = new ProfileRequestDto();
@@ -113,16 +112,19 @@ public class EmployeesServiceImpl implements EmployeesService {
         
         User user = userService.createUser(profileRequestDto);
         
-        if(employeesDto.getGrantAccessUser()==true){
+        
             user.setUserEmail(employeesDto.getEmail());
+            if(employeesDto.getGrantAccessUser()==true){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(employeesDto.getEmpPhone().getUsphPhoneNumber());
+            }
             user.setUserFullName(employeesDto.getEmpName());
             user.setUserNationalId("idn"+user.getUserEntityId());
             user.setUserNPWP("npwp"+user.getUserEntityId());
         
             
             userRolesService.createUserRole(RoleName.EM, user);
+            
             
 
             UserPhoneDto userPhoneDto = new UserPhoneDto();
@@ -131,7 +133,6 @@ public class EmployeesServiceImpl implements EmployeesService {
             userPhoneDto.setUserPhoneId(userPhoneIdDto);
             List<UserPhoneDto> listPhone = new ArrayList<>();
             listPhone.add(userPhoneDto);
-            
             userPhoneService.createUserPhone(user, listPhone);
         
             UserAddressDto userAddressDto = new UserAddressDto();
@@ -140,7 +141,7 @@ public class EmployeesServiceImpl implements EmployeesService {
             List<UserAddressDto> listAddress = new ArrayList<>();
             listAddress.add(userAddressDto);
             userAddressService.createUserAddress(user, listAddress, employeesDto.getEmpAddress().getCityId());
-        }
+        
         
         employee.setEmpEntityid(user.getUserEntityId());
         employee.setUser(user);
@@ -181,6 +182,8 @@ public class EmployeesServiceImpl implements EmployeesService {
     userAddressRequestDto.setCityId(employeesDto.getEmpAddress().getCityId());
     userAddressService.updateUserAddress(employeeId, userAddress.getUsdrId(), userAddressRequestDto);
 
+
+
     
     existingEmployee.setEmpName(employeesDto.getEmpName());
     existingEmployee.setEmpJoinDate(empJoinDate);
@@ -189,7 +192,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
     existingEmployee.setEmpGraduate(employeesDto.getEmpGraduate());
     existingEmployee.setEmpNetSalary(employeesDto.getEmpSalary());
-    existingEmployee.setEmpJobCode(employeesDto.getEmpJobRole().getJobCode());
+    existingEmployee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
     existingEmployee.setEmpModifiedDate(LocalDateTime.now());
 
     
@@ -225,19 +228,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         return employeesRepository.findAllByEmpName(employeeName);
     }
 
-    @Override
-    public Employees getById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
-    }
-
     
-
-    @Override
-    public Employees save(Employees entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
 
     @Override
     public List<EmployeesRequestDto> getAllEmployeesDto() {
@@ -246,15 +237,32 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
 
     @Override
-    public List<Employees> getAll() {
-        List<Employees> empList = employeesRepository.findAll();
-        List<EmployeesDto> empDto = new ArrayList<>();
-        for (Employees emp : empList) {
-            EmployeesDto dto = EmployeesMapper.convertEntityToDto(emp);
-            empDto.add(dto);
-        }
-        return empList;
+    public List<EmployeesDto> getAllDto() {
+      List<Employees> employees = employeesRepository.findAll();
+      List<EmployeesDto> empDto = TransactionMapper.mapEntityListToDtoList(employees, EmployeesDto.class);
+      return empDto;
     }
+
+    @Override
+    public Employees getById(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+    }
+
+    @Override
+    public List<Employees> getAll() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+    }
+
+    @Override
+    public Employees save(Employees entity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    
+
     
 
     

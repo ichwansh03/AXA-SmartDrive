@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.dto.master.response;
 
+import com.app.smartdrive.api.entities.master.Cities;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;

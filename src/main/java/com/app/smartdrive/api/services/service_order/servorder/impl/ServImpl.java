@@ -1,8 +1,8 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,7 +39,7 @@ public class ServImpl implements ServService {
 
     @Transactional
     @Override
-    public Services addService(Long creqId) {
+    public Services addService(Long creqId) throws Exception {
 
         CustomerRequest cr = customerRequestRepository.findById(creqId).get();
 
@@ -66,24 +65,21 @@ public class ServImpl implements ServService {
         return saved;
     }
 
+    @Transactional
     @Override
-    public boolean checkAllTaskComplete(String seroId) {
+    public ServiceReqDto updateServices(ServiceReqDto serviceReqDto, Long servId) {
+        Services services = soRepository.findById(servId).orElseThrow(() -> new EntityNotFoundException("ID not found"));
 
-        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findSeotBySeroId(seroId);
+        services.setServCreatedOn(serviceReqDto.getServCreatedOn());
+        services.setServType(serviceReqDto.getServType());
+        services.setServVehicleNumber(serviceReqDto.getServVehicleNumber());
+        services.setServStartDate(serviceReqDto.getServStartDate());
+        services.setServEndDate(serviceReqDto.getServEndDate());
+        services.setServStatus(serviceReqDto.getServStatus());
 
-        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
-        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository, tewoRepository);
-        boolean allWorkComplete = servOrderWorkorder.checkAllWorkComplete(sowoBySeotId);
+        soRepository.save(services);
 
-        boolean checkedAll = false;
-        for (ServiceOrderTasks item : seotBySeroId) {
-            if (item.getSeotStatus().toString().equals("COMPLETED") && allWorkComplete){
-                checkedAll = true;
-            }
-        }
-
-        log.info("ServOrderTaskImpl::checkAllTaskComplete the results is {}",checkedAll);
-        return checkedAll;
+        return serviceReqDto;
     }
 
     @Transactional(readOnly = true)

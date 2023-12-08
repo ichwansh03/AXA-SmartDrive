@@ -6,7 +6,8 @@ import com.app.smartdrive.api.services.BaseService;
 import org.springframework.data.domain.Page;
 
 public interface PartnerService extends BaseService<Partner, Long> {
-    Partner convertToEntity(PartnerRequest request);
-
+    Partner create(PartnerRequest request);
     Page<Partner> searchByNameOrNpwp(String value, int page);
+
+    Partner save(PartnerRequest request);
 }

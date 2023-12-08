@@ -8,7 +8,9 @@ import com.app.smartdrive.api.entities.partner.PartnerContact;
 import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerAreaWorkGroupRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerContactRepository;
+import com.app.smartdrive.api.services.master.ArwgService;
 import com.app.smartdrive.api.services.partner.PartnerAreaWorkgroupService;
+import com.app.smartdrive.api.services.partner.PartnerContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupService {
 
-    private final ArwgRepository arwgRepository;
-    private final PartnerContactRepository partnerContactRepository;
     private final PartnerAreaWorkGroupRepository partnerAreaWorkGroupRepository;
-
+    private final ArwgService arwgService;
+    private final PartnerContactService partnerContactService;
 
 
     @Override
@@ -47,10 +48,12 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
 
     @Override
     @Transactional
-    public PartnerAreaWorkgroup save(PartnerAreaWorkgroupRequest request) {
+    public PartnerAreaWorkgroup create(PartnerAreaWorkgroupRequest request) {
         PartnerAreaWorkgroup pawo = new PartnerAreaWorkgroup();
-        AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode(request.getWorkgroup());
-        PartnerContact partnerContact = partnerContactRepository.findByUser_UserFullName(request.getPartnerContactName()).get();
+
+        AreaWorkGroup areaWorkGroup = arwgService.getById(request.getAreaWorkgroupId());
+        PartnerContact partnerContact = partnerContactService.getById(request.getPartnerContactId());
+
         pawo.setPartnerContact(partnerContact);
         pawo.setAreaWorkGroup(areaWorkGroup);
         PartnerAreaWorkGroupId id = new PartnerAreaWorkGroupId();
@@ -61,4 +64,5 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
 
         return partnerAreaWorkGroupRepository.save(pawo);
     }
+
 }

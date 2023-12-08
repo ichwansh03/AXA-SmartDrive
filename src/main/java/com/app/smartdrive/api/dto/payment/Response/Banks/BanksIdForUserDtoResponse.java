@@ -1,4 +1,4 @@
-    package com.app.smartdrive.api.dto.payment.Response;
+    package com.app.smartdrive.api.dto.payment.Response.Banks;
 
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BanksIdForUserDto {
+public class BanksIdForUserDtoResponse {
     private EnumPaymentType enumPaymentType;
     private Long bank_entity_id;
 }
