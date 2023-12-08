@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SemiReqDto {
 
-    @NotNull
-    private Long semiServId;
     private BigDecimal semiPremiDebet;
     private BigDecimal semiPremiCredit;
     private String semiPaidType;

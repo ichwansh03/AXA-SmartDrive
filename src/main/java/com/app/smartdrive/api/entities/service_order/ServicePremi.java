@@ -12,7 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -25,7 +25,7 @@ import java.util.List;
 public class ServicePremi {
 
     @Id
-    @Column(name = "semi_serv_id")
+    @Column(name = "semi_serv_id", insertable = false, updatable = false)
     private Long semiServId;
 
     @Column(name = "semi_premi_debet")
@@ -44,14 +44,15 @@ public class ServicePremi {
     private String semiStatus;
 
     @Column(name = "semi_modified_date")
-    private LocalDate semiModifiedDate;
+    private LocalDateTime semiModifiedDate;
 
+    //@MapsId
+    @JsonIgnore
     @ManyToOne
-    @MapsId
     @JoinColumn(name = "semi_serv_id")
     Services services;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "servicePremi", cascade = CascadeType.ALL)
-    private List<ServicePremiCredit> servicePremiCredits;
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "servicePremi", cascade = CascadeType.ALL)
+//    private List<ServicePremiCredit> servicePremiCredits;
 }

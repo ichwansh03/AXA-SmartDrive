@@ -84,8 +84,9 @@ public class PaymentTransactions {
     private String patrTrxnoRev;
 
  
-    // @OneToMany(mappedBy = "paymentTransactions", cascade = CascadeType.ALL, orphanRemoval = true)
-    // List<ServicePremiCredit> servicePremiCredits;
+//     @ManyToOne
+//     @JoinColumn(name = "")
+//     ServicePremiCredit servicePremiCredits;
 
     @ManyToOne
     @JoinColumn(name = "patr_trxno_rev", referencedColumnName = "patr_trxno" ,insertable = false, updatable = false)

@@ -73,7 +73,7 @@ public class ServOrderController {
 
         ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
         serviceOrderRespDto.setServices(serviceRespDto);
-        serviceOrderRespDto.setArwgRes(arwgRes);
+        serviceOrderRespDto.setAreaWorkGroup(arwgRes);
         serviceOrderRespDto.setSoTasksDtoList(soTasksDtos);
 
         return serviceOrderRespDto;
