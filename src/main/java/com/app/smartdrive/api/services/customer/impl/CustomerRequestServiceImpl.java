@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.UserNotFoundException;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.entities.customer.*;
@@ -91,7 +92,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         return this.convert(existCustomerRequest);
     }
-
     @Transactional
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
@@ -375,7 +375,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
     @Override
-    public Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status) {
         User user = this.userRepository.findById(custId).get();
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
 

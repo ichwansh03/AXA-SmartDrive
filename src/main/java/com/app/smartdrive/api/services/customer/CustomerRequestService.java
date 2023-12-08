@@ -32,7 +32,7 @@ public interface CustomerRequestService {
 
     public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs);
 
-    public Page<CustomerResponseDTO> getPagingCustomer(Long custId, Pageable paging, String type, String status);
+    public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status);
 
     public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
