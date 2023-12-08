@@ -28,7 +28,7 @@ public class CustomerServiceController {
     private final CustomerRequestService customerRequestService;
 
     @GetMapping("/request")
-    public Page<CustomerResponseDTO> getAllUserCustomersRequest(
+    public ResponseEntity<Page<CustomerResponseDTO>> getAllUserCustomersRequest(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "3") int size,
             @RequestParam(value = "type", defaultValue = "ALL") String type,
@@ -46,22 +46,23 @@ public class CustomerServiceController {
 
         Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingUserCustomerRequests(custId, paging, type, status);
 
-        return pagingCustomerResponseDTO;
+        return ResponseEntity.status(HttpStatus.OK).body(pagingCustomerResponseDTO);
     }
 
 
 
     @GetMapping("request/search")
-    public CustomerResponseDTO getById(
+    public ResponseEntity<CustomerResponseDTO> getById(
             @RequestParam("creqEntityId") Long creqEntityId
     ){
         CustomerResponseDTO customerResponseDTO = this.customerRequestService.getCustomerRequestById(creqEntityId);
-        return customerResponseDTO;
+
+        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
 
     }
 
     @PostMapping("/request")
-    public CustomerResponseDTO create(
+    public ResponseEntity<CustomerResponseDTO> create(
             @Valid @RequestParam("client") String client,
             @RequestParam("file") MultipartFile[] files
     ) throws Exception{
@@ -69,13 +70,13 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         CustomerRequestDTO customerRequestDTO = mapper.readValue(client, CustomerRequestDTO.class);
 
-        CustomerResponseDTO customerRequest = this.customerRequestService.create(customerRequestDTO, files);
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.create(customerRequestDTO, files);
 
-        return customerRequest;
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
     }
 
     @PutMapping("/request")
-    public CustomerResponseDTO update(
+    public ResponseEntity<CustomerResponseDTO> update(
             @RequestParam("creqEntityId") Long creqEntityId,
             @Valid @RequestParam("client") String client,
             @RequestParam("file") MultipartFile[] files
@@ -85,7 +86,7 @@ public class CustomerServiceController {
 
         CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerRequest(creqEntityId, updateCustomerRequestDTO, files);
 
-        return customerResponseDTO;
+        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
 
