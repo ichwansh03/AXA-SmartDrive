@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
@@ -15,6 +16,7 @@ import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,31 +44,28 @@ public class ServOrderImpl implements ServOrderService {
 
         ServiceOrders orders;
 
-        if (services.getServType().toString().equals("FEASIBLITY")) {
-            orders = generateSeroFeasiblity(services);
-        } else {
-            orders = generateSeroPolis(services);
-        }
-
-        ServiceOrders seroSaved = soOrderRepository.save(orders);
-        log.info("SoOrderServiceImpl::addServiceOrders in ID {}",orders.getSeroId());
-
         ServOrderTaskImpl servOrderTask = new ServOrderTaskImpl(soTasksRepository, soWorkorderRepository, testaRepository, tewoRepository);
-        List<ServiceOrderTasks> seotList;
 
         switch (services.getServType().toString()){
-            case "FEASIBLITY" -> seotList = servOrderTask.addFeasiblityList(seroSaved);
-            case "POLIS" -> seotList = servOrderTask.addPolisList(seroSaved);
-            case "CLAIM" -> seotList = servOrderTask.addClaimList(seroSaved);
-            default -> {
-                seotList = servOrderTask.closeAllTasks(seroSaved);
-                seroSaved.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
+            case "FEASIBLITY" -> {
+                orders = generateSeroFeasiblity(services);
+                servOrderTask.addFeasiblityList(orders);
             }
+            case "POLIS" -> {
+                orders = generateSeroPolis(services);
+                //temporary validate
+                if (checkAllTaskComplete(services.getServiceOrdersSet().get(0).getSeroId())){
+                    servOrderTask.addPolisList(orders);
+                } else {
+                    throw new TasksNotCompletedException("Completed your feasiblity tasks before new request", HttpStatus.BAD_REQUEST);
+                }
+            }
+            case "CLAIM" -> {
+                orders = generateSeroFeasiblity(services);
+                servOrderTask.addClaimList(orders);
+            }
+            default -> orders = generateSeroFeasiblity(services);
         }
-
-        List<ServiceOrderTasks> serviceOrderTasks = seotList;
-
-        seroSaved.setServiceOrderTasks(serviceOrderTasks);
 
         return orders;
     }
@@ -110,6 +109,7 @@ public class ServOrderImpl implements ServOrderService {
         return checkedAll;
     }
 
+    @Transactional
     private ServiceOrders generateSeroFeasiblity(Services services){
         soAdapter = new SoAdapter();
         String formatSeroId = soAdapter.formatServiceOrderId(services);
@@ -121,9 +121,10 @@ public class ServOrderImpl implements ServOrderService {
                 .seroStatus(serviceOrders.getSeroStatus())
                 .services(services).build();
 
-        return serviceOrders;
+        return soOrderRepository.save(serviceOrders);
     }
 
+    @Transactional
     private ServiceOrders generateSeroPolis(Services services){
         soAdapter = new SoAdapter();
         String formatSeroId = soAdapter.formatServiceOrderId(services);
@@ -138,6 +139,6 @@ public class ServOrderImpl implements ServOrderService {
                 .servClaimEnddate(services.getServStartDate().plusYears(1))
                 .services(services).build();
 
-        return serviceOrders;
+        return soOrderRepository.save(serviceOrders);
     }
 }

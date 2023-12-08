@@ -2,6 +2,7 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
@@ -41,24 +42,23 @@ public class ServImpl implements ServService {
     public Services addService(Long creqId) throws Exception {
 
         CustomerRequest cr = customerRequestRepository.findById(creqId).get();
-
         Services serv;
+        ServOrderImpl servOrder = new ServOrderImpl(soRepository, soOrderRepository, soTasksRepository,
+                soWorkorderRepository, testaRepository, tewoRepository);
 
-        //FS from CR
-        if (cr.getCreqType().toString().equals("FEASIBLITY")){
-            serv = generateFeasiblity(cr);
-        }
-        //when CR update to POLIS, create new service orders and update service
-        else if (cr.getCreqType().toString().equals("POLIS") || cr.getCreqType().toString().equals("CLAIM")) {
-            serv = generatePolisAndClaim(cr);
-        } else {
-            serv = generateTypeInactive(cr);
+        switch (cr.getCreqType().toString()){
+            case "FEASIBLITY" -> serv = generateFeasiblity(cr);
+            case "POLIS", "CLAIM" -> {
+                Services servFs = soRepository.findByServTypeAndCustomer_CreqEntityId(EnumCustomer.CreqType.FEASIBLITY, cr.getCreqEntityId());
+                log.info("Call ID CR {} ", servFs.getServId());
+                serv = generatePolis(servFs.getServId(), cr);
+            }
+            default -> serv = generateTypeInactive(cr);
         }
 
         Services saved = soRepository.save(serv);
         log.info("ServOrderServiceImpl::addService created service");
 
-        ServOrderImpl servOrder = new ServOrderImpl(soRepository, soOrderRepository, soTasksRepository, soWorkorderRepository, testaRepository, tewoRepository);
         servOrder.addServiceOrders(saved.getServId());
 
         log.info("ServOrderServiceImpl::addService created Service Orders");
@@ -75,34 +75,6 @@ public class ServImpl implements ServService {
         return byId;
     }
 
-    @Transactional
-    @Override
-    public Services updateService(Long servId, Services services) throws Exception {
-
-        Services existingService = soRepository.findById(servId)
-                .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
-
-        Services newServices = Services.builder()
-                .servType(services.getServType())
-                .servVehicleNumber(existingService.getServVehicleNumber())
-                .servCreatedOn(LocalDateTime.now())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusYears(1))
-                .servInsuranceNo(existingService.getServInsuranceNo())
-                .servStatus(services.getServStatus())
-                .users(existingService.getUsers())
-                .customer(existingService.getCustomer()).build();
-
-        Services saved = soRepository.save(newServices);
-
-        ServOrderImpl servOrder = new ServOrderImpl(soRepository, soOrderRepository, soTasksRepository, soWorkorderRepository, testaRepository, tewoRepository);
-        servOrder.addServiceOrders(saved.getServId());
-        log.info("ServImpl::updateService successfully updated");
-        soRepository.flush();
-
-        return saved;
-    }
-
     public Services generateFeasiblity(CustomerRequest cr){
         return Services.builder()
                 .servType(cr.getCreqType())
@@ -115,21 +87,26 @@ public class ServImpl implements ServService {
                 .build();
     }
 
-    public Services generatePolisAndClaim(CustomerRequest cr){
-        //id services based on customer id
-        return Services.builder()
+    public Services generatePolis(Long servId, CustomerRequest cr) {
+
+        Services existingService = soRepository.findById(servId)
+                .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
+
+        existingService = Services.builder()
+                .servId(existingService.getServId())
                 .servType(cr.getCreqType())
-                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
+                .servVehicleNumber(existingService.getServVehicleNumber())
                 .servCreatedOn(LocalDateTime.now())
                 .servStartDate(LocalDateTime.now())
                 .servEndDate(LocalDateTime.now().plusYears(1))
+                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
-                .users(cr.getCustomer())
-                .customer(cr)
-                //this result is null, how to generate this parent services automatically after execute FS to get servId FS
-                //.parentServices(generateFeasiblity(cr))
-                .build();
+                .users(existingService.getUsers())
+                .customer(existingService.getCustomer()).build();
+
+        log.info("ServImpl::updateService successfully updated");
+
+        return existingService;
     }
 
     public Services generateTypeInactive(CustomerRequest cr){
