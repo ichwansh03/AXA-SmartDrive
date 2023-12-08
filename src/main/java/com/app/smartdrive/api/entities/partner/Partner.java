@@ -57,9 +57,8 @@ public class Partner {
     @Column(name = "part_modified_date")
     private LocalDateTime partModifiedDate;
 
-    @JsonManagedReference
-    @OneToOne(mappedBy = "partner")
-    private ServiceOrders serviceOrders;
+    @OneToMany(mappedBy = "partner")
+    private List<ServiceOrders> serviceOrders;
 
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId
