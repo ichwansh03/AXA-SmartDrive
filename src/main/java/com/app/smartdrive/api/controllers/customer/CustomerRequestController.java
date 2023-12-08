@@ -75,7 +75,7 @@ public class CustomerRequestController {
             paging = PageRequest.of(page, size, Sort.by("creqEntityId").ascending());
         }
 
-        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingCustomer(custId, paging, type, status);
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingUserCustomerRequests(custId, paging, type, status);
 
         return pagingCustomerResponseDTO;
     }
