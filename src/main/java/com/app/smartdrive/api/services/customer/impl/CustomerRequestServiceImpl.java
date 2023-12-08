@@ -12,7 +12,9 @@ import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.master.*;
+import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
@@ -67,6 +69,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final UserService userService;
 
+    private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
+
 
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
@@ -104,6 +108,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCias_cars_id()).get();
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
+
+        //EmployeeAreaWorkgroup employeeAreaWorkgroup
+        var wg = this.employeeAreaWorkgroupRepository.findByEawgId(customerRequestDTO.getAgen_id());//.get();
 
         // new customerRequest
         // belum set eawag

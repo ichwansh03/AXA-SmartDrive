@@ -28,8 +28,12 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     @Query(value = "SELECT TOP(1) * FROM HR.EMPLOYEE_ARE_WORKGROUP ORDER BY eawg_id DESC", nativeQuery = true)
     Optional<EmployeeAreaWorkgroup> findLastOptional();
 
-    @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_id=?1", nativeQuery=true)
+//    @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_id=?1", nativeQuery=true)
     Optional<EmployeeAreaWorkgroup> findByEawgId(Long eawgId);
+
+
+//    @Query("SELECT em FROM EmployeeAreaWorkgroup em WHERE em.ewagId=?1")
+//    Optional<EmployeeAreaWorkgroup> findByEworkgroupId(Long eawgId);
 
     Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
 
