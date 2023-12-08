@@ -3,8 +3,7 @@ package com.app.smartdrive.api.controllers.customer;
 import java.util.List;
 import java.util.Objects;
 
-import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
-import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import org.springframework.data.domain.Page;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -127,13 +125,6 @@ public class CustomerRequestController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/claim")
-    public CustomerResponseDTO createClaim(@RequestBody ClaimRequestDTO claimRequestDTO){
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.createClaim(claimRequestDTO);
-
-        return customerResponseDTO;
-    }
-
     @PutMapping("/claim")
     public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
             @RequestBody ClaimRequestDTO claimRequestDTO
@@ -157,6 +148,31 @@ public class CustomerRequestController {
     ){
         this.customerRequestService.deleteCustomerClaim(cuclCreqEntityId);
 
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/close")
+    public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.closePolis(closeRequestDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+    }
+
+    @PutMapping("/polis/type")
+    public ResponseEntity<Void> changeTypePolis(@RequestBody CustomerRequestTypeDTO customerRequestTypeDTO){
+        this.customerRequestService.changeRequestTypeToPolis(customerRequestTypeDTO);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/claim/type")
+    public ResponseEntity<Void> changeTypeClaim(@RequestBody CustomerRequestTypeDTO customerRequestTypeDTO){
+        this.customerRequestService.changeRequestTypeToClaim(customerRequestTypeDTO);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/close/type")
+    public ResponseEntity<Void> changeTypeClose(@RequestBody CustomerRequestTypeDTO customerRequestTypeDTO){
+        this.customerRequestService.changeRequestTypeToClose(customerRequestTypeDTO);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

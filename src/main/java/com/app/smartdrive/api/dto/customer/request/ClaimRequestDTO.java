@@ -18,11 +18,7 @@ public class ClaimRequestDTO {
 
     private Long creqEntityId;
 
-    private String cuclCreateDate;
-
     private Double cuclEventPrice;
 
     private Double cuclSubtotal;
-
-    private String cuclReason;
 }
