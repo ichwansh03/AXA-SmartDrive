@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
@@ -45,9 +44,12 @@ public class ServImpl implements ServService {
 
         Services serv;
 
+        //FS from CR
         if (cr.getCreqType().toString().equals("FEASIBLITY")){
             serv = generateFeasiblity(cr);
-        } else if (cr.getCreqType().toString().equals("POLIS") || cr.getCreqType().toString().equals("CLAIM")) {
+        }
+        //when CR update to POLIS, create new service orders and update service
+        else if (cr.getCreqType().toString().equals("POLIS") || cr.getCreqType().toString().equals("CLAIM")) {
             serv = generatePolisAndClaim(cr);
         } else {
             serv = generateTypeInactive(cr);
@@ -65,29 +67,40 @@ public class ServImpl implements ServService {
         return saved;
     }
 
-    @Transactional
-    @Override
-    public ServiceReqDto updateServices(ServiceReqDto serviceReqDto, Long servId) {
-        Services services = soRepository.findById(servId).orElseThrow(() -> new EntityNotFoundException("ID not found"));
-
-        services.setServCreatedOn(serviceReqDto.getServCreatedOn());
-        services.setServType(serviceReqDto.getServType());
-        services.setServVehicleNumber(serviceReqDto.getServVehicleNumber());
-        services.setServStartDate(serviceReqDto.getServStartDate());
-        services.setServEndDate(serviceReqDto.getServEndDate());
-        services.setServStatus(serviceReqDto.getServStatus());
-
-        soRepository.save(services);
-
-        return serviceReqDto;
-    }
-
     @Transactional(readOnly = true)
     @Override
     public Optional<Services> findServicesById(Long servId) {
         Optional<Services> byId = soRepository.findById(servId);
         log.info("SoOrderServiceImpl::findServicesById in ID {} ",byId);
         return byId;
+    }
+
+    @Transactional
+    @Override
+    public Services updateService(Long servId, Services services) throws Exception {
+
+        Services existingService = soRepository.findById(servId)
+                .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
+
+        Services newServices = Services.builder()
+                .servType(services.getServType())
+                .servVehicleNumber(existingService.getServVehicleNumber())
+                .servCreatedOn(LocalDateTime.now())
+                .servStartDate(LocalDateTime.now())
+                .servEndDate(LocalDateTime.now().plusYears(1))
+                .servInsuranceNo(existingService.getServInsuranceNo())
+                .servStatus(services.getServStatus())
+                .users(existingService.getUsers())
+                .customer(existingService.getCustomer()).build();
+
+        Services saved = soRepository.save(newServices);
+
+        ServOrderImpl servOrder = new ServOrderImpl(soRepository, soOrderRepository, soTasksRepository, soWorkorderRepository, testaRepository, tewoRepository);
+        servOrder.addServiceOrders(saved.getServId());
+        log.info("ServImpl::updateService successfully updated");
+        soRepository.flush();
+
+        return saved;
     }
 
     public Services generateFeasiblity(CustomerRequest cr){
@@ -103,14 +116,14 @@ public class ServImpl implements ServService {
     }
 
     public Services generatePolisAndClaim(CustomerRequest cr){
-
+        //id services based on customer id
         return Services.builder()
                 .servType(cr.getCreqType())
                 .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
                 .servInsuranceNo(soAdapter.generatePolisNumber(cr))
-                .servCreatedOn(cr.getCreqCreateDate())
+                .servCreatedOn(LocalDateTime.now())
                 .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusDays(7))
+                .servEndDate(LocalDateTime.now().plusYears(1))
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
                 .users(cr.getCustomer())
                 .customer(cr)
