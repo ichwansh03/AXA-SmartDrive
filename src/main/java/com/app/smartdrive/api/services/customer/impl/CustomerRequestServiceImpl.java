@@ -386,53 +386,18 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 () -> new EntityNotFoundException("Insurance type dengan id " + creqEntityId + " tidak ditemukan")
         );
 
+        this.customerInscAssetsService.updateCustomerInscAssets(cias, ciasUpdateDTO, existCity, carSeries, existInty);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
-
-        // update cias
-        cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
-        cias.setCiasYear(ciasUpdateDTO.getCiasYear());
-        cias.setCiasStartdate(ciasStartdate);
-        cias.setCiasEnddate(ciasStartdate.plusYears(1));
-        cias.setCiasCurrentPrice(ciasUpdateDTO.getCurrentPrice());
-        cias.setCiasTotalPremi(ciasUpdateDTO.getCurrentPrice());
-        cias.setCiasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasUpdateDTO.getCiasPaidType()));
-        cias.setCiasIsNewChar(ciasUpdateDTO.getCiasIsNewChar());
-        cias.setCity(existCity);
-        cias.setCarSeries(carSeries);
-        cias.setInsuranceType(existInty);
 
         // update cuex
-        this.cuexRepository.deleteAllByCuexCreqEntityid(entityId);
+        this.customerInscExtendService.deleteAllCustomerInscExtendInCustomerRequest(entityId);
 
-        List<CustomerInscExtend> cuex = new ArrayList<>();
+        List<CustomerInscExtend> updatedCustomerInscExtend = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId);
 
-        for (Long i: cuexIds) {
-            Double nominal;
-
-            TemplateInsurancePremi temi = this.temiRepository.findById(i).get();
-
-            if(Objects.nonNull(temi.getTemiRateMin())){
-                nominal = temi.getTemiRateMin() * temi.getTemiNominal();
-            }else{
-                nominal = temi.getTemiNominal();
-            }
-
-            CustomerInscExtend newCuex = CustomerInscExtend.builder()
-                    .cuexName(temi.getTemiName())
-                    .cuex_nominal(nominal)
-                    .cuexTotalItem(1)
-                    .customerInscAssets(cias)
-                    .cuexCreqEntityid(entityId)
-                    .build();
-
-            cuex.add(newCuex);
-        }
-
-        cias.setCustomerInscExtend(cuex);
+        cias.setCustomerInscExtend(updatedCustomerInscExtend);
 
         // update cadoc
+        this.cust
         this.cadocRepository.deleteAllByCadocCreqEntityid(entityId);
 
         List<CustomerInscDoc> newCiasDocs = this.customerInscDocService.fileCheck(files, entityId);

@@ -11,4 +11,6 @@ public interface CustomerInscExtendService {
             CustomerInscAssets cias,
             Long entityId
     );
+
+    public void deleteAllCustomerInscExtendInCustomerRequest(Long creqEntityId);
 }

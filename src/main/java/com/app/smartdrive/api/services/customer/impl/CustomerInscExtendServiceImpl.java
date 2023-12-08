@@ -3,6 +3,7 @@ package com.app.smartdrive.api.services.customer.impl;
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
+import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.TemiRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscExtendService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CustomerInscExtendServiceImpl implements CustomerInscExtendService {
     private final TemiRepository temiRepository;
+
+    private final CustomerInscExtendRepository customerInscExtendRepository;
 
     @Override
     public List<CustomerInscExtend> getCustomerInscEtend(
@@ -48,4 +51,11 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
         }
         return ciasCuexs;
     }
+
+    @Override
+    public void deleteAllCustomerInscExtendInCustomerRequest(Long creqEntityId) {
+        this.customerInscExtendRepository.deleteAllByCuexCreqEntityid(creqEntityId);
+    }
+
+
 }

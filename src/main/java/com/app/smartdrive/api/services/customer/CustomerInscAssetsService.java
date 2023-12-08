@@ -17,5 +17,11 @@ public interface CustomerInscAssetsService {
             CustomerRequest newCustomerRequest
     );
 
+    public void updateCustomerInscAssets(CustomerInscAssets cias,
+                                         CiasDTO ciasUpdateDTO,
+                                         Cities existCity,
+                                         CarSeries carSeries,
+                                         InsuranceType existInty);
+
 
 }

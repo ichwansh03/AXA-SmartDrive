@@ -2,6 +2,7 @@ package com.app.smartdrive.api.services.customer.impl;
 
 import com.app.smartdrive.api.entities.customer.CustomerInscDoc;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
+import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscDocService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CustomerInscDocServiceImpl implements CustomerInscDocService {
+
+    private  final CustomerInscDocRepository customerInscDocRepository;
 
     @Override
     public List<CustomerInscDoc> fileCheck(MultipartFile[] files, Long creqEntityId) throws Exception {
@@ -57,6 +60,11 @@ public class CustomerInscDocServiceImpl implements CustomerInscDocService {
         }
 
         return listDoc;
+    }
+
+    @Override
+    public void deleteAllCustomerInscDocInCustomerRequest(Long creqEntityId) {
+        this.customerInscDocRepository.deleteAllByCadocCreqEntityid(creqEntityId);
     }
 
 

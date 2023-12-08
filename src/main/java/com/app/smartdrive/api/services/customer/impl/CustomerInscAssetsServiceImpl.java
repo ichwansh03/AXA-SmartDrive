@@ -48,5 +48,27 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
                 .build();
     }
 
+    @Override
+    public void updateCustomerInscAssets(CustomerInscAssets cias,
+                                         CiasDTO ciasUpdateDTO,
+                                         Cities existCity,
+                                         CarSeries carSeries,
+                                         InsuranceType existInty) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
+
+        cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+        cias.setCiasYear(ciasUpdateDTO.getCiasYear());
+        cias.setCiasStartdate(ciasStartdate);
+        cias.setCiasEnddate(ciasStartdate.plusYears(1));
+        cias.setCiasCurrentPrice(ciasUpdateDTO.getCurrentPrice());
+        cias.setCiasTotalPremi(ciasUpdateDTO.getCurrentPrice());
+        cias.setCiasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasUpdateDTO.getCiasPaidType()));
+        cias.setCiasIsNewChar(ciasUpdateDTO.getCiasIsNewChar());
+        cias.setCity(existCity);
+        cias.setCarSeries(carSeries);
+        cias.setInsuranceType(existInty);
+    }
+
 
 }

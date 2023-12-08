@@ -8,5 +8,5 @@ import java.util.List;
 public interface CustomerInscDocService {
     List<CustomerInscDoc> fileCheck(MultipartFile[] files, Long creqEntityId) throws Exception;
 
-
+    void deleteAllCustomerInscDocInCustomerRequest(Long creqEntityId);
 }
