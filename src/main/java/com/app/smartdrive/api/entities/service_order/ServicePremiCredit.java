@@ -1,8 +1,8 @@
 package com.app.smartdrive.api.entities.service_order;
 
+import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,14 +30,10 @@ public class ServicePremiCredit {
     private Long secrId;
 
     @Id
-    @Column(name = "secr_serv_id", insertable = false, updatable = false)
+    @Column(name = "secr_serv_id")
     private Long secrServId;
 
-//    @EmbeddedId
-//    ServicePremiCreditId servicePremiCreditId;
-
     @Column(name = "secr_year")
-    @Size(max = 4)
     private String secrYear;
 
     @Column(name = "secr_premi_debet")
@@ -54,11 +50,12 @@ public class ServicePremiCredit {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "secr_serv_id")
+    @JoinColumn(name = "secr_serv_id", insertable = false, updatable = false)
     private Services services;
 
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "")
-//    PaymentTransactions paymentTransactions;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "secr_patr_trxno")
+    PaymentTransactions paymentTransactions;
 
 }

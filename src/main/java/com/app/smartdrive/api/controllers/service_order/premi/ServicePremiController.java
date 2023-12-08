@@ -4,6 +4,7 @@ import com.app.smartdrive.api.dto.service_order.request.SemiReqDto;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
+import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 public class ServicePremiController {
 
     private final ServPremiService servPremiService;
+    private final ServService servService;
 
     @PostMapping
     public ResponseEntity<?> addServicePremi(@Valid @RequestBody SemiReqDto semiReqDto){

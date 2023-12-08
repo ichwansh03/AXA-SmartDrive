@@ -88,6 +88,9 @@ public class PaymentTransactions {
 //     @JoinColumn(name = "")
 //     ServicePremiCredit servicePremiCredits;
 
+    @OneToMany(mappedBy = "paymentTransactions")
+    private List<ServicePremiCredit> servicePremiCredits;
+
     @ManyToOne
     @JoinColumn(name = "patr_trxno_rev", referencedColumnName = "patr_trxno" ,insertable = false, updatable = false)
     @JsonIgnore
