@@ -23,18 +23,10 @@ public interface EmployeesRepository  extends JpaRepository<Employees, Long>{
     List<Employees> findAllByEmpName(@Param("employeeName") String empName);
 
     Employees findByEmpName(String empName);
-    
-    // @Transactional
-    // @Modifying(clearAutomatically = true)
-    // @Query(value = "delete from hr.employees where emp_entityid=:emp_entityid", nativeQuery = true)
-    // void deleteEmployeesById(Long emp_entityid);
 
 
     Page<Employees> findByEmpGraduate(EnumClassHR.emp_graduate empGraduate, Pageable pageable);
 
     Page<Employees> findByEmpNameContaining(String empName, Pageable pageable);
 
-    
-    
-// Page<Employees> findByEmpNameContaining(String empName, Pageable pageable);
 }

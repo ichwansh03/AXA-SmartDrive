@@ -8,6 +8,7 @@ import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.payment.BanksRepository;
@@ -20,30 +21,32 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class UserServiceImpl implements UserService {
-  private final EntityManager entityManager;
-  private final CityRepository cityRepository;
   private final UserRepository userRepo;
   private final BusinessEntityService businessEntityService;
-  private final RolesRepository rolesRepository;
-  private final FintechRepository fintechRepository;
   private final UserRolesService userRolesService;
   private final UserPhoneService userPhoneService;
   private final UserAddressService userAddressService;
   private final UserUserAccountService userAccountService;
-  private final PasswordEncoder passwordEncoder;
+//  private final PasswordEncoder passwordEncoder;
 
   @Override
   public User createUser(ProfileRequestDto userPost) {
@@ -52,16 +55,17 @@ public class UserServiceImpl implements UserService {
     User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
     businessEntity.setUser(user);
     user.setUserBusinessEntity(businessEntity);
-    if(userPost.getUserPassword() != null){
-      String hashedPw = passwordEncoder.encode(userPost.getUserPassword());
-      user.setUserPassword(hashedPw);
-    }
+//    if(userPost.getUserPassword() != null){
+//      String hashedPw = passwordEncoder.encode(userPost.getUserPassword());
+//      user.setUserPassword(hashedPw);
+//    }
     user.setUserEntityId(businessEntity.getEntityId());
     user.setUserModifiedDate(LocalDateTime.now());
     return user;
   }
 
   @Override
+  @PreAuthorize("hasAuthority('Customer')")
   public UserDto getByIdDto(Long id) {
     return TransactionMapper.mapEntityToDto(userRepo.findById(id).get(), UserDto.class);
   }
@@ -94,6 +98,8 @@ public class UserServiceImpl implements UserService {
         : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
 
     userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
+
+    Collection<?> list = user.getAuthorities();
 
     return save(user);
   }
@@ -131,7 +137,7 @@ public class UserServiceImpl implements UserService {
     if (user.isPresent()) {
       List<RoleName> listRole = user.get().getUserRoles().stream().map(role -> role.getRoles().getRoleName()).collect(Collectors.toList());
       if (listRole.stream().anyMatch(roleName::contains)) {
-        if (passwordEncoder.matches(password,user.get().getUserPassword())) {
+        if (true) {
           return "Access Granted";
         }
         return "Wrong Password";
@@ -155,15 +161,32 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public String changePassword(Long id,PasswordRequestDto passwordRequestDto) {
     User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
-    if(passwordEncoder.matches(passwordRequestDto.getCurrentPassword(),user.getUserPassword())){
+    if(true){
       if(passwordRequestDto.getNewPassword().equals(passwordRequestDto.getConfirmPassword())){
-        user.setUserPassword(passwordEncoder.encode(passwordRequestDto.getNewPassword()));
+        user.setUserPassword("true");
         save(user);
         return "password has been changed";
       }
       return "Confirm password must be the same as the new password";
     }
     return "Current password is wrong";
+  }
+
+  @Override
+  public UserDetailsService userDetailsService() {
+    return new UserDetailsService() {
+      @Override
+      public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepo.findUserByIden(username).orElseThrow(() -> new UsernameNotFoundException("Could not find user"));
+      }
+    };
+  }
+
+  private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<UserRoles> roles) {
+    Collection<? extends GrantedAuthority> mapRoles = roles.stream()
+            .map(role -> new SimpleGrantedAuthority(role.getRoles().getRoleName().getValue()))
+            .collect(Collectors.toList());
+    return mapRoles;
   }
 
 

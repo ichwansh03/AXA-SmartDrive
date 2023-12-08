@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.HR.EmployeeAreaWorkgroupDto;
+import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
@@ -53,12 +54,14 @@ public class EmployeeAreaWorkgroupController {
             return new ResponseEntity<>("EAWG deleted successfully", HttpStatus.OK);
     }
 
+    
     @GetMapping("/search")
-    public Page<EmployeeAreaWorkgroup> searchEmployeeAreaWorkgroups(
-            @RequestParam(value = "value") String value,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size
-    ) {
+    public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(
+            @RequestParam(name = "value") String value,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
+
         return employeeAreaWorkgroupService.searchEawg(value, page, size);
     }
+
 }

@@ -6,9 +6,7 @@ import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -36,7 +34,7 @@ public class ServiceOrders {
 
     @Column(name = "sero_ordt_type")
     @Enumerated(EnumType.STRING)
-    private EnumModuleServiceOrders.SeroOrdtType seroOrdtType = EnumModuleServiceOrders.SeroOrdtType.CREATE;;
+    private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
 
     @Column(name = "sero_status")
     @Enumerated(EnumType.STRING)
@@ -54,10 +52,10 @@ public class ServiceOrders {
     @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sero_part_id")
-    private Partner partner;
+    // @JsonBackReference
+    // @OneToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "sero_part_id")
+    // private Partner partner;
 
     @JsonIgnore
     @ManyToOne

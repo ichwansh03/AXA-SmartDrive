@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.entities.users;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -26,7 +27,11 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 // @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userBusinessEntity")
 @Entity
@@ -34,7 +39,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "users", schema = "users")
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User implements UserDetails {
 
   @Id
   @Column(name = "user_entityid")
@@ -70,6 +75,42 @@ public class User {
   @Column(name = "user_modified_date")
   private LocalDateTime userModifiedDate;
 
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    List<String> listRole = this.userRoles.stream().map(role -> role.getUserRolesId().getUsroRoleName().getValue()).toList();
+    return listRole.stream().map(SimpleGrantedAuthority::new).toList();
+  }
+
+  @Override
+  public String getPassword() {
+    return userPassword;
+  }
+
+  @Override
+  public String getUsername() {
+    return userName;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
+
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @MapsId
   @JoinColumn(name = "user_entityid")
@@ -81,7 +122,7 @@ public class User {
   @PrimaryKeyJoinColumn
   private List<UserPhone> userPhone;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
   private List<UserRoles> userRoles;
