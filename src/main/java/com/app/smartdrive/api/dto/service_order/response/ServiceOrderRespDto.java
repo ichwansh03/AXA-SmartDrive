@@ -26,10 +26,6 @@ public class ServiceOrderRespDto {
     private ServiceRespDto services;
     private EmployeesRequestDto employees;
     private ArwgRes arwgRes;
-<<<<<<< HEAD
-//    private Partner partner;
-=======
     private PartnerDto partner;
->>>>>>> development
     private List<SoTasksDto> soTasksDtoList;
 }
