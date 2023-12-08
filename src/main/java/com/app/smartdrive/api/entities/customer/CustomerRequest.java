@@ -59,10 +59,14 @@ public class CustomerRequest {
     @PrimaryKeyJoinColumn
     private CustomerInscAssets customerInscAssets;
 
-        @JsonBackReference
-        @ManyToOne
-        @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id")
-        private EmployeeAreaWorkgroup employeeAreaWorkgroup;
+    @Column(name = "creq_agen_entityid")
+    private Long creqAgenEntityid;
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id",
+    insertable = false, updatable = false)
+    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
     @JsonManagedReference
     @OneToOne(mappedBy = "customer")

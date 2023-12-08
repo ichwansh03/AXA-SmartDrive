@@ -13,6 +13,7 @@ import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
@@ -109,12 +110,15 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
 
+
         //EmployeeAreaWorkgroup employeeAreaWorkgroup
-        var wg = this.employeeAreaWorkgroupRepository.findByEawgId(customerRequestDTO.getAgen_id());//.get();
+        var wg = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmpId())).get();
 
         // new customerRequest
         // belum set eawag
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
+        newCustomerRequest.setCreqAgenEntityid(wg.getEawgId());
+        newCustomerRequest.setEmployeeAreaWorkgroup(wg);
 
         CustomerInscAssets cias = this.createCustomerInscAssets(entityId, ciasDTO, carSeries, existCity, existInty, newCustomerRequest);
 
@@ -189,7 +193,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
 
 //        Employees employee = eawag.getEmployees();
-//        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
+        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
 
         BussinessEntityResponseDTO bussinessEntityResponseDTO = BussinessEntityResponseDTO.builder()
                 .entityId(customerRequest.getBusinessEntity().getEntityId())
@@ -329,6 +333,11 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 //
 //                // .workGroup(eawag.getAreaWorkGroup().getArwgCode())
 
+        EmployeeResponseDTO employeeResponseDTO = EmployeeResponseDTO.builder()
+                .arwgCode(eawag.getEawgArwgCode())
+                .empName(eawag.getEmployees().getEmpName())
+                .build();
+
 
 
         CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
@@ -340,6 +349,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .creqType(customerRequest.getCreqType())
                 .customerInscAssets(ciasResponseDTO)
                 .customer(customerUserResponseDTO)
+                .empAreaworkgroup(employeeResponseDTO)
                 .build();
 
 

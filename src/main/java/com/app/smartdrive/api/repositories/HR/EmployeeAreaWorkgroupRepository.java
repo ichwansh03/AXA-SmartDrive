@@ -24,7 +24,7 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, Long> {
+public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, EmployeeAreaWorkgroupId> {
     @Query(value = "SELECT TOP(1) * FROM HR.EMPLOYEE_ARE_WORKGROUP ORDER BY eawg_id DESC", nativeQuery = true)
     Optional<EmployeeAreaWorkgroup> findLastOptional();
 
