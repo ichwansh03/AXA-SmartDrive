@@ -2,8 +2,11 @@ package com.app.smartdrive.api.controllers.users;
 
 import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
+import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;

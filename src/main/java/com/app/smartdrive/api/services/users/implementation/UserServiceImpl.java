@@ -8,6 +8,7 @@ import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.payment.BanksRepository;
@@ -20,6 +21,11 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,14 +33,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepo;
   private final BusinessEntityService businessEntityService;
@@ -61,6 +65,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @PreAuthorize("hasAuthority('Customer')")
   public UserDto getByIdDto(Long id) {
     return TransactionMapper.mapEntityToDto(userRepo.findById(id).get(), UserDto.class);
   }
@@ -93,6 +98,8 @@ public class UserServiceImpl implements UserService {
         : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
 
     userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
+
+    Collection<?> list = user.getAuthorities();
 
     return save(user);
   }
@@ -173,6 +180,13 @@ public class UserServiceImpl implements UserService {
         return userRepo.findUserByIden(username).orElseThrow(() -> new UsernameNotFoundException("Could not find user"));
       }
     };
+  }
+
+  private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<UserRoles> roles) {
+    Collection<? extends GrantedAuthority> mapRoles = roles.stream()
+            .map(role -> new SimpleGrantedAuthority(role.getRoles().getRoleName().getValue()))
+            .collect(Collectors.toList());
+    return mapRoles;
   }
 
 

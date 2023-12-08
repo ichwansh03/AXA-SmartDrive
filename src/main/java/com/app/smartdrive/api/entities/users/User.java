@@ -122,7 +122,7 @@ public class User implements UserDetails {
   @PrimaryKeyJoinColumn
   private List<UserPhone> userPhone;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @PrimaryKeyJoinColumn
   @JsonManagedReference
   private List<UserRoles> userRoles;
