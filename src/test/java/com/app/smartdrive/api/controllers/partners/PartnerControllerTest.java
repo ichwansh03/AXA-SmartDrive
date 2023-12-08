@@ -3,8 +3,8 @@ package com.app.smartdrive.api.controllers.partners;
 import com.app.smartdrive.api.Exceptions.Error;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
+import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
-import com.app.smartdrive.api.entities.users.*;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
@@ -12,7 +12,6 @@ import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import com.app.smartdrive.api.services.partner.PartnerService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -24,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import java.util.List;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,8 +65,22 @@ class PartnerControllerTest {
 
     @BeforeEach
     void setUp() {
-        partnerRepository.deleteAll();
+//        partnerRepository.deleteAll();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
+
+    @Test
+    void whenGetAllServiceByPartner() throws Exception {
+
+        mockMvc.perform(
+                get("/partners/workorder")
+                        .header("PARTNER-ID", 1027)
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            List<ServiceOrderRespDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<ServiceOrderRespDto>>() {});
+            log.info(objectMapper.writeValueAsString(response));
+        });
     }
 
     @Test

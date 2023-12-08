@@ -58,8 +58,8 @@ public class Partner {
     private LocalDateTime partModifiedDate;
 
     @JsonManagedReference
-    @OneToOne(mappedBy = "partner")
-    private ServiceOrders serviceOrders;
+    @OneToMany(mappedBy = "partner")
+    private List<ServiceOrders> serviceOrders;
 
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId

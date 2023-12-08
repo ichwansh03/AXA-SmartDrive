@@ -65,7 +65,7 @@ public class Services {
     @JoinColumn(name = "serv_cust_entityid")
     private User users;
 
-    @JsonBackReference
+//    @JsonBackReference
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "serv_creq_entityid", unique = true)
     private CustomerRequest customer;

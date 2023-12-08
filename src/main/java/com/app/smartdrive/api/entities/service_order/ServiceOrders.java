@@ -50,7 +50,7 @@ public class ServiceOrders {
     private LocalDateTime servClaimEnddate;
 
     @JsonBackReference
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_part_id")
     private Partner partner;
 

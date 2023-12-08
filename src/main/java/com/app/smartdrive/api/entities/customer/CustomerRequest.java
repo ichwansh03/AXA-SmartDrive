@@ -64,7 +64,7 @@ public class CustomerRequest {
     //    @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id")
     //    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
-    @JsonManagedReference
+//
     @OneToOne(mappedBy = "customer")
     private Services services;
 }
