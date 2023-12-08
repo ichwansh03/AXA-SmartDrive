@@ -74,8 +74,11 @@ public class Services {
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrdersSet;
 
-    @JsonIgnore
+    //@PrimaryKeyJoinColumn
+    //@JsonIgnore
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
     private List<ServicePremi> servicePremiSet;
+
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
+    private List<ServicePremiCredit> servicePremiCredits;
 }

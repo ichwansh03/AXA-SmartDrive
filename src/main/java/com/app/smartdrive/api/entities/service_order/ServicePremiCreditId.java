@@ -1,11 +1,11 @@
 package com.app.smartdrive.api.entities.service_order;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-
 
 @Data
 @AllArgsConstructor

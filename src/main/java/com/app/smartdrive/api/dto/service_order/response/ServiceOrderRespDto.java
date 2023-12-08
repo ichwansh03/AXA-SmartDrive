@@ -25,7 +25,7 @@ public class ServiceOrderRespDto {
     private String servClaimEndDate;
     private ServiceRespDto services;
     private EmployeesRequestDto employees;
-    private ArwgRes arwgRes;
+    private ArwgRes areaWorkGroup;
     private PartnerDto partner;
     private List<SoTasksDto> soTasksDtoList;
 }

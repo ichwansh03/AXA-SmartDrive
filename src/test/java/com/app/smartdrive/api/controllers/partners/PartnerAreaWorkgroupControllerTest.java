@@ -93,8 +93,8 @@ class PartnerAreaWorkgroupControllerTest {
 
         PartnerContactRequest partnerContactRequest = new PartnerContactRequest();
         partnerContactRequest.setPartnerId(partner.getPartEntityid());
-        partnerContactRequest.setName("TEST");
-        partnerContactRequest.setPhone("089999999998");
+        partnerContactRequest.setName("TEST2");
+        partnerContactRequest.setPhone("089999999908");
         partnerContactRequest.setGrantUserAccess(true);
 
         partnerContact = partnerContactService.create(partnerContactRequest);

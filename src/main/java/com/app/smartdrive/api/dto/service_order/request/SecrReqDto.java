@@ -15,12 +15,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SecrReqDto {
 
-    @NotNull
-    private Long secrServYear;
     private String secrYear;
     private BigDecimal secrPremiDebet;
     private BigDecimal secrPremiCredit;
     private LocalDateTime secrTrxDate;
     private LocalDateTime secrDueDate;
-    private String secrPatrTrxno;
+    //private String secrPatrTrxno;
 }
