@@ -43,6 +43,9 @@ public class CustomerRequest {
     @Column(name = "creq_modified_date")
     private LocalDateTime creqModifiedDate;
 
+    @Column(name = "creq_agen_entityid")
+    private Long creqAgenEntityId;
+
 
     @ManyToOne
     @JoinColumn(name = "creq_cust_entityid")
@@ -59,10 +62,10 @@ public class CustomerRequest {
     @PrimaryKeyJoinColumn
     private CustomerInscAssets customerInscAssets;
 
-    //    @JsonBackReference
-    //    @ManyToOne
-    //    @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id")
-    //    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id", insertable = false, updatable = false)
+    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
     @JsonManagedReference
     @OneToOne(mappedBy = "customer")

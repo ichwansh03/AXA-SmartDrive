@@ -8,11 +8,17 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.*;
+import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
@@ -74,6 +80,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final CustomerInscExtendService customerInscExtendService;
 
+    private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
 
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
@@ -111,9 +118,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
 
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId())).get();
+
         // new customerRequest
         // belum set eawag
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
+        newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+        newCustomerRequest.setCreqAgenEntityId(employeeAreaWorkgroup.getEawgId());
 
         CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, carSeries, existCity, existInty, newCustomerRequest);
 
@@ -146,8 +157,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CarSeries carSeries = cias.getCarSeries();
 
 
-//        Employees employee = eawag.getEmployees();
-//        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
+        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
+        Employees employee = eawag.getEmployees();
 
         BussinessEntityResponseDTO bussinessEntityResponseDTO = BussinessEntityResponseDTO.builder()
                 .entityId(customerRequest.getBusinessEntity().getEntityId())
@@ -243,49 +254,17 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .userPhone(userPhoneResponseDTOList)
                 .build();
 
-//        //  Address and Phone Agen
-//        List<UserPhoneResponseDTO> agenPhoneResponseDTOList = employee.getUser().getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
-//                phone.getUserPhoneId().getUsphEntityId(),
-//                phone.getUserPhoneId().getUsphPhoneNumber(),
-//                phone.getUsphMime(),
-//                phone.getUsphPhoneType(),
-//                phone.getUsphStatus(),
-//                phone.getUsphModifiedDate()
-//        )).toList();
-//
-//        List<UserAddressResponseDTO> addressAgenResponseDTOList = employee.getUser().getUserAddress().stream().map(address -> new UserAddressResponseDTO(
-//                address.getUsdrId(),
-//                address.getUsdrEntityId(),
-//                address.getUsdrAddress1(),
-//                address.getUsdrAddress2(),
-//                address.getUsdrCityId(),
-//                address.getUsdrModifiedDate()
-//        )).toList();
-//
-//        CustomerUserResponseDTO agenUserResponseDTO = CustomerUserResponseDTO.builder()
-//                .userEntityId(employee.getUser().getUserEntityId())
-//                .userName(employee.getUser().getUserName())
-//                .userFullName(employee.getUser().getUserFullName())
-//                .userBirthPlace(employee.getUser().getUserBirthPlace())
-//                .userNationalId(employee.getUser().getUserNationalId())
-//                .userNPWP(employee.getUser().getUserNPWP())
-//                .userBirthDate(employee.getUser().getUserBirthDate())
-//                .userModifiedDate(employee.getUser().getUserModifiedDate())
-//                .userEmail(employee.getUser().getUserEmail())
-//                .userPhoto(employee.getUser().getUserPhoto())
-//                .userAddresses(addressAgenResponseDTOList)
-//                .userPhone(agenPhoneResponseDTOList)
-//                .build();
-//
-//        // EAWAG
-//        EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto = EmployeeAreaWorkgroupDto.builder()
-//                .empName(eawag.getEmployees().getEmpName())
-//                .cityName(eawag.getAreaWorkGroup().getCities().getCityName())
-//                .provinsi(eawag.getAreaWorkGroup().getCities().getProvinsi().getProvName())
-//                .zoneName(eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesName())
-//                .build();
-//
-//                // .workGroup(eawag.getAreaWorkGroup().getArwgCode())
+
+       // EAWAG
+        EmployeesDto employeesDto = EmployeesDto.builder()
+                .empName(employee.getEmpName())
+                .empAccountNumber(employee.getEmpAccountNumber())
+                .empGraduate(employee.getEmpGraduate())
+                .build();
+
+        EmployeesAreaWorkgroupResponseDto employeeAreaWorkgroupDto = EmployeesAreaWorkgroupResponseDto.builder()
+                .employees(employeesDto)
+                .build();
 
 
 
@@ -298,6 +277,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .creqType(customerRequest.getCreqType())
                 .customerInscAssets(ciasResponseDTO)
                 .customer(customerUserResponseDTO)
+                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
                 .build();
 
 

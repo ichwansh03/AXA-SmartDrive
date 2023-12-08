@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.dto.customer.response;
 
 import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
@@ -36,7 +37,7 @@ public class CustomerResponseDTO {
 
     private CustomerUserResponseDTO employee;
 
-    private EmployeeAreaWorkgroupDto employeeAreaWorkgroup;
+    private EmployeesAreaWorkgroupResponseDto employeeAreaWorkgroup;
 
     private ClaimResponseDTO claimResponseDTO;
 }
