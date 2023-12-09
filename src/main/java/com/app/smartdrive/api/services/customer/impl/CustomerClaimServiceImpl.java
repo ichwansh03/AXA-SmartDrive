@@ -2,6 +2,7 @@ package com.app.smartdrive.api.services.customer.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.CloseRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.entities.customer.CustomerClaim;
@@ -100,6 +101,23 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         existCustomerClaim.setCuclEvents(cuclEvents);
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+    }
+
+    @Transactional
+    @Override
+    public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO) {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(closeRequestDTO.getCreqEntityId()).orElseThrow(
+                () -> new EntityNotFoundException("Customer Request dengan id " + closeRequestDTO.getCreqEntityId() + " tidak ada")
+        );
+
+        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
+
+        CustomerClaim customerClaim = existCustomerRequest.getCustomerClaim();
+        customerClaim.setCuclReason(closeRequestDTO.getCuclReason());
+        customerClaim.setCuclCreateDate(LocalDateTime.now());
+
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 }

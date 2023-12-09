@@ -112,7 +112,7 @@ public class CustomerServiceController {
 
     @PutMapping("/request/close")
     public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.closePolis(closeRequestDTO);
+        CustomerResponseDTO customerResponseDTO = this.customerClaimService.closePolis(closeRequestDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }

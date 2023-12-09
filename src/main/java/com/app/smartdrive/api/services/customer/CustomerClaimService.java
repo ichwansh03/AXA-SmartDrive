@@ -2,11 +2,14 @@ package com.app.smartdrive.api.services.customer;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.CloseRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -19,4 +22,6 @@ public interface CustomerClaimService {
     public void deleteCustomerClaim(Long cuclCreqEntityId);
 
     public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
+
+    public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO);
 }

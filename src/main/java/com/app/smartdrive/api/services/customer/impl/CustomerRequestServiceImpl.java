@@ -464,22 +464,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.save(existCustomerRequest);
     }
 
-    @Transactional
-    @Override
-    public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(closeRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + closeRequestDTO.getCreqEntityId() + " tidak ada")
-        );
-
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
-
-        CustomerClaim customerClaim = existCustomerRequest.getCustomerClaim();
-        customerClaim.setCuclReason(closeRequestDTO.getCuclReason());
-        customerClaim.setCuclCreateDate(LocalDateTime.now());
-
-        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
-        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
-    }
 
     @Transactional
     @Override
