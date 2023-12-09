@@ -13,21 +13,19 @@ import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.master.*;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
-import com.app.smartdrive.api.services.customer.CustomerInscAssetsService;
-import com.app.smartdrive.api.services.customer.CustomerInscDocService;
-import com.app.smartdrive.api.services.customer.CustomerInscExtendService;
-import com.app.smartdrive.api.services.customer.CustomerRequestService;
+import com.app.smartdrive.api.services.customer.*;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -46,8 +44,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
-    private final BusinessEntityRepository businessEntityRepo;
-
     private final CarsRepository carsRepository;
 
     private final IntyRepository intyRepository;
@@ -57,12 +53,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final UserRepository userRepository;
 
     private final TemiRepository temiRepository;
-
-    private final CustomerInscExtendRepository cuexRepository;
-
-    private final CustomerInscDocRepository cadocRepository;
-
-    private final CustomerClaimRepository customerClaimRepository;
 
     private final BusinessEntityService businessEntityService;
 
@@ -74,31 +64,41 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final CustomerInscExtendService customerInscExtendService;
 
+    private final CustomerClaimService customerClaimService;
 
+
+    @Transactional(readOnly = true)
+    @Override
     public List<CustomerRequest> get(){
         return this.customerRequestRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    @Override
     public Page<CustomerResponseDTO> getPaging(Pageable pageable){
         Page<CustomerRequest> pageCustomerRequest = this.customerRequestRepository.findAll(pageable);
         Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
             @Override
             public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return convert(customerRequest);
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
             }
         });
 
         return pageCustomerResponseDTO;
     }
 
+    @Transactional(readOnly = true)
+    @Override
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
                 .orElseThrow(() -> new EntityNotFoundException("Customer Request dengan id ${creqEntityId} tidak ditemukan")
                 );
 
-        return this.convert(existCustomerRequest);
+        return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
     }
+
     @Transactional
+    @Override
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
@@ -106,10 +106,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
-        User entityUser = this.userService.getUserById(customerRequestDTO.getCreq_cust_entityid()).get();
-        CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCias_cars_id()).get();
-        Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
-        InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
+        User entityUser = this.userService.getUserById(customerRequestDTO.getCustomerId()).get();
+        CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCiasCarsId()).get();
+        Cities existCity = this.cityRepository.findById(ciasDTO.getCiasCityId()).get();
+        InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCiasIntyName()).get();
 
         // new customerRequest
         // belum set eawag
@@ -127,16 +127,17 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         cias.setCiasTotalPremi(premi);
         cias.setCustomerInscExtend(ciasCuexs);
 
-        CustomerClaim newClaim = this.createNewClaim(newCustomerRequest);
+        CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
 
         // set and save
         newCustomerRequest.setCustomerClaim(newClaim);
         newCustomerRequest.setCustomerInscAssets(cias);
 
         CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
-        return this.convert(savedCreq);
+        return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
 
+    @Override
     public CustomerResponseDTO convert(CustomerRequest customerRequest){
         CustomerInscAssets cias = customerRequest.getCustomerInscAssets();
         List<CustomerInscExtend> cuexList = cias.getCustomerInscExtend();
@@ -160,7 +161,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 cuex.getCuexCreqEntityid(),
                 cuex.getCuexName(),
                 cuex.getCuexTotalItem(),
-                cuex.getCuex_nominal()
+                cuex.getCuexNominal()
         )).toList();
 
         List<CadocResponseDTO> cadocResponseDTOList = cadocList.stream().map(cadoc -> new CadocResponseDTO(
@@ -190,23 +191,23 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .carsName(carSeries.getCarsName())
                 .build();
 
-        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
-                .ciasCreqEntityid(cias.getCiasCreqEntityid())
-                .ciasEnddate(cias.getCiasEnddate())
-                .ciasStartdate(cias.getCiasStartdate())
-                .ciasYear(cias.getCiasYear())
-                .ciasCurrentPrice(cias.getCiasCurrentPrice())
-                .ciasInsurancePrice(cias.getCiasInsurancePrice())
-                .ciasTotalPremi(cias.getCiasTotalPremi())
-                .ciasIsNewChar(cias.getCiasIsNewChar())
-                .ciasPaidType(cias.getCiasPaidType())
-                .ciasPoliceNumber(cias.getCiasPoliceNumber())
-                .customerInscDoc(cadocResponseDTOList)
-                .customerInscExtend(cuexResponseDTOList)
-                .city(citiesResponseDTO)
-                .carSeriesResponseDTO(carSeriesResponseDTO)
-                .intyResponseDTO(intyResponseDTO)
-                .build();
+//        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
+//                .ciasCreqEntityid(cias.getCiasCreqEntityid())
+//                .ciasEnddate(cias.getCiasEnddate())
+//                .ciasStartdate(cias.getCiasStartdate())
+//                .ciasYear(cias.getCiasYear())
+//                .ciasCurrentPrice(cias.getCiasCurrentPrice())
+//                .ciasInsurancePrice(cias.getCiasInsurancePrice())
+//                .ciasTotalPremi(cias.getCiasTotalPremi())
+//                .ciasIsNewChar(cias.getCiasIsNewChar())
+//                .ciasPaidType(cias.getCiasPaidType())
+//                .ciasPoliceNumber(cias.getCiasPoliceNumber())
+//                .customerInscDoc(cadocResponseDTOList)
+//                .customerInscExtend(cuexResponseDTOList)
+//                .city(citiesResponseDTO)
+//                .carSeriesResponseDTO(carSeriesResponseDTO)
+//                .intyResponseDTO(intyResponseDTO)
+//                .build();
 
 
         List<UserPhoneResponseDTO> userPhoneResponseDTOList = customer.getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
@@ -289,16 +290,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
 
 
-        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
-                .creqEntityId(customerRequest.getCreqEntityId())
-                .bussinessEntity(bussinessEntityResponseDTO)
-                .creqModifiedDate(customerRequest.getCreqModifiedDate())
-                .creqCreateDate(customerRequest.getCreqCreateDate())
-                .creqStatus(customerRequest.getCreqStatus())
-                .creqType(customerRequest.getCreqType())
-                .customerInscAssets(ciasResponseDTO)
-                .customer(customerUserResponseDTO)
-                .build();
+//        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+//                .creqEntityId(customerRequest.getCreqEntityId())
+//                .bussinessEntity(bussinessEntityResponseDTO)
+//                .creqModifiedDate(customerRequest.getCreqModifiedDate())
+//                .creqCreateDate(customerRequest.getCreqCreateDate())
+//                .creqStatus(customerRequest.getCreqStatus())
+//                .creqType(customerRequest.getCreqType())
+//                .customerInscAssets(ciasResponseDTO)
+//                .customer(customerUserResponseDTO)
+//                .build();
 
 
             CustomerClaim customerClaim = customerRequest.getCustomerClaim();
@@ -312,14 +313,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                     .cuclSubtotal(customerClaim.getCuclSubtotal())
                     .build();
 
-            customerResponseDTO.setClaimResponseDTO(claimResponseDTO);
+//            customerResponseDTO.setClaimResponseDTO(claimResponseDTO);
 
 
 //                .employee(agenUserResponseDTO)
 //                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
-        return customerResponseDTO;
+        return new CustomerResponseDTO();
     }
 
+    @Transactional(readOnly = true)
+    @Override
     public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs){
         TemplateInsurancePremi temiMain = this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(zonesId, insuraceType, 1L);
 
@@ -329,7 +332,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         if(!cuexs.isEmpty()){
             for (CustomerInscExtend  cuex: cuexs) {
-                premiExtend += cuex.getCuex_nominal();
+                premiExtend += cuex.getCuexNominal();
             }
 
         }
@@ -339,6 +342,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return totalPremi;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status) {
         User user = this.userRepository.findById(custId).get();
@@ -356,13 +360,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
             @Override
             public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return convert(customerRequest);
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
             }
         });
 
         return pageCustomerResponseDTO;
     }
 
+    @Transactional
     @Override
     public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
@@ -376,13 +381,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
 
-        CarSeries carSeries = this.carsRepository.findById(ciasUpdateDTO.getCias_cars_id()).orElseThrow(
+        CarSeries carSeries = this.carsRepository.findById(ciasUpdateDTO.getCiasCarsId()).orElseThrow(
                 () -> new EntityNotFoundException("Car Series dengan id " + creqEntityId + " tidak ditemukan")
         );
-        Cities existCity = this.cityRepository.findById(ciasUpdateDTO.getCias_city_id()).orElseThrow(
+        Cities existCity = this.cityRepository.findById(ciasUpdateDTO.getCiasCityId()).orElseThrow(
                 () -> new EntityNotFoundException("City dengan id " + creqEntityId + " tidak ditemukan")
         );
-        InsuranceType existInty = this.intyRepository.findById(ciasUpdateDTO.getCias_inty_name()).orElseThrow(
+        InsuranceType existInty = this.intyRepository.findById(ciasUpdateDTO.getCiasIntyName()).orElseThrow(
                 () -> new EntityNotFoundException("Insurance type dengan id " + creqEntityId + " tidak ditemukan")
         );
 
@@ -405,7 +410,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
-        return this.convert(savedCustomerRequest);
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
@@ -418,53 +423,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.delete(existCustomerRequest);
     }
 
-
-    @Override
-    public CustomerClaim createNewClaim(CustomerRequest customerRequest) {
-        CustomerClaim newCustomerClaim = CustomerClaim.builder()
-                .cuclEventPrice(0.0)
-                .cuclSubtotal(0.0)
-                .cuclEvents(0)
-                .cuclCreqEntityid(customerRequest.getCreqEntityId())
-                .customerRequest(customerRequest)
-                .build();
-
-        return newCustomerClaim;
-    }
-
-
-    @Override
-    public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId) {
-        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
-        );
-
-
-       return ClaimResponseDTO.builder()
-               .cuclCreqEntityId(existCustomerClaim.getCuclCreqEntityid())
-               .cuclCreateDate(existCustomerClaim.getCuclCreateDate())
-               .cuclReason(existCustomerClaim.getCuclReason())
-               .cuclEventPrice(existCustomerClaim.getCuclEventPrice())
-               .cuclSubtotal(existCustomerClaim.getCuclSubtotal())
-               .build();
-
-    }
-
-    @Override
-    public void deleteCustomerClaim(Long cuclCreqEntityId) {
-        CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
-        );
-
-        this.customerClaimRepository.delete(existCustomerClaim);
-    }
-
     @Override
     public CustomerRequest createCustomerRequest(
             BusinessEntity newEntity,
             User customer,
             Long entityId
-            ){
+    ){
 
         return CustomerRequest.builder()
                 .businessEntity(newEntity)
@@ -476,10 +440,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .build();
     }
 
-
-
-
-
+    @Transactional
     @Override
     public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
@@ -491,41 +452,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.save(existCustomerRequest);
     }
 
-    @Override
-    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
-        );
-
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
-        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
-
-        CustomerClaim existCustomerClaim = existCustomerRequest.getCustomerClaim();
-
-        LocalDateTime cuclCreateDate = existCustomerClaim.getCuclCreateDate();
-
-        if(Objects.isNull(cuclCreateDate)){
-            existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
-        }
-
-
-        Double cuclEventPrice = existCustomerClaim.getCuclEventPrice();
-        cuclEventPrice += claimRequestDTO.getCuclEventPrice();
-
-        Double cuclSubtotal = existCustomerClaim.getCuclSubtotal();
-        cuclSubtotal += claimRequestDTO.getCuclSubtotal();
-
-        int cuclEvents = existCustomerClaim.getCuclEvents();
-        cuclEvents += 1;
-
-        existCustomerClaim.setCuclEventPrice(cuclEventPrice);
-        existCustomerClaim.setCuclSubtotal(cuclSubtotal);
-        existCustomerClaim.setCuclEvents(cuclEvents);
-
-        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
-        return this.convert(savedCustomerRequest);
-    }
-
+    @Transactional
     @Override
     public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
@@ -538,22 +465,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
 
-    @Override
-    public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(closeRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + closeRequestDTO.getCreqEntityId() + " tidak ada")
-        );
-
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
-
-        CustomerClaim customerClaim = existCustomerRequest.getCustomerClaim();
-        customerClaim.setCuclReason(closeRequestDTO.getCuclReason());
-        customerClaim.setCuclCreateDate(LocalDateTime.now());
-
-        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
-        return this.convert(savedCustomerRequest);
-    }
-
+    @Transactional
     @Override
     public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(

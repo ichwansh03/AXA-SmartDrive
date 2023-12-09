@@ -6,6 +6,7 @@ import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
+import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
@@ -26,6 +27,8 @@ import java.util.Objects;
 @RequestMapping("/customer/service")
 public class CustomerServiceController {
     private final CustomerRequestService customerRequestService;
+
+    private final CustomerClaimService customerClaimService;
 
     @GetMapping("/request")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllUserCustomersRequest(
@@ -94,7 +97,7 @@ public class CustomerServiceController {
     public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
             @RequestBody ClaimRequestDTO claimRequestDTO
     ){
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerClaim(claimRequestDTO);
+        CustomerResponseDTO customerResponseDTO = this.customerClaimService.updateCustomerClaim(claimRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
@@ -102,14 +105,14 @@ public class CustomerServiceController {
     public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
             @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
     ){
-        ClaimResponseDTO existCustomerClaim = this.customerRequestService.getCustomerClaimById(cuclCreqEntityId);
+        ClaimResponseDTO existCustomerClaim = this.customerClaimService.getCustomerClaimById(cuclCreqEntityId);
         return ResponseEntity.status(HttpStatus.OK).body(existCustomerClaim);
 
     }
 
     @PutMapping("/request/close")
     public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.closePolis(closeRequestDTO);
+        CustomerResponseDTO customerResponseDTO = this.customerClaimService.closePolis(closeRequestDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }

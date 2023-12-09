@@ -25,7 +25,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
             Cities existCity,
             InsuranceType existInty,
             CustomerRequest newCustomerRequest
-    ) {
+    ){
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime ciasStartdate = LocalDateTime.parse(ciasDTO.getCiasStartdate(), formatter);
@@ -49,11 +49,13 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
     }
 
     @Override
-    public void updateCustomerInscAssets(CustomerInscAssets cias,
-                                         CiasDTO ciasUpdateDTO,
-                                         Cities existCity,
-                                         CarSeries carSeries,
-                                         InsuranceType existInty) {
+    public void updateCustomerInscAssets(
+            CustomerInscAssets cias,
+            CiasDTO ciasUpdateDTO,
+            Cities existCity,
+            CarSeries carSeries,
+            InsuranceType existInty
+    ){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
 
