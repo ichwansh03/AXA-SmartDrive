@@ -6,6 +6,7 @@ import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscDocService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,6 +63,7 @@ public class CustomerInscDocServiceImpl implements CustomerInscDocService {
         return listDoc;
     }
 
+    @Transactional
     @Override
     public void deleteAllCustomerInscDocInCustomerRequest(Long creqEntityId) {
         this.customerInscDocRepository.deleteAllByCadocCreqEntityid(creqEntityId);

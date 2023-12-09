@@ -31,18 +31,9 @@ public interface CustomerRequestService {
 
     public void delete(Long creqEntityId);
 
-    public CustomerClaim createNewClaim(CustomerRequest customerRequest);
-
-
-    public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId);
-
-    public void deleteCustomerClaim(Long cuclCreqEntityId);
-
     public CustomerRequest createCustomerRequest(BusinessEntity newEntity, User customer, Long entityId);
 
     public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO);
-
-    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
 
     public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO);
 
