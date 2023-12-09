@@ -12,8 +12,11 @@ import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
@@ -53,6 +56,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final UserRepository userRepository;
 
     private final TemiRepository temiRepository;
+
+    private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
 
     private final BusinessEntityService businessEntityService;
 
@@ -111,9 +116,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Cities existCity = this.cityRepository.findById(ciasDTO.getCiasCityId()).get();
         InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCiasIntyName()).get();
 
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId())).get();
+
         // new customerRequest
         // belum set eawag
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
+        newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
 
         CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, carSeries, existCity, existInty, newCustomerRequest);
 

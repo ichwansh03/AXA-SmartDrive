@@ -24,7 +24,7 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, Long> {
+public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, EmployeeAreaWorkgroupId> {
     @Query(value = "SELECT TOP(1) * FROM HR.EMPLOYEE_ARE_WORKGROUP ORDER BY eawg_id DESC", nativeQuery = true)
     Optional<EmployeeAreaWorkgroup> findLastOptional();
 
@@ -33,6 +33,7 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
 
     Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
 
+    Optional<EmployeeAreaWorkgroup> findByEawgIdAndEawgEntityid(Long eawgId, Long eawgEntityId);
 
     @Transactional
     @Modifying(clearAutomatically = true)
