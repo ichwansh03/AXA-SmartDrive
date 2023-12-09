@@ -16,7 +16,7 @@ public interface SoOrderRepository extends JpaRepository<ServiceOrders, String> 
     @Override
     ServiceOrders save(ServiceOrders entity);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<ServiceOrders> findByServices_ServId(Long servId);
 
+    ServiceOrders findBySeroIdLikeAndServices_ServId(String seroIdLike, Long servId);
 }

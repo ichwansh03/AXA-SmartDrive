@@ -79,6 +79,12 @@ public class GlobalExceptions {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(TasksNotCompletedException.class)
+    public ResponseEntity<?> httpRequestTasksNotCompletedException(TasksNotCompletedException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+
     public ResponseEntity<?> methodArgumentConversionNotSupportedException(
             MethodArgumentConversionNotSupportedException ex) {
 

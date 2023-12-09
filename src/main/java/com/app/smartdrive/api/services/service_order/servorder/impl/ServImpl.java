@@ -3,16 +3,15 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
+import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.master.TestaRepository;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
+import com.app.smartdrive.api.repositories.service_orders.*;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
+import com.app.smartdrive.api.services.service_order.premi.impl.ServPremiImpl;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +33,8 @@ public class ServImpl implements ServService {
     private final CustomerRequestRepository customerRequestRepository;
     private final TestaRepository testaRepository;
     private final TewoRepository tewoRepository;
+    private final SemiRepository semiRepository;
+    private final SecrRepository secrRepository;
 
     SoAdapter soAdapter = new SoAdapter();
 
@@ -105,6 +106,15 @@ public class ServImpl implements ServService {
                 .customer(existingService.getCustomer()).build();
 
         log.info("ServImpl::updateService successfully updated");
+
+        ServPremiImpl servPremi = new ServPremiImpl(semiRepository, secrRepository, soRepository);
+        ServicePremi servicePremi = ServicePremi.builder()
+                .semiServId(existingService.getServId())
+                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
+                .semiPaidType(cr.getCustomerInscAssets().getCiasPaidType().toString())
+                .semiStatus("ACTIVE").build();
+
+        servPremi.addSemi(servicePremi, existingService.getServId());
 
         return existingService;
     }

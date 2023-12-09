@@ -15,7 +15,6 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
-		<jobrunr.version>3.1.2</jobrunr.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -74,11 +73,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jobrunr</groupId>
-			<artifactId>jobrunr-spring-boot-starter</artifactId>
-			<version>${jobrunr.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

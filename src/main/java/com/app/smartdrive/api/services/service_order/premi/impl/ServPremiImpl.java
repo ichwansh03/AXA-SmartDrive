@@ -49,7 +49,7 @@ public class ServPremiImpl implements ServPremiService {
 
         ServPremiCreditImpl servPremiCredit = new ServPremiCreditImpl(secrRepository);
         servPremiCredit.addSecr(premi);
-
+        log.info("ServPremiImpl::addSemi successfully added service premi");
         return save;
     }
 }
