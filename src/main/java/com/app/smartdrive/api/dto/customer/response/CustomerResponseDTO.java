@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class CustomerResponseDTO {
     private Long creqEntityId;
 
-    private BussinessEntityResponseDTO bussinessEntity;
+    private BussinessEntityResponseDTO businessEntity;
         
     private LocalDateTime creqCreateDate;
     
