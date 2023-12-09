@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CustomerRequestDTO {
 
-    private Long CreqCustEntityId;
-
-    private Long agenId;
+    private Long customerId;
 
     private Long employeeId;
+
+    private Long agenId;
 
     private CiasDTO ciasDTO;
 }

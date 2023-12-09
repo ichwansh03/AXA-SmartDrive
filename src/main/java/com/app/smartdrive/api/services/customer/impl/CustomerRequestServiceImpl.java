@@ -13,6 +13,7 @@ import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.master.*;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
@@ -96,7 +97,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .orElseThrow(() -> new EntityNotFoundException("Customer Request dengan id ${creqEntityId} tidak ditemukan")
                 );
 
-        return this.convert(existCustomerRequest);
+        return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
     }
     @Transactional
     public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
@@ -106,10 +107,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
-        User entityUser = this.userService.getUserById(customerRequestDTO.getCreq_cust_entityid()).get();
-        CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCias_cars_id()).get();
-        Cities existCity = this.cityRepository.findById(ciasDTO.getCias_city_id()).get();
-        InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCias_inty_name()).get();
+        User entityUser = this.userService.getUserById(customerRequestDTO.getCustomerId()).get();
+        CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCiasCarsId()).get();
+        Cities existCity = this.cityRepository.findById(ciasDTO.getCiasCityId()).get();
+        InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCiasIntyName()).get();
 
         // new customerRequest
         // belum set eawag
@@ -134,7 +135,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         newCustomerRequest.setCustomerInscAssets(cias);
 
         CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
-        return this.convert(savedCreq);
+        return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
 
     public CustomerResponseDTO convert(CustomerRequest customerRequest){
@@ -160,7 +161,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 cuex.getCuexCreqEntityid(),
                 cuex.getCuexName(),
                 cuex.getCuexTotalItem(),
-                cuex.getCuex_nominal()
+                cuex.getCuexNominal()
         )).toList();
 
         List<CadocResponseDTO> cadocResponseDTOList = cadocList.stream().map(cadoc -> new CadocResponseDTO(
@@ -190,23 +191,23 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .carsName(carSeries.getCarsName())
                 .build();
 
-        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
-                .ciasCreqEntityid(cias.getCiasCreqEntityid())
-                .ciasEnddate(cias.getCiasEnddate())
-                .ciasStartdate(cias.getCiasStartdate())
-                .ciasYear(cias.getCiasYear())
-                .ciasCurrentPrice(cias.getCiasCurrentPrice())
-                .ciasInsurancePrice(cias.getCiasInsurancePrice())
-                .ciasTotalPremi(cias.getCiasTotalPremi())
-                .ciasIsNewChar(cias.getCiasIsNewChar())
-                .ciasPaidType(cias.getCiasPaidType())
-                .ciasPoliceNumber(cias.getCiasPoliceNumber())
-                .customerInscDoc(cadocResponseDTOList)
-                .customerInscExtend(cuexResponseDTOList)
-                .city(citiesResponseDTO)
-                .carSeriesResponseDTO(carSeriesResponseDTO)
-                .intyResponseDTO(intyResponseDTO)
-                .build();
+//        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
+//                .ciasCreqEntityid(cias.getCiasCreqEntityid())
+//                .ciasEnddate(cias.getCiasEnddate())
+//                .ciasStartdate(cias.getCiasStartdate())
+//                .ciasYear(cias.getCiasYear())
+//                .ciasCurrentPrice(cias.getCiasCurrentPrice())
+//                .ciasInsurancePrice(cias.getCiasInsurancePrice())
+//                .ciasTotalPremi(cias.getCiasTotalPremi())
+//                .ciasIsNewChar(cias.getCiasIsNewChar())
+//                .ciasPaidType(cias.getCiasPaidType())
+//                .ciasPoliceNumber(cias.getCiasPoliceNumber())
+//                .customerInscDoc(cadocResponseDTOList)
+//                .customerInscExtend(cuexResponseDTOList)
+//                .city(citiesResponseDTO)
+//                .carSeriesResponseDTO(carSeriesResponseDTO)
+//                .intyResponseDTO(intyResponseDTO)
+//                .build();
 
 
         List<UserPhoneResponseDTO> userPhoneResponseDTOList = customer.getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
@@ -289,16 +290,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
 
 
-        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
-                .creqEntityId(customerRequest.getCreqEntityId())
-                .bussinessEntity(bussinessEntityResponseDTO)
-                .creqModifiedDate(customerRequest.getCreqModifiedDate())
-                .creqCreateDate(customerRequest.getCreqCreateDate())
-                .creqStatus(customerRequest.getCreqStatus())
-                .creqType(customerRequest.getCreqType())
-                .customerInscAssets(ciasResponseDTO)
-                .customer(customerUserResponseDTO)
-                .build();
+//        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+//                .creqEntityId(customerRequest.getCreqEntityId())
+//                .bussinessEntity(bussinessEntityResponseDTO)
+//                .creqModifiedDate(customerRequest.getCreqModifiedDate())
+//                .creqCreateDate(customerRequest.getCreqCreateDate())
+//                .creqStatus(customerRequest.getCreqStatus())
+//                .creqType(customerRequest.getCreqType())
+//                .customerInscAssets(ciasResponseDTO)
+//                .customer(customerUserResponseDTO)
+//                .build();
 
 
             CustomerClaim customerClaim = customerRequest.getCustomerClaim();
@@ -312,12 +313,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                     .cuclSubtotal(customerClaim.getCuclSubtotal())
                     .build();
 
-            customerResponseDTO.setClaimResponseDTO(claimResponseDTO);
+//            customerResponseDTO.setClaimResponseDTO(claimResponseDTO);
 
 
 //                .employee(agenUserResponseDTO)
 //                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
-        return customerResponseDTO;
+        return new CustomerResponseDTO();
     }
 
     public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs){
@@ -329,7 +330,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         if(!cuexs.isEmpty()){
             for (CustomerInscExtend  cuex: cuexs) {
-                premiExtend += cuex.getCuex_nominal();
+                premiExtend += cuex.getCuexNominal();
             }
 
         }
@@ -376,13 +377,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
 
-        CarSeries carSeries = this.carsRepository.findById(ciasUpdateDTO.getCias_cars_id()).orElseThrow(
+        CarSeries carSeries = this.carsRepository.findById(ciasUpdateDTO.getCiasCarsId()).orElseThrow(
                 () -> new EntityNotFoundException("Car Series dengan id " + creqEntityId + " tidak ditemukan")
         );
-        Cities existCity = this.cityRepository.findById(ciasUpdateDTO.getCias_city_id()).orElseThrow(
+        Cities existCity = this.cityRepository.findById(ciasUpdateDTO.getCiasCityId()).orElseThrow(
                 () -> new EntityNotFoundException("City dengan id " + creqEntityId + " tidak ditemukan")
         );
-        InsuranceType existInty = this.intyRepository.findById(ciasUpdateDTO.getCias_inty_name()).orElseThrow(
+        InsuranceType existInty = this.intyRepository.findById(ciasUpdateDTO.getCiasIntyName()).orElseThrow(
                 () -> new EntityNotFoundException("Insurance type dengan id " + creqEntityId + " tidak ditemukan")
         );
 

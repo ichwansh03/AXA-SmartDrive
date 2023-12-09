@@ -41,7 +41,7 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
 
             CustomerInscExtend cuex = CustomerInscExtend.builder()
                     .cuexName(temi.getTemiName())
-                    .cuex_nominal(nominal)
+                    .cuexNominal(nominal)
                     .cuexTotalItem(1)
                     .customerInscAssets(cias)
                     .cuexCreqEntityid(entityId)

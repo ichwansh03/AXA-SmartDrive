@@ -21,9 +21,9 @@ public class CiasDTO {
 
     private Long ciasCarsId;
 
-    private String ciasIntyName;
-
     private Long ciasCityId;
+
+    private String ciasIntyName;
 
     private Double currentPrice;
 
