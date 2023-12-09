@@ -4,10 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public class TasksNotCompletedException extends RuntimeException {
 
-    public TasksNotCompletedException(String message, HttpStatus badRequest) {
-        super();
-    }
-
     public TasksNotCompletedException(String message) {
         super(message);
     }
