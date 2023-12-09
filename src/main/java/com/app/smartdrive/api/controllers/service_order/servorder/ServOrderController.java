@@ -55,12 +55,6 @@ public class ServOrderController {
         return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
     }
 
-    @GetMapping("/check/{seroId}")
-    public ResponseEntity<?> checkTask(@PathVariable("seroId") String seroId){
-
-        return new ResponseEntity<>(servOrderService.checkAllTaskComplete(seroId), HttpStatus.OK);
-    }
-
     private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders){
         Services servicesById = servService.findServicesById(serviceOrders.getServices().getServId()).get();
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);

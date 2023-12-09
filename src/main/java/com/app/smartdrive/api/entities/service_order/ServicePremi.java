@@ -28,10 +28,10 @@ public class ServicePremi {
     private Long semiServId;
 
     @Column(name = "semi_premi_debet")
-    private BigDecimal semiPremiDebet;
+    private Double semiPremiDebet;
 
     @Column(name = "semi_premi_credit")
-    private BigDecimal semiPremiCredit;
+    private Double semiPremiCredit;
 
     @Column(name = "semi_paid_type")
     @Size(max = 15)

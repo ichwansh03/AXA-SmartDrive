@@ -1,10 +1,7 @@
 package com.app.smartdrive.api.services.service_order;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.service_order.ServicePremi;
-import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.app.smartdrive.api.entities.service_order.Services;
-import com.app.smartdrive.api.services.service_order.premi.impl.ServPremiCreditImpl;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -73,6 +68,5 @@ public class SoAdapter {
 
     }
 
-
-
+    
 }
