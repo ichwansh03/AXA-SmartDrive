@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.customer.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
@@ -33,7 +34,9 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
         for (Long i: cuexIds) {
             Double nominal;
 
-            TemplateInsurancePremi temi = this.temiRepository.findById(i).get();
+            TemplateInsurancePremi temi = this.temiRepository.findById(i).orElseThrow(
+                    () -> new EntityNotFoundException("Template Insurance Premi with id " + i + " is not found")
+            );
 
             if(Objects.nonNull(temi.getTemiRateMin())){
                 nominal = temi.getTemiRateMin() * temi.getTemiNominal();

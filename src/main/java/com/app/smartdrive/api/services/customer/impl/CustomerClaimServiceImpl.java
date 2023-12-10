@@ -44,7 +44,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
     @Override
     public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId) {
         CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
+                () -> new EntityNotFoundException("Customer Claim with id " + cuclCreqEntityId + " is not found")
         );
 
 
@@ -62,7 +62,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
     @Override
     public void deleteCustomerClaim(Long cuclCreqEntityId) {
         CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
+                () -> new EntityNotFoundException("Customer Claim with id " + cuclCreqEntityId + " is not found")
         );
 
         this.customerClaimRepository.delete(existCustomerClaim);
@@ -72,7 +72,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
     @Override
     public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
+                () -> new EntityNotFoundException("Customer Request with id " + claimRequestDTO.getCreqEntityId() + " is not found")
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
@@ -108,7 +108,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
     @Override
     public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(closeRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + closeRequestDTO.getCreqEntityId() + " tidak ada")
+                () -> new EntityNotFoundException("Customer Request with id " + closeRequestDTO.getCreqEntityId() + " is not found")
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
