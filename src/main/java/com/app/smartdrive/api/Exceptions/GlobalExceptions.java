@@ -1,9 +1,12 @@
 package com.app.smartdrive.api.Exceptions;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.jobrunr.storage.sql.common.db.Sql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +29,14 @@ public class GlobalExceptions {
     public ResponseEntity<?> handleAllExceptionMethod(MethodArgumentNotValidException ex, WebRequest requset) {
         return ResponseEntity.badRequest().body(ex.getBindingResult().getAllErrors());
     }
+
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<?> handleErrorSqlException(SQLException sql){
+
+        return ResponseEntity.internalServerError().body(sql.getMessage());
+    }
+        
+    
 
     @ExceptionHandler(BindException.class)
     public final ResponseEntity<?> handleBindException(BindException ex) {

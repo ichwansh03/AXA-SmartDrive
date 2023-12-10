@@ -11,11 +11,11 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 
 public class EmployeesAreaWorkgroupMapper {
     
-     public static EmployeesAreaWorkgroupResponseDto convertEntityToDto(EmployeeAreaWorkgroup employeeAreaWorkgroup){
-        EmployeesAreaWorkgroupResponseDto dto = EmployeesAreaWorkgroupResponseDto.builder().areaWorkGroup(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getAreaWorkGroup(), ArwgRes.class))
-        .employees(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getEmployees(), EmployeesDto.class))
-        .build();
+      public static EmployeesAreaWorkgroupResponseDto convertToDto(EmployeeAreaWorkgroup employeeAreaWorkgroup) {
+        EmployeesAreaWorkgroupResponseDto dto = new EmployeesAreaWorkgroupResponseDto();
+        dto.setAreaWorkGroup(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getAreaWorkGroup(), ArwgRes.class));
+        dto.setEmployees(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup.getEmployees(), EmployeesDto.class));
         return dto;
-     }
+    }
 
 }
