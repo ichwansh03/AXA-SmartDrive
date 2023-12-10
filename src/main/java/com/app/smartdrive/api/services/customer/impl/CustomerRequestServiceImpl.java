@@ -22,6 +22,10 @@ import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
 import com.app.smartdrive.api.services.customer.*;
+import com.app.smartdrive.api.services.master.CarsService;
+import com.app.smartdrive.api.services.master.CityService;
+import com.app.smartdrive.api.services.master.IntyService;
+import com.app.smartdrive.api.services.master.TemiService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +75,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final CustomerClaimService customerClaimService;
 
+    private final CarsService carsService;
+
+    private final IntyService intyService;
+
+    private final CityService cityService;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -116,17 +126,11 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 () -> new EntityNotFoundException("User with id " + customerRequestDTO.getCustomerId() + " is not found")
         );
 
-        CarSeries existCarSeries = this.carsRepository.findById(ciasDTO.getCiasCarsId()).orElseThrow(
-                () -> new EntityNotFoundException("Car Series with id " + ciasDTO.getCiasCarsId() + " is not found")
-        );
+        CarSeries existCarSeries = this.carsService.getById(ciasDTO.getCiasCarsId());
 
-        Cities existCity = this.cityRepository.findById(ciasDTO.getCiasCityId()).orElseThrow(
-                () -> new EntityNotFoundException("City with id " + ciasDTO.getCiasCityId() + " is not found")
-        );
+        Cities existCity = this.cityService.getById(ciasDTO.getCiasCityId());
 
-        InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCiasIntyName()).orElseThrow(
-                () -> new EntityNotFoundException("Insurance Type with id " + customerRequestDTO.getCustomerId() + " is not found")
-        );
+        InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
 
         EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()))
                 .orElseThrow(
@@ -353,7 +357,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional(readOnly = true)
     @Override
     public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs){
-        TemplateInsurancePremi temiMain = this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(zonesId, insuraceType, 1L);
+        TemplateInsurancePremi temiMain = this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(zonesId, insuraceType, 1L).orElseThrow(
+                () -> new EntityNotFoundException("Template Insurance Premi is not found")
+        );
 
         Double premiMain = currentPrice * temiMain.getTemiRateMin();
 
@@ -374,7 +380,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional(readOnly = true)
     @Override
     public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status) {
-        User user = this.userRepository.findById(custId).get();
+        User user = this.userService.getUserById(custId).orElseThrow(
+                () -> new EntityNotFoundException("User with id " + custId + " is not found")
+        );
+
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
 
         Page<CustomerRequest> pageCustomerRequest;
@@ -400,7 +409,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Override
     public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer Request dengan id " + creqEntityId + " tidak ditemukan")
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
                 );
 
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
@@ -410,18 +420,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
 
-        CarSeries carSeries = this.carsRepository.findById(ciasUpdateDTO.getCiasCarsId()).orElseThrow(
-                () -> new EntityNotFoundException("Car Series dengan id " + creqEntityId + " tidak ditemukan")
-        );
-        Cities existCity = this.cityRepository.findById(ciasUpdateDTO.getCiasCityId()).orElseThrow(
-                () -> new EntityNotFoundException("City dengan id " + creqEntityId + " tidak ditemukan")
-        );
-        InsuranceType existInty = this.intyRepository.findById(ciasUpdateDTO.getCiasIntyName()).orElseThrow(
-                () -> new EntityNotFoundException("Insurance type dengan id " + creqEntityId + " tidak ditemukan")
-        );
+        CarSeries carSeries = this.carsService.getById(ciasUpdateDTO.getCiasCarsId());
+
+        Cities existCity = this.cityService.getById(ciasUpdateDTO.getCiasCityId());
+
+        InsuranceType existInty = this.intyService.getById(ciasUpdateDTO.getCiasIntyName());
 
         this.customerInscAssetsService.updateCustomerInscAssets(cias, ciasUpdateDTO, existCity, carSeries, existInty);
-
 
         // update cuex
         this.customerInscExtendService.deleteAllCustomerInscExtendInCustomerRequest(entityId);
@@ -446,7 +451,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Override
     public void delete(Long creqEntityId) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + creqEntityId + " tidak ditemukan")
+                () -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
         );
 
         this.customerRequestRepository.delete(existCustomerRequest);
@@ -473,7 +478,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Override
     public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + customerRequestTypeDTO.getCreqEntityId() + " tidak ada")
+                () -> new EntityNotFoundException("Customer Request with id " + customerRequestTypeDTO.getCreqEntityId() + " is not found")
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.POLIS);
@@ -485,7 +490,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Override
     public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + customerRequestTypeDTO.getCreqEntityId() + " tidak ada")
+                () -> new EntityNotFoundException("Customer Request with id " + customerRequestTypeDTO.getCreqEntityId() + " is not found")
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
@@ -498,7 +503,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Override
     public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + customerRequestTypeDTO.getCreqEntityId() + " tidak ada")
+                () -> new EntityNotFoundException("Customer Request with id " + customerRequestTypeDTO.getCreqEntityId() + " is not found")
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
