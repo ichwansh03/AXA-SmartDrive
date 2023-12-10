@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.app.smartdrive.api.entities.users.UserAddress;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -45,7 +46,7 @@ public class JobType {
 
     // @PrimaryKeyJoinColumn
     @OneToMany(mappedBy = "jobType", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<Employees> employees ;
 
 }
