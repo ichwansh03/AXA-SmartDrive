@@ -57,7 +57,7 @@ public class GlobalExceptions {
                 .setUrl(request.getRequestURL().toString())
                 .setReqMethod(request.getMethod())
                 .setTimestamp(LocalDateTime.now());
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(UserExistException.class)
@@ -77,5 +77,29 @@ public class GlobalExceptions {
 
         Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UsernameExistException.class)
+    public ResponseEntity<?> userNameExist(UsernameExistException ex){
+        Error error = ErrorUtils.createError(
+                ex.getMessage(),ex.getLocalizedMessage(),HttpStatus.BAD_REQUEST.value()
+        );
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmailExistException.class)
+    public ResponseEntity<?> emailExist(EmailExistException ex){
+        Error error = ErrorUtils.createError(
+                ex.getMessage(),ex.getLocalizedMessage(),HttpStatus.BAD_REQUEST.value()
+        );
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserPhoneExistException.class)
+    public ResponseEntity<?> emailExist(UserPhoneExistException ex){
+        Error error = ErrorUtils.createError(
+                ex.getMessage(),ex.getLocalizedMessage(),HttpStatus.BAD_REQUEST.value()
+        );
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

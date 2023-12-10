@@ -10,18 +10,12 @@ import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.repositories.master.CityRepository;
-import com.app.smartdrive.api.repositories.payment.BanksRepository;
-import com.app.smartdrive.api.repositories.payment.FintechRepository;
-import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
+import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.users.*;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,7 +32,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@EnableMethodSecurity
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepo;
   private final BusinessEntityService businessEntityService;
@@ -46,6 +39,7 @@ public class UserServiceImpl implements UserService {
   private final UserPhoneService userPhoneService;
   private final UserAddressService userAddressService;
   private final UserUserAccountService userAccountService;
+  private final RefreshTokenService refreshTokenService;
 //  private final PasswordEncoder passwordEncoder;
 
   @Override
@@ -65,7 +59,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @PreAuthorize("hasAuthority('Customer')")
   public UserDto getByIdDto(Long id) {
     return TransactionMapper.mapEntityToDto(userRepo.findById(id).get(), UserDto.class);
   }
@@ -80,6 +73,7 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public void deleteById(Long id) {
+    refreshTokenService.deleteByUserId(id);
     userRepo.deleteById(id);
   }
 
@@ -94,12 +88,12 @@ public class UserServiceImpl implements UserService {
 
     userAddressService.createUserAddress(user, userPost.getUserAddress(), userPost.getCityId());
 
+//    user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
+
     Long paymentId = (userPost.getBankId() != null) ? userPost.getBankId()
         : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
 
     userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
-
-    Collection<?> list = user.getAuthorities();
 
     return save(user);
   }

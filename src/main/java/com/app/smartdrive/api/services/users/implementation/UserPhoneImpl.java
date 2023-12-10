@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
@@ -15,8 +14,6 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.UserPhoneService;
-import com.app.smartdrive.api.services.users.UserService;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -48,13 +45,13 @@ public class UserPhoneImpl implements UserPhoneService {
     // user.setUserPhone(listUserPhones);
 
     // User user = userRepository.findById(userId).get();
-    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(phoneNumber, userId);
+    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumberAndUserId(phoneNumber, userId);
     if(userPhone.isPresent()){
       userPhone.get().setUsphModifiedDate(LocalDateTime.now());
       userPhone.get().setUsphPhoneType(userPost.getUsphPhoneType());
       userPhoneRepository.save(userPhone.get());
       userPhoneRepository.setPhoneNumber(userPost.getUsphPhoneNumber(), phoneNumber);
-      return userPhoneRepository.findByUsphPhoneNumber(userPost.getUsphPhoneNumber(), userId).get();
+      return userPhoneRepository.findByUsphPhoneNumberAndUserId(userPost.getUsphPhoneNumber(), userId).get();
     }
     throw new EntityNotFoundException("Phone Number is not exist or you are not granted access to this phone number");
   }
@@ -73,7 +70,7 @@ public class UserPhoneImpl implements UserPhoneService {
 
   @Override
   public void deleteUserPhone(Long id, String number) {
-    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumber(number, id);
+    Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumberAndUserId(number, id);
     if(userPhone.isPresent()){
       userPhoneRepository.delete(userPhone.get());
     }

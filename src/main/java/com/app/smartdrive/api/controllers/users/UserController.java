@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@EnableMethodSecurity
 public class UserController {
   private final UserService userService;
   private final AuthenticationService authenticationService;
@@ -54,6 +55,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
+  @PreAuthorize("(hasAuthority('Customer') || hasAuthority('Potential Customer')) && principal.getUserEntityId() == #id")
   public UserDto getUser(@PathVariable("id") Long id) {
     return userService.getByIdDto(id);
   }
