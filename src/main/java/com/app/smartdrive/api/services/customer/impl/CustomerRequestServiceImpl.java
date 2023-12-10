@@ -96,7 +96,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Override
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer Request dengan id ${creqEntityId} tidak ditemukan")
+                .orElseThrow(() -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
                 );
 
         return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
@@ -111,29 +111,49 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
-        User entityUser = this.userService.getUserById(customerRequestDTO.getCustomerId()).get();
-        CarSeries carSeries = this.carsRepository.findById(ciasDTO.getCiasCarsId()).get();
-        Cities existCity = this.cityRepository.findById(ciasDTO.getCiasCityId()).get();
-        InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCiasIntyName()).get();
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId())).get();
+        User entityUser = this.userService.getUserById(customerRequestDTO.getCustomerId()).orElseThrow(
+                () -> new EntityNotFoundException("User with id " + customerRequestDTO.getCustomerId() + " is not found")
+        );
 
-        // new customerRequest
-        // belum set eawag
+        CarSeries existCarSeries = this.carsRepository.findById(ciasDTO.getCiasCarsId()).orElseThrow(
+                () -> new EntityNotFoundException("Car Series with id " + ciasDTO.getCiasCarsId() + " is not found")
+        );
+
+        Cities existCity = this.cityRepository.findById(ciasDTO.getCiasCityId()).orElseThrow(
+                () -> new EntityNotFoundException("City with id " + ciasDTO.getCiasCityId() + " is not found")
+        );
+
+        InsuranceType existInty = this.intyRepository.findById(ciasDTO.getCiasIntyName()).orElseThrow(
+                () -> new EntityNotFoundException("Insurance Type with id " + customerRequestDTO.getCustomerId() + " is not found")
+        );
+
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()))
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
+                );
+
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
         newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
 
-        CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, carSeries, existCity, existInty, newCustomerRequest);
+        CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, existCarSeries, existCity, existInty, newCustomerRequest);
 
         List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
         cias.setCustomerInscDoc(ciasDocs);
 
-
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId);
 
-        Double premi = ciasDTO.getCurrentPrice();
-        cias.setCiasTotalPremi(premi);
+
+        Double premiPrice = this.getPremiPrice(
+                existInty.getIntyName(),
+                existCarSeries.getCarModel().getCarBrand().getCabrName(),
+                existCity.getProvinsi().getZones().getZonesId(),
+                ciasDTO.getCurrentPrice(),
+                ciasCuexs
+        );
+
+        cias.setCiasTotalPremi(premiPrice);
         cias.setCustomerInscExtend(ciasCuexs);
 
         CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
