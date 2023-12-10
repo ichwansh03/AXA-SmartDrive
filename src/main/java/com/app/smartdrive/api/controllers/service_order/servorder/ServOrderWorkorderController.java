@@ -29,19 +29,10 @@ public class ServOrderWorkorderController {
         return new ResponseEntity<>(sowoBySeotId, HttpStatus.OK);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateSoWorkorderStatus(@Valid @RequestBody SoWorkorderDto soWorkorderDto){
-        int sowoStatus = servOrderWorkorderService.updateSowoStatus(soWorkorderDto.getSowoStatus(), soWorkorderDto.getSowoId());
+    @PutMapping("/update/{sowoId}")
+    public ResponseEntity<?> updateSoWorkorderStatus(@Valid @RequestBody SoWorkorderDto soWorkorderDto, @PathVariable("sowoId") Long sowoId){
+        int sowoStatus = servOrderWorkorderService.updateSowoStatus(soWorkorderDto.getSowoStatus(), sowoId);
 
-        if (sowoStatus == 0){
-            throw new UserNotFoundException("ID not found");
-        }
-
-        soWorkorderDto = SoWorkorderDto.builder()
-                .sowoId(soWorkorderDto.getSowoId())
-                .sowoStatus(soWorkorderDto.getSowoStatus())
-                .build();
-
-        return new ResponseEntity<>(soWorkorderDto, HttpStatus.OK);
+        return new ResponseEntity<>(sowoStatus, HttpStatus.OK);
     }
 }

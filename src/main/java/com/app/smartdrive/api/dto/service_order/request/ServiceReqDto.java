@@ -25,20 +25,16 @@ public class ServiceReqDto {
     private LocalDateTime servCreatedOn;
     @NotNull
     private EnumCustomer.CreqType servType;
-    @Size(max = 12, message = "insurance number can't more than 12 character")
-    private String servInsuranceNo;
     @NotBlank
     private String servVehicleNumber;
-    @NotNull
     private LocalDateTime servStartDate;
-    @NotNull
     private LocalDateTime servEndDate;
     @NotNull
     private EnumModuleServiceOrders.ServStatus servStatus;
-    private Services parentServices;
-    @NotNull
-    private User users;
-    @NotNull
-    private CustomerRequest customer;
+//    private Services parentServices;
+//    @NotNull
+//    private User users;
+//    @NotNull
+//    private CustomerRequest customer;
 
 }

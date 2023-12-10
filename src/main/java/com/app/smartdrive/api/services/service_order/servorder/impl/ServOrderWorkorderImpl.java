@@ -10,14 +10,10 @@ import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jobrunr.scheduling.JobScheduler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +24,6 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
 
     private final SoWorkorderRepository soWorkorderRepository;
     private final TewoRepository tewoRepository;
-
-    @Autowired
-    private JobScheduler jobScheduler;
 
     @Transactional
     @Override
@@ -44,7 +37,6 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
         sowo.add(new ServiceWorkorderReqDto(taskWorkOrders.get(3).getTewoName(), LocalDateTime.now(), false, seotList.get(3)));
 
         List<ServiceOrderWorkorder> workorders = TransactionMapper.mapListDtoToListEntity(sowo, ServiceOrderWorkorder.class);
-        jobScheduler.schedule(Instant.now().plus(15, ChronoUnit.SECONDS), () -> log.info("JobRunr is run..."));
         return soWorkorderRepository.saveAll(workorders);
     }
 

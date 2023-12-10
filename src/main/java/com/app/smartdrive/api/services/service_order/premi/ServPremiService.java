@@ -8,5 +8,5 @@ public interface ServPremiService {
 
     List<ServicePremi> findAllBySemiServId(Long servId);
 
-    ServicePremi addSemi(ServicePremi servicePremi);
+    ServicePremi addSemi(ServicePremi servicePremi, Long servId);
 }

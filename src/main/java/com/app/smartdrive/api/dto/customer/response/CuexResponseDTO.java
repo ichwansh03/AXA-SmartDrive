@@ -18,5 +18,5 @@ public class CuexResponseDTO {
 
     private int cuexTotalItem;
 
-    private double cuex_nominal;
+    private double cuexNominal;
 }

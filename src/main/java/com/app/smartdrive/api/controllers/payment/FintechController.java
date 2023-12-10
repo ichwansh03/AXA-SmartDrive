@@ -18,18 +18,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.payment.Response.FintechDto;
+import com.app.smartdrive.api.dto.payment.Request.Fintech.FintechDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechDtoResponse;
+import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechIdForUserDtoResponse;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.Fintech;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.services.payment.FintechService;
 import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -42,27 +45,33 @@ public class FintechController {
 
     @GetMapping("/fintech/all")
     public ResponseEntity<?> getAllFintech(){
-        List<FintechDto> listFintech = service.getAll();
+        List<FintechDtoResponse> listFintech = service.getAll();
         return new ResponseEntity<>(listFintech, HttpStatus.OK);
     }
 
     @GetMapping("/fintech/{fint_entityid}")
     public ResponseEntity<?> getFintechById(@Valid @PathVariable("fint_entityid") Long fint_entityid){
-        FintechDto newFintechId = service.getById(fint_entityid);
+        FintechDtoResponse newFintechId = service.getById(fint_entityid);
         return new ResponseEntity<>(newFintechId, HttpStatus.OK);
     }
 
+    @GetMapping("/fintech/user/{fint_name}")
+    public ResponseEntity<?> getIdFintNameUser(@Valid @PathVariable("fint_name") String fint_name){
+        FintechIdForUserDtoResponse dto = service.getUserFintId(fint_name);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+
+    }
+
     @PostMapping("/fintech/add")
-    public ResponseEntity<?> addFintech(@Valid @RequestBody FintechDto fintechDto){;
-        FintechDto resulDto = service.save(fintechDto);
+    public ResponseEntity<?> addedFintech(@Valid @RequestBody FintechDtoRequests fintechDtoRequests){
+        FintechDtoResponse resulDto = service.addFintech(fintechDtoRequests);
         return new ResponseEntity<>(resulDto, HttpStatus.OK);
     }
 
     @PutMapping("/fintech/{fint_entityid}/update")
     public ResponseEntity<?> updateFintech(@Valid @PathVariable("fint_entityid") Long fint_entityid, 
-    @RequestParam(name = "fint_name", required = false)String fint_name,
-    @RequestParam(name = "fint_desc", required = false)String fint_desc){
-        Boolean updateFintechDto = service.updateFintech(fint_entityid, fint_name, fint_desc);
+    @RequestBody FintechDtoRequests fintechDtoRequests){
+        Boolean updateFintechDto = service.updateFintech(fint_entityid, fintechDtoRequests);
         return new ResponseEntity<>(updateFintechDto, HttpStatus.OK);
     }
 

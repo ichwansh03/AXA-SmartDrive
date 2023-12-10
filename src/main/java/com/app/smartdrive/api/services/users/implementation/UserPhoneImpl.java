@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+
+import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
@@ -18,6 +21,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserPhoneImpl implements UserPhoneService {
@@ -58,6 +62,7 @@ public class UserPhoneImpl implements UserPhoneService {
 
   @Override
   public UserPhone addUserPhone(Long id, UserPhoneDto userPost) {
+
     User user = userRepository.findById(id).get();
     UserPhoneId userPhoneId = new UserPhoneId(user.getUserEntityId(), userPost.getUserPhoneId().getUsphPhoneNumber());
     UserPhone userPhone = new UserPhone();

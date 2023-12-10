@@ -9,13 +9,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupBankRequests;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupFintechRequests;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransferTransactionsRequest;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactionsDto;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupBanksResponse;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupFintechResponse;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransferTransactionsResponse;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.services.payment.PaymentTransactionsService;
 import com.app.smartdrive.api.services.payment.implementation.PaymentTransactionsImpl;
+
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,26 +37,11 @@ public class PaymentTransactionsController {
     @GetMapping("/all")
     public ResponseEntity<?> findAllPaymentTransactions(){
         List<PaymentTransactions> findPayment = service.findAllPaymentTransactions();
-
-        List<PaymentTransactionsDto> listDto = findPayment.stream().map(payment -> {
-            PaymentTransactionsDto dto = new PaymentTransactionsDto();
-            dto.setPatrTrxno(payment.getPatrTrxno());
-            dto.setPatr_created_on(payment.getPatr_created_on());
-            dto.setPatr_debet(payment.getPatr_debet());
-            dto.setPatr_credit(payment.getPatr_credit());
-            dto.setPatr_usac_accounntNo_from(payment.getPatr_usac_accountNo_from());
-            dto.setPatr_usac_accountNo_to(payment.getPatr_usac_accountNo_to());
-            dto.setEnumPayment(payment.getEnumPayment());
-            dto.setPatr_invoice_no(payment.getPatr_invoice_no());
-            dto.setPatr_notes(payment.getPatr_notes());
-            dto.setPatrTrxnoRev(payment.getPatrTrxnoRev());
-            return dto;
-        }).collect(Collectors.toList());
-        return new ResponseEntity<>(listDto, HttpStatus.OK);
+        return new ResponseEntity<>(findPayment, HttpStatus.OK);
     }
     
     @PostMapping("/transactions/add")
-    public ResponseEntity<?> addPy(@Valid @ModelAttribute PaymentTransactionsDto paymentTransactionsDto){
+    public ResponseEntity<?> addPaymentTransactions(@Valid @ModelAttribute PaymentTransactionsDto paymentTransactionsDto){
         PaymentTransactionsDto dto = service.addPaymentTransactions(paymentTransactionsDto);
         
         return new ResponseEntity<>(dto, HttpStatus.OK);
@@ -59,5 +52,26 @@ public class PaymentTransactionsController {
         PaymentTransactions pt = service.getById(patrTrxno);
         return new ResponseEntity<>(pt, HttpStatus.OK);
     }
+
+    @PostMapping("/transactions/{usac_id}/topupBank")
+    public ResponseEntity<?> topupBank(@Valid @PathVariable("usac_id") Long usac_id,
+     @RequestBody TopupBankRequests requests){
+        TopupBanksResponse topupBanks = service.topupBanks(usac_id, requests);
+        return new ResponseEntity<>(topupBanks, HttpStatus.OK);
+    }
     
+    @PostMapping("/transactions/{usac_id}/transfer")
+    public ResponseEntity<?> transfer(@Valid @PathVariable("usac_id") Long usac_id,
+    @RequestBody TransferTransactionsRequest request){
+        TransferTransactionsResponse transfer = service.transfer(usac_id, request);
+        return new ResponseEntity<>(transfer, HttpStatus.OK);
+    }
+
+    @PostMapping("/transactions/{usac_id}/topupFintech")
+    public ResponseEntity<?> topupFintech(@Valid @PathVariable("usac_id") Long usac_id,
+    @RequestBody TopupFintechRequests requests){
+        TopupFintechResponse topupFintech = service.topupFintech(usac_id, requests);
+        return new ResponseEntity<>(topupFintech, HttpStatus.OK);
+    }
+
 }

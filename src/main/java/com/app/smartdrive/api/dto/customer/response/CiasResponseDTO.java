@@ -1,5 +1,8 @@
 package com.app.smartdrive.api.dto.customer.response;
 
+import com.app.smartdrive.api.dto.master.response.CarsRes;
+import com.app.smartdrive.api.dto.master.response.CitiesRes;
+import com.app.smartdrive.api.dto.master.response.IntyRes;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,12 +22,9 @@ public class CiasResponseDTO {
 
     private String ciasPoliceNumber;
 
-
     private String ciasYear;
 
-
     private LocalDateTime ciasStartdate;
-
 
     private LocalDateTime ciasEnddate;
 
@@ -32,26 +32,19 @@ public class CiasResponseDTO {
 
     private Double ciasInsurancePrice;
 
-
     private Double ciasTotalPremi;
-
 
     private EnumCustomer.CreqPaidType ciasPaidType;
 
-
     private Character ciasIsNewChar;
-
 
     private List<CadocResponseDTO> customerInscDoc;
 
-
     private List<CuexResponseDTO> customerInscExtend;
 
+    private IntyRes insuranceType;
 
-    private IntyResponseDTO intyResponseDTO;
+    private CarsRes carSeries;
 
-    private CarSeriesResponseDTO carSeriesResponseDTO;
-
-
-    private CitiesResponseDTO city;
+    private CitiesRes city;
 }

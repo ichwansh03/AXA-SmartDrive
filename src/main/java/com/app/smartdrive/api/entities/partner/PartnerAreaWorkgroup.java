@@ -41,15 +41,4 @@ public class PartnerAreaWorkgroup {
             @JoinColumn(name = "pawo_user_entityid", referencedColumnName = "paco_user_entityid", insertable = false, updatable = false)
     })
     private PartnerContact partnerContact;
-
-    public PartnerAreaWorkgroupDto convertToDto(){
-        return PartnerAreaWorkgroupDto.builder()
-                .id(id)
-                .partnerContact(partnerContact.getUser().getUsername())
-                .areaWorkGroup(areaWorkGroup)
-                .status(status.name())
-                .modifiedDate(modifiedDate.toString())
-                .build();
-    }
-
 }

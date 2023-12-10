@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
+import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
@@ -12,6 +13,7 @@ import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import com.app.smartdrive.api.services.users.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,7 +46,7 @@ public class ServController {
     }
 
     @GetMapping("/addserv")
-    public ResponseEntity<?> generateService(@RequestParam("creqId") Long creqId){
+    public ResponseEntity<?> generateService(@RequestParam("creqId") Long creqId) throws Exception {
         Services services = servService.addService(creqId);
 
         ServiceRespDto serviceRespDto = responseService(services);

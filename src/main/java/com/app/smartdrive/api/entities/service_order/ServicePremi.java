@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -37,20 +37,16 @@ public class ServicePremi {
     @Size(max = 15)
     private String semiPaidType;
 
-    //should be enum
     @Column(name = "semi_status")
     @Size(max = 15)
     private String semiStatus;
 
     @Column(name = "semi_modified_date")
-    private LocalDate semiModifiedDate;
-
-    @ManyToOne
-    @MapsId
-    @JoinColumn(name = "semi_serv_id")
-    Services services;
+    private LocalDateTime semiModifiedDate;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "servicePremi", cascade = CascadeType.ALL)
-    private List<ServicePremiCredit> servicePremiCredits;
+    @ManyToOne
+    @JoinColumn(name = "semi_serv_id", insertable = false, updatable = false)
+    Services services;
+
 }

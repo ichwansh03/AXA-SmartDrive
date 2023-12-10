@@ -14,12 +14,10 @@ import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +44,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
             seot.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
                     serviceOrders.getServices().getServStartDate(),
                     serviceOrders.getServices().getServStartDate().plusDays(1),
-                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(),
+                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, null));
         }
 
@@ -61,43 +59,26 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     }
 
     @Override
-    public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) {
+    public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) throws Exception {
 
         List<ServiceTaskReqDto> seotList = new ArrayList<>();
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(2L);
 
-        //String polisNumber = getPolisNumber();
+        Method generatePolisNumber = SoAdapter.class.getMethod("generatePolisNumber", CustomerRequest.class);
 
         for (TemplateServiceTask templateServiceTask : templateServiceTasks) {
             seotList.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
                     serviceOrders.getServices().getServStartDate(),
                     serviceOrders.getServices().getServStartDate().plusDays(1),
-                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, null));
+                    EnumModuleServiceOrders.SeotStatus.COMPLETED, serviceOrders.getEmployees().getAreaWorkGroup(),
+                    serviceOrders, generatePolisNumber));
         }
 
-        log.info("ServOrderTaskImpl::addPolisList the result of number polis is {} ", seotList.get(0).getGeneratePolisTasks());
+        log.info("ServOrderTaskImpl::addPolisList the result of number polis is {} ", seotList.get(0).getGenerateTasks());
 
         List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seotList, ServiceOrderTasks.class);
 
         return soTasksRepository.saveAll(mapperTaskList);
-    }
-
-    private static String getPolisNumber() {
-        Method generatePolis;
-        try {
-            generatePolis = SoAdapter.class.getMethod("generatePolisNumber", CustomerRequest.class);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-        SoAdapter soAdapter = new SoAdapter();
-        CustomerRequest cr = new CustomerRequest();
-        String polisNumber;
-        try {
-            polisNumber = (String) generatePolis.invoke(soAdapter, cr);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-        return polisNumber;
     }
 
     @Override
@@ -110,7 +91,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
             seot.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
                     serviceOrders.getServices().getServStartDate(),
                     serviceOrders.getServices().getServStartDate().plusDays(1),
-                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(),
+                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, null));
         }
 
@@ -119,23 +100,17 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         return soTasksRepository.saveAll(serviceOrderTasks);
     }
 
-    @Override
-    public List<ServiceOrderTasks> closeAllTasks(ServiceOrders serviceOrders) {
-
-        return null;
-    }
-
     @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderTasks> findSeotBySeroId(String seroId) {
-        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findSeotBySeroId(seroId);
+        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
         log.info("SoOrderServiceImpl::findSeotById in ID start from {} ", seotBySeroId.get(0));
         return seotBySeroId;
     }
 
     @Transactional
     @Override
-    public int updateTasksStatus(String seotStatus, Long seotId) {
+    public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
         int serviceOrderTasks = soTasksRepository.updateTasksStatus(seotStatus, seotId);
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
         return serviceOrderTasks;
