@@ -44,7 +44,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
             seot.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
                     serviceOrders.getServices().getServStartDate(),
                     serviceOrders.getServices().getServStartDate().plusDays(1),
-                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(),
+                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, null));
         }
 
@@ -70,7 +70,8 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
             seotList.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
                     serviceOrders.getServices().getServStartDate(),
                     serviceOrders.getServices().getServStartDate().plusDays(1),
-                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(), serviceOrders, generatePolisNumber));
+                    EnumModuleServiceOrders.SeotStatus.COMPLETED, serviceOrders.getEmployees().getAreaWorkGroup(),
+                    serviceOrders, generatePolisNumber));
         }
 
         log.info("ServOrderTaskImpl::addPolisList the result of number polis is {} ", seotList.get(0).getGenerateTasks());
@@ -90,19 +91,13 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
             seot.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
                     serviceOrders.getServices().getServStartDate(),
                     serviceOrders.getServices().getServStartDate().plusDays(1),
-                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getAreaWorkGroup(),
+                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, null));
         }
 
         List<ServiceOrderTasks> serviceOrderTasks = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
 
         return soTasksRepository.saveAll(serviceOrderTasks);
-    }
-
-    @Override
-    public List<ServiceOrderTasks> closeAllTasks(ServiceOrders serviceOrders) {
-
-        return null;
     }
 
     @Transactional(readOnly = true)

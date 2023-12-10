@@ -49,10 +49,14 @@ public class ServImpl implements ServService {
 
         switch (cr.getCreqType().toString()){
             case "FEASIBLITY" -> serv = generateFeasiblity(cr);
-            case "POLIS", "CLAIM" -> {
+            case "POLIS" -> {
                 Services servFs = soRepository.findByServTypeAndCustomer_CreqEntityId(EnumCustomer.CreqType.FEASIBLITY, cr.getCreqEntityId());
                 log.info("Call ID CR {} ", servFs.getServId());
                 serv = generatePolis(servFs.getServId(), cr);
+            }
+            case "CLAIM" -> {
+                Services servPl = soRepository.findByServTypeAndCustomer_CreqEntityId(EnumCustomer.CreqType.POLIS, cr.getCreqEntityId());
+                serv = generateClaim(servPl.getServId(), cr);
             }
             default -> serv = generateTypeInactive(cr);
         }
@@ -76,7 +80,7 @@ public class ServImpl implements ServService {
         return byId;
     }
 
-    public Services generateFeasiblity(CustomerRequest cr){
+    private Services generateFeasiblity(CustomerRequest cr){
         return Services.builder()
                 .servType(cr.getCreqType())
                 .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
@@ -88,7 +92,7 @@ public class ServImpl implements ServService {
                 .build();
     }
 
-    public Services generatePolis(Long servId, CustomerRequest cr) {
+    private Services generatePolis(Long servId, CustomerRequest cr) {
 
         Services existingService = soRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
@@ -119,16 +123,30 @@ public class ServImpl implements ServService {
         return existingService;
     }
 
-    public Services generateTypeInactive(CustomerRequest cr){
+    private Services generateClaim(Long servId, CustomerRequest cr){
+        Services existingService = soRepository.findById(servId)
+                .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
+
+        existingService = Services.builder()
+                .servId(existingService.getServId())
+                .servType(cr.getCreqType())
+                .servVehicleNumber(existingService.getServVehicleNumber())
+                .servCreatedOn(LocalDateTime.now())
+                .servStartDate(LocalDateTime.now())
+                .servEndDate(LocalDateTime.now().plusDays(10))
+                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
+                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
+                .users(existingService.getUsers())
+                .customer(existingService.getCustomer()).build();
+
+        return existingService;
+    }
+
+    private Services generateTypeInactive(CustomerRequest cr){
         return Services.builder()
                 .servType(cr.getCreqType())
-                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
                 .servCreatedOn(cr.getCreqCreateDate())
                 .servStatus(EnumModuleServiceOrders.ServStatus.INACTIVE)
-                .users(cr.getCustomer())
-                .customer(cr)
-                .parentServices(generateFeasiblity(cr))
                 .build();
     }
 }
