@@ -31,8 +31,8 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
 
         LocalDateTime semiModifiedDate = servicePremi.getSemiModifiedDate();
         List<ServicePremiCredit> servicePremiCredits = new ArrayList<>();
-        int i;
-        for (i = 1; i <= 12; i++) {
+
+        for (int i = 1; i <= 12; i++) {
             ServicePremiCredit servicePremiCredit = new ServicePremiCredit();
             LocalDateTime dateTime = semiModifiedDate.plusMonths(i);
 
@@ -44,7 +44,6 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
             ServicePremiCredit save = secrRepository.save(servicePremiCredit);
             servicePremiCredits.add(save);
         }
-        i = 0;
         log.info("ServPremiImpl::addSecr successfully added service premi credit");
         return servicePremiCredits;
     }

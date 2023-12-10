@@ -100,6 +100,6 @@ public class Employees {
     private List<EmployeeAreaWorkgroup> employeeAreaWorkgroup;
     
 
-    @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
-    private List<ServiceOrders> serviceOrders;
+//    @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
+//    private List<ServiceOrders> serviceOrders;
 }

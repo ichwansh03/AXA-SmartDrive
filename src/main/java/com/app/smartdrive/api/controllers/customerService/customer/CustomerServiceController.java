@@ -6,8 +6,13 @@ import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
+import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -29,6 +35,8 @@ public class CustomerServiceController {
     private final CustomerRequestService customerRequestService;
 
     private final CustomerClaimService customerClaimService;
+
+    private final ServOrderService servOrderService;
 
     @GetMapping("/request")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllUserCustomersRequest(
@@ -117,6 +125,13 @@ public class CustomerServiceController {
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
+    @GetMapping("/requests")
+    public ResponseEntity<?> getAllRequestClosePolis(@RequestParam("userentityid") Long custId){
+        List<ServiceOrders> bySeroStatus = servOrderService.findAllSeroByUserId(custId);
+        List<ServiceOrderRespDto> serviceOrderRespDtos = TransactionMapper.mapEntityListToDtoList(bySeroStatus, ServiceOrderRespDto.class);
+
+        return ResponseEntity.status(HttpStatus.OK).body(serviceOrderRespDtos);
+    }
 
 
 }
