@@ -56,8 +56,8 @@ public class EmployeesController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createEmployee(@RequestBody EmployeesRequestDto employeesDto) {
-        EmployeesRequestDto createdEmployee = employeesService.createEmployee(employeesDto);
-        return new ResponseEntity<>(createdEmployee, HttpStatus.OK);
+    EmployeesRequestDto createdEmployee = employeesService.createEmployee(employeesDto);
+    return new ResponseEntity<>(createdEmployee, HttpStatus.OK);
     }
 
     @GetMapping("/search")
