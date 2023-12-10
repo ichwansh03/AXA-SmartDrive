@@ -1,7 +1,12 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
+import com.app.smartdrive.api.entities.users.Roles;
+import com.app.smartdrive.api.services.auth.AuthenticationService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
@@ -29,12 +34,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@EnableMethodSecurity
 public class UserController {
   private final UserService userService;
+  private final AuthenticationService authenticationService;
 
   @PostMapping("/signin")
-  public ResponseEntity<?> loginCustomer(@Valid @RequestBody LoginDto login){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.loginCustomer(login.getIdentity(), login.getPassword()));
+  public ResponseEntity<?> loginCustomer(@Valid @RequestBody SignInRequest login){
+    return ResponseEntity.status(HttpStatus.OK).body(authenticationService.signin(login));
   }
 
   @PostMapping("/emps/signin")
@@ -48,6 +55,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
+  @PreAuthorize("(hasAuthority('Customer') || hasAuthority('Potential Customer')) && principal.getUserEntityId() == #id")
   public UserDto getUser(@PathVariable("id") Long id) {
     return userService.getByIdDto(id);
   }

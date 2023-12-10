@@ -240,7 +240,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerUserResponseDTO customerUserResponseDTO = CustomerUserResponseDTO.builder()
                 .userEntityId(customer.getUserEntityId())
-                .userName(customer.getUserName())
+                .userName(customer.getUsername())
                 .userFullName(customer.getUserFullName())
                 .userBirthPlace(customer.getUserBirthPlace())
                 .userNationalId(customer.getUserNationalId())

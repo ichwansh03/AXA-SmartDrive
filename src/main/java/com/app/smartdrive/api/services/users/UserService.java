@@ -11,6 +11,7 @@ import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.services.BaseService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 
 public interface UserService extends BaseService<User, Long> {
@@ -34,5 +35,7 @@ public interface UserService extends BaseService<User, Long> {
 
   public String loginEmployee(String identity, String password);
 
-public String changePassword(Long id, PasswordRequestDto passwordRequestDto);
+  public String changePassword(Long id, PasswordRequestDto passwordRequestDto);
+
+  public UserDetailsService userDetailsService();
 }
