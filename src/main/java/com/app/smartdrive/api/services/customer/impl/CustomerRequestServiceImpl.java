@@ -84,8 +84,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CustomerRequest> get(){
-        return this.customerRequestRepository.findAll();
+    public List<CustomerResponseDTO> get(){
+        List<CustomerRequest> customerRequestList = this.customerRequestRepository.findAll();
+        log.info("CustomerRequestServiceImpl::get, get all customer request");
+        return TransactionMapper.mapEntityListToDtoList(customerRequestList, CustomerResponseDTO.class);
     }
 
     @Transactional(readOnly = true)
@@ -99,6 +101,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             }
         });
 
+        log.info("CustomerRequestServiceImpl::getPaging, successfully get all customer request with paging");
         return pageCustomerResponseDTO;
     }
 
@@ -109,12 +112,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .orElseThrow(() -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
                 );
 
+        log.info("CustomerRequestImpl::getCustomerRequestById in ID {} ", existCustomerRequest.getCreqEntityId());
         return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
     @Override
-    public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
@@ -167,6 +171,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         newCustomerRequest.setCustomerInscAssets(cias);
 
         CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
+        log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
         return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
 
@@ -374,6 +379,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         Double totalPremi = premiMain + premiExtend;
 
+        log.info("CustomerRequestServiceImpl:getPremiPrice, successfully calculate premi");
         return totalPremi;
     }
 
@@ -401,6 +407,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
             }
         });
+
+        log.info("CustomerRequestServiceImpl::getPagingCustomerRequest," +
+                " successfully get all customer request who belong to user with ID: {}", user.getUserEntityId());
 
         return pageCustomerResponseDTO;
     }
@@ -444,6 +453,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
+        log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
         return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
@@ -455,6 +465,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         );
 
         this.customerRequestRepository.delete(existCustomerRequest);
+        log.info("CustomerRequestServiceImpl:delete, successfully delete customer request");
     }
 
     @Override
@@ -464,7 +475,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             Long entityId
     ){
 
-        return CustomerRequest.builder()
+        CustomerRequest customerRequest = CustomerRequest.builder()
                 .businessEntity(newEntity)
                 .customer(customer)
                 .creqCreateDate(LocalDateTime.now())
@@ -472,6 +483,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 .creqType(EnumCustomer.CreqType.FEASIBLITY)
                 .creqEntityId(entityId)
                 .build();
+
+        log.info("CustomerRequestServiceImpl:createCustomerRequest, create new customerRequest");
+        return customerRequest;
     }
 
     @Transactional
@@ -484,6 +498,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.POLIS);
 
         this.customerRequestRepository.save(existCustomerRequest);
+        log.info("CustomerRequestServiceImpl:changeRequestTypeToPolis, successfully change creq type to polis");
     }
 
     @Transactional
@@ -496,6 +511,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
 
         this.customerRequestRepository.save(existCustomerRequest);
+        log.info("CustomerRequestServiceImpl:changeRequestTypeToClaim, successfully change creq type to claim");
     }
 
 
@@ -509,6 +525,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
 
         this.customerRequestRepository.save(existCustomerRequest);
+        log.info("CustomerRequestServiceImpl:changeRequestTypeToClose, successfully change creq type to close");
     }
 
 

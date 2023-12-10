@@ -5,6 +5,7 @@ import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscDocService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CustomerInscDocServiceImpl implements CustomerInscDocService {
 
@@ -58,8 +60,10 @@ public class CustomerInscDocServiceImpl implements CustomerInscDocService {
                 throw new Exception("Could not save File: " + fileName + " because : " + e.getMessage());
             }
 
+
         }
 
+        log.info("CustomerInscDocServiceImpl::fileCheck, successfully document checking");
         return listDoc;
     }
 
@@ -67,6 +71,7 @@ public class CustomerInscDocServiceImpl implements CustomerInscDocService {
     @Override
     public void deleteAllCustomerInscDocInCustomerRequest(Long creqEntityId) {
         this.customerInscDocRepository.deleteAllByCadocCreqEntityid(creqEntityId);
+        log.info("CustomerInscDocServiceImpl::deleteAllCustomerInscDocInCustomerRequest, delete all cadoc for inserting a new one");
     }
 
 

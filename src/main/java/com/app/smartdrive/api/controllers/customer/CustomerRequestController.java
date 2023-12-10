@@ -32,11 +32,8 @@ public class CustomerRequestController {
 
     @GetMapping
     public List<CustomerResponseDTO> getAll() {
-        List<CustomerRequest> customerRequestList = this.customerRequestService.get();
-        List<CustomerResponseDTO> customerRequestDTOList = customerRequestList.stream()
-                .map(creq -> this.customerRequestService.convert(creq)).
-                toList();
-        return customerRequestDTOList;
+        List<CustomerResponseDTO> customerRequestList = this.customerRequestService.get();
+        return customerRequestList;
     }
 
     @GetMapping("/page")

@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CustomerRequestService {
-    public List<CustomerRequest> get();
+    public List<CustomerResponseDTO> get();
 
     public Page<CustomerResponseDTO> getPaging(Pageable pageable);
 

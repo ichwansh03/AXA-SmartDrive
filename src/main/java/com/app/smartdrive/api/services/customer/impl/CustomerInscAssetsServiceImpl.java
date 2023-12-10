@@ -9,12 +9,14 @@ import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.app.smartdrive.api.services.customer.CustomerInscAssetsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService {
     @Override
@@ -32,7 +34,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
 
         // new cias
 
-        return CustomerInscAssets.builder()
+        CustomerInscAssets customerInscAssets = CustomerInscAssets.builder()
                 .ciasCreqEntityid(entityId).ciasPoliceNumber(ciasDTO.getCiasPoliceNumber())
                 .ciasYear(ciasDTO.getCiasYear())
                 .ciasStartdate(ciasStartdate)
@@ -46,6 +48,9 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
                 .insuranceType(existInty)
                 .customerRequest(newCustomerRequest)
                 .build();
+
+        log.info("CustomerInscAssetsServiceImpl::createCustomerInscAssets, create new customerInscAssets");
+        return customerInscAssets;
     }
 
     @Override
@@ -70,6 +75,8 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
         cias.setCity(existCity);
         cias.setCarSeries(carSeries);
         cias.setInsuranceType(existInty);
+
+        log.info("CustomerInscAssetsServiceImpl::updateCustomerInscAssets, update customerInscAssets by ID : {}", cias.getCiasCreqEntityid());
     }
 
 
