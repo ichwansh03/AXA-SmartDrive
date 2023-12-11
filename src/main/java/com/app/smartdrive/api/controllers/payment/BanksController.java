@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,9 +36,11 @@ import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/payment")
 public class BanksController {
     private final BankServiceImpl service;
@@ -45,8 +48,21 @@ public class BanksController {
 
     @GetMapping("/banks/all")
     public ResponseEntity<?> getAllBanks(){
-        List<BanksDtoResponse> resultDto = service.getAll();
-        return new ResponseEntity<>(resultDto,HttpStatus.OK);
+        log.debug("Get All Bank ");
+        
+        try{
+            List<BanksDtoResponse> resultDto = service.getAll();
+            if(resultDto.isEmpty()){
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }else{
+                return new ResponseEntity<>(resultDto,HttpStatus.OK);
+            }
+        }catch (Exception e){
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        
+        
     }
     @GetMapping("/banks/{bank_entityid}")
     public ResponseEntity<?> getBanksById(@Valid @PathVariable("bank_entityid") Long bank_entityid){
