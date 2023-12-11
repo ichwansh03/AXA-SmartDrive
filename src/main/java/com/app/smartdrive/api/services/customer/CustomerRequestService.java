@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CustomerRequestService {
-    public List<CustomerRequest> get();
+    public List<CustomerResponseDTO> get();
 
     public Page<CustomerResponseDTO> getPaging(Pageable pageable);
 
@@ -27,7 +27,7 @@ public interface CustomerRequestService {
 
     public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status);
 
-    public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
     public void delete(Long creqEntityId);
 

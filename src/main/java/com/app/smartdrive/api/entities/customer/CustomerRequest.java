@@ -5,6 +5,7 @@ import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,7 +44,7 @@ public class CustomerRequest {
     @Column(name = "creq_modified_date")
     private LocalDateTime creqModifiedDate;
 
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
@@ -62,8 +63,8 @@ public class CustomerRequest {
     @PrimaryKeyJoinColumn
     private CustomerInscAssets customerInscAssets;
 
-    @JsonBackReference
-    @ManyToOne
+//    @JsonBackReference
+    @ManyToOne(targetEntity = EmployeeAreaWorkgroup.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(
             name = "creq_agen_entityid",
             referencedColumnName = "eawg_id",
