@@ -122,7 +122,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
     }
 
-//    @Transactional
+    @Transactional
     @Override
     public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
