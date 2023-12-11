@@ -6,7 +6,6 @@ import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.jobrunr.storage.sql.common.db.Sql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +119,7 @@ public class GlobalExceptions {
     public ResponseEntity<?> saldoIsNotEnoughException(SaldoIsNotEnoughException ex){
         Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-
+    }
 
     @ExceptionHandler(UsernameExistException.class)
     public ResponseEntity<?> userNameExist(UsernameExistException ex){
@@ -147,3 +146,4 @@ public class GlobalExceptions {
 
     }
 }
+

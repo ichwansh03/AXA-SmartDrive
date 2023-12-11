@@ -123,7 +123,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
                     if(saldoSender == null || saldoSender == 0.0){
                         throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp."+ saldoSender + ", Failed: "+ typeTransaksi + ", Harap melakukan pengisian saldo!");
                     }else if(saldoSender < request.getNominall()){
-                         throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp."+ saldoSender + ", Failed: "+ typeTransaksi + ", Saldo anda kurang!");
+                         throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp."+ saldoSender + ", Failed: "+ typeTransaksi + ", Saldo anda kurangg!");
                     }else{
                         Double totalSaldoSender = saldoSender - request.getNominall();
                         userAccounts.setUsac_debet(totalSaldoSender);
