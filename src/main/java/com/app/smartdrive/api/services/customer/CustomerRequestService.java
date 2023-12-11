@@ -27,6 +27,8 @@ public interface CustomerRequestService {
 
     public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status);
 
+    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable pageable, String type, String status);
+
     public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
     public void delete(Long creqEntityId);

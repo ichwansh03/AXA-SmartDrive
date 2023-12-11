@@ -228,8 +228,11 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     @Override
     public Employees getById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+        Employees existEmployees = this.employeesRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Employee with id : " + id + " is not found")
+        );
+
+        return existEmployees;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class CustomerServiceController {
             @RequestParam(value = "type", defaultValue = "ALL") String type,
             @RequestParam(value = "status", defaultValue = "OPEN") String status,
             @RequestParam(value = "sort", defaultValue = "ascending") String sort,
-            @RequestParam(value = "custId") Long custId
+            @RequestParam(value = "custId") Long customerId
     ){
         Pageable paging;
 
@@ -55,11 +55,34 @@ public class CustomerServiceController {
             paging = PageRequest.of(page, size, Sort.by("creqEntityId").ascending());
         }
 
-        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingUserCustomerRequests(custId, paging, type, status);
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingUserCustomerRequests(customerId, paging, type, status);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingCustomerResponseDTO);
     }
 
+    @GetMapping("/request/agen")
+    public ResponseEntity<Page<CustomerResponseDTO>> getAllUAgenCustomersRequest(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "3") int size,
+            @RequestParam(value = "type", defaultValue = "ALL") String type,
+            @RequestParam(value = "status", defaultValue = "OPEN") String status,
+            @RequestParam(value = "sort", defaultValue = "ascending") String sort,
+            @RequestParam(value = "employeeId") Long employeeId,
+            @RequestParam(value = "arwgCode") String arwgCode
+
+    ){
+        Pageable paging;
+
+        if(Objects.equals(sort, "descending")){
+            paging = PageRequest.of(page, size, Sort.by("creqEntityId").descending());
+        }else {
+            paging = PageRequest.of(page, size, Sort.by("creqEntityId").ascending());
+        }
+
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getPagingAgenCustomerRequest(employeeId, arwgCode, paging, type, status);
+
+        return ResponseEntity.status(HttpStatus.OK).body(pagingCustomerResponseDTO);
+    }
 
 
     @GetMapping("request/search")

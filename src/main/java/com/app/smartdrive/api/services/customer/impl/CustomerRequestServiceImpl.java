@@ -17,6 +17,7 @@ import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
@@ -24,11 +25,9 @@ import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
+import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
-import com.app.smartdrive.api.services.master.CarsService;
-import com.app.smartdrive.api.services.master.CityService;
-import com.app.smartdrive.api.services.master.IntyService;
-import com.app.smartdrive.api.services.master.TemiService;
+import com.app.smartdrive.api.services.master.*;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
 import jakarta.persistence.EntityManager;
@@ -55,14 +54,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
-    private final CarsRepository carsRepository;
-
-    private final IntyRepository intyRepository;
-
-    private final CityRepository cityRepository;
-
-    private final UserRepository userRepository;
-
     private final TemiRepository temiRepository;
 
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
@@ -85,7 +76,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final CityService cityService;
 
-    private final EntityManager entityManager;
+    private final ArwgService arwgService;
+
+    private final EmployeesService employeesService;
 
 
     @Transactional(readOnly = true)
@@ -181,6 +174,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
         return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
+
+
 
     @Override
     public CustomerResponseDTO convert(CustomerRequest customerRequest){
@@ -420,6 +415,38 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         log.info("CustomerRequestServiceImpl::getPagingCustomerRequest," +
                 " successfully get all customer request who belong to user with ID: {}", user.getUserEntityId());
+
+        return pageCustomerResponseDTO;
+    }
+
+    @Override
+    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable paging, String type, String status) {
+        AreaWorkGroup existAreaWorkgroup = this.arwgService.getById(arwgCode);
+        Employees existEmployee = this.employeesService.getById(empId);
+        EmployeeAreaWorkgroup existEawg = this.employeeAreaWorkgroupRepository.findByAreaWorkGroupAndEmployees(existAreaWorkgroup, existEmployee).orElseThrow(
+                () -> new EntityNotFoundException("Agen with id : " + empId + " is not found")
+        );
+
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
+
+        Page<CustomerRequest> pageCustomerRequest;
+
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqStatus(existEawg, paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqTypeAndCreqStatus(existEawg, paging, creqType, creqStatus);
+        }
+
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
+        log.info("CustomerRequestServiceImpl::getPagingCustomerRequest," +
+                " successfully get all customer request who belong to agen with ID: {} and areaCode: {}", empId, arwgCode);
 
         return pageCustomerResponseDTO;
     }
