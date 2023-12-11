@@ -63,7 +63,7 @@ public class CustomerRequest {
     private CustomerInscAssets customerInscAssets;
 
     @JsonBackReference
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(
             name = "creq_agen_entityid",
             referencedColumnName = "eawg_id",
