@@ -9,7 +9,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -40,11 +39,10 @@ public class EmployeesController {
 
 
     @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('Employee') && principal.getUserEntityId() == #emp_entityid")
-    public ResponseEntity<?> deleteEmployeesById (@RequestParam Long emp_entityid) {
-            employeesService.deleteById(emp_entityid);
+    public ResponseEntity<?> deleteEmployeesById (@RequestParam Long id) {
+            employeesService.deleteEmployeesById(id);
             return new ResponseEntity<>("Employees deleted successfully", HttpStatus.OK);
-    }
+    } 
 
     @PutMapping("/update/{employeeId}")
     public ResponseEntity<EmployeesRequestDto> updateEmployee(

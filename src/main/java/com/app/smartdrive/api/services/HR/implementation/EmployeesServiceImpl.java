@@ -3,10 +3,15 @@ package com.app.smartdrive.api.services.HR.implementation;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
@@ -23,6 +28,7 @@ import com.app.smartdrive.api.entities.hr.EnumClassHR.emp_type;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserAddress;
+import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
@@ -51,6 +57,8 @@ public class EmployeesServiceImpl implements EmployeesService {
     private final UserUserAccountService userAccountService;
   
     private final UserService userService;
+
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -81,7 +89,7 @@ public class EmployeesServiceImpl implements EmployeesService {
             user.setUserEmail(employeesDto.getEmail());
             if(employeesDto.getGrantAccessUser()==true){
             user.setUserName(employeesDto.getEmail());
-            user.setUserPassword(employeesDto.getEmpPhone().getUsphPhoneNumber());
+            user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
             }
             user.setUserFullName(employeesDto.getEmpName());
             user.setUserNationalId("idn"+user.getUserEntityId());
@@ -112,7 +120,7 @@ public class EmployeesServiceImpl implements EmployeesService {
             userAccountDto.setEnumPaymentType(EnumPaymentType.BANK);
             List<UserUserAccountDto> listUserAccount = new ArrayList<>();
             listUserAccount.add(userAccountDto);
-            userAccountService.createUserAccounts(listUserAccount, user, 5L);
+            userAccountService.createUserAccounts(listUserAccount, user, 1L);
         
         
         employee.setEmpEntityid(user.getUserEntityId());
@@ -131,7 +139,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     public EmployeesRequestDto editEmployee(Long employeeId, EmployeesRequestDto employeesDto) {
     
     Employees existingEmployee = employeesRepository.findById(employeeId)
-            .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + employeeId));
+            .orElseThrow(() -> new EmployeesNotFoundException("Employee not found with id: " + employeeId));
 
     LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
 
@@ -193,6 +201,15 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
     
 
+
+
+    @Override
+  public void deleteEmployeesById(Long empEntitiyid) {
+    Optional<Employees> emp = employeesRepository.findById(empEntitiyid);
+    if(emp.isPresent()){
+      employeesRepository.delete(emp.get());
+    }
+  }
 
     
 
