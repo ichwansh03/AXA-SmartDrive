@@ -11,6 +11,10 @@ import org.apache.catalina.mapper.Mapper;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.UserExistException;
+import com.app.smartdrive.api.Exceptions.UserNotFoundException;
+import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.payment.Request.Fintech.FintechDtoRequests;
 import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechDtoResponse;
 import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechIdForUserDtoResponse;
@@ -26,6 +30,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -39,11 +45,9 @@ public class FintechServiceImpl implements FintechService {
         entityManager.persist(fintech);
         return fintech;
     }
-   
-    
-   
+
     @Override
-    public FintechDtoResponse addFintech(FintechDtoRequests fintechDtoRequests) {
+    public FintechDtoResponse addFintech(FintechDtoRequests fintechDtoRequests){
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
         BusinessEntity businessEntityId = businessEntityService.save(businessEntity);
@@ -53,78 +57,70 @@ public class FintechServiceImpl implements FintechService {
         fintech.setFint_entityid(businessEntityId.getEntityId());
         fintech.setFint_name(fintechDtoRequests.getFint_name());
         fintech.setFint_desc(fintechDtoRequests.getFint_desc());
-        addFintech(fintech);
 
         FintechDtoResponse dto = FintechMapper.convertEntityToDto(fintech);
-        return dto;
+
+        String fintName = fintechDtoRequests.getFint_name();
+        Fintech existingFintech = fintechRepository.findByFintNameOptional(fintName).orElse(null);
+        if(existingFintech == null){
+            addFintech(fintech);
+            return dto;
+        }else{
+            throw new UserExistException(fintName + " Sudah terdaftar ");
+        }
     }
-
-
 
     @Override
     public Boolean deleteFintech(Long fintech_entityid) {
-        Optional<Fintech> findId = fintechRepository.findById(fintech_entityid);
+        Fintech findId = fintechRepository.findById(fintech_entityid).orElse(null);
         List<BusinessEntity> businesData = businessRepository.findAll();
-        if(findId.isPresent()){
-            for (BusinessEntity bisnis: businesData) {
-                if(fintech_entityid.equals(bisnis.getEntityId())){
-                    businessRepository.deleteById(bisnis.getEntityId());
-                    fintechRepository.deleteFintechById(fintech_entityid);
+
+        if(findId == null){
+            throw new UserNotFoundException(fintech_entityid + " Tidak terdaftar ");
+        }else{
+                for (BusinessEntity bisnis: businesData) {  
+                    if(fintech_entityid.equals(bisnis.getEntityId())){
+                        businessRepository.deleteById(bisnis.getEntityId());
+                        fintechRepository.deleteFintechById(fintech_entityid);
+                    }
                 }
-            }
             return true;
         }
-        return false;
-        
     }
-
 
     @Override
     public Boolean updateFintech(Long fint_entityid,FintechDtoRequests requests) {
-        Optional<Fintech> fintechId = fintechRepository.findById(fint_entityid);
+        Fintech fintechData = fintechRepository.findById(fint_entityid).orElse(null);
         List<BusinessEntity> businessData = businessRepository.findAll();
-        Fintech fintech = fintechId.get();
         BusinessEntity businessEntity = new BusinessEntity();
         businessEntity.setEntityModifiedDate(LocalDateTime.now());
-        if(fintechId.isPresent()){
+
+        if(fintechData == null){
+            throw new UserNotFoundException("Terjadi Kesalahan Saat Update Fintech");
+        }else{
             for (BusinessEntity bisnis : businessData) {
                 if(fint_entityid.equals(bisnis.getEntityId())){
-                    if(requests.getFint_name()!=null && requests.getFint_desc()!=null){
-                        bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        fintech.setFint_name(requests.getFint_name());
-                        fintech.setFint_desc(requests.getFint_desc());
-                        businessRepository.save(bisnis);
-                        fintechRepository.save(fintech);
-                    }else if(requests.getFint_name()!=null){
-                        bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        fintech.setFint_name(requests.getFint_name());
-                        businessRepository.save(bisnis);
-                        fintechRepository.save(fintech);
-                    }else if(requests.getFint_desc()!=null){
-                        bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        fintech.setFint_desc(requests.getFint_desc());
-                        businessRepository.save(bisnis);
-                        fintechRepository.save(fintech);
-                    }else{
-                        return false;
-                    }
-                    return true;
+                    bisnis.setEntityModifiedDate(LocalDateTime.now());
+                    fintechData.setFint_name(requests.getFint_name());
+                    fintechData.setFint_desc(requests.getFint_desc());
+                    businessRepository.save(bisnis);
+                    fintechRepository.save(fintechData);
                 }
             }
-        }return false;
-        
+            return true;
+        } 
     }
-
     
-
-
     @Override
     public FintechIdForUserDtoResponse getUserFintId(String fint_name) {
-        Optional<Fintech> getName = fintechRepository.findByFintNameOptional(fint_name);
+        String nameFintech = fint_name;
+        Fintech getName = fintechRepository.findByFintNameOptional(nameFintech).orElse(null);
         FintechIdForUserDtoResponse dto = new FintechIdForUserDtoResponse();
 
-        if(getName.isPresent()){
-            Fintech fintech = getName.get();
+        if(getName == null){
+            throw new UserNotFoundException("Tidak Terdapat Nama Fintech: " + fint_name);
+        }else{
+            Fintech fintech = getName;
             dto.setFint_entityid(fintech.getFint_entityid());
         }
 
@@ -136,38 +132,28 @@ public class FintechServiceImpl implements FintechService {
     public List<FintechDtoResponse> getAll() {
         List<Fintech> listFintech = fintechRepository.findAll();
         List<FintechDtoResponse> listDto = new ArrayList<>();
-        for (Fintech fint : listFintech) {
-            FintechDtoResponse fintechDto = FintechMapper.convertEntityToDto(fint);
-            listDto.add(fintechDto);
+        if(listFintech.isEmpty()){
+            throw new EntityNotFoundException("Data Fintech Masih Kosong");
+        }else{
+            for (Fintech fint : listFintech) {
+                FintechDtoResponse fintechDto = FintechMapper.convertEntityToDto(fint);
+                listDto.add(fintechDto);
+            }
         }
+      
         return listDto;
     }
 
-
     @Override
     public FintechDtoResponse getById(Long id) {
-        Optional<Fintech> idFintech = fintechRepository.findById(id);
-        FintechDtoResponse fintechDto = new FintechDtoResponse();
-        if(idFintech.isPresent()){
-            Fintech fint = idFintech.get();
-            fintechDto = FintechMapper.convertEntityToDto(fint);
-        }
-
-        return fintechDto;
+        Fintech idFintech = fintechRepository.findById(id).orElseThrow(() 
+        -> new EntityNotFoundException(" Tidak terdapat id : " + id));
+        return FintechMapper.convertEntityToDto(idFintech);
     }
 
-    
     @Override
     public FintechDtoResponse save(FintechDtoResponse fintechDto) {
 
         return null;
     }
-
-    
-    
-    
-    
-    
-
-    
 }

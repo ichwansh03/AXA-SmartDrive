@@ -35,31 +35,36 @@ public class GlobalExceptions {
                         HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .setTimestamp(LocalDateTime.now());
 
-        /*
-         * Map<String, String> errors = new HashMap<>();
-         * ex.getFieldErrors().forEach(fieldError -> {
-         * String fieldName = fieldError.getField();
-         * String errorMessage = fieldError.getDefaultMessage();
-         * errors.put(fieldName, errorMessage);
-         * });
-         */
+    //     /*
+    //      * Map<String, String> errors = new HashMap<>();
+    //      * ex.getFieldErrors().forEach(fieldError -> {
+    //      * String fieldName = fieldError.getField();
+    //      * String errorMessage = fieldError.getDefaultMessage();
+    //      * errors.put(fieldName, errorMessage);
+    //      * });
+    //      */
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<?> handleException(
-//            HttpServletRequest request, Exception ex, Locale locale) {
-//
-//        Error error = ErrorUtils.createError(
-//                        ex.getMessage(),
-//                        ex.getLocalizedMessage(),
-//                        HttpStatus.INTERNAL_SERVER_ERROR.value())
-//                .setUrl(request.getRequestURL().toString())
-//                .setReqMethod(request.getMethod())
-//                .setTimestamp(LocalDateTime.now());
-//        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-//    }
+   @ExceptionHandler(Exception.class)
+   public ResponseEntity<?> handleException(
+           HttpServletRequest request, Exception ex, Locale locale) {
+
+       Error error = ErrorUtils.createError(
+                       ex.getMessage(),
+                       ex.getLocalizedMessage(),
+                       HttpStatus.INTERNAL_SERVER_ERROR.value())
+               .setUrl(request.getRequestURL().toString())
+               .setReqMethod(request.getMethod())
+               .setTimestamp(LocalDateTime.now());
+       return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+   }
+
+   @ExceptionHandler(ValidasiRequestException.class)
+   public ResponseEntity<?> handleValidasi(ValidasiRequestException e){
+       return ResponseEntity.status(400).body(e.toString()+ "ERROR VALIDASI MASUK DISINI");
+   }
 
     @ExceptionHandler(UserExistException.class)
     public ResponseEntity<?> userExistException(UserExistException ex) {
@@ -74,6 +79,12 @@ public class GlobalExceptions {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> userNotFoundException(UserNotFoundException ex){
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<?> httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -82,6 +93,11 @@ public class GlobalExceptions {
     public ResponseEntity<?> methodArgumentConversionNotSupportedException(
             MethodArgumentConversionNotSupportedException ex) {
 
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(SaldoIsNotEnoughException.class)
+    public ResponseEntity<?> saldoIsNotEnoughException(SaldoIsNotEnoughException ex){
         Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }

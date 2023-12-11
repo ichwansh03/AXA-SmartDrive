@@ -166,6 +166,18 @@ public class UserServiceImpl implements UserService {
     return "Current password is wrong";
   }
 
+  // @Override
+  // public User getById(Long id) {
+  //   // TODO Auto-generated method stub
+  //   throw new UnsupportedOperationException("Unimplemented method 'getById'");
+  // }
+
+  // @Override
+  // public List<User> getAll() {
+  //   // TODO Auto-generated method stub
+  //   throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+  // }
+
 
   @Override
   public User getById(Long id) {
