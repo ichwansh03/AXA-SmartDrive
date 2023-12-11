@@ -83,18 +83,20 @@ class PartnerAreaWorkgroupControllerTest {
 
 
         PartnerRequest request = new PartnerRequest();
-        request.setPartName("1234567890");
+        request.setPartName("GALLEY LA COMPANY");
         request.setCityId(1L);
         request.setPartNpwp("1234567890");
-        request.setPartAddress("JL BENGKEL");
+        request.setPartAddress("WATER SEVEN");
         request.setPartAccountNo("123");
 
         partner = partnerService.save(request);
 
         PartnerContactRequest partnerContactRequest = new PartnerContactRequest();
         partnerContactRequest.setPartnerId(partner.getPartEntityid());
-        partnerContactRequest.setName("TEST");
-        partnerContactRequest.setPhone("089999999998");
+
+        partnerContactRequest.setName("ICE BERG");
+        partnerContactRequest.setPhone("089999999999");
+
         partnerContactRequest.setGrantUserAccess(true);
 
         partnerContact = partnerContactService.create(partnerContactRequest);

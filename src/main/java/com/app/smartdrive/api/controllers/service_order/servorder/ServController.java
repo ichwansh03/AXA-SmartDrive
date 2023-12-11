@@ -55,12 +55,6 @@ public class ServController {
         return new ResponseEntity<>(serviceRespDto, HttpStatus.OK);
     }
 
-    @PutMapping("/{servId}")
-    public ResponseEntity<?> updateServiceOrders(@Valid @RequestBody ServiceReqDto serviceReqDto, @PathVariable("servId") Long servId) {
-
-        return new ResponseEntity<>(servService.updateServices(serviceReqDto, servId), HttpStatus.OK);
-    }
-
     private ServiceRespDto responseService(Services services){
 
         User userById = userService.getUserById(services.getUsers().getUserEntityId()).get();

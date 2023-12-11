@@ -24,5 +24,5 @@ public class EmployeesDto {
     private Double empNetSalary;
     private String empAccountNumber;
     private LocalDateTime empModifiedDate;
-    private String empJobCode;
+    private EmployeesJobTypeResponseDto jobType;
 }

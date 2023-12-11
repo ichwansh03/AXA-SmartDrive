@@ -1,7 +1,5 @@
 package com.app.smartdrive.api.entities.service_order.enumerated;
 
-import lombok.RequiredArgsConstructor;
-
 public class EnumModuleServiceOrders {
     public enum SeroStatus {
         OPEN,

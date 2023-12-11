@@ -1,20 +1,11 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
-import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
-import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.Services;
+import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
+import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.master.TestaRepository;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
+import com.app.smartdrive.api.repositories.service_orders.*;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,38 +28,44 @@ public class ServOrderImpl implements ServOrderService {
     private final TestaRepository testaRepository;
     private final TewoRepository tewoRepository;
 
-    SoAdapter soAdapter = new SoAdapter();
+    private SoAdapter soAdapter;
 
     @Transactional
     @Override
     public ServiceOrders addServiceOrders(Long servId) throws Exception {
 
         Services services = soRepository.findById(servId).get();
-
-        ServiceOrders orders = generateServiceOrders(services);
-
-        ServiceOrders seroSaved = soOrderRepository.save(orders);
-        log.info("SoOrderServiceImpl::addServiceOrders in ID {}",orders.getSeroId());
-
+        ServiceOrders orders;
         ServOrderTaskImpl servOrderTask = new ServOrderTaskImpl(soTasksRepository, soWorkorderRepository, testaRepository, tewoRepository);
-        List<ServiceOrderTasks> seotList;
 
         switch (services.getServType().toString()){
-            case "FEASIBLITY" -> seotList = servOrderTask.addFeasiblityList(seroSaved);
+            case "FEASIBLITY" -> {
+                orders = generateSeroFeasiblity(services);
+                servOrderTask.addFeasiblityList(orders);
+                log.info("ServOrderImpl::addServiceOrders create FEASIBLITY tasks");
+            }
             case "POLIS" -> {
-                seotList = servOrderTask.addPolisList(seroSaved);
-                seroSaved.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE);
+                orders = generateSeroPolis(services);
+                ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
+
+                if (checkAllTaskComplete(fs.getSeroId())){
+                    fs.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
+                    fs.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
+                    soOrderRepository.save(fs);
+                    servOrderTask.addPolisList(orders);
+                    log.info("ServOrderImpl::addServiceOrders create new POLIS tasks");
+                } else {
+                    throw new TasksNotCompletedException("Completed your feasiblity tasks before new request");
+                }
+
             }
-            case "CLAIM" -> seotList = servOrderTask.addClaimList(seroSaved);
-            default -> {
-                seotList = servOrderTask.closeAllTasks(seroSaved);
-                seroSaved.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
+            case "CLAIM" -> {
+                orders = generateSeroClaim(services);
+                servOrderTask.addClaimList(orders);
+                log.info("ServOrderImpl::addServiceOrders create new CLAIM tasks");
             }
+            default -> orders = generateSeroFeasiblity(services);
         }
-
-        List<ServiceOrderTasks> serviceOrderTasks = seotList;
-
-        seroSaved.setServiceOrderTasks(serviceOrderTasks);
 
         return orders;
     }
@@ -91,8 +88,11 @@ public class ServOrderImpl implements ServOrderService {
         return allSeroByServId;
     }
 
-    @Transactional
     @Override
+    public List<ServiceOrders> findAllSeroByUserId(Long custId) {
+        return soOrderRepository.findByServices_Users_UserEntityId(custId);
+    }
+
     public boolean checkAllTaskComplete(String seroId) {
 
         List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
@@ -112,44 +112,58 @@ public class ServOrderImpl implements ServOrderService {
         return checkedAll;
     }
 
-
-    @Override
     @Transactional
-    public ServiceOrderReqDto updateServiceOrders(ServiceOrderReqDto serviceOrderReqDto, String seroId) throws Exception {
-        Optional<ServiceOrders> serviceOrders = soOrderRepository.findById(seroId);
-
-        if (serviceOrders.isPresent() && checkAllTaskComplete(seroId)){
-            String formatSeroId = soAdapter.formatServiceOrderId(serviceOrders.get().getServices());
-            ServiceOrders newServOrders = ServiceOrders.builder()
-                    .seroId(formatSeroId)
-                    .seroOrdtType(serviceOrderReqDto.getSeroOrdtType())
-                    .seroStatus(serviceOrderReqDto.getSeroStatus())
-                    .seroReason(serviceOrderReqDto.getSeroReason())
-                    .servClaimNo(serviceOrderReqDto.getServClaimNo())
-                    .servClaimStartdate(serviceOrderReqDto.getServClaimStartdate())
-                    .servClaimEnddate(serviceOrderReqDto.getServClaimEnddate())
-                    .services(serviceOrders.get().getServices()).build();
-            soOrderRepository.save(newServOrders);
-        } else {
-            throw new EntityNotFoundException("Data for id "+seroId+"is not found or all task are not finished");
-        }
-
-        return serviceOrderReqDto;
-    }
-
-    private ServiceOrders generateServiceOrders(Services services){
+    private ServiceOrders generateSeroFeasiblity(Services services){
+        soAdapter = new SoAdapter();
         String formatSeroId = soAdapter.formatServiceOrderId(services);
 
         ServiceOrders serviceOrders = new ServiceOrders();
         serviceOrders = ServiceOrders.builder()
                 .seroId(formatSeroId)
+                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
                 .seroStatus(serviceOrders.getSeroStatus())
-                .seroReason(serviceOrders.getSeroReason())
-                .servClaimNo(serviceOrders.getServClaimNo())
-                .servClaimStartdate(services.getServStartDate())
-                .servClaimEnddate(services.getServStartDate().plusYears(1))
+                .seroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId())
+                .employees(services.getCustomer().getEmployeeAreaWorkgroup())
                 .services(services).build();
 
-        return serviceOrders;
+        return soOrderRepository.save(serviceOrders);
+    }
+
+    @Transactional
+    private ServiceOrders generateSeroPolis(Services services){
+        soAdapter = new SoAdapter();
+        String formatSeroId = soAdapter.formatServiceOrderId(services);
+        ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
+        ServiceOrders serviceOrders = new ServiceOrders();
+        serviceOrders = ServiceOrders.builder()
+                .seroId(formatSeroId)
+                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
+                .seroStatus(serviceOrders.getSeroStatus())
+                .parentServiceOrders(fs)
+                .seroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId())
+                .employees(services.getCustomer().getEmployeeAreaWorkgroup())
+                .services(services).build();
+
+        return soOrderRepository.save(serviceOrders);
+    }
+
+    @Transactional
+    private ServiceOrders generateSeroClaim(Services services){
+        soAdapter = new SoAdapter();
+        String formatSeroId = soAdapter.formatServiceOrderId(services);
+        ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndServices_ServId("PL%", services.getServId());
+        ServiceOrders serviceOrders = new ServiceOrders();
+        serviceOrders = ServiceOrders.builder()
+                .seroId(formatSeroId)
+                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
+                .seroStatus(serviceOrders.getSeroStatus())
+                .servClaimStartdate(LocalDateTime.now())
+                .servClaimEnddate(LocalDateTime.now().plusDays(10))
+                .parentServiceOrders(pl)
+                .seroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId())
+                .employees(services.getCustomer().getEmployeeAreaWorkgroup())
+                .services(services).build();
+
+        return soOrderRepository.save(serviceOrders);
     }
 }

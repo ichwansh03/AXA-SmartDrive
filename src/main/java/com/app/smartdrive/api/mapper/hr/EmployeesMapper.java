@@ -22,7 +22,7 @@ public class EmployeesMapper {
         .empNetSalary(employees.getEmpNetSalary())
         .empAccountNumber(employees.getEmpAccountNumber())
         .empModifiedDate(employees.getEmpModifiedDate())
-        .empJobCode(employees.getEmpJobCode())
+        .jobType(TransactionMapper.mapEntityToDto(employees.getJobType(), EmployeesJobTypeResponseDto.class))
             .build();
         return employeesDto;
     }

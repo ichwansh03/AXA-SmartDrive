@@ -1,7 +1,9 @@
 package com.app.smartdrive.api.dto.customer.response;
 
 import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import lombok.AllArgsConstructor;
@@ -18,7 +20,7 @@ import java.time.LocalDateTime;
 public class CustomerResponseDTO {
     private Long creqEntityId;
 
-    private BussinessEntityResponseDTO bussinessEntity;
+    private BussinessEntityResponseDTO businessEntity;
         
     private LocalDateTime creqCreateDate;
     
@@ -28,15 +30,11 @@ public class CustomerResponseDTO {
 
     private LocalDateTime creqModifiedDate;
 
-    private CustomerUserResponseDTO customer;
-    
-    private CustomerClaim customerClaim;
+    private UserDto customer;
 
     private CiasResponseDTO customerInscAssets;
 
-    private CustomerUserResponseDTO employee;
+    private EmployeesAreaWorkgroupResponseDto employeeAreaWorkgroup;
 
-    private EmployeeAreaWorkgroupDto employeeAreaWorkgroup;
-
-    private ClaimResponseDTO claimResponseDTO;
+    private ClaimResponseDTO customerClaim;
 }

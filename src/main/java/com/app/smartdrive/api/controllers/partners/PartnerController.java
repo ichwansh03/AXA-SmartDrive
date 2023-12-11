@@ -5,14 +5,18 @@ import com.app.smartdrive.api.dto.partner.PartnerContactDto;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.dto.partner.request.PartnerContactRequest;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
+import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.partner.PartnerAreaWorkgroup;
 import com.app.smartdrive.api.entities.partner.PartnerContact;
 import com.app.smartdrive.api.entities.partner.PartnerContactEntityId;
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.partner.implementation.PartnerContactServiceImpl;
 import com.app.smartdrive.api.services.partner.implementation.PartnerServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +34,7 @@ public class PartnerController {
 
     private final PartnerServiceImpl partnerService;
     private final PartnerContactServiceImpl partnerContactService;
+    private final SoOrderRepository soOrderRepository;
 
     @PostMapping
     public ResponseEntity<PartnerDto> createPartner(@Valid @RequestBody PartnerRequest request){
@@ -67,5 +72,10 @@ public class PartnerController {
     @GetMapping("/{id}")
     public ResponseEntity<PartnerDto> getById(@PathVariable("id") Long id){
         return ResponseEntity.ok(TransactionMapper.mapEntityToDto(partnerService.getById(id), PartnerDto.class));
+    }
+    @GetMapping("/workorder")
+    public ResponseEntity<?> getAllService(HttpServletRequest request){
+        Partner partner = partnerService.getById(Long.valueOf(request.getHeader("PARTNER-ID")));
+        return ResponseEntity.status(200).body(TransactionMapper.mapEntityListToDtoList(soOrderRepository.findByPartner(partner), ServiceOrderRespDto.class));
     }
 }

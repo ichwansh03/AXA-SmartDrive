@@ -19,7 +19,7 @@ public class ProfileRequestDto {
   @NotBlank(message = "Name may not be blank")
   private String userFullName;
   @Email(message = "email must be valid")
-  @NotBlank(message = "Username may not be blank")
+  @NotBlank(message = "Email may not be blank")
   private String userEmail;
 
   private String userBirthPlace;

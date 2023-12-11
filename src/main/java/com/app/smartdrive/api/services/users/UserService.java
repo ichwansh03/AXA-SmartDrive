@@ -11,28 +11,23 @@ import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.services.BaseService;
+import jakarta.transaction.Transactional;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 
 public interface UserService extends BaseService<User, Long> {
   public User save(User user);
 
-  public UpdateUserRequestDto save(UpdateUserRequestDto userPost, Long id);
-
   public User createUserCustomer(CreateUserDto userPost);
 
   public User createUser(ProfileRequestDto userPost);
 
+  @Transactional
+  UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id);
+
   public Optional<User> getUserById(Long id);
 
-  public String loginUser(String identity, String password, List<RoleName> roleName);
+  public String changePassword(Long id, PasswordRequestDto passwordRequestDto);
 
-  public UserDto getByIdDto(Long id);
-
-  public List<UserDto> getAllDto();
-
-  public String loginCustomer(String identity, String password);
-
-  public String loginEmployee(String identity, String password);
-
-public String changePassword(Long id, PasswordRequestDto passwordRequestDto);
+  public UserDetailsService userDetailsService();
 }
