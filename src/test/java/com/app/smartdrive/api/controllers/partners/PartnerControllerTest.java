@@ -65,7 +65,7 @@ class PartnerControllerTest {
 
     @BeforeEach
     void setUp() {
-//        partnerRepository.deleteAll();
+        partnerRepository.deleteAll();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
@@ -77,10 +77,7 @@ class PartnerControllerTest {
                         .header("PARTNER-ID", 1027)
         ).andExpectAll(
                 status().isOk()
-        ).andDo(result -> {
-            List<ServiceOrderRespDto> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<ServiceOrderRespDto>>() {});
-            log.info(objectMapper.writeValueAsString(response));
-        });
+        );
     }
 
     @Test
@@ -131,6 +128,7 @@ class PartnerControllerTest {
         ).andDo(result -> {
             PartnerDto partnerDto = objectMapper.readValue(result.getResponse().getContentAsString(), PartnerDto.class);
             assertEquals(partnerDto.getPartName(), request.getPartName());
+
         });
     }
 
@@ -144,6 +142,7 @@ class PartnerControllerTest {
         ).andDo(result -> {
             Error error = objectMapper.readValue(result.getResponse().getContentAsString(), Error.class);
             assertEquals("Partner not found by id 999", error.getMessage());
+           // log.info(error.toString());
         });
 
     }

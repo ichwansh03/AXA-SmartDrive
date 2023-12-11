@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
@@ -75,8 +76,12 @@ public class ServImpl implements ServService {
         return byId;
     }
 
-    @Transactional
     @Override
+    public ServiceReqDto updateServices(ServiceReqDto serviceReqDto, Long servId) {
+        return null;
+    }
+
+    @Transactional
     public Services updateService(Long servId, Services services) throws Exception {
 
         Services existingService = soRepository.findById(servId)
