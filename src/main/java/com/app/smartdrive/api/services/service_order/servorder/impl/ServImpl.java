@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
@@ -48,7 +49,7 @@ public class ServImpl implements ServService {
                 soWorkorderRepository, testaRepository, tewoRepository);
 
         switch (cr.getCreqType().toString()){
-            case "FEASIBLITY" -> serv = generateFeasiblity(cr);
+            // case "FEASIBLITY" -> serv = generateFeasiblity(cr);
             case "POLIS" -> {
                 Services servFs = soRepository.findByServTypeAndCustomer_CreqEntityId(EnumCustomer.CreqType.FEASIBLITY, cr.getCreqEntityId());
                 log.info("Call ID CR {} ", servFs.getServId());
@@ -80,19 +81,8 @@ public class ServImpl implements ServService {
         return byId;
     }
 
-    private Services generateFeasiblity(CustomerRequest cr){
-        return Services.builder()
-                .servType(cr.getCreqType())
-                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servCreatedOn(cr.getCreqCreateDate())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusDays(7))
-                .users(cr.getCustomer())
-                .customer(cr)
-                .build();
-    }
-
     private Services generatePolis(Long servId, CustomerRequest cr) {
+
 
         Services existingService = soRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("ID is not found"));

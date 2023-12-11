@@ -74,6 +74,7 @@ public class PartnerServiceImpl implements PartnerService {
         }
 
         User user = userService.createUser(userDto);
+
         userRolesService.createUserRole(EnumUsers.RoleName.PR, user);
 
         return userService.save(user);

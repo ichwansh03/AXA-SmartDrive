@@ -1,14 +1,14 @@
 package com.app.smartdrive.api.mapper.payment.PaymentTransactions;
 
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupBankRequests;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupBanksResponse;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransactionsDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransaksiResponse;
 
 import lombok.Data;
 
 @Data
-public class TopupBanksMapper {
-    public static TopupBanksResponse mapperTransactionsDto(TopupBankRequests request){
-        TopupBanksResponse dto = TopupBanksResponse.builder()
+public class TransaksiMapper {
+    public static TransaksiResponse mapperTransactionsDto(TransactionsDtoRequests request){
+        TransaksiResponse dto = TransaksiResponse.builder()
         .usac_accountno(request.getUsac_accountno())
         .patr_usac_accountNo_to(request.getPatr_usac_accountNo_to())
         .nominall(request.getNominall())

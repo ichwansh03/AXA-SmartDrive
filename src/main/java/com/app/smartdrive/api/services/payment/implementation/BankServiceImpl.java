@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.UserNotFoundException;
 import com.app.smartdrive.api.dto.payment.Request.Banks.BanksDtoRequests;
 import com.app.smartdrive.api.dto.payment.Response.Banks.BanksDtoResponse;
 import com.app.smartdrive.api.dto.payment.Response.Banks.BanksIdForUserDtoResponse;
@@ -38,18 +40,6 @@ public class BankServiceImpl implements BankService {
         return banks;
     }
 
-    
-
-
-    @Override
-    public BanksDtoResponse save(BanksDtoResponse entity) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-
-
     @Override
     public BanksDtoResponse addBankss(BanksDtoRequests requests) {
         BusinessEntity busines = new BusinessEntity();
@@ -61,79 +51,78 @@ public class BankServiceImpl implements BankService {
         banks.setBank_entityid(businessEntityId.getEntityId());
         banks.setBank_name(requests.getBank_name());
         banks.setBank_desc(requests.getBank_desc());
-        addaBanks(banks);
-
-        BanksDtoResponse dto = BanksMapper.convertEntityToDto(banks);
         
-        return dto;
+        BanksDtoResponse dto = BanksMapper.convertEntityToDto(banks);
+
+        String bankName = requests.getBank_name();
+        Banks banksName = banksRepository.findByBankNameOptional(bankName).orElse(null);
+
+        if(banksName == null){
+            addaBanks(banks);
+            return dto;
+        }else{
+            throw new EntityNotFoundException(bankName + " Sudah Terdaftar");
+        }
+        
+       
     }
-
-
-
 
     @Override
     public BanksDtoResponse getById(Long id) {
-        Optional<Banks> idBanks = banksRepository.findById(id);
-        Banks banks = idBanks.get();
+        Banks banks = banksRepository.findById(id).orElseThrow(() 
+        -> new EntityNotFoundException(id + " Tidak terdaftar "));
         BanksDtoResponse dto = BanksMapper.convertEntityToDto(banks);
         return dto;
     }
-
 
     @Override
     public List<BanksDtoResponse> getAll() {
         List<Banks> banksList = banksRepository.findAll();
         List<BanksDtoResponse> banksDtos = new ArrayList<>();
-        for (Banks banks : banksList) {
-            BanksDtoResponse dto = BanksMapper.convertEntityToDto(banks);
-            banksDtos.add(dto);
+        if(banksList.isEmpty()){
+            throw new EntityNotFoundException("Data masih kosong");
+        }else{
+            for (Banks banks : banksList) {
+                BanksDtoResponse dto = BanksMapper.convertEntityToDto(banks);
+                banksDtos.add(dto);
+            }
         }
         return banksDtos;
     }
 
-   
-
     @Override
     public Boolean updateBanks(Long bank_entityid,BanksDtoResponse banksDto) {
-        Optional<Banks> banksId = banksRepository.findById(bank_entityid);
+        Banks banks = banksRepository.findById(bank_entityid).orElse(null);
         List<BusinessEntity> listBusinessEntities = businessEntityService.getAll();
-        Banks bankss = banksId.get();
         BusinessEntity busines = new BusinessEntity();
         busines.setEntityModifiedDate(LocalDateTime.now());
-        if(banksId.isPresent()){
+        if(banks == null){
+            throw new EntityNotFoundException("Terjadi kesalahan dalam mengupdate banks");
+        }else{
             for (BusinessEntity bisnis: listBusinessEntities) {
                 if(bank_entityid.equals(bisnis.getEntityId())){
                     if(banksDto.getBank_name()!=null && banksDto.getBank_desc()!=null){
                         bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        bankss.setBank_name(banksDto.getBank_name());
-                        bankss.setBank_desc(banksDto.getBank_desc());
+                        banks.setBank_name(banksDto.getBank_name());
+                        banks.setBank_desc(banksDto.getBank_desc());
                         repositoryBisnis.save(bisnis);
-                        banksRepository.save(bankss);
-                    }else if(banksDto.getBank_name()!=null){
-                        bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        bankss.setBank_name(banksDto.getBank_name());
-                        repositoryBisnis.save(bisnis);
-                        banksRepository.save(bankss);
-                    }else if(banksDto.getBank_desc()!=null){
-                        bisnis.setEntityModifiedDate(LocalDateTime.now());
-                        bankss.setBank_desc(banksDto.getBank_desc());
-                        repositoryBisnis.save(bisnis);
-                        banksRepository.save(bankss);
-                    }else{
-                        return false;
+                        banksRepository.save(banks);
                     }
-                    return true;
+                   
                 }
             }
+            return true;
         }
-        return false;
+
     }
 
     @Override
     public Boolean deleteBanks(Long bank_entityid) {
-        Optional<Banks> idBanks = banksRepository.findById(bank_entityid);
+        Banks idBanks = banksRepository.findById(bank_entityid).orElse(null);
         List<BusinessEntity> listBisnis = repositoryBisnis.findAll();
-        if(idBanks.isPresent()){
+        if(idBanks == null){
+            throw new EntityNotFoundException("ID : " + bank_entityid + " Tidak terdaftar ");
+        }else{
             for (BusinessEntity bisnis : listBisnis) {
                 if(bank_entityid.equals(bisnis.getEntityId())){
                     banksRepository.deleteByID(bank_entityid);
@@ -141,17 +130,18 @@ public class BankServiceImpl implements BankService {
                 }
             }
             return true;
-        }else{
-            return false;
         }
-
     }
+
     @Override
     public BanksIdForUserDtoResponse getBanksUser(String bank_name) {
         List<Banks> banksData = banksRepository.findAll();
-        Optional<Banks> banksName = banksRepository.findByBankNameOptional(bank_name);
+        Banks banksName = banksRepository.findByBankNameOptional(bank_name).orElse(null);
         BanksIdForUserDtoResponse bankDtoId = new BanksIdForUserDtoResponse();
-        if(banksName.isPresent()){
+        
+        if(banksName == null){
+            throw new UserNotFoundException(bank_name + " Tidak terdaftar");
+        }else{
             for (Banks banks : banksData) {
                 if(bank_name.equals(banks.getBank_name())){
                     bankDtoId.setBank_entity_id(banks.getBank_entityid());
@@ -160,4 +150,10 @@ public class BankServiceImpl implements BankService {
         }
         return bankDtoId;
     }
+
+    @Override
+    public BanksDtoResponse save(BanksDtoResponse entity) {
+        return null;
+    }
+
 }

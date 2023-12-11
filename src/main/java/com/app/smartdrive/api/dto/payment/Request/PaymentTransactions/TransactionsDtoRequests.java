@@ -10,28 +10,27 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class TopupFintechRequests {
-    @NotBlank(message = "Tidak Boleh Kosong")
+public class TransactionsDtoRequests {
+    
+    @NotBlank(message = "Tidak boleh kosong")
     private String usac_accountno;
 
-    @NotBlank(message = "Tidak Boleh Kosong")
+    @NotBlank(message = "Tidak boleh kosong")
     private String patr_usac_accountNo_to;
    
-    @NotNull(message = "Tidak Boleh Kosong")
+    @NotNull(message = "Tidak boleh kosong nominalnya")
     private Double nominall;
     
-    @NotBlank(message = "Tidak Boleh Kosong")
+    @NotBlank(message = "Tidak boleh kosong")
     private String patr_notes;
-    
-    @NotNull(message = "Tidak Boleh Kosong")
+
+    @NotNull(message = "Silahkan pilih tipe transaksi terlebih dahulu: TOPUP_BANK / TOPUP_FINTECH / TRANSFER / SALARY / PREMI / CLAIM_EVENT / PAID_PARTNER")
     @Enumerated(EnumType.STRING)
     private EnumClassPayment.EnumPayment enumPayment;
     
-    @NotBlank(message = "Tidak Boleh Kosong")
+    @NotBlank(message = "Tidak boleh kosong")
     private String patr_invoice_no;
 }
