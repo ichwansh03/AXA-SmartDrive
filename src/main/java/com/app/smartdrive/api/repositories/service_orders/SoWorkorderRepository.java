@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -23,5 +24,5 @@ public interface SoWorkorderRepository extends JpaRepository<ServiceOrderWorkord
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    int updateSowoStatus(@Param("sowoStatus") Boolean sowoStatus, @Param("sowoId") Long sowoId);
+    int updateSowoStatus(@Param("sowoStatus") Boolean sowoStatus, @Param("sowoModDate") LocalDateTime sowoModDate, @Param("sowoId") Long sowoId);
 }

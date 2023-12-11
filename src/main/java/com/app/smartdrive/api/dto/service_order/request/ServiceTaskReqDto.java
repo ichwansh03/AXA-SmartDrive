@@ -26,10 +26,10 @@ public class ServiceTaskReqDto {
     private ServiceOrders serviceOrders;
     private Object generateTasks;
 
-    public ServiceTaskReqDto(String seotName, LocalDateTime seotStartDate, LocalDateTime seotEndDate, EnumModuleServiceOrders.SeotStatus seotStatus, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders, Object generateTasks) {
+    public ServiceTaskReqDto(String seotName, LocalDateTime seotActualStartdate, LocalDateTime seotActualEnddate, EnumModuleServiceOrders.SeotStatus seotStatus, AreaWorkGroup areaWorkGroup, ServiceOrders serviceOrders, Object generateTasks) {
         this.seotName = seotName;
-        this.seotStartDate = seotStartDate;
-        this.seotEndDate = seotEndDate;
+        this.seotActualStartdate = seotActualStartdate;
+        this.seotActualEnddate = seotActualEnddate;
         this.seotStatus = seotStatus;
         this.areaWorkGroup = areaWorkGroup;
         this.serviceOrders = serviceOrders;

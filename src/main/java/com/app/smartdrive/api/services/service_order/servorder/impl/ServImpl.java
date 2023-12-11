@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
@@ -49,15 +48,15 @@ public class ServImpl implements ServService {
                 soWorkorderRepository, testaRepository, tewoRepository);
 
         switch (cr.getCreqType().toString()){
-            // case "FEASIBLITY" -> serv = generateFeasiblity(cr);
+            case "FEASIBLITY" -> serv = generateFeasiblityType(cr);
             case "POLIS" -> {
                 Services servFs = soRepository.findByServTypeAndCustomer_CreqEntityId(EnumCustomer.CreqType.FEASIBLITY, cr.getCreqEntityId());
                 log.info("Call ID CR {} ", servFs.getServId());
-                serv = generatePolis(servFs.getServId(), cr);
+                serv = generatePolisType(servFs.getServId(), cr);
             }
             case "CLAIM" -> {
                 Services servPl = soRepository.findByServTypeAndCustomer_CreqEntityId(EnumCustomer.CreqType.POLIS, cr.getCreqEntityId());
-                serv = generateClaim(servPl.getServId(), cr);
+                serv = generateClaimType(servPl.getServId(), cr);
             }
             default -> serv = generateTypeInactive(cr);
         }
@@ -81,8 +80,19 @@ public class ServImpl implements ServService {
         return byId;
     }
 
-    private Services generatePolis(Long servId, CustomerRequest cr) {
+    private Services generateFeasiblityType(CustomerRequest cr){
+        return Services.builder()
+                .servType(cr.getCreqType())
+                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
+                .servCreatedOn(cr.getCreqCreateDate())
+                .servStartDate(LocalDateTime.now())
+                .servEndDate(LocalDateTime.now().plusDays(7))
+                .users(cr.getCustomer())
+                .customer(cr)
+                .build();
+    }
 
+    private Services generatePolisType(Long servId, CustomerRequest cr) {
 
         Services existingService = soRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
@@ -94,26 +104,19 @@ public class ServImpl implements ServService {
                 .servCreatedOn(LocalDateTime.now())
                 .servStartDate(LocalDateTime.now())
                 .servEndDate(LocalDateTime.now().plusYears(1))
-                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
+                .servInsuranceNo(soAdapter.generatePolis(cr))
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
                 .users(existingService.getUsers())
                 .customer(existingService.getCustomer()).build();
 
         log.info("ServImpl::updateService successfully updated");
 
-        ServPremiImpl servPremi = new ServPremiImpl(semiRepository, secrRepository, soRepository);
-        ServicePremi servicePremi = ServicePremi.builder()
-                .semiServId(existingService.getServId())
-                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
-                .semiPaidType(cr.getCustomerInscAssets().getCiasPaidType().toString())
-                .semiStatus("ACTIVE").build();
-
-        servPremi.addSemi(servicePremi, existingService.getServId());
+        generateServPremi(existingService, cr);
 
         return existingService;
     }
 
-    private Services generateClaim(Long servId, CustomerRequest cr){
+    private Services generateClaimType(Long servId, CustomerRequest cr){
         Services existingService = soRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
 
@@ -124,7 +127,7 @@ public class ServImpl implements ServService {
                 .servCreatedOn(LocalDateTime.now())
                 .servStartDate(LocalDateTime.now())
                 .servEndDate(LocalDateTime.now().plusDays(10))
-                .servInsuranceNo(soAdapter.generatePolisNumber(cr))
+                .servInsuranceNo(soAdapter.generatePolis(cr))
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
                 .users(existingService.getUsers())
                 .customer(existingService.getCustomer()).build();
@@ -138,5 +141,16 @@ public class ServImpl implements ServService {
                 .servCreatedOn(cr.getCreqCreateDate())
                 .servStatus(EnumModuleServiceOrders.ServStatus.INACTIVE)
                 .build();
+    }
+
+    private void generateServPremi(Services services, CustomerRequest cr){
+        ServPremiImpl servPremi = new ServPremiImpl(semiRepository, secrRepository, soRepository);
+        ServicePremi servicePremi = ServicePremi.builder()
+                .semiServId(services.getServId())
+                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
+                .semiPaidType(cr.getCustomerInscAssets().getCiasPaidType().toString())
+                .semiStatus("ACTIVE").build();
+
+        servPremi.addSemi(servicePremi, services.getServId());
     }
 }

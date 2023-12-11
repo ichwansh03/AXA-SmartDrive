@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.repositories.service_orders;
 
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,8 +13,7 @@ import java.util.List;
 @Repository
 public interface SemiRepository extends JpaRepository<ServicePremi, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<ServicePremi> findAllBySemiServId(Long servId);
+    List<ServicePremi> findByServices_ServId(Long servId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Override
