@@ -74,7 +74,7 @@ public class CustomerServiceController {
 
     @PostMapping("/request")
     public ResponseEntity<CustomerResponseDTO> create(
-            @Valid @RequestParam("client") String client,
+            @RequestParam("client") String client,
             @RequestParam("file") MultipartFile[] files
     ) throws Exception{
 
