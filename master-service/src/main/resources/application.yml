@@ -1,25 +1,5 @@
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-server:
-  port: 8090
 spring:
-  application:
-    name: masters
   config:
     import: optional:configserver:http://localhost:8888
-  datasource:
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:sqlserver://localhost:1433;databaseName=smartdrive;encrypt=true;trustServerCertificate=true;
-    username: sa
-    password: admin
-    dbcp2:
-      driver: com.microsoft.sqlserver.jdbc.SQLServerDriver
-  jpa:
-    hibernate:
-      ddl-auto: none
-    database: sql_server
-    database-platform: org.hibernate.dialect.SQLServerDialect
+  application:
+    name: master
