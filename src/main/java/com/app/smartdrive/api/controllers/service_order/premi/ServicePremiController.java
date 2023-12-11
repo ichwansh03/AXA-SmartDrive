@@ -1,8 +1,10 @@
 package com.app.smartdrive.api.controllers.service_order.premi;
 
+import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
 import com.app.smartdrive.api.dto.service_order.request.SemiReqDto;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import jakarta.validation.Valid;
@@ -11,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/premi")
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 public class ServicePremiController {
 
     private final ServPremiService servPremiService;
+    private final ServPremiCreditService servPremiCreditService;
     private final ServService servService;
 
     @PostMapping
@@ -30,5 +32,16 @@ public class ServicePremiController {
         ServicePremi semi = servPremiService.addSemi(servicePremi, 1L);
         SemiReqDto semiReqDtos = TransactionMapper.mapEntityToDto(semi, SemiReqDto.class);
         return new ResponseEntity<>(semiReqDtos, HttpStatus.OK);
+    }
+
+    @GetMapping("/credit")
+    public ResponseEntity<?> getPremiByDuedate(){
+        return new ResponseEntity<>(servPremiCreditService.findByDueDate(), HttpStatus.OK);
+    }
+
+    @PutMapping("/credit/update")
+    public ResponseEntity<?> updatePremiByDuedate(@Valid @RequestBody SecrReqDto secrReqDto){
+
+        return new ResponseEntity<>(servPremiCreditService.updateSecr(secrReqDto), HttpStatus.OK);
     }
 }

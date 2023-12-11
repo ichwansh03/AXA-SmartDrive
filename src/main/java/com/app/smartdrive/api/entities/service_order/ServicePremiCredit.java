@@ -4,6 +4,7 @@ import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -12,6 +13,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
