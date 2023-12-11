@@ -57,6 +57,7 @@ public class Partner {
     @Column(name = "part_modified_date")
     private LocalDateTime partModifiedDate;
 
+
     @OneToMany(mappedBy = "partner")
     private List<ServiceOrders> serviceOrders;
 
