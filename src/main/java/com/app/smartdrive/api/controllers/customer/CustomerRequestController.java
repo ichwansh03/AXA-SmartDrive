@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerRequestController {
     private final CustomerRequestService customerRequestService;
+
+    private final CustomerClaimService customerClaimService;
 
     @GetMapping
     public List<CustomerResponseDTO> getAll() {
@@ -129,7 +132,7 @@ public class CustomerRequestController {
     public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
             @RequestBody ClaimRequestDTO claimRequestDTO
     ){
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerClaim(claimRequestDTO);
+        CustomerResponseDTO customerResponseDTO = this.customerClaimService.updateCustomerClaim(claimRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
@@ -137,7 +140,7 @@ public class CustomerRequestController {
     public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
             @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
     ){
-        ClaimResponseDTO existCustomerClaim = this.customerRequestService.getCustomerClaimById(cuclCreqEntityId);
+        ClaimResponseDTO existCustomerClaim = this.customerClaimService.getCustomerClaimById(cuclCreqEntityId);
         return ResponseEntity.status(HttpStatus.OK).body(existCustomerClaim);
 
     }
@@ -146,14 +149,14 @@ public class CustomerRequestController {
     public ResponseEntity<Void> deleteCustomerClaim(
             @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
     ){
-        this.customerRequestService.deleteCustomerClaim(cuclCreqEntityId);
+        this.customerClaimService.deleteCustomerClaim(cuclCreqEntityId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/close")
     public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.closePolis(closeRequestDTO);
+        CustomerResponseDTO customerResponseDTO = this.customerClaimService.closePolis(closeRequestDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }

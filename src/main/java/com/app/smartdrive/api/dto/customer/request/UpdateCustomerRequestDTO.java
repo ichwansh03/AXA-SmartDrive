@@ -11,9 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateCustomerRequestDTO {
 
-    private String arwg_code;
+    private Long creqAgenEntityId;
 
-    private Long agen_id;
+    private Long agenId;
+
+    private Long employeeId;
 
     private CiasDTO ciasDTO;
 }

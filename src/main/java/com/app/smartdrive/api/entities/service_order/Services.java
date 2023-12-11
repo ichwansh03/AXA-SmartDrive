@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "services", schema = "so")
+@Table(name = "services", schema = "so", uniqueConstraints = @UniqueConstraint(columnNames = "serv_creq_entityid"))
 @DynamicInsert
 @DynamicUpdate
 public class Services {
@@ -67,15 +67,18 @@ public class Services {
 
     @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "serv_creq_entityid", unique = true)
+    @JoinColumn(name = "serv_creq_entityid")
     private CustomerRequest customer;
 
     @JsonIgnore
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrdersSet;
 
-    @JsonIgnore
+    //@PrimaryKeyJoinColumn
+    //@JsonIgnore
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
     private List<ServicePremi> servicePremiSet;
+
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
+    private List<ServicePremiCredit> servicePremiCredits;
 }

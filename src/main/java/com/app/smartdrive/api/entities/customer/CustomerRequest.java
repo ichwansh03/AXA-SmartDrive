@@ -48,6 +48,9 @@ public class CustomerRequest {
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
 
+    @Column(name = "creq_agen_entityid")
+    private Long creqAgenEntityid;
+
 
     @JsonManagedReference
     @OneToOne(mappedBy = "customerRequest", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -59,10 +62,15 @@ public class CustomerRequest {
     @PrimaryKeyJoinColumn
     private CustomerInscAssets customerInscAssets;
 
-    //    @JsonBackReference
-    //    @ManyToOne
-    //    @JoinColumn(name = "creq_agen_entityid", referencedColumnName = "eawg_id")
-    //    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(
+            name = "creq_agen_entityid",
+            referencedColumnName = "eawg_id",
+            insertable = false,
+            updatable = false
+    )
+    private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
 //
     @OneToOne(mappedBy = "customer")

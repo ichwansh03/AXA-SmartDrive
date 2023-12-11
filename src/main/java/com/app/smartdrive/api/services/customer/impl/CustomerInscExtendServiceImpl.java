@@ -8,6 +8,7 @@ import com.app.smartdrive.api.repositories.master.TemiRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscExtendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
 
     private final CustomerInscExtendRepository customerInscExtendRepository;
 
+    @Transactional(readOnly = true)
     @Override
     public List<CustomerInscExtend> getCustomerInscEtend(
             Long[] cuexIds,
@@ -41,7 +43,7 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
 
             CustomerInscExtend cuex = CustomerInscExtend.builder()
                     .cuexName(temi.getTemiName())
-                    .cuex_nominal(nominal)
+                    .cuexNominal(nominal)
                     .cuexTotalItem(1)
                     .customerInscAssets(cias)
                     .cuexCreqEntityid(entityId)
@@ -52,6 +54,7 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
         return ciasCuexs;
     }
 
+    @Transactional
     @Override
     public void deleteAllCustomerInscExtendInCustomerRequest(Long creqEntityId) {
         this.customerInscExtendRepository.deleteAllByCuexCreqEntityid(creqEntityId);

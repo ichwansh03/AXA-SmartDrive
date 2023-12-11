@@ -23,11 +23,6 @@ public class SmartDriveAppApplication implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(SmartDriveAppApplication.class, args);
 
-		JobRunr.configure()
-				.useStorageProvider(new InMemoryStorageProvider())
-				.useBackgroundJobServer()
-				.useDashboard(8080)
-				.initialize();
 	}
 
 	@Override

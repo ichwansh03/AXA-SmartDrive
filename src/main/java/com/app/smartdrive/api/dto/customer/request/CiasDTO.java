@@ -19,11 +19,11 @@ public class CiasDTO {
 
     private String ciasPaidType;
 
-    private Long cias_cars_id;
+    private Long ciasCarsId;
 
-    private String cias_inty_name;
+    private Long ciasCityId;
 
-    private Long cias_city_id;
+    private String ciasIntyName;
 
     private Double currentPrice;
 

@@ -1,8 +1,9 @@
 package com.app.smartdrive.api.entities.hr;
 
+
+
+import java.time.LocalDate;
 import java.util.Date;
-
-
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -24,6 +25,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
@@ -39,7 +41,6 @@ public class EmployeeSalaryDetail {
      @Column(name="emsa_subtotal")
      private Double emsaSubtotal;
 
-//    @MapsId("emsaEmpEntityid")
     @ManyToOne
     @JoinColumn(name = "emsa_emp_entityid")
     @JsonBackReference

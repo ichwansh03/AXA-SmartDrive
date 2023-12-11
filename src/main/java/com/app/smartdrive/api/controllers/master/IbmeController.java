@@ -1,15 +1,17 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.controllers.BaseController;
+import com.app.smartdrive.api.dto.EmailReq;
+import com.app.smartdrive.api.dto.master.request.NotificationReq;
 import com.app.smartdrive.api.dto.master.response.IbmeRes;
 import com.app.smartdrive.api.dto.master.request.IbmeReq;
 import com.app.smartdrive.api.entities.master.InboxMessaging;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.master.EmailService;
 import com.app.smartdrive.api.services.master.IbmeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ import java.util.List;
 @Tag(name = "Master Module")
 public class IbmeController implements BaseController<IbmeReq, Long> {
     private final IbmeService service;
+    private final EmailService emailService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
@@ -40,26 +43,45 @@ public class IbmeController implements BaseController<IbmeReq, Long> {
     }
 
     @Override
+    public ResponseEntity<?> saveData(@Valid @RequestBody IbmeReq request) {
+        return ResponseEntity.ok("OK");
+    }
+
     @Transactional
     @PostMapping
-    public ResponseEntity<?> saveData(@Valid @RequestBody IbmeReq request) {
-        return getResponseEntity(request, new InboxMessaging());
+    public ResponseEntity<?> saveAndSendMail(@Valid @RequestBody NotificationReq request) {
+        IbmeReq ibmeReq = new IbmeReq();
+        ibmeReq.setIbmeDate(request.getIbmeDate());
+        ibmeReq.setIbme_type(request.getIbme_type());
+        ibmeReq.setIbme_entityid_target(request.getIbme_entityid_target());
+        ibmeReq.setIbme_entityid_source(request.getIbme_entityid_source());
+        ibmeReq.setIbme_count(request.getIbme_count());
+        getResponseEntity(ibmeReq, new InboxMessaging());
+
+        EmailReq emailReq = new EmailReq();
+        emailReq.setTo(request.getTargetMail());
+        emailReq.setSubject(request.getSubjectMail());
+        emailReq.setBody(request.getBodyMail());
+        emailService.sendMail(emailReq);
+
+        return ResponseEntity.ok("Email Has Been Sent");
     }
 
     @Override
     @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody IbmeReq request) {
-        return getResponseEntity(request, service.getById(id));
+        InboxMessaging result = getResponseEntity(request, service.getById(id));
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(result, IbmeRes.class));
     }
 
-    private ResponseEntity<?> getResponseEntity(@RequestBody @Valid IbmeReq request, InboxMessaging result) {
+    private InboxMessaging getResponseEntity(@RequestBody @Valid IbmeReq request, InboxMessaging result) {
         if(request.getIbmeDate() != null) {
             LocalDate localDate = LocalDate.parse(request.getIbmeDate().toString(), formatter);
             result.setIbmeDate(localDate);
         }
 
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, result)), HttpStatus.CREATED);
+        return service.save(TransactionMapper.mapDtoToEntity(request, result));
     }
 
     @Override
