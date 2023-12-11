@@ -31,7 +31,7 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_id=?1", nativeQuery=true)
     Optional<EmployeeAreaWorkgroup> findByEawgId(Long eawgId);
 
-    Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
+//    Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
 
     Optional<EmployeeAreaWorkgroup> findByEawgIdAndEawgEntityid(Long eawgId, Long eawgEntityId);
 
@@ -40,12 +40,12 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     @Query(value = "delete from hr.employee_are_workgroup where eawg_id=:eawg_id", nativeQuery = true)
     void deleteEawgById(Long eawg_id);
     
-    EmployeeAreaWorkgroup findByEawgArwgCode(String eawgArwgCode);
+//    EmployeeAreaWorkgroup findByEawgArwgCode(String eawgArwgCode);
     EmployeeAreaWorkgroup findByAreaWorkGroup(AreaWorkGroup areaWorkGroup);
 
-    @Transactional
-    @Query(value = "SELECT * FROM hr.employee_are_workgroup WHERE eawg_entityid =:eawgEntityid AND eawg_arwg_code =:arwgCode", nativeQuery=true)
-    public EmployeeAreaWorkgroup findByAgenAndArwgCode(Long eawgEntityid, String arwgCode);
+//    @Transactional
+//    @Query(value = "SELECT * FROM hr.employee_are_workgroup WHERE eawg_entityid =:eawgEntityid AND eawg_arwg_code =:arwgCode", nativeQuery=true)
+//    public EmployeeAreaWorkgroup findByAgenAndArwgCode(Long eawgEntityid, String arwgCode);
 
 
 }

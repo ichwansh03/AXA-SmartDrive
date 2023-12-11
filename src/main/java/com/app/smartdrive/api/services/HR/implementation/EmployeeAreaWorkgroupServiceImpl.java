@@ -89,7 +89,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
                 AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findById(employeeAreaWorkgroupDto.getArwgCode()).orElse(null);
                 if (areaWorkGroup != null) {
                     employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
-                    employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
+//                    employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
                 }
                 Cities cityInAreaWorkGroup = areaWorkGroup != null ? areaWorkGroup.getCities() : null;
                 if (cityInAreaWorkGroup != null) {
@@ -111,13 +111,13 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         if (optionalEmployeeAreaWorkgroup.isPresent()) {
             EmployeeAreaWorkgroup employeeAreaWorkgroup = optionalEmployeeAreaWorkgroup.get();
 
-            if (!Objects.equals(employeeAreaWorkgroupDto.getArwgCode(), employeeAreaWorkgroup.getEawgArwgCode())) {
+//            if (!Objects.equals(employeeAreaWorkgroupDto.getArwgCode(), employeeAreaWorkgroup.getEawgArwgCode())) {
                 AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findByArwgCode(employeeAreaWorkgroupDto.getArwgCode());
                 if (areaWorkGroup != null) {
                     employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
-                    employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
+//                    employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
                 }
-            }
+//            }
 
             if (!Objects.equals(employeeAreaWorkgroupDto.getEmpEntityid(), employeeAreaWorkgroup.getEawgEntityid())) {
                 Employees employees = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElse(null);
@@ -138,7 +138,9 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<EmployeeAreaWorkgroup> resultPage = employeeAreaWorkgroupRepository.findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(value, value, value, pageable);
+//        Page<EmployeeAreaWorkgroup> resultPage = employeeAreaWorkgroupRepository.findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(value, value, value, pageable);
+
+        Page<EmployeeAreaWorkgroup> resultPage = employeeAreaWorkgroupRepository.findAll(pageable);
 
         List<EmployeesAreaWorkgroupResponseDto> dtos = resultPage.getContent().stream()
                 .map(this::convertToDto)

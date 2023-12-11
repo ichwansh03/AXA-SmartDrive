@@ -119,7 +119,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
     }
 
-    @Transactional
+//    @Transactional
     @Override
     public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
@@ -146,7 +146,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
-        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
+//        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
 
         CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, existCarSeries, existCity, existInty, newCustomerRequest);
 
@@ -436,7 +436,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                         () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
                 );
 
-        existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
+//        existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
 //        existCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
 

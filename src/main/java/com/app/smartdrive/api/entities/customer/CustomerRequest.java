@@ -48,8 +48,8 @@ public class CustomerRequest {
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
 
-    @Column(name = "creq_agen_entityid")
-    private Long creqAgenEntityid;
+//    @Column(name = "creq_agen_entityid")
+//    private Long creqAgenEntityid;
 
 
     @JsonManagedReference
@@ -66,9 +66,7 @@ public class CustomerRequest {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(
             name = "creq_agen_entityid",
-            referencedColumnName = "eawg_id",
-            insertable = false,
-            updatable = false
+            referencedColumnName = "eawg_id"
     )
     private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
