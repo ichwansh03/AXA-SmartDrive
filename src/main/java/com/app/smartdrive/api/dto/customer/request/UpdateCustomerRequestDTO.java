@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateCustomerRequestDTO {
 
-    private Long creqEntityId;
-
-    private Long customerId;
+    private Long creqAgenEntityId;
 
     private Long agenId;
 

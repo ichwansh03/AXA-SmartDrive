@@ -28,7 +28,6 @@ import com.app.smartdrive.api.services.master.IntyService;
 import com.app.smartdrive.api.services.master.TemiService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
-import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,8 +80,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final IntyService intyService;
 
     private final CityService cityService;
-
-    private final EntityManager entityManager;
 
 
     @Transactional(readOnly = true)
@@ -419,10 +416,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public CustomerResponseDTO updateCustomerRequest( UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(updateCustomerRequestDTO.getCreqEntityId())
+    public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
                 .orElseThrow(
-                        () -> new EntityNotFoundException("Customer Request with id " + updateCustomerRequestDTO.getCreqEntityId() + " is not found")
+                        () -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
                 );
 
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
@@ -437,7 +434,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 );
 
 //        existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
-//        existCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+        existCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
 
         CarSeries carSeries = this.carsService.getById(ciasUpdateDTO.getCiasCarsId());
@@ -463,7 +460,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
-        CustomerRequest savedCustomerRequest = this.customerRequestRepository.saveAndFlush(existCustomerRequest);
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
         return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
