@@ -59,13 +59,13 @@ public class EmployeeAreaWorkgroup {
     private LocalDateTime eawgModifiedDate;
 
 
-//    @Column(name = "eawg_arwg_code",length=15)
-//    private String eawgArwgCode;
+    @Column(name = "eawg_arwg_code",length=15)
+    private String eawgArwgCode;
 
 
 //    @MapsId("eawgArwgCode")
     @ManyToOne
-    @JoinColumn(name = "eawg_arwg_code")
+    @JoinColumn(name = "eawg_arwg_code",insertable = false, updatable = false)
     @JsonBackReference
     private AreaWorkGroup areaWorkGroup;
 
@@ -76,7 +76,6 @@ public class EmployeeAreaWorkgroup {
     @JsonIgnore
     private Employees employees;
 
-//     @MapsId("eawgId")
 //     @JsonManagedReference
 //     @OneToMany(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //     private List<CustomerRequest> customerRequests;

@@ -8,8 +8,11 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.dto.master.response.ArwgRes;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
@@ -28,6 +31,7 @@ import com.app.smartdrive.api.services.master.IntyService;
 import com.app.smartdrive.api.services.master.TemiService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -80,6 +84,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final IntyService intyService;
 
     private final CityService cityService;
+
+    private final EntityManager entityManager;
 
 
     @Transactional(readOnly = true)
@@ -141,9 +147,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                         () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
                 );
 
+
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
+        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
-//        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
 
         CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, existCarSeries, existCity, existInty, newCustomerRequest);
 
@@ -183,10 +190,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         User customer = customerRequest.getCustomer();
         InsuranceType insuranceType = cias.getInsuranceType();
         CarSeries carSeries = cias.getCarSeries();
+        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
 
 
 //        Employees employee = eawag.getEmployees();
-//        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
 
         BussinessEntityResponseDTO bussinessEntityResponseDTO = BussinessEntityResponseDTO.builder()
                 .entityId(customerRequest.getBusinessEntity().getEntityId())
@@ -317,28 +324,30 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 //                .build();
 //
 //        // EAWAG
-//        EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto = EmployeeAreaWorkgroupDto.builder()
-//                .empName(eawag.getEmployees().getEmpName())
-//                .cityName(eawag.getAreaWorkGroup().getCities().getCityName())
-//                .provinsi(eawag.getAreaWorkGroup().getCities().getProvinsi().getProvName())
-//                .zoneName(eawag.getAreaWorkGroup().getCities().getProvinsi().getZones().getZonesName())
-//                .build();
-//
-//                // .workGroup(eawag.getAreaWorkGroup().getArwgCode())
+
+        ArwgRes arwgRes = ArwgRes.builder()
+                .arwgCode(eawag.getAreaWorkGroup().getArwgCode())
+                .arwgDesc(eawag.getAreaWorkGroup().getArwgDesc())
+                .build();
+
+        EmployeesAreaWorkgroupResponseDto eawg = EmployeesAreaWorkgroupResponseDto.builder()
+                .areaWorkGroup(arwgRes)
+                .build();
 
 
 
-//        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
-//                .creqEntityId(customerRequest.getCreqEntityId())
+        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+                .creqEntityId(customerRequest.getCreqEntityId())
+                .creqModifiedDate(customerRequest.getCreqModifiedDate())
+                .creqCreateDate(customerRequest.getCreqCreateDate())
+                .creqStatus(customerRequest.getCreqStatus())
+                .creqType(customerRequest.getCreqType())
+                .employeeAreaWorkgroup(eawg)
+                .build();
+
 //                .bussinessEntity(bussinessEntityResponseDTO)
-//                .creqModifiedDate(customerRequest.getCreqModifiedDate())
-//                .creqCreateDate(customerRequest.getCreqCreateDate())
-//                .creqStatus(customerRequest.getCreqStatus())
-//                .creqType(customerRequest.getCreqType())
-//                .customerInscAssets(ciasResponseDTO)
 //                .customer(customerUserResponseDTO)
-//                .build();
-
+//                .customerInscAssets(ciasResponseDTO)
 
             CustomerClaim customerClaim = customerRequest.getCustomerClaim();
 
@@ -356,7 +365,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
 //                .employee(agenUserResponseDTO)
 //                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
-        return new CustomerResponseDTO();
+//        return new CustomerResponseDTO();
+        return customerResponseDTO;
     }
 
     @Transactional(readOnly = true)
@@ -416,10 +426,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
+    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
+        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(updateCustomerRequestDTO.getCreqEntityId())
                 .orElseThrow(
-                        () -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
+                        () -> new EntityNotFoundException("Customer Request with id " + updateCustomerRequestDTO.getCreqEntityId() + " is not found")
                 );
 
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
@@ -428,13 +438,17 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CiasDTO ciasUpdateDTO = updateCustomerRequestDTO.getCiasDTO();
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
-                );
+//        existCustomerRequest.setEmployeeAreaWorkgroup(null);
 
-//        existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
-        existCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+//        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
+//                .orElseThrow(
+//                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
+//                );
+
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findByEawgId(updateCustomerRequestDTO.getAgenId()).get();
+
+        existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
+//        existCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
 
         CarSeries carSeries = this.carsService.getById(ciasUpdateDTO.getCiasCarsId());
@@ -460,9 +474,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
+
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
-        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(employeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
+        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
+
+        return customerResponseDTO;
     }
 
     @Transactional
