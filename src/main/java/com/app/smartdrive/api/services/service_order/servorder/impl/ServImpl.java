@@ -49,7 +49,7 @@ public class ServImpl implements ServService {
                 soWorkorderRepository, testaRepository, tewoRepository);
 
         switch (cr.getCreqType().toString()){
-            case "FEASIBLITY" -> serv = generateFeasiblity(cr);
+            // case "FEASIBLITY" -> serv = generateFeasiblity(cr);
             case "POLIS" -> {
                 Services servFs = soRepository.findByServTypeAndCustomer_CreqEntityId(EnumCustomer.CreqType.FEASIBLITY, cr.getCreqEntityId());
                 log.info("Call ID CR {} ", servFs.getServId());
