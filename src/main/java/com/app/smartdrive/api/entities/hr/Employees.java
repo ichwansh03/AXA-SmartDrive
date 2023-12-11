@@ -75,7 +75,7 @@ public class Employees {
     // @MapsId("empJobCode")
     @ManyToOne
     @JoinColumn(name = "emp_job_code",insertable = false, updatable = false)
-    @JsonBackReference
+    @JsonManagedReference
     private JobType jobType;
 
     @OneToOne(orphanRemoval = true,cascade = CascadeType.ALL)

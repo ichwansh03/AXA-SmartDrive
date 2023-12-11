@@ -8,7 +8,6 @@ import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
@@ -16,14 +15,9 @@ import com.app.smartdrive.api.services.users.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -49,25 +43,9 @@ public class UserServiceImpl implements UserService {
     User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
     businessEntity.setUser(user);
     user.setUserBusinessEntity(businessEntity);
-//    if(userPost.getUserPassword() != null){
-//      String hashedPw = passwordEncoder.encode(userPost.getUserPassword());
-//      user.setUserPassword(hashedPw);
-//    }
     user.setUserEntityId(businessEntity.getEntityId());
     user.setUserModifiedDate(LocalDateTime.now());
     return user;
-  }
-
-  @Override
-  public UserDto getByIdDto(Long id) {
-    return TransactionMapper.mapEntityToDto(userRepo.findById(id).get(), UserDto.class);
-  }
-
-  @Override
-  public List<UserDto> getAllDto() {
-    List<User> users = userRepo.findAll();
-    List<UserDto> userDto = TransactionMapper.mapEntityListToDtoList(users, UserDto.class);
-    return userDto;
   }
 
   @Override
@@ -88,14 +66,12 @@ public class UserServiceImpl implements UserService {
 
     userAddressService.createUserAddress(user, userPost.getUserAddress(), userPost.getCityId());
 
-//    user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
-
     Long paymentId = (userPost.getBankId() != null) ? userPost.getBankId()
         : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
 
     userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
 
-    return save(user);
+    return user;
   }
 
   @Transactional
@@ -108,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public UpdateUserRequestDto save(UpdateUserRequestDto userPost, Long id){
+  public UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id){
     User user = userRepo.findById(id).orElseThrow(
       () -> new EntityNotFoundException("User not found")
       );
@@ -123,32 +99,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public Optional<User> getUserById(Long id) {
     return userRepo.findById(id);
-  }
-
-  @Override
-  public String loginUser(String identity, String password, List<RoleName> roleName) {
-    Optional<User> user = userRepo.findUserByIden(identity);
-    if (user.isPresent()) {
-      List<RoleName> listRole = user.get().getUserRoles().stream().map(role -> role.getRoles().getRoleName()).collect(Collectors.toList());
-      if (listRole.stream().anyMatch(roleName::contains)) {
-        if (true) {
-          return "Access Granted";
-        }
-        return "Wrong Password";
-      }
-      return "Access Denied";
-    }
-    return "Input email atau username atau phoneNumber salah";
-  }
-
-  @Override
-  public String loginCustomer(String identity, String password) {
-    return loginUser(identity, password, Arrays.asList(RoleName.PC, RoleName.CU));
-  }
-
-  @Override
-  public String loginEmployee(String identity, String password) {
-    return loginUser(identity, password, Collections.singletonList(RoleName.EM));
   }
 
   @Override
@@ -176,18 +126,10 @@ public class UserServiceImpl implements UserService {
     };
   }
 
-  private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<UserRoles> roles) {
-    Collection<? extends GrantedAuthority> mapRoles = roles.stream()
-            .map(role -> new SimpleGrantedAuthority(role.getRoles().getRoleName().getValue()))
-            .collect(Collectors.toList());
-    return mapRoles;
-  }
-
-
   @Override
   public User getById(Long id) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getById'");
+    return userRepo.findById(id).orElseThrow(
+            () -> new com.app.smartdrive.api.Exceptions.EntityNotFoundException("User not found!"));
   }
 
   @Override
@@ -195,7 +137,4 @@ public class UserServiceImpl implements UserService {
     List<User> users = userRepo.findAll();
     return users;
   }
-
-
-
 }

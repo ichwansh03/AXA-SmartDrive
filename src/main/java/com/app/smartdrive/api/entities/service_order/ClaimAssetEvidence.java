@@ -8,6 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -15,6 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "claim_asset_evidence", schema = "so")
+@EntityListeners(AuditingEntityListener.class)
 public class ClaimAssetEvidence {
 
     @Id
@@ -40,17 +45,20 @@ public class ClaimAssetEvidence {
     @Column(name = "caev_note")
     private String caevNote;
 
-    @Column(name = "caev_part_entityid")
-    private Long caevPartEntityid;
+    @Column(name = "caev_service_fee")
+    private Double caevServiceFee;
 
-    @Column(name = "caev_sero_id")
-    private String caevSeroId;
+    @CreatedDate
+    @Column(name = "caev_created_date")
+    private LocalDateTime createdDate;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "caev_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "caev_part_entityid")
     Partner caevPartners;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "caev_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "caev_sero_id")
     ServiceOrders caevServiceOrders;
 }

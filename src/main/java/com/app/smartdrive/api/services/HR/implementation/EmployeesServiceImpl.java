@@ -4,69 +4,40 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
-
 import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
+import com.app.smartdrive.api.dto.user.UserUserAccountDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserAddressDto;
-import com.app.smartdrive.api.dto.user.response.UserCityDto;
-import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneIdDto;
-import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
-import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.hr.EnumClassHR.emp_type;
-import com.app.smartdrive.api.entities.master.Cities;
-import com.app.smartdrive.api.entities.partner.Partner;
-import com.app.smartdrive.api.entities.payment.Banks;
-import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserAddress;
-import com.app.smartdrive.api.entities.users.UserAdressId;
 import com.app.smartdrive.api.entities.users.UserPhone;
-import com.app.smartdrive.api.entities.users.UserPhoneId;
-import com.app.smartdrive.api.entities.users.UserRoles;
-import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.mapper.hr.EmployeesMapper;
-import com.app.smartdrive.api.mapper.user.UserMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
-import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
-import com.app.smartdrive.api.repositories.HR.JobTypeRepository;
-import com.app.smartdrive.api.repositories.master.CityRepository;
-import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
-import com.app.smartdrive.api.repositories.users.RolesRepository;
-import com.app.smartdrive.api.repositories.users.UserAddressRepository;
-import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
-import com.app.smartdrive.api.repositories.users.UserRepository;
-import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
-import com.app.smartdrive.api.services.payment.UserAccountsService;
-import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserAddressService;
 import com.app.smartdrive.api.services.users.UserPhoneService;
 import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
 import com.app.smartdrive.api.services.users.UserUserAccountService;
-import com.app.smartdrive.api.services.users.implementation.UserAddressImpl;
-import com.app.smartdrive.api.services.users.implementation.UserPhoneImpl;
-import com.app.smartdrive.api.services.users.implementation.UserRolesImpl;
-import com.app.smartdrive.api.services.users.implementation.UserServiceImpl;
-import com.app.smartdrive.api.utils.NullUtils;
-
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -87,6 +58,8 @@ public class EmployeesServiceImpl implements EmployeesService {
   
     private final UserService userService;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     @Transactional
@@ -100,10 +73,10 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setEmpJoinDate(empJoinDate);
         employee.setEmpStatus(EnumClassHR.status.ACTIVE);
         employee.setEmpType(emp_type.PERMANENT);
-        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         employee.setEmpGraduate(employeesDto.getEmpGraduate());
+        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         employee.setEmpNetSalary(employeesDto.getEmpSalary());
-        employee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
+        employee.setEmpJobCode(employeesDto.getJobType().getJobCode());
         employee.setEmpModifiedDate(LocalDateTime.now());
 
         ProfileRequestDto profileRequestDto = new ProfileRequestDto();
@@ -116,7 +89,7 @@ public class EmployeesServiceImpl implements EmployeesService {
             user.setUserEmail(employeesDto.getEmail());
             if(employeesDto.getGrantAccessUser()==true){
             user.setUserName(employeesDto.getEmail());
-            user.setUserPassword(employeesDto.getEmpPhone().getUsphPhoneNumber());
+            user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
             }
             user.setUserFullName(employeesDto.getEmpName());
             user.setUserNationalId("idn"+user.getUserEntityId());
@@ -125,8 +98,6 @@ public class EmployeesServiceImpl implements EmployeesService {
             
             userRolesService.createUserRole(RoleName.EM, user);
             
-            
-
             UserPhoneDto userPhoneDto = new UserPhoneDto();
             UserPhoneIdDto userPhoneIdDto = new UserPhoneIdDto();
             userPhoneIdDto.setUsphPhoneNumber(employeesDto.getEmpPhone().getUsphPhoneNumber());
@@ -141,6 +112,15 @@ public class EmployeesServiceImpl implements EmployeesService {
             List<UserAddressDto> listAddress = new ArrayList<>();
             listAddress.add(userAddressDto);
             userAddressService.createUserAddress(user, listAddress, employeesDto.getEmpAddress().getCityId());
+
+            
+
+            UserUserAccountDto userAccountDto = new UserUserAccountDto();
+            userAccountDto.setUsac_accountno(employeesDto.getEmpAccountNumber());
+            userAccountDto.setEnumPaymentType(EnumPaymentType.BANK);
+            List<UserUserAccountDto> listUserAccount = new ArrayList<>();
+            listUserAccount.add(userAccountDto);
+            userAccountService.createUserAccounts(listUserAccount, user, 1L);
         
         
         employee.setEmpEntityid(user.getUserEntityId());
@@ -159,7 +139,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     public EmployeesRequestDto editEmployee(Long employeeId, EmployeesRequestDto employeesDto) {
     
     Employees existingEmployee = employeesRepository.findById(employeeId)
-            .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + employeeId));
+            .orElseThrow(() -> new EmployeesNotFoundException("Employee not found with id: " + employeeId));
 
     LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
 
@@ -182,8 +162,6 @@ public class EmployeesServiceImpl implements EmployeesService {
     userAddressRequestDto.setCityId(employeesDto.getEmpAddress().getCityId());
     userAddressService.updateUserAddress(employeeId, userAddress.getUsdrId(), userAddressRequestDto);
 
-
-
     
     existingEmployee.setEmpName(employeesDto.getEmpName());
     existingEmployee.setEmpJoinDate(empJoinDate);
@@ -192,7 +170,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
     existingEmployee.setEmpGraduate(employeesDto.getEmpGraduate());
     existingEmployee.setEmpNetSalary(employeesDto.getEmpSalary());
-    existingEmployee.setEmpJobCode(employeesDto.getEmpJobType().getJobCode());
+    existingEmployee.setEmpJobCode(employeesDto.getJobType().getJobCode());
     existingEmployee.setEmpModifiedDate(LocalDateTime.now());
 
     
@@ -223,10 +201,15 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
     
 
+
+
     @Override
-    public List<Employees> getAllByEmployeeName(String employeeName) {
-        return employeesRepository.findAllByEmpName(employeeName);
+  public void deleteEmployeesById(Long empEntitiyid) {
+    Optional<Employees> emp = employeesRepository.findById(empEntitiyid);
+    if(emp.isPresent()){
+      employeesRepository.delete(emp.get());
     }
+  }
 
     
 

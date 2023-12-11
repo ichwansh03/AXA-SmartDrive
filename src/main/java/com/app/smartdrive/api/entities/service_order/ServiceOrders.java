@@ -52,6 +52,7 @@ public class ServiceOrders {
     @Column(name = "sero_agent_entityid")
     private Long seroAgentEntityid;
 
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "sero_part_id")

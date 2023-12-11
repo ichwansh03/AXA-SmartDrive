@@ -8,7 +8,6 @@ import lombok.Data;
 
 @Data
 public class UserAccountsDtoResponse {
-    
     private String usac_accountno;
     private Double usac_debet;
     private Double usac_credit;

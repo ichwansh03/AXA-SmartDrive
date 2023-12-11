@@ -29,7 +29,7 @@ public class EmployeesRequestDto {
     private Double empSalary;
     private String empAccountNumber;
     private UserAddressRequestDto empAddress;
-    private EmployeesJobTypeResponseDto empJobType;
+    private EmployeesJobTypeResponseDto jobType;
     private Boolean grantAccessUser;
     // private String empAddress2;
     // private CreateUserDto createUserDto;
