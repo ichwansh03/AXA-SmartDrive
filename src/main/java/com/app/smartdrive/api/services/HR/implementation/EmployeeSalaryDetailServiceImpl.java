@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.services.HR.implementation;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-
-import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
-import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetailId;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.hr.TemplateSalary;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
@@ -21,7 +17,6 @@ import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.HR.TemplateSalaryRepository;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.HR.EmployeeSalaryDetailService;
 
 import jakarta.transaction.Transactional;
