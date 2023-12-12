@@ -1,11 +1,11 @@
 package com.app.smartdrive.api.services.service_order.premi.impl;
 
+import com.app.smartdrive.api.Exceptions.CheckPaymentException;
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
-import com.app.smartdrive.api.entities.service_order.ServicePremiCreditId;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
+import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +22,16 @@ import java.util.List;
 public class ServPremiCreditImpl implements ServPremiCreditService {
 
     private final SecrRepository secrRepository;
+    private final SemiRepository semiRepository;
 
     @Override
     public List<ServicePremiCredit> findByServId(Long servId) {
         return secrRepository.findByServices_ServId(servId);
+    }
+
+    @Override
+    public ServicePremiCredit findByDueDate() {
+        return secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
     }
 
     @Transactional
@@ -52,15 +58,10 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     }
 
     @Override
-    public ServicePremiCredit findByDueDate() {
-        return secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
-    }
-
-    @Override
-    public SecrReqDto updateSecr(SecrReqDto secrReqDto) {
+    public boolean updateSecr(SecrReqDto secrReqDto) {
         ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
 
-        ServicePremiCredit build = ServicePremiCredit.builder()
+        ServicePremiCredit newSecr = ServicePremiCredit.builder()
                 .secrId(existSecr.getSecrId())
                 .secrServId(existSecr.getSecrServId())
                 .secrYear(existSecr.getSecrYear())
@@ -69,9 +70,26 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
                 .secrTrxDate(LocalDateTime.now())
                 .secrDuedate(existSecr.getSecrDuedate()).build();
 
-        ServicePremiCredit save = secrRepository.save(build);
-        log.info("ServPremiImpl::updateSecr successfully updated");
-        return TransactionMapper.mapEntityToDto(save, SecrReqDto.class);
+        if (checkPremiPayment(newSecr)){
+            semiRepository.updateSemiStatus("INACTIVE", existSecr.getSecrServId());
+            throw new CheckPaymentException("your payment has passed deadline");
+        } else {
+            log.info("ServPremiImpl::updateSecr successfully updated");
+            secrRepository.save(newSecr);
+            return true;
+        }
+    }
+
+    /**
+     * Scenario 1 : cek pembayaran premi apakah dibulan ini sudah bayar
+     * Scenario 2 : cek total premi yang sudah dibayar apakah sudah sama dengan total tagihan di table service premi
+     * Scenario 3 : jika sudah lanjutkan, namun jika due date minusDays(2) kirim notifikasi ke customer (get email)
+     * Scenario 4 : jika sudah melewati due date maka ubah semi status menjadi INACTIVE
+     */
+    @Override
+    public boolean checkPremiPayment(ServicePremiCredit servicePremiCredit) {
+        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+        return existSecr.getSecrPremiDebet() == null && LocalDateTime.now().isAfter(existSecr.getSecrDuedate());
     }
 
 }

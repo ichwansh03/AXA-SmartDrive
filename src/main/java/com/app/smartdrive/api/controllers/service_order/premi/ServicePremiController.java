@@ -21,21 +21,9 @@ public class ServicePremiController {
 
     private final ServPremiService servPremiService;
     private final ServPremiCreditService servPremiCreditService;
-    private final ServService servService;
-
-    @PostMapping
-    public ResponseEntity<?> addServicePremi(@Valid @RequestBody SemiReqDto semiReqDto){
-        ServicePremi servicePremi = ServicePremi.builder()
-                .semiPaidType(semiReqDto.getSemiPaidType())
-                .semiStatus(semiReqDto.getSemiStatus())
-                .semiPremiDebet(semiReqDto.getSemiPremiDebet()).build();
-        ServicePremi semi = servPremiService.addSemi(servicePremi, 1L);
-        SemiReqDto semiReqDtos = TransactionMapper.mapEntityToDto(semi, SemiReqDto.class);
-        return new ResponseEntity<>(semiReqDtos, HttpStatus.OK);
-    }
 
     @GetMapping("/credit")
-    public ResponseEntity<?> getPremiByDuedate(){
+    public ResponseEntity<?> getServicePremiCredit(){
         return new ResponseEntity<>(servPremiCreditService.findByDueDate(), HttpStatus.OK);
     }
 
