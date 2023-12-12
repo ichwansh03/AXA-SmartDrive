@@ -85,7 +85,7 @@ public class BatchPartnerInvoiceServiceImpl implements BatchPartnerInvoiceServic
     public Double calculatePaidFromCasp(List<ClaimAssetSparepart> claimAssetSparepartList){
         return claimAssetSparepartList.stream()
                 .map(ClaimAssetSparepart::getCaspSubtotal)
-                .reduce(0.0, (Double::sum));
+                .reduce(0.0, ((a,b)-> (a+b)));
     }
 
 }

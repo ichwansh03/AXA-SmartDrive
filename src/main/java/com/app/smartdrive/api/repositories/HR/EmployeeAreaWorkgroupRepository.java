@@ -24,6 +24,9 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_id=?1", nativeQuery=true)
     Optional<EmployeeAreaWorkgroup> findByEawgId(Long eawgId);
 
+    @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_entityid=?1", nativeQuery=true)
+    EmployeeAreaWorkgroup findByEawgEntityid(Long eawgEntityid);
+
     Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
 
     Optional<EmployeeAreaWorkgroup> findByEawgIdAndEawgEntityid(Long eawgId, Long eawgEntityId);

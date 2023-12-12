@@ -6,6 +6,7 @@ import java.util.List;
 import com.app.smartdrive.api.entities.customer.CustomerInscDocId;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -76,9 +77,11 @@ public class EmployeeAreaWorkgroup {
     @JsonIgnore
     private Employees employees;
 
+
 //     @JsonManagedReference
 //     @OneToMany(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //     private List<CustomerRequest> customerRequests;
+
 
 
 

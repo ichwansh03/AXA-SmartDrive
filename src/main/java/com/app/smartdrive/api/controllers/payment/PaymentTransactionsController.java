@@ -14,15 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransactionsDtoRequests;
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupFintechRequests;
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransferTransactionsRequest;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactionsDto;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransaksiResponse;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupFintechResponse;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransferTransactionsResponse;
+
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.services.payment.PaymentTransactionsService;
-import com.app.smartdrive.api.services.payment.implementation.PaymentTransactionsImpl;
 
 
 import jakarta.validation.Valid;

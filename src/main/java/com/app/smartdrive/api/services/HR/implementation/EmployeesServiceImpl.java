@@ -71,7 +71,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         
         employee.setEmpName(employeesDto.getEmpName());
         employee.setEmpJoinDate(empJoinDate);
-        employee.setEmpStatus(EnumClassHR.status.ACTIVE);
+        employee.setEmpStatus(EnumClassHR.status.INACTIVE);
         employee.setEmpType(emp_type.PERMANENT);
         employee.setEmpGraduate(employeesDto.getEmpGraduate());
         employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
@@ -90,6 +90,7 @@ public class EmployeesServiceImpl implements EmployeesService {
             if(employeesDto.getGrantAccessUser()==true){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
+            employee.setEmpStatus(EnumClassHR.status.ACTIVE);
             }
             user.setUserFullName(employeesDto.getEmpName());
             user.setUserNationalId("idn"+user.getUserEntityId());
