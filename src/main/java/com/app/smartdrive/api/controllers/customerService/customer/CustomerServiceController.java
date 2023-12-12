@@ -42,7 +42,7 @@ public class CustomerServiceController {
             @RequestParam(value = "type", defaultValue = "ALL") String type,
             @RequestParam(value = "status", defaultValue = "OPEN") String status,
             @RequestParam(value = "sort", defaultValue = "ascending") String sort,
-            @RequestParam(value = "custId") Long customerId
+            @RequestParam(value = "customerId") Long customerId
     ){
         Pageable paging;
 
@@ -157,6 +157,9 @@ public class CustomerServiceController {
 
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
+
+
+
 
     @GetMapping("/requests")
     public ResponseEntity<?> getAllRequestClosePolis(@RequestParam("userentityid") Long custId){
