@@ -2,6 +2,7 @@ package com.app.smartdrive.api.services.customer;
 
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
@@ -19,7 +20,9 @@ public interface CustomerRequestService {
 
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId);
 
-    public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
+
+    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
     public CustomerResponseDTO convert(CustomerRequest customerRequest);
 

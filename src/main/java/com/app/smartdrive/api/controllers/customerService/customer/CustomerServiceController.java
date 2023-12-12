@@ -1,9 +1,6 @@
 package com.app.smartdrive.api.controllers.customerService.customer;
 
-import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
-import com.app.smartdrive.api.dto.customer.request.CloseRequestDTO;
-import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
-import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
@@ -105,6 +102,20 @@ public class CustomerServiceController {
         CustomerRequestDTO customerRequestDTO = mapper.readValue(client, CustomerRequestDTO.class);
 
         CustomerResponseDTO customerResponseDTO = this.customerRequestService.create(customerRequestDTO, files);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
+    }
+
+    @PostMapping("/request/agen")
+    public ResponseEntity<CustomerResponseDTO> createByAgen(
+            @RequestParam("client") String client,
+            @RequestParam("file") MultipartFile[] files
+    ) throws Exception{
+
+        ObjectMapper mapper = new ObjectMapper();
+        CreateCustomerRequestByAgenDTO customerRequestDTO = mapper.readValue(client, CreateCustomerRequestByAgenDTO.class);
+
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.createByAgen(customerRequestDTO, files);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
     }

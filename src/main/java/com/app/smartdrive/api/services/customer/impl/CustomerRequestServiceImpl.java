@@ -13,6 +13,7 @@ import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
@@ -175,6 +176,69 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
 
+    @Override
+    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+
+        // prep
+        CreateUserDto userPost = customerRequestDTO.getUserDTO();
+        CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
+        Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
+
+
+        BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
+        Long entityId = newEntity.getEntityId();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
+        userPost.getProfile().setUserBirthDate(birthDate);
+        User newCustomer = this.userService.createUserCustomer(userPost);
+
+
+        CarSeries existCarSeries = this.carsService.getById(ciasDTO.getCiasCarsId());
+
+        Cities existCity = this.cityService.getById(ciasDTO.getCiasCityId());
+
+        InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
+
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()))
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
+                );
+
+
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, newCustomer, entityId);
+        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
+        newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+
+        CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, existCarSeries, existCity, existInty, newCustomerRequest);
+
+        List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
+        cias.setCustomerInscDoc(ciasDocs);
+
+        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId);
+
+
+        Double premiPrice = this.getPremiPrice(
+                existInty.getIntyName(),
+                existCarSeries.getCarModel().getCarBrand().getCabrName(),
+                existCity.getProvinsi().getZones().getZonesId(),
+                ciasDTO.getCurrentPrice(),
+                ciasCuexs
+        );
+
+        cias.setCiasTotalPremi(premiPrice);
+        cias.setCustomerInscExtend(ciasCuexs);
+
+        CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
+
+        // set and save
+        newCustomerRequest.setCustomerClaim(newClaim);
+        newCustomerRequest.setCustomerInscAssets(cias);
+
+        CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
+        log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
+        return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
+    }
 
 
     @Override
