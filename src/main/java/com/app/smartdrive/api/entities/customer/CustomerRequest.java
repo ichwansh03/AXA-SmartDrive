@@ -64,7 +64,7 @@ public class CustomerRequest {
     private CustomerInscAssets customerInscAssets;
 
 //    @JsonBackReference
-    @ManyToOne(targetEntity = EmployeeAreaWorkgroup.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = EmployeeAreaWorkgroup.class, fetch = FetchType.LAZY)
     @JoinColumn(
             name = "creq_agen_entityid",
             referencedColumnName = "eawg_id",
