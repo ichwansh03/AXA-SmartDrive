@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.customer.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
@@ -7,6 +8,7 @@ import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository
 import com.app.smartdrive.api.repositories.master.TemiRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscExtendService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CustomerInscExtendServiceImpl implements CustomerInscExtendService {
     private final TemiRepository temiRepository;
@@ -26,17 +29,20 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
     public List<CustomerInscExtend> getCustomerInscEtend(
             Long[] cuexIds,
             CustomerInscAssets cias,
-            Long entityId
+            Long entityId,
+            Double currentPrice
     ) {
         List<CustomerInscExtend> ciasCuexs = new ArrayList<>();
 
         for (Long i: cuexIds) {
             Double nominal;
 
-            TemplateInsurancePremi temi = this.temiRepository.findById(i).get();
+            TemplateInsurancePremi temi = this.temiRepository.findById(i).orElseThrow(
+                    () -> new EntityNotFoundException("Template Insurance Premi with id " + i + " is not found")
+            );
 
             if(Objects.nonNull(temi.getTemiRateMin())){
-                nominal = temi.getTemiRateMin() * temi.getTemiNominal();
+                nominal = (temi.getTemiRateMin() / 100) * currentPrice;
             }else{
                 nominal = temi.getTemiNominal();
             }
@@ -51,6 +57,8 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
 
             ciasCuexs.add(cuex);
         }
+
+        log.info("CustomerInscExtendServiceImpl::getCustomerInscEtend, generate cuex from temi");
         return ciasCuexs;
     }
 
@@ -58,6 +66,7 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
     @Override
     public void deleteAllCustomerInscExtendInCustomerRequest(Long creqEntityId) {
         this.customerInscExtendRepository.deleteAllByCuexCreqEntityid(creqEntityId);
+        log.info("CustomerInscExtendServiceImpl::deleteAllCustomerInscExtendInCustomerRequest, delete all cuex for inserting a new one");
     }
 
 

@@ -1,17 +1,18 @@
 package com.app.smartdrive.api.dto.customer.request;
 
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerRequestDTO {
-
-    private Long customerId;
+@Builder
+public class CreateCustomerRequestByAgenDTO {
 
     private Long employeeId;
 
@@ -20,4 +21,8 @@ public class CustomerRequestDTO {
     @Valid
     @NotBlank
     private CiasDTO ciasDTO;
+
+    @Valid
+    @NotBlank
+    private CreateUserDto userDTO;
 }

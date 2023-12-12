@@ -25,8 +25,8 @@ public class ServPremiImpl implements ServPremiService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ServicePremi> findAllBySemiServId(Long servId) {
-        List<ServicePremi> allBySemiServId = semiRepository.findAllBySemiServId(servId);
+    public List<ServicePremi> findByServId(Long servId) {
+        List<ServicePremi> allBySemiServId = semiRepository.findByServices_ServId(servId);
         log.info("ServPremiImpl::findAllBySemiServId successfully viewed");
         return allBySemiServId;
     }

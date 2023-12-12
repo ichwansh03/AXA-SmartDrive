@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
                 query = "SELECT sowo FROM ServiceOrderWorkorder sowo WHERE sowo.serviceOrderTasks.seotId = :seotId"),
         @NamedQuery(
                 name = "ServiceOrderWorkorder.updateSowoStatus",
-                query = "UPDATE ServiceOrderWorkorder sowo SET sowo.sowoStatus = :sowoStatus WHERE sowo.sowoId = :sowoId", lockMode = LockModeType.PESSIMISTIC_WRITE)
+                query = "UPDATE ServiceOrderWorkorder sowo SET sowo.sowoStatus = :sowoStatus, sowo.sowoModDate = :sowoModDate WHERE sowo.sowoId = :sowoId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 })
 @DynamicInsert
 public class ServiceOrderWorkorder {
@@ -32,6 +33,7 @@ public class ServiceOrderWorkorder {
     @Column(name = "sowo_name")
     private String sowoName;
 
+    @LastModifiedDate
     @Column(name = "sowo_modified_date")
     private LocalDateTime sowoModDate;
 

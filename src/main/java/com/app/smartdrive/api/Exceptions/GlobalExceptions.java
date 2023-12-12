@@ -6,9 +6,11 @@ import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -34,7 +36,19 @@ public class GlobalExceptions {
 
         return ResponseEntity.internalServerError().body(sql.getMessage());
     }
-        
+
+    @ExceptionHandler(InvalidDataAccessResourceUsageException.class)
+    public ResponseEntity<?> handleErrorInvalidDataAccess(InvalidDataAccessResourceUsageException ex, HttpServletRequest request){
+        Error error = ErrorUtils.createError(
+                        ex.getMessage(),
+                        ex.getLocalizedMessage(),
+                        HttpStatus.BAD_REQUEST.value())
+                .setUrl(request.getRequestURL().toString())
+                .setReqMethod(request.getMethod())
+                .setTimestamp(LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     
 
     @ExceptionHandler(BindException.class)

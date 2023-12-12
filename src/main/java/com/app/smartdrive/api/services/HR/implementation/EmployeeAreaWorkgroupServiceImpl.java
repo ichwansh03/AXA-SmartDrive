@@ -11,6 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.app.smartdrive.api.Exceptions.AreaWorkGroupNotFoundException;
+import com.app.smartdrive.api.Exceptions.EmployeeAreaWorkgroupNotFoundException;
+import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
@@ -50,7 +53,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     @Transactional
     public EmployeeAreaWorkgroupDto addEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto) {
         Employees existingEmployee = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid())
-        .orElseThrow(() -> new EntityNotFoundException("Employee not found : " + employeeAreaWorkgroupDto.getEmpEntityid()));
+        .orElseThrow(() -> new EmployeesNotFoundException("Employee not found : " + employeeAreaWorkgroupDto.getEmpEntityid()));
     
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
     
@@ -93,6 +96,19 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     @Transactional
     public EmployeeAreaWorkgroupDto updateEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, Long id) {
         Optional<EmployeeAreaWorkgroup> optionalEmployeeAreaWorkgroup = employeeAreaWorkgroupRepository.findByEawgId(id);
+         if (employeeAreaWorkgroupDto.getCityId() != null) {
+            Cities city = cityRepository.findById(employeeAreaWorkgroupDto.getCityId()) 
+            .orElseThrow(() -> new EntityNotFoundException("City not found : " + employeeAreaWorkgroupDto.getCityId()));
+
+                Provinsi provinsi = city.getProvinsi();
+                String provName = provinsi.getProvName();
+                Zones zones = provinsi.getZones();
+                String zonesName = zones.getZonesName();
+                
+                employeeAreaWorkgroupDto.setProvinsi(provName);
+                employeeAreaWorkgroupDto.setZoneName(zonesName);
+                employeeAreaWorkgroupDto.setCityId(city.getCityId());
+
         if (optionalEmployeeAreaWorkgroup.isPresent()) {
             EmployeeAreaWorkgroup employeeAreaWorkgroup = optionalEmployeeAreaWorkgroup.get();
 
@@ -101,19 +117,24 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
                 if (areaWorkGroup != null) {
                     employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
                     employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
+                }else{
+                     throw new AreaWorkGroupNotFoundException("AreaWorkGroup not found with Code: " + employeeAreaWorkgroupDto.getArwgCode());
                 }
             }
 
             if (!Objects.equals(employeeAreaWorkgroupDto.getEmpEntityid(), employeeAreaWorkgroup.getEawgEntityid())) {
-                Employees employees = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + employeeAreaWorkgroupDto.getEmpEntityid()));
+                Employees employees = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElseThrow(() -> new EmployeesNotFoundException("Employee not found with ID: " + employeeAreaWorkgroupDto.getEmpEntityid()));
 
                 if (employees != null) {
-                    employeeAreaWorkgroup.setEawgEntityid(employeeAreaWorkgroupDto.getEmpEntityid());
+                    employeeAreaWorkgroupRepository.setEawgEntityid(employeeAreaWorkgroupDto.getEmpEntityid(), employeeAreaWorkgroup.getEawgEntityid());
                 }
             }
             employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
             employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
+        }else{
+            throw new EmployeeAreaWorkgroupNotFoundException("EmployeeAreaWorkGroup not found with Code: " + employeeAreaWorkgroupDto.getArwgCode());
         }
+    }
 
             return employeeAreaWorkgroupDto;
         }

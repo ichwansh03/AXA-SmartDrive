@@ -32,11 +32,8 @@ public class CustomerRequestController {
 
     @GetMapping
     public List<CustomerResponseDTO> getAll() {
-        List<CustomerRequest> customerRequestList = this.customerRequestService.get();
-        List<CustomerResponseDTO> customerRequestDTOList = customerRequestList.stream()
-                .map(creq -> this.customerRequestService.convert(creq)).
-                toList();
-        return customerRequestDTOList;
+        List<CustomerResponseDTO> customerRequestList = this.customerRequestService.get();
+        return customerRequestList;
     }
 
     @GetMapping("/page")
@@ -108,14 +105,13 @@ public class CustomerRequestController {
 
     @PutMapping
     public CustomerResponseDTO update(
-            @RequestParam("creqEntityId") Long creqEntityId,
             @Valid @RequestParam("client") String client,
             @RequestParam("file") MultipartFile[] files
     ) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         UpdateCustomerRequestDTO updateCustomerRequestDTO = mapper.readValue(client, UpdateCustomerRequestDTO.class);
 
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerRequest(creqEntityId, updateCustomerRequestDTO, files);
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, files);
 
         return customerResponseDTO;
     }

@@ -8,12 +8,14 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface SecrRepository extends JpaRepository<ServicePremiCredit, ServicePremiCreditId> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<ServicePremiCredit> findAllBySecrServId(Long servId);
+    List<ServicePremiCredit> findByServices_ServId(Long servId);
 
+    ServicePremiCredit findBySecrDuedateBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

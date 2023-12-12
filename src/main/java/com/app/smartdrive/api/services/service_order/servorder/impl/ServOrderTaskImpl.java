@@ -40,10 +40,10 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(1L);
 
-        for (TemplateServiceTask templateServiceTask : templateServiceTasks) {
-            seot.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
-                    serviceOrders.getServices().getServStartDate(),
-                    serviceOrders.getServices().getServStartDate().plusDays(1),
+        for (int i = 0; i < templateServiceTasks.size(); i++) {
+            seot.add(new ServiceTaskReqDto(templateServiceTasks.get(i).getTestaName(),
+                    serviceOrders.getServices().getServStartDate().plusDays(i),
+                    serviceOrders.getServices().getServStartDate().plusDays(i+1),
                     EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, null));
         }
@@ -64,7 +64,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         List<ServiceTaskReqDto> seotList = new ArrayList<>();
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(2L);
 
-        Method generatePolisNumber = SoAdapter.class.getMethod("generatePolisNumber", CustomerRequest.class);
+        Method generatePolisNumber = SoAdapter.class.getMethod("generatePolis", CustomerRequest.class);
 
         for (TemplateServiceTask templateServiceTask : templateServiceTasks) {
             seotList.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),

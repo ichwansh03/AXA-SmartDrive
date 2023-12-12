@@ -51,7 +51,7 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     @Transactional
     @Override
     public int updateSowoStatus(Boolean sowoStatus, Long sowoId) {
-        int updatedSowoStatus = soWorkorderRepository.updateSowoStatus(sowoStatus, sowoId);
+        int updatedSowoStatus = soWorkorderRepository.updateSowoStatus(sowoStatus, LocalDateTime.now(), sowoId);
         log.info("SoOrderServiceImpl::addSoWorkorder updated {} ", updatedSowoStatus);
         return updatedSowoStatus;
     }
