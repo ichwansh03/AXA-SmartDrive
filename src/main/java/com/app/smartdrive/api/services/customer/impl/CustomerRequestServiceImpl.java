@@ -439,6 +439,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         Double premiExtend = 0.0;
 
+        Double materai = 10_000.0;
+
         if(!cuexs.isEmpty()){
             for (CustomerInscExtend  cuex: cuexs) {
                 premiExtend += cuex.getCuexNominal();
@@ -446,7 +448,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         }
 
-        Double totalPremi = premiMain + premiExtend;
+        Double totalPremi = premiMain + premiExtend + materai;
 
         log.info("CustomerRequestServiceImpl:getPremiPrice, successfully calculate premi");
         return totalPremi;
