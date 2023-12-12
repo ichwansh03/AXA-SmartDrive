@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.services.HR.implementation;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,14 +10,11 @@ import com.app.smartdrive.api.entities.hr.BatchEmployeeSalary;
 import com.app.smartdrive.api.entities.hr.BatchEmployeeSalaryId;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
 import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.entities.hr.EnumClassHR;
-import com.app.smartdrive.api.entities.hr.BatchEmployeeSalary.BatchEmployeeSalaryBuilder;
 import com.app.smartdrive.api.entities.partner.BatchPartnerInvoice;
-import com.app.smartdrive.api.entities.service_order.ServiceOrders;
+import com.app.smartdrive.api.entities.partner.BpinStatus;
 import com.app.smartdrive.api.repositories.HR.BatchEmployeeSalaryRepository;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.services.HR.BatchEmployeeSalaryService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryService {
     
     private final BatchEmployeeSalaryRepository batchEmployeeSalaryRepository;
-
 
     private final EmployeesRepository employeesRepository;
 
@@ -48,6 +44,11 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
 
         return batchEmployeeSalaryRepository.save(batchEmployeeSalary);
 
+    }
+
+    @Override
+    public List<BatchEmployeeSalary> getAllTransNull() {
+        return batchEmployeeSalaryRepository.findAllByBesaPatrTrxno(null);
     }
 
 
