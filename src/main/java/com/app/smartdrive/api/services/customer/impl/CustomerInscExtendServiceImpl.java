@@ -29,7 +29,8 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
     public List<CustomerInscExtend> getCustomerInscEtend(
             Long[] cuexIds,
             CustomerInscAssets cias,
-            Long entityId
+            Long entityId,
+            Double currentPrice
     ) {
         List<CustomerInscExtend> ciasCuexs = new ArrayList<>();
 
@@ -41,7 +42,7 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
             );
 
             if(Objects.nonNull(temi.getTemiRateMin())){
-                nominal = temi.getTemiRateMin() * temi.getTemiNominal();
+                nominal = (temi.getTemiRateMin() / 100) * currentPrice;
             }else{
                 nominal = temi.getTemiNominal();
             }

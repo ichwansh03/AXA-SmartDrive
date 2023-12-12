@@ -13,10 +13,12 @@ import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
@@ -24,11 +26,9 @@ import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
 import com.app.smartdrive.api.repositories.master.*;
+import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
-import com.app.smartdrive.api.services.master.CarsService;
-import com.app.smartdrive.api.services.master.CityService;
-import com.app.smartdrive.api.services.master.IntyService;
-import com.app.smartdrive.api.services.master.TemiService;
+import com.app.smartdrive.api.services.master.*;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
 import jakarta.persistence.EntityManager;
@@ -55,14 +55,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
-    private final CarsRepository carsRepository;
-
-    private final IntyRepository intyRepository;
-
-    private final CityRepository cityRepository;
-
-    private final UserRepository userRepository;
-
     private final TemiRepository temiRepository;
 
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
@@ -85,7 +77,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final CityService cityService;
 
-    private final EntityManager entityManager;
+    private final ArwgService arwgService;
+
+    private final EmployeesService employeesService;
 
 
     @Transactional(readOnly = true)
@@ -157,7 +151,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
         cias.setCustomerInscDoc(ciasDocs);
 
-        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId);
+        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, cias.getCiasCurrentPrice());
 
 
         Double premiPrice = this.getPremiPrice(
@@ -181,6 +175,71 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
         return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
+
+    @Override
+    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+
+        // prep
+        CreateUserDto userPost = customerRequestDTO.getUserDTO();
+        CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
+        Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
+
+
+        BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
+        Long entityId = newEntity.getEntityId();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
+        userPost.getProfile().setUserBirthDate(birthDate);
+        User newCustomer = this.userService.createUserCustomer(userPost);
+
+
+        CarSeries existCarSeries = this.carsService.getById(ciasDTO.getCiasCarsId());
+
+        Cities existCity = this.cityService.getById(ciasDTO.getCiasCityId());
+
+        InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
+
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()))
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
+                );
+
+
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, newCustomer, entityId);
+        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
+        newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+
+        CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, existCarSeries, existCity, existInty, newCustomerRequest);
+
+        List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
+        cias.setCustomerInscDoc(ciasDocs);
+
+        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasDTO.getCurrentPrice());
+
+
+        Double premiPrice = this.getPremiPrice(
+                existInty.getIntyName(),
+                existCarSeries.getCarModel().getCarBrand().getCabrName(),
+                existCity.getProvinsi().getZones().getZonesId(),
+                ciasDTO.getCurrentPrice(),
+                ciasCuexs
+        );
+
+        cias.setCiasTotalPremi(premiPrice);
+        cias.setCustomerInscExtend(ciasCuexs);
+
+        CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
+
+        // set and save
+        newCustomerRequest.setCustomerClaim(newClaim);
+        newCustomerRequest.setCustomerInscAssets(cias);
+
+        CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
+        log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
+        return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
+    }
+
 
     @Override
     public CustomerResponseDTO convert(CustomerRequest customerRequest){
@@ -376,9 +435,11 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 () -> new EntityNotFoundException("Template Insurance Premi is not found")
         );
 
-        Double premiMain = currentPrice * temiMain.getTemiRateMin();
+        Double premiMain = (temiMain.getTemiRateMin() / 100) * currentPrice;
 
         Double premiExtend = 0.0;
+
+        Double materai = 10_000.0;
 
         if(!cuexs.isEmpty()){
             for (CustomerInscExtend  cuex: cuexs) {
@@ -387,7 +448,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         }
 
-        Double totalPremi = premiMain + premiExtend;
+        Double totalPremi = premiMain + premiExtend + materai;
 
         log.info("CustomerRequestServiceImpl:getPremiPrice, successfully calculate premi");
         return totalPremi;
@@ -420,6 +481,38 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         log.info("CustomerRequestServiceImpl::getPagingCustomerRequest," +
                 " successfully get all customer request who belong to user with ID: {}", user.getUserEntityId());
+
+        return pageCustomerResponseDTO;
+    }
+
+    @Override
+    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable paging, String type, String status) {
+        AreaWorkGroup existAreaWorkgroup = this.arwgService.getById(arwgCode);
+        Employees existEmployee = this.employeesService.getById(empId);
+        EmployeeAreaWorkgroup existEawg = this.employeeAreaWorkgroupRepository.findByAreaWorkGroupAndEmployees(existAreaWorkgroup, existEmployee).orElseThrow(
+                () -> new EntityNotFoundException("Agen with id : " + empId + " is not found")
+        );
+
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
+
+        Page<CustomerRequest> pageCustomerRequest;
+
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqStatus(existEawg, paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqTypeAndCreqStatus(existEawg, paging, creqType, creqStatus);
+        }
+
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
+        log.info("CustomerRequestServiceImpl::getPagingCustomerRequest," +
+                " successfully get all customer request who belong to agen with ID: {} and areaCode: {}", empId, arwgCode);
 
         return pageCustomerResponseDTO;
     }
@@ -462,7 +555,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         // update cuex
         this.customerInscExtendService.deleteAllCustomerInscExtendInCustomerRequest(entityId);
 
-        List<CustomerInscExtend> updatedCustomerInscExtend = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId);
+        List<CustomerInscExtend> updatedCustomerInscExtend = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasUpdateDTO.getCurrentPrice());
 
         cias.setCustomerInscExtend(updatedCustomerInscExtend);
 
