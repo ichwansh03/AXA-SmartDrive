@@ -63,8 +63,6 @@ public class BankServiceImpl implements BankService {
         }else{
             throw new EntityNotFoundException(bankName + " Sudah Terdaftar");
         }
-        
-       
     }
 
     @Override
