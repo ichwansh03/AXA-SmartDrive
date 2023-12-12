@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_premi", schema = "so")
+@NamedQuery(
+        name = "ServicePremi.updateSemiStatus",
+        query = "UPDATE ServicePremi semi SET semi.semiStatus = :semiStatus WHERE semi.semiServId = :semiServId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 @DynamicInsert
 @DynamicUpdate
 public class ServicePremi {
@@ -41,7 +44,7 @@ public class ServicePremi {
     private LocalDateTime semiModifiedDate;
 
     @JsonIgnore
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "semi_serv_id", insertable = false, updatable = false)
     Services services;
 

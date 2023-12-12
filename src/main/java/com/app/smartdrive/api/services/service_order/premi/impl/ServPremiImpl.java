@@ -2,12 +2,13 @@ package com.app.smartdrive.api.services.service_order.premi.impl;
 
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
-import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +21,9 @@ import java.util.List;
 public class ServPremiImpl implements ServPremiService {
 
     private final SemiRepository semiRepository;
-    private final SecrRepository secrRepository;
     private final SoRepository soRepository;
+
+    private final ServPremiCreditService servPremiCreditService;
 
     @Transactional(readOnly = true)
     @Override
@@ -47,9 +49,22 @@ public class ServPremiImpl implements ServPremiService {
 
         ServicePremi save = semiRepository.save(premi);
 
-        ServPremiCreditImpl servPremiCredit = new ServPremiCreditImpl(secrRepository);
-        servPremiCredit.addSecr(premi);
+        servPremiCreditService.addSecr(premi);
         log.info("ServPremiImpl::addSemi successfully added service premi");
         return save;
     }
+
+    @Override
+    public int updateSemiStatus(String semiStatus, Long semiServId) {
+        int updated = semiRepository.updateSemiStatus(semiStatus, semiServId);
+        log.info("ServPremiImpl::updateSemiStatus successfully updated {} ", updated);
+        return updated;
+    }
+
+//    @Scheduled(cron = "* * * * * *")
+//    public void dueDateSemi(){
+//        //check jika
+//        log.info("ServPremiImpl::update service premi");
+//    }
+
 }

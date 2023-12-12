@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
@@ -11,6 +12,7 @@ import com.app.smartdrive.api.repositories.master.TestaRepository;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
+import com.app.smartdrive.api.services.master.EmailService;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     private final SoWorkorderRepository soWorkorderRepository;
     private final TestaRepository testaRepository;
     private final TewoRepository tewoRepository;
+    private final EmailService emailService;
 
     @Transactional
     @Override
@@ -62,6 +65,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) throws Exception {
 
         List<ServiceTaskReqDto> seotList = new ArrayList<>();
+        EmailReq emailReq = new EmailReq();
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(2L);
 
         Method generatePolisNumber = SoAdapter.class.getMethod("generatePolis", CustomerRequest.class);
@@ -72,9 +76,25 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                     serviceOrders.getServices().getServStartDate().plusDays(1),
                     EnumModuleServiceOrders.SeotStatus.COMPLETED, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, generatePolisNumber));
+
+            if (templateServiceTask.getTestaName().equals("NOTIFY TO AGENT")) {
+                emailReq.setTo(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail());
+                emailReq.setSubject("New Customer POLIS");
+                emailReq.setBody("New Customer POLIS with name " + serviceOrders.getServices().getUsers().getUserFullName());
+                log.info("Email send to agent");
+                emailService.sendMail(emailReq);
+            }
+
+            if (templateServiceTask.getTestaName().equals("NOTIFY TO CUSTOMER")) {
+                emailReq.setTo(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail());
+                emailReq.setSubject("New POLIS has been created");
+                emailReq.setBody("Your successfully created POLIS");
+                log.info("Email send to customer");
+                emailService.sendMail(emailReq);
+            }
         }
 
-        log.info("ServOrderTaskImpl::addPolisList the result of number polis is {} ", seotList.get(0).getGenerateTasks());
+        log.info("ServOrderTaskImpl::addPolisList the result of number polis is {} ", generatePolisNumber);
 
         List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seotList, ServiceOrderTasks.class);
 
@@ -87,12 +107,16 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         List<ServiceTaskReqDto> seot = new ArrayList<>();
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(3L);
 
-        for (TemplateServiceTask templateServiceTask : templateServiceTasks) {
-            seot.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
-                    serviceOrders.getServices().getServStartDate(),
-                    serviceOrders.getServices().getServStartDate().plusDays(1),
+        for (int i = 0; i < templateServiceTasks.size(); i++) {
+            seot.add(new ServiceTaskReqDto(templateServiceTasks.get(i).getTestaName(),
+                    serviceOrders.getServices().getServStartDate().plusDays(i),
+                    serviceOrders.getServices().getServStartDate().plusDays(i+1),
                     EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, null));
+
+            if (templateServiceTasks.get(i).getTestaName().equals("NOTIFY PARTNER TO REPAIR")){
+
+            }
         }
 
         List<ServiceOrderTasks> serviceOrderTasks = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
