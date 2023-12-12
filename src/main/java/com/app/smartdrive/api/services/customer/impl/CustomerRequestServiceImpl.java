@@ -151,7 +151,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
         cias.setCustomerInscDoc(ciasDocs);
 
-        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId);
+        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, cias.getCiasCurrentPrice());
 
 
         Double premiPrice = this.getPremiPrice(
@@ -215,7 +215,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
         cias.setCustomerInscDoc(ciasDocs);
 
-        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId);
+        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasDTO.getCurrentPrice());
 
 
         Double premiPrice = this.getPremiPrice(
@@ -435,7 +435,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 () -> new EntityNotFoundException("Template Insurance Premi is not found")
         );
 
-        Double premiMain = currentPrice * temiMain.getTemiRateMin();
+        Double premiMain = (temiMain.getTemiRateMin() / 100) * currentPrice;
 
         Double premiExtend = 0.0;
 
@@ -553,7 +553,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         // update cuex
         this.customerInscExtendService.deleteAllCustomerInscExtendInCustomerRequest(entityId);
 
-        List<CustomerInscExtend> updatedCustomerInscExtend = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId);
+        List<CustomerInscExtend> updatedCustomerInscExtend = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasUpdateDTO.getCurrentPrice());
 
         cias.setCustomerInscExtend(updatedCustomerInscExtend);
 

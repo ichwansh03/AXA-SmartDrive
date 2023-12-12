@@ -9,7 +9,8 @@ public interface CustomerInscExtendService {
     public List<CustomerInscExtend> getCustomerInscEtend(
             Long[] cuexIds,
             CustomerInscAssets cias,
-            Long entityId
+            Long entityId,
+            Double currentPrice
     );
 
     public void deleteAllCustomerInscExtendInCustomerRequest(Long creqEntityId);
