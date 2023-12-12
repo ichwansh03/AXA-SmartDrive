@@ -28,7 +28,7 @@ public class ServOrderImpl implements ServOrderService {
     private final TestaRepository testaRepository;
     private final TewoRepository tewoRepository;
 
-    private SoAdapter soAdapter;
+    SoAdapter soAdapter = new SoAdapter();
 
     @Transactional
     @Override
@@ -64,7 +64,7 @@ public class ServOrderImpl implements ServOrderService {
                 servOrderTask.addClaimList(orders);
                 log.info("ServOrderImpl::addServiceOrders create new CLAIM tasks");
             }
-            default -> orders = generateSeroFeasiblity(services);
+            default -> orders = generateSeroClose(services);
         }
 
         return orders;
@@ -114,7 +114,6 @@ public class ServOrderImpl implements ServOrderService {
 
     @Transactional
     private ServiceOrders generateSeroFeasiblity(Services services){
-        soAdapter = new SoAdapter();
         String formatSeroId = soAdapter.formatServiceOrderId(services);
 
         ServiceOrders serviceOrders = new ServiceOrders();
@@ -126,12 +125,15 @@ public class ServOrderImpl implements ServOrderService {
                 .employees(services.getCustomer().getEmployeeAreaWorkgroup())
                 .services(services).build();
 
-        return soOrderRepository.save(serviceOrders);
+        ServiceOrders saved = soOrderRepository.save(serviceOrders);
+
+        log.info("ServOrderTaskImpl::generateSeroFeasiblity successfully added {} ", saved.getSeroId());
+
+        return saved;
     }
 
     @Transactional
     private ServiceOrders generateSeroPolis(Services services){
-        soAdapter = new SoAdapter();
         String formatSeroId = soAdapter.formatServiceOrderId(services);
         ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
         ServiceOrders serviceOrders = new ServiceOrders();
@@ -144,12 +146,15 @@ public class ServOrderImpl implements ServOrderService {
                 .employees(services.getCustomer().getEmployeeAreaWorkgroup())
                 .services(services).build();
 
-        return soOrderRepository.save(serviceOrders);
+        ServiceOrders saved = soOrderRepository.save(serviceOrders);
+
+        log.info("ServOrderTaskImpl::generateSeroPolis successfully added {} ", saved.getSeroId());
+
+        return saved;
     }
 
     @Transactional
     private ServiceOrders generateSeroClaim(Services services){
-        soAdapter = new SoAdapter();
         String formatSeroId = soAdapter.formatServiceOrderId(services);
         ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndServices_ServId("PL%", services.getServId());
         ServiceOrders serviceOrders = new ServiceOrders();
@@ -164,6 +169,28 @@ public class ServOrderImpl implements ServOrderService {
                 .employees(services.getCustomer().getEmployeeAreaWorkgroup())
                 .services(services).build();
 
-        return soOrderRepository.save(serviceOrders);
+        ServiceOrders saved = soOrderRepository.save(serviceOrders);
+
+        log.info("ServOrderTaskImpl::generateSeroClaim successfully added {} ", saved.getSeroId());
+
+        return saved;
+    }
+
+    @Transactional
+    private ServiceOrders generateSeroClose(Services services){
+        String formatSeroId = soAdapter.formatServiceOrderId(services);
+        ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndServices_ServId("PL%", services.getServId());
+        ServiceOrders serviceOrders = ServiceOrders.builder()
+                .seroId(formatSeroId)
+                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE)
+                .seroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED)
+                .parentServiceOrders(pl)
+                .services(services).build();
+
+        ServiceOrders saved = soOrderRepository.save(serviceOrders);
+
+        log.info("ServOrderTaskImpl::generateSeroClose successfully added {} ", saved.getSeroId());
+
+        return saved;
     }
 }

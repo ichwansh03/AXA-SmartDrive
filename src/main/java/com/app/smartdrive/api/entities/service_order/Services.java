@@ -52,7 +52,7 @@ public class Services {
 
     @Column(name = "serv_status")
     @Enumerated(EnumType.STRING)
-    private EnumModuleServiceOrders.ServStatus servStatus = EnumModuleServiceOrders.ServStatus.ACTIVE;;
+    private EnumModuleServiceOrders.ServStatus servStatus;
 
     @ManyToOne
     @JoinColumn(name = "serv_serv_id")

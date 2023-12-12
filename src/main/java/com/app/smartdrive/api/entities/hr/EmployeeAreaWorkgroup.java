@@ -77,14 +77,11 @@ public class EmployeeAreaWorkgroup {
     @JsonIgnore
     private Employees employees;
 
-    // @OneToMany(mappedBy="employee_are_workgroup", cascade = CascadeType.ALL)
-    // @MapsId("eawgId")
-    // @JoinColumn(name = "eawg_id", referencedColumnName = "sero_agent_entityid")
-    // private List<ServiceOrders> serviceOrders;
-    // @MapsId("eawgId")
-    // @JsonManagedReference
-    // @OneToMany(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<CustomerRequest> customerRequests;
+
+//     @JsonManagedReference
+//     @OneToMany(mappedBy = "employeeAreaWorkgroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//     private List<CustomerRequest> customerRequests;
+
 
 
 
