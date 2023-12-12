@@ -144,7 +144,9 @@ class PartnerControllerTest {
             Error error = objectMapper.readValue(result.getResponse().getContentAsString(), Error.class);
             assertEquals("Partner not found by id 999", error.getMessage());
 
+
             log.info(error.toString());
+
 
         });
 

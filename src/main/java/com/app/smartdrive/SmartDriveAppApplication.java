@@ -3,6 +3,8 @@ package com.app.smartdrive;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetService;
 import jakarta.annotation.Resource;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
