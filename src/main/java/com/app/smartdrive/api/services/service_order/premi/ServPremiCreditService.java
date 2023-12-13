@@ -17,7 +17,7 @@ public interface ServPremiCreditService {
 
     List<ServicePremiCredit> addSecr(ServicePremi servicePremi);
 
-    boolean updateSecr(SecrReqDto secrReqDto);
+    boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId);
 
     boolean checkPremiPayment(ServicePremiCredit servicePremiCredit);
 

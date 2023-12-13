@@ -4,7 +4,6 @@ import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.User;
@@ -39,7 +38,7 @@ public class ServController {
     @GetMapping
     public ResponseEntity<?> getServiceById(@RequestParam("servid") Long servId) {
 
-        Services servicesById = servService.findServicesById(servId).get();
+        Services servicesById = servService.findServicesById(servId);
 
         ServiceRespDto serviceRespDto = responseService(servicesById);
 
