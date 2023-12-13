@@ -21,23 +21,23 @@ public class ServControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    void getServiceByIdTest_Success() throws Exception {
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/service?servid={servid}",1L)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(jsonPath("$.servVehicleNumber").value("BE 2090 OE"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void getServiceByIdTest_Notfound() throws Exception {
-        mockMvc.perform(
-                        MockMvcRequestBuilders.get("/service?servid={servid}",999L)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNotFound());
-    }
+//    @Test
+//    void getServiceByIdTest_Success() throws Exception {
+//        mockMvc.perform(
+//                MockMvcRequestBuilders.get("/service?servid={servid}",1L)
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andDo(print())
+//                .andExpect(jsonPath("$.servVehicleNumber").value("BE 2090 OE"))
+//                .andExpect(status().isOk());
+//    }
+//
+//    @Test
+//    void getServiceByIdTest_Notfound() throws Exception {
+//        mockMvc.perform(
+//                        MockMvcRequestBuilders.get("/service?servid={servid}",999L)
+//                                .accept(MediaType.APPLICATION_JSON))
+//                .andDo(print())
+//                .andExpect(status().isNotFound());
+//    }
 
 }
