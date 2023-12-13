@@ -35,6 +35,28 @@ public class CustomerServiceController {
 
     private final ServOrderService servOrderService;
 
+//    @GetMapping("/request")
+//    public ResponseEntity<Page<CustomerResponseDTO>> getAllCustomersRequest(
+//            @RequestParam(value = "page", defaultValue = "0") int page,
+//            @RequestParam(value = "size", defaultValue = "3") int size,
+//            @RequestParam(value = "type", defaultValue = "ALL") String type,
+//            @RequestParam(value = "status", defaultValue = "OPEN") String status,
+//            @RequestParam(value = "sort", defaultValue = "ascending") String sort,
+//            @RequestParam(value = "customerId") Long customerId
+//    ){
+//        Pageable paging;
+//
+//        if(Objects.equals(sort, "descending")){
+//            paging = PageRequest.of(page, size, Sort.by("creqEntityId").descending());
+//        }else {
+//            paging = PageRequest.of(page, size, Sort.by("creqEntityId").ascending());
+//        }
+//
+//        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.get();
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(pagingCustomerResponseDTO);
+//    }
+
     @GetMapping("/request")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllUserCustomersRequest(
             @RequestParam(value = "page", defaultValue = "0") int page,

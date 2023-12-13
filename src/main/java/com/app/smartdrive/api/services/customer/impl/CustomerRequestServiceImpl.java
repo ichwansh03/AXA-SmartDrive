@@ -55,8 +55,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
-    private final TemiRepository temiRepository;
-
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
 
     private final BusinessEntityService businessEntityService;
@@ -154,7 +152,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, cias.getCiasCurrentPrice());
 
 
-        Double premiPrice = this.getPremiPrice(
+        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
@@ -218,7 +216,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasDTO.getCurrentPrice());
 
 
-        Double premiPrice = this.getPremiPrice(
+        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
@@ -428,31 +426,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return customerResponseDTO;
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs){
-        TemplateInsurancePremi temiMain = this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(zonesId, insuraceType, 1L).orElseThrow(
-                () -> new EntityNotFoundException("Template Insurance Premi is not found")
-        );
-
-        Double premiMain = (temiMain.getTemiRateMin() / 100) * currentPrice;
-
-        Double premiExtend = 0.0;
-
-        Double materai = 10_000.0;
-
-        if(!cuexs.isEmpty()){
-            for (CustomerInscExtend  cuex: cuexs) {
-                premiExtend += cuex.getCuexNominal();
-            }
-
-        }
-
-        Double totalPremi = premiMain + premiExtend + materai;
-
-        log.info("CustomerRequestServiceImpl:getPremiPrice, successfully calculate premi");
-        return totalPremi;
-    }
 
     @Transactional(readOnly = true)
     @Override
