@@ -24,5 +24,8 @@ public interface CustomerRequestRepository extends JpaRepository<CustomerRequest
 
     Page<CustomerRequest> findByEmployeeAreaWorkgroupAndCreqStatus(EmployeeAreaWorkgroup employeeAreaWorkgroup, Pageable pageable, EnumCustomer.CreqStatus creqStatus);
 
+    Page<CustomerRequest> findByCreqTypeAndCreqStatus(Pageable pageable, EnumCustomer.CreqType creqType, EnumCustomer.CreqStatus creqStatus);
+
+    Page<CustomerRequest> findByCreqStatus(Pageable pageable, EnumCustomer.CreqStatus creqStatus);
 
 }

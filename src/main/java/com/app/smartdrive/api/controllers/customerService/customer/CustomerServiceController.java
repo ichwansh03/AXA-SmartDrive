@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,6 +37,29 @@ public class CustomerServiceController {
     private final ServOrderService servOrderService;
 
     @GetMapping("/request")
+    public ResponseEntity<Page<CustomerResponseDTO>> getAllCustomersRequest(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "3") int size,
+            @RequestParam(value = "type", defaultValue = "ALL") String type,
+            @RequestParam(value = "status", defaultValue = "OPEN") String status,
+            @RequestParam(value = "sortBy", defaultValue = "creqEntityId") String sortBy,
+            @RequestParam(value = "sort", defaultValue = "ascending") String sort
+
+    ){
+        Pageable paging;
+
+        if(Objects.equals(sort, "descending")){
+            paging = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }else {
+            paging = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        }
+
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = this.customerRequestService.getAllPaging(paging, type, status);
+
+        return ResponseEntity.status(HttpStatus.OK).body(pagingCustomerResponseDTO);
+    }
+
+    @GetMapping("/request/customer")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllUserCustomersRequest(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "3") int size,

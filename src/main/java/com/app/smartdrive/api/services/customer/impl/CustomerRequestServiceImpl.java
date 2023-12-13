@@ -55,8 +55,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
-    private final TemiRepository temiRepository;
-
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
 
     private final BusinessEntityService businessEntityService;
@@ -154,7 +152,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, cias.getCiasCurrentPrice());
 
 
-        Double premiPrice = this.getPremiPrice(
+        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
@@ -218,7 +216,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasDTO.getCurrentPrice());
 
 
-        Double premiPrice = this.getPremiPrice(
+        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
@@ -428,30 +426,28 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return customerResponseDTO;
     }
 
-    @Transactional(readOnly = true)
+
     @Override
-    public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs){
-        TemplateInsurancePremi temiMain = this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(zonesId, insuraceType, 1L).orElseThrow(
-                () -> new EntityNotFoundException("Template Insurance Premi is not found")
-        );
+    public Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status) {
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
 
-        Double premiMain = (temiMain.getTemiRateMin() / 100) * currentPrice;
+        Page<CustomerRequest> pageCustomerRequest;
 
-        Double premiExtend = 0.0;
-
-        Double materai = 10_000.0;
-
-        if(!cuexs.isEmpty()){
-            for (CustomerInscExtend  cuex: cuexs) {
-                premiExtend += cuex.getCuexNominal();
-            }
-
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByCreqStatus(paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByCreqTypeAndCreqStatus(paging, creqType, creqStatus);
         }
 
-        Double totalPremi = premiMain + premiExtend + materai;
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
 
-        log.info("CustomerRequestServiceImpl:getPremiPrice, successfully calculate premi");
-        return totalPremi;
+        return pageCustomerResponseDTO;
     }
 
     @Transactional(readOnly = true)
@@ -484,6 +480,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         return pageCustomerResponseDTO;
     }
+
 
     @Override
     public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable paging, String type, String status) {
@@ -647,8 +644,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl:changeRequestTypeToClose, successfully change creq type to close");
     }
-
-
 }
 
 
