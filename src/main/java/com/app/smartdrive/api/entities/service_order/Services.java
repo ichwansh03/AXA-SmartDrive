@@ -17,7 +17,6 @@ import java.util.List;
 @Builder
 @Setter
 @Getter
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -77,8 +76,8 @@ public class Services {
 
     //@PrimaryKeyJoinColumn
     //@JsonIgnore
-    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
-    private List<ServicePremi> servicePremiSet;
+    @OneToOne(mappedBy = "services", cascade = CascadeType.ALL)
+    private ServicePremi servicePremi;
 
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     private List<ServicePremiCredit> servicePremiCredits;

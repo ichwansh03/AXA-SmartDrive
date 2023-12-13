@@ -1,8 +1,10 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
+import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
@@ -51,8 +53,18 @@ public class ServOrderController {
         return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
     }
 
+    @GetMapping("/partner")
+    public ResponseEntity<?> getAllPartnerBySeroId(@RequestParam("seroId") String seroId){
+
+        List<Partner> allPartner = servOrderService.findAllPartner(seroId);
+
+        //List<PartnerDto> partnerDtos = TransactionMapper.mapEntityListToDtoList(allPartner, PartnerDto.class);
+
+        return new ResponseEntity<>(allPartner, HttpStatus.OK);
+    }
+
     private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders) {
-        Services servicesById = servService.findServicesById(serviceOrders.getServices().getServId()).get();
+        Services servicesById = servService.findServicesById(serviceOrders.getServices().getServId());
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);
 
         List<ServiceOrderTasks> serviceOrderTasks = servOrderTaskService.findSeotBySeroId(serviceOrders.getSeroId());

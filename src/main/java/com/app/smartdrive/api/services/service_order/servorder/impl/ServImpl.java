@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,10 +57,11 @@ public class ServImpl implements ServService {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Services> findServicesById(Long servId) {
-        Optional<Services> byId = soRepository.findById(servId);
-        log.info("SoOrderServiceImpl::findServicesById in ID {} ",byId);
-        return byId;
+    public Services findServicesById(Long servId) {
+        Services services = soRepository.findById(servId)
+                .orElseThrow(() -> new EntityNotFoundException("Service with ID " + servId + " not found"));
+        log.info("SoOrderServiceImpl::findServicesById in ID {} ",services.getServId());
+        return services;
     }
 
     private Services generateFeasiblityType(CustomerRequest cr){

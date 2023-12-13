@@ -1,14 +1,22 @@
 package com.app.smartdrive.api.services.service_order.premi.impl;
 
 import com.app.smartdrive.api.Exceptions.CheckPaymentException;
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
+import com.app.smartdrive.api.entities.service_order.ServicePremiCreditId;
+import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoRepository;
+import com.app.smartdrive.api.services.master.EmailService;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +31,10 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
 
     private final SecrRepository secrRepository;
     private final SemiRepository semiRepository;
+    private final SoRepository soRepository;
+    private final EmailService emailService;
+
+    private static final long PEROIOD_IN_MILLIS = 24 * 60 * 60 * 1000;
 
     @Override
     public List<ServicePremiCredit> findByServId(Long servId) {
@@ -58,8 +70,8 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     }
 
     @Override
-    public boolean updateSecr(SecrReqDto secrReqDto) {
-        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+    public boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId) {
+        ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId)).get();
 
         ServicePremiCredit newSecr = ServicePremiCredit.builder()
                 .secrId(existSecr.getSecrId())
@@ -92,4 +104,18 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         return existSecr.getSecrPremiDebet() == null && LocalDateTime.now().isAfter(existSecr.getSecrDuedate());
     }
 
+    @Async
+    @Scheduled(fixedRate = PEROIOD_IN_MILLIS)
+    public void sendNotify(){
+        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+        Services services = soRepository.findById(existSecr.getSecrServId())
+                .orElseThrow(() -> new EntityNotFoundException("Service not found"));
+        if (existSecr.getSecrDuedate().minusDays(2).isBefore(LocalDateTime.now())){
+            EmailReq emailReq = new EmailReq();
+            emailReq.setTo(services.getUsers().getUserEmail());
+            emailReq.setSubject("Due Date Premi Payment");
+            emailReq.setBody("Pay your bill immediately before it closes");
+            emailService.sendMail(emailReq);
+        }
+    }
 }

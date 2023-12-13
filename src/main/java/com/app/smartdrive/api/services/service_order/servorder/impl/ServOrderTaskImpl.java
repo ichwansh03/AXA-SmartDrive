@@ -4,12 +4,14 @@ import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TestaRepository;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
+import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
@@ -77,20 +79,15 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                     EnumModuleServiceOrders.SeotStatus.COMPLETED, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, generatePolisNumber));
 
-            if (templateServiceTask.getTestaName().equals("NOTIFY TO AGENT")) {
-                emailReq.setTo(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail());
-                emailReq.setSubject("New Customer POLIS");
-                emailReq.setBody("New Customer POLIS with name " + serviceOrders.getServices().getUsers().getUserFullName());
-                log.info("Email send to agent");
-                emailService.sendMail(emailReq);
-            }
+            switch (templateServiceTask.getTestaName()){
+                case "NOTIFY TO AGENT" -> notifyTask(emailReq, serviceOrders,
+                        "Request new POLIS",
+                        "Request new POLIS from "+serviceOrders.getServices().getUsers().getUserFullName());
+                case "NOTIFY TO CUSTOMER" -> notifyTask(emailReq, serviceOrders,
+                        "POLIS has been created",
+                        "Your request POLIS has been created, check your dashboard page");
+                default -> log.info("ServOrderTaskImpl::addPolisList all notify in POLIS has been created");
 
-            if (templateServiceTask.getTestaName().equals("NOTIFY TO CUSTOMER")) {
-                emailReq.setTo(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail());
-                emailReq.setSubject("New POLIS has been created");
-                emailReq.setBody("Your successfully created POLIS");
-                log.info("Email send to customer");
-                emailService.sendMail(emailReq);
             }
         }
 
@@ -105,6 +102,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     public List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders) {
 
         List<ServiceTaskReqDto> seot = new ArrayList<>();
+        EmailReq emailReq = new EmailReq();
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(3L);
 
         for (int i = 0; i < templateServiceTasks.size(); i++) {
@@ -114,8 +112,27 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                     EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, null));
 
-            if (templateServiceTasks.get(i).getTestaName().equals("NOTIFY PARTNER TO REPAIR")){
-
+            switch (templateServiceTasks.get(i).getTestaName()){
+                //pilih partner berdasarkan area workgroup
+                //wo1-pilih partner
+                //wo2-call method add partner(so, partner)
+                //wo3-notify to repair or ganti suku cadang or keduanya
+                case "NOTIFY PARTNER TO REPAIR" -> {
+                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
+                        notifyTask(emailReq, serviceOrders,
+                                "Check Vehicle Condition",
+                                "Check condition of customer vehicle from "+serviceOrders.getServices().getUsers().getUserFullName());
+                    }
+                }
+                //task calculate sparepart call createOne(String seroId) => BPIN Service
+                case "NOTIFY AGENT CLAIM" -> {
+                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
+                        notifyTask(emailReq, serviceOrders,
+                                "New CLAIM Request",
+                                "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
+                    }
+                }
+                default -> log.info("ServOrderTaskImpl::addClaimList all notify in CLAIM has been created");
             }
         }
 
@@ -135,9 +152,23 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     @Transactional
     @Override
     public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
-        int serviceOrderTasks = soTasksRepository.updateTasksStatus(seotStatus, seotId);
+        int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, seotId);
+        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId).get();
+
+        switch (orderTasks.getSeotName()){
+            case "CLAIM DOCUMENT APPROVED" -> {
+                //call partner
+            }
+        }
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
-        return serviceOrderTasks;
+        return updateSeot;
     }
 
+    private void notifyTask(EmailReq emailReq, ServiceOrders serviceOrders, String subject, String message){
+        emailReq.setTo(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail());
+        emailReq.setSubject(subject);
+        emailReq.setBody(message);
+        log.info("Email has been send");
+        emailService.sendMail(emailReq);
+    }
 }
