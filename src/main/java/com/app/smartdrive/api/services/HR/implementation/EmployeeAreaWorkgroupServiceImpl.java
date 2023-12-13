@@ -166,8 +166,9 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     
     @Override
     public EmployeeAreaWorkgroup getById(Long id) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.employeeAreaWorkgroupRepository.findByEawgId(id).orElseThrow(
+                () -> new EntityNotFoundException("EmployeeAreaWorkgroup is not found")
+        );
     }
 
     @Override
