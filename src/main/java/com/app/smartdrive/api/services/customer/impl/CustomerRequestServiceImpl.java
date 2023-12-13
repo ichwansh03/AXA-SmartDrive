@@ -427,6 +427,29 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
 
+    @Override
+    public Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status) {
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
+
+        Page<CustomerRequest> pageCustomerRequest;
+
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByCreqStatus(paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByCreqTypeAndCreqStatus(paging, creqType, creqStatus);
+        }
+
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
+        return pageCustomerResponseDTO;
+    }
+
     @Transactional(readOnly = true)
     @Override
     public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status) {
@@ -457,6 +480,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         return pageCustomerResponseDTO;
     }
+
 
     @Override
     public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable paging, String type, String status) {
@@ -620,8 +644,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl:changeRequestTypeToClose, successfully change creq type to close");
     }
-
-
 }
 
 
