@@ -44,10 +44,10 @@ class BatchPartnerInvoiceControllerTest {
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            BatchPartnerInvoice bpin = objectMapper.readValue(result.getResponse().getContentAsString(), BatchPartnerInvoice.class);
+           BatchPartnerInvoice bpin = objectMapper.readValue(result.getResponse().getContentAsString(), BatchPartnerInvoice.class);
 
-            assertNotNull(bpin);
-            log.info(objectMapper.enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(bpin));
+           assertNotNull(bpin);
+           log.info(objectMapper.enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(bpin));
 
         });
     }
@@ -60,9 +60,9 @@ class BatchPartnerInvoiceControllerTest {
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            List<BatchPartnerInvoice> bpin = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<BatchPartnerInvoice>>() {});
+           List<BatchPartnerInvoice> bpin = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<BatchPartnerInvoice>>() {});
 
-            assertNotNull(bpin);
+           assertNotNull(bpin);
             log.info(objectMapper.enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(bpin));
 
         });

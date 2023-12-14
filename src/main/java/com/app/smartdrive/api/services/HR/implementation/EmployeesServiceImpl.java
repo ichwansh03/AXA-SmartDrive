@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -227,9 +228,12 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     @Override
     public Employees getById(Long id) {
-        return employeesRepository.findById(id).orElseThrow(() -> {
-            throw new EntityNotFoundException("employees not found by id "+id);
-        });
+
+        Employees existEmployees = this.employeesRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Employee with id : " + id + " is not found")
+        );
+
+        return existEmployees;
     }
 
     @Override

@@ -159,5 +159,11 @@ public class GlobalExceptions {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
 
     }
+
+    @ExceptionHandler(TypeTransaksiNotFoundException.class)
+    public ResponseEntity<?> typeTransaksiNotFound(TypeTransaksiNotFoundException ex){
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }
 

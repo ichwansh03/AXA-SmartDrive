@@ -85,6 +85,8 @@ public class SoAdapter {
 
     }
 
+
+
     public ServiceRespDto responseServices(Services services){
         User userById = userService.getUserById(services.getUsers().getUserEntityId()).get();
         UserDto userDto = TransactionMapper.mapEntityToDto(userById, UserDto.class);
@@ -107,7 +109,7 @@ public class SoAdapter {
     }
 
     private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders) {
-        Services servicesById = servService.findServicesById(serviceOrders.getServices().getServId()).get();
+        Services servicesById = servService.findServicesById(serviceOrders.getServices().getServId());
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);
 
         List<ServiceOrderTasks> serviceOrderTasks = servOrderTaskService.findSeotBySeroId(serviceOrders.getSeroId());
@@ -121,7 +123,7 @@ public class SoAdapter {
     }
 
     private SemiDto responseServPremi(ServicePremi servicePremi) {
-        Services servicesById = servService.findServicesById(servicePremi.getServices().getServId()).get();
+        Services servicesById = servService.findServicesById(servicePremi.getServices().getServId());
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);
 
         List<ServicePremiCredit> servicePremiCredits = servPremiCreditService.findByServId(servicePremi.getSemiServId());

@@ -16,6 +16,8 @@ public interface PaymentTransactionsRepository extends JpaRepository<PaymentTran
     @Query(value = "SELECT TOP(1) * FROM payment.payment_transactions ORDER BY patr_trxno DESC ", nativeQuery = true) 
     Optional<PaymentTransactions> findLastOptional();
     
+    @Query(value = "SELECT COUNT(patr_trxno) FROM payment.payment_transactions", nativeQuery = true)
+    int countTrxno();
 
     
 } 

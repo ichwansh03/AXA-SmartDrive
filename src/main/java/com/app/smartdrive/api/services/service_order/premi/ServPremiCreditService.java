@@ -17,7 +17,9 @@ public interface ServPremiCreditService {
 
     List<ServicePremiCredit> addSecr(ServicePremi servicePremi);
 
-    ServicePremiCredit findByDueDate();
+    boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId);
 
-    SecrReqDto updateSecr(SecrReqDto secrReqDto);
+    boolean checkPremiPayment(ServicePremiCredit servicePremiCredit);
+
+    ServicePremiCredit findByDueDate();
 }
