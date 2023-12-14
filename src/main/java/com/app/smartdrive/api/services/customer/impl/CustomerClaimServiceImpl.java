@@ -13,6 +13,7 @@ import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CustomerClaimServiceImpl implements CustomerClaimService {
 
@@ -29,6 +31,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
 
     @Override
     public CustomerClaim createNewClaim(CustomerRequest customerRequest) {
+
         CustomerClaim newCustomerClaim = CustomerClaim.builder()
                 .cuclEventPrice(0.0)
                 .cuclSubtotal(0.0)
@@ -37,18 +40,20 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
                 .customerRequest(customerRequest)
                 .build();
 
+        log.info("CustomerClaimImpl::createNewClaim, create new customer claim");
         return newCustomerClaim;
     }
 
     @Transactional(readOnly = true)
     @Override
     public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId) {
+
         CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
+                () -> new EntityNotFoundException("Customer Claim with id " + cuclCreqEntityId + " is not found")
         );
 
 
-        return ClaimResponseDTO.builder()
+        ClaimResponseDTO claimResponseDTO = ClaimResponseDTO.builder()
                 .cuclCreqEntityId(existCustomerClaim.getCuclCreqEntityid())
                 .cuclCreateDate(existCustomerClaim.getCuclCreateDate())
                 .cuclReason(existCustomerClaim.getCuclReason())
@@ -56,23 +61,28 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
                 .cuclSubtotal(existCustomerClaim.getCuclSubtotal())
                 .build();
 
+        log.info("CustomerClaimImpl::getCustomerClaimById, find customer claim with id: {}", cuclCreqEntityId);
+        return claimResponseDTO;
+
     }
 
     @Transactional
     @Override
     public void deleteCustomerClaim(Long cuclCreqEntityId) {
         CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + cuclCreqEntityId + " tidak ditemukan")
+                () -> new EntityNotFoundException("Customer Claim with id " + cuclCreqEntityId + " is not found")
         );
 
+
         this.customerClaimRepository.delete(existCustomerClaim);
+        log.info("CustomerClaimImpl::deleteCustomerClaim, delete customer claim by id: {}", cuclCreqEntityId);
     }
 
     @Transactional
     @Override
     public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Claim dengan id " + claimRequestDTO.getCreqEntityId() + " tidak ditemukan")
+                () -> new EntityNotFoundException("Customer Request with id " + claimRequestDTO.getCreqEntityId() + " is not found")
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
@@ -101,6 +111,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         existCustomerClaim.setCuclEvents(cuclEvents);
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
+        log.info("CustomerClaimServiceImpl::updateCustomerClaim by ID {}", savedCustomerRequest.getCreqEntityId());
         return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
@@ -108,7 +119,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
     @Override
     public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(closeRequestDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request dengan id " + closeRequestDTO.getCreqEntityId() + " tidak ada")
+                () -> new EntityNotFoundException("Customer Request with id " + closeRequestDTO.getCreqEntityId() + " is not found")
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
@@ -118,6 +129,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         customerClaim.setCuclCreateDate(LocalDateTime.now());
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
+        log.info("CustomerClaimServiceImpl::closePolis successfully close polis");
         return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 }

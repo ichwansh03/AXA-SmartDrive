@@ -13,11 +13,11 @@ import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.services.BaseService;
 
 public interface EmployeeAreaWorkgroupService extends BaseService<EmployeeAreaWorkgroup, Long> {
-    public EmployeeAreaWorkgroupDto addEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto); 
-
     public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size);
 
-     public EmployeeAreaWorkgroupDto updateEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, Long id);
+     public EmployeeAreaWorkgroup createEawg(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto);
+
+     public EmployeeAreaWorkgroup updateEawg(Long eawgId, EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto);
 
      public List<EmployeesAreaWorkgroupResponseDto> getAllDto();
 

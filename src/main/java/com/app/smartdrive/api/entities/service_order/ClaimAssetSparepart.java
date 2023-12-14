@@ -8,6 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -15,6 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "claim_asset_sparepart", schema = "so")
+@EntityListeners(AuditingEntityListener.class)
 public class ClaimAssetSparepart {
 
     @Id
@@ -35,17 +41,20 @@ public class ClaimAssetSparepart {
     @Column(name = "casp_subtotal")
     private Double caspSubtotal;
 
-    @Column(name = "casp_part_entityid")
-    private Long caspPartEntityid;
+    @CreatedDate
+    @Column(name = "casp_created_date")
+    private LocalDateTime createdDate;
 
-    @Column(name = "casp_sero_id")
+    @Column(name = "casp_sero_id", insertable = false, updatable = false)
     private String caspSeroId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "casp_part_entityid", referencedColumnName = "part_entityid", insertable = false, updatable = false)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "casp_part_entityid")
     Partner caspPartners;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "casp_sero_id", referencedColumnName = "sero_id", insertable = false, updatable = false)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "casp_sero_id")
     ServiceOrders caspServiceOrders;
 }

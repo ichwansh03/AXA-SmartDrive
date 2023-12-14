@@ -6,6 +6,8 @@ import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -29,6 +31,7 @@ public class CustomerInscAssets {
     @JoinColumn(name = "cias_creq_entityid")
     private CustomerRequest customerRequest;
 
+    @NotBlank
     @Column(name = "cias_police_number", length = 15, unique = true, nullable = false)
     private String ciasPoliceNumber;
 

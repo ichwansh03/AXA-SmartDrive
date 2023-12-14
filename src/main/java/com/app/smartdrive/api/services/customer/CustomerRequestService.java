@@ -2,6 +2,7 @@ package com.app.smartdrive.api.services.customer;
 
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
@@ -13,21 +14,23 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CustomerRequestService {
-    public List<CustomerRequest> get();
+    public List<CustomerResponseDTO> get();
 
     public Page<CustomerResponseDTO> getPaging(Pageable pageable);
 
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId);
 
-    public CustomerResponseDTO create(@Valid CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
+
+    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
     public CustomerResponseDTO convert(CustomerRequest customerRequest);
 
-    public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs);
-
     public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status);
 
-    public CustomerResponseDTO updateCustomerRequest(Long creqEntityId, UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
+    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable pageable, String type, String status);
+
+    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
     public void delete(Long creqEntityId);
 
@@ -39,4 +42,5 @@ public interface CustomerRequestService {
 
     public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO);
 
+    Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status);
 }

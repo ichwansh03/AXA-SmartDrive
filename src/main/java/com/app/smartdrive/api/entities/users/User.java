@@ -142,7 +142,7 @@ public class User implements UserDetails {
   @JsonManagedReference
   private List<UserAccounts> userAccounts;
 
-  @JsonIgnore
+//  @JsonIgnore
   @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
   List<CustomerRequest> customerRequest;
 

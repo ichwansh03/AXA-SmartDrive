@@ -18,13 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeSalaryDetailId implements Serializable{
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="emsa_id")
     private Long emsaId;
-
-    @Column(name = "emsa_emp_entityid",insertable=false, updatable=false)
     private Long emsaEmpEntityid;
-
-    @Column(name = "emsa_create_date")
     private LocalDate emsaCreateDate;
 }

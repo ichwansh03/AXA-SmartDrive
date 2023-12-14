@@ -3,8 +3,12 @@ package com.app.smartdrive.api.Exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -46,7 +50,19 @@ public class GlobalExceptions {
 
         return ResponseEntity.internalServerError().body(sql.getMessage());
     }
-        
+
+    @ExceptionHandler(InvalidDataAccessResourceUsageException.class)
+    public ResponseEntity<?> handleErrorInvalidDataAccess(InvalidDataAccessResourceUsageException ex, HttpServletRequest request){
+        Error error = ErrorUtils.createError(
+                        ex.getMessage(),
+                        ex.getLocalizedMessage(),
+                        HttpStatus.BAD_REQUEST.value())
+                .setUrl(request.getRequestURL().toString())
+                .setReqMethod(request.getMethod())
+                .setTimestamp(LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     
 
     @ExceptionHandler(BindException.class)
@@ -57,17 +73,23 @@ public class GlobalExceptions {
                         HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .setTimestamp(LocalDateTime.now());
 
-        /*
-         * Map<String, String> errors = new HashMap<>();
-         * ex.getFieldErrors().forEach(fieldError -> {
-         * String fieldName = fieldError.getField();
-         * String errorMessage = fieldError.getDefaultMessage();
-         * errors.put(fieldName, errorMessage);
-         * });
-         */
+    //     /*
+    //      * Map<String, String> errors = new HashMap<>();
+    //      * ex.getFieldErrors().forEach(fieldError -> {
+    //      * String fieldName = fieldError.getField();
+    //      * String errorMessage = fieldError.getDefaultMessage();
+    //      * errors.put(fieldName, errorMessage);
+    //      * });
+    //      */
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+
+   @ExceptionHandler(ValidasiRequestException.class)
+   public ResponseEntity<?> handleValidasi(ValidasiRequestException e){
+       return ResponseEntity.status(400).body(e.toString()+ "ERROR VALIDASI MASUK DISINI");
+   }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(
@@ -83,6 +105,7 @@ public class GlobalExceptions {
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
     @ExceptionHandler(UserExistException.class)
     public ResponseEntity<?> userExistException(UserExistException ex) {
 
@@ -92,6 +115,12 @@ public class GlobalExceptions {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> entityNotFoundException(EntityNotFoundException ex){
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.NOT_FOUND.value());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<?> userNotFoundException(UserNotFoundException ex){
         Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.NOT_FOUND.value());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
@@ -110,6 +139,12 @@ public class GlobalExceptions {
     public ResponseEntity<?> methodArgumentConversionNotSupportedException(
             MethodArgumentConversionNotSupportedException ex) {
 
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SaldoIsNotEnoughException.class)
+    public ResponseEntity<?> saldoIsNotEnoughException(SaldoIsNotEnoughException ex){
         Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
@@ -136,6 +171,13 @@ public class GlobalExceptions {
                 ex.getMessage(),ex.getLocalizedMessage(),HttpStatus.BAD_REQUEST.value()
         );
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+
+    }
+
+    @ExceptionHandler(TypeTransaksiNotFoundException.class)
+    public ResponseEntity<?> typeTransaksiNotFound(TypeTransaksiNotFoundException ex){
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -164,3 +206,4 @@ public class GlobalExceptions {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(re);
     }
 }
+

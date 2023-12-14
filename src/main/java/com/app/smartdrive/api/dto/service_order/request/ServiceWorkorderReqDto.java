@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 public class ServiceWorkorderReqDto {
 
     private String sowoName;
+    @LastModifiedDate
     private LocalDateTime sowoModDate;
     private Boolean sowoStatus;
     private ServiceOrderTasks serviceOrderTasks;

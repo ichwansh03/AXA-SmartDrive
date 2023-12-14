@@ -22,7 +22,7 @@ public class TemplateSalary {
     private Long tesalId;
 
     @Column(name="tesal_name",unique = true)
-    private Long tesalName;
+    private String tesalName;
 
     @Column(name="tesal_nominal")
     private Double tesalNominal;

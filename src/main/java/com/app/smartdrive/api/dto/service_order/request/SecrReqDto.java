@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SecrReqDto {
 
+    private Long secrServId;
     private String secrYear;
     private BigDecimal secrPremiDebet;
     private BigDecimal secrPremiCredit;

@@ -4,7 +4,9 @@ import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface TemiRepository extends JpaRepository<TemplateInsurancePremi, Long> {
-    TemplateInsurancePremi findByTemiZonesIdAndTemiIntyNameAndTemiCateId(Long zonesId, String temiIntyName, Long temiCateId);
+    Optional<TemplateInsurancePremi> findByTemiZonesIdAndTemiIntyNameAndTemiCateId(Long zonesId, String temiIntyName, Long temiCateId);
 }
