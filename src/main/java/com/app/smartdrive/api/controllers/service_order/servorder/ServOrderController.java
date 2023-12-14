@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
-import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
@@ -12,14 +11,12 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,17 +30,6 @@ public class ServOrderController {
     private final ServService servService;
     private final ServOrderTaskService servOrderTaskService;
 
-    @GetMapping
-    public ResponseEntity<?> getServiceOrderById(@RequestParam("seroid") String seroId) {
-
-        ServiceOrders seroById = servOrderService.findServiceOrdersById(seroId);
-
-        ServiceOrderRespDto serviceOrderRespDto = responseServiceOrders(seroById);
-
-        log.info("ServiceOrdersController::getServiceOrderById successfully viewed");
-        return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
-    }
-
     @GetMapping("/search")
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId) {
         ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(seroId);
@@ -53,14 +39,10 @@ public class ServOrderController {
         return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
     }
 
-    @GetMapping("/partner")
-    public ResponseEntity<?> getAllPartnerBySeroId(@RequestParam("seroId") String seroId){
-
-        List<Partner> allPartner = servOrderService.findAllPartner(seroId);
-
-        //List<PartnerDto> partnerDtos = TransactionMapper.mapEntityListToDtoList(allPartner, PartnerDto.class);
-
-        return new ResponseEntity<>(allPartner, HttpStatus.OK);
+    @PutMapping("/partner/{seroId}")
+    public ResponseEntity<?> updateToAddPartner(@Valid @RequestBody Partner partner, @PathVariable("seroId") String seroId){
+        servOrderService.selectPartner(partner, seroId);
+        return new ResponseEntity<>(partner, HttpStatus.OK);
     }
 
     private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders) {
