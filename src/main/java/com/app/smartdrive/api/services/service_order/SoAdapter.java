@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.*;
 import com.app.smartdrive.api.dto.user.response.UserDto;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @AllArgsConstructor
@@ -85,27 +87,31 @@ public class SoAdapter {
 
     }
 
-
-
-    public ServiceRespDto responseServices(Services services){
-        User userById = userService.getUserById(services.getUsers().getUserEntityId()).get();
-        UserDto userDto = TransactionMapper.mapEntityToDto(userById, UserDto.class);
-
+    public ServiceRespDto responseServices(Services services) {
+        UserDto userDto = mapUserToDto(services.getUsers().getUserEntityId());
         CustomerResponseDTO creqDto = customerRequestService.getCustomerRequestById(services.getCustomer().getCreqEntityId());
-
-        List<ServiceOrders> serviceOrders = servOrderService.findAllSeroByServId(services.getServId());
-        List<ServiceOrderRespDto> serviceOrderRespDtoClass = TransactionMapper.mapListDtoToListEntity(serviceOrders, ServiceOrderRespDto.class);
-
-        List<ServicePremi> servicePremis = servPremiService.findByServId(services.getServId());
-        List<SemiDto> semiDtos = TransactionMapper.mapListDtoToListEntity(servicePremis, SemiDto.class);
+        List<ServiceOrderRespDto> serviceOrderRespDtoList = mapServiceOrdersToDtoList(services.getServId());
+        SemiDto semiDto = mapServPremiToDto(services.getServId());
 
         ServiceRespDto serviceDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
         serviceDto.setUserDto(userDto);
         serviceDto.setCustomerResponseDTO(creqDto);
-        serviceDto.setServiceOrdersList(serviceOrderRespDtoClass);
-        serviceDto.setSemiDtoList(semiDtos);
+        serviceDto.setServiceOrdersList(serviceOrderRespDtoList);
+        serviceDto.setSemiDto(semiDto);
 
         return serviceDto;
+    }
+
+    private UserDto mapUserToDto(Long userEntityId) {
+        User userById = userService.getUserById(userEntityId).orElseThrow(EntityNotFoundException::new);
+        return TransactionMapper.mapEntityToDto(userById, UserDto.class);
+    }
+
+    private List<ServiceOrderRespDto> mapServiceOrdersToDtoList(Long servId) {
+        List<ServiceOrders> serviceOrders = servOrderService.findAllSeroByServId(servId);
+        return serviceOrders.stream()
+                .map(this::responseServiceOrders)
+                .collect(Collectors.toList());
     }
 
     private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders) {
@@ -122,14 +128,13 @@ public class SoAdapter {
         return serviceOrderRespDto;
     }
 
-    private SemiDto responseServPremi(ServicePremi servicePremi) {
-        Services servicesById = servService.findServicesById(servicePremi.getServices().getServId());
-        ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);
+    private SemiDto mapServPremiToDto(Long servId) {
+        ServicePremi servicePremis = servPremiService.findByServId(servId);
 
-        List<ServicePremiCredit> servicePremiCredits = servPremiCreditService.findByServId(servicePremi.getSemiServId());
+        List<ServicePremiCredit> servicePremiCredits = servPremiCreditService.findByServId(servicePremis.getSemiServId());
         List<SecrDto> secrDtoList = TransactionMapper.mapEntityListToDtoList(servicePremiCredits, SecrDto.class);
 
-        SemiDto semiDto = TransactionMapper.mapEntityToDto(servicePremi, SemiDto.class);
+        SemiDto semiDto = TransactionMapper.mapEntityToDto(servicePremis, SemiDto.class);
         semiDto.setSecrDtoList(secrDtoList);
 
         return semiDto;
