@@ -239,6 +239,48 @@ class CustomerServiceControllerTest {
                 .andExpect(status().isCreated()
         );
     }
+
+    @Test
+    void createCustomerRequest_willFailed() throws Exception {
+
+        MockMultipartFile file =
+                new MockMultipartFile(
+                        "file",
+                        "contract.pdf",
+                        MediaType.APPLICATION_PDF_VALUE,
+                        "<<pdf data>>".getBytes(StandardCharsets.UTF_8));
+
+        Long[] arr = {7L,8L,9L};
+
+        CiasDTO ciasDTO = CiasDTO.builder()
+                .ciasPoliceNumber("B 123457 CBD")
+                .ciasYear("2007")
+                .ciasIsNewChar('Y')
+                .ciasPaidType("CASH")
+                .ciasCarsId(1L)
+                .ciasCityId(20L)
+                .ciasIntyName("Comprehensive")
+                .ciasStartdate("2023-09-01 15:02:00")
+                .currentPrice(150_000_000.00)
+                .cuexIds(arr)
+                .build();
+
+        CustomerRequestDTO customerRequestDTO = CustomerRequestDTO.builder()
+                .customerId(2L)
+                .agenId(8L)
+                .employeeId(1L)
+                .ciasDTO(ciasDTO)
+                .build();
+
+        mockMvc.perform(
+                        multipart("/customer/service/request")
+                                .file(file)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("client", objectMapper.writeValueAsString(customerRequestDTO))
+                )
+                .andExpect(status().isNotFound()
+                );
+    }
 }
 
 
