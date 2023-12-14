@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.controllers.users;
 
-import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,49 +18,38 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
-@EnableMethodSecurity
 public class UserController {
   private final UserService userService;
 
-//  @PostMapping("/emps/signin")
-//  public ResponseEntity<?> loginEmployee(@Valid @RequestBody LoginDto login){
-//    return ResponseEntity.status(HttpStatus.OK).body(userService.loginEmployee(login.getIdentity(), login.getPassword()));
-//  }
-
   @GetMapping
+  @PreAuthorize("hasAuthority('Admin')")
   public List<UserDto> getAllUsers() {
     return TransactionMapper.mapEntityListToDtoList(userService.getAll(), UserDto.class);
   }
 
   @GetMapping("/{id}")
-  @PreAuthorize("principal.getUserEntityId() == #id")
+  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public UserDto getUser(@PathVariable("id") Long id) {
     User user = userService.getById(id);
     return TransactionMapper.mapEntityToDto(user, UserDto.class);
   }
 
   @PatchMapping("/{id}")
-  @PreAuthorize("principal.getUserEntityId() == #id")
+  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> updateUser(@Valid @ModelAttribute UpdateUserRequestDto userPost,
       @PathVariable("id") Long id) {
-
     UpdateUserRequestDto userUpdated = userService.updateUser(userPost, id);
     return ResponseEntity.status(HttpStatus.OK).body(userUpdated);
   }
 
   @DeleteMapping("/{id}")
-  @PreAuthorize("principal.getUserEntityId() == #id")
+  @PreAuthorize("hasAuthority('Admin') or principal.getUserEntityId() == #id")
   public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
     Optional<User> user = userService.getUserById(id);
-    if(user.isPresent()){
-      userService.deleteById(id);
-      return ResponseEntity.status(HttpStatus.OK).body("User sudah dihapus");
-    }
+      if(user.isPresent()){
+        userService.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).body("User sudah dihapus");
+      }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");
-    }
-  @PostMapping("/{id}/changePassword")
-  @PreAuthorize("principal.getUserEntityId() == #id")
-  public ResponseEntity<?> changePassword(@PathVariable("id") Long id, @Valid @RequestBody PasswordRequestDto passwordRequestDto){
-    return ResponseEntity.status(HttpStatus.OK).body(userService.changePassword(id, passwordRequestDto));
   }
 }

@@ -38,29 +38,32 @@ import lombok.RequiredArgsConstructor;
 public class EmployeesController {
      private final EmployeesService employeesService;
 
-
-    @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('Employee') && principal.getUserEntityId() == #emp_entityid")
-    public ResponseEntity<?> deleteEmployeesById (@RequestParam Long emp_entityid) {
-            employeesService.deleteById(emp_entityid);
-            return new ResponseEntity<>("Employees deleted successfully", HttpStatus.OK);
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('Admin')")
+    public ResponseEntity<?> deleteEmployeesById (@PathVariable("id") Long emp_entityid) {
+        employeesService.deleteById(emp_entityid);
+        return new ResponseEntity<>("Employees deleted successfully", HttpStatus.OK);
     }
 
-    @PutMapping("/update/{employeeId}")
+    @PutMapping("/{employeeId}")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<EmployeesRequestDto> updateEmployee(
-            @PathVariable Long employeeId,
+            @PathVariable("employeeId") Long employeeId,
             @RequestBody EmployeesRequestDto updatedEmployeeDto) {
         EmployeesRequestDto updatedEmployee = employeesService.editEmployee(employeeId, updatedEmployeeDto);
         return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> createEmployee(@RequestBody EmployeesRequestDto employeesDto) {
-    EmployeesRequestDto createdEmployee = employeesService.createEmployee(employeesDto);
-    return new ResponseEntity<>(createdEmployee, HttpStatus.OK);
+        EmployeesRequestDto createdEmployee = employeesService.createEmployee(employeesDto);
+        return new ResponseEntity<>(createdEmployee, HttpStatus.OK);
     }
 
+
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('Admin')")
     public Page<Employees> searchEmployees(
             @RequestParam(value = "value") String value,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -70,6 +73,7 @@ public class EmployeesController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('Admin')")
     public List<EmployeesDto> getAllEmployees() {
       return employeesService.getAllDto();
     }
