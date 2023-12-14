@@ -5,7 +5,8 @@ public class EnumUsers {
     CU("Customer"), //Customer
     EM("Employee"), //Employee
     PC("Potential Customer"), //Potential Customer
-    PR("Partner"); //Partner
+    PR("Partner"), //Partner
+    AD("Admin");
 
     private final String value;
     private RoleName(String value){
