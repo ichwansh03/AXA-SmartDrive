@@ -528,17 +528,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CiasDTO ciasUpdateDTO = updateCustomerRequestDTO.getCiasDTO();
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
-//        existCustomerRequest.setEmployeeAreaWorkgroup(null);
 
-//        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
-//                .orElseThrow(
-//                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
-//                );
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
+                );
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findByEawgId(updateCustomerRequestDTO.getAgenId()).get();
 
         existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
-//        existCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
 
         CarSeries carSeries = this.carsService.getById(ciasUpdateDTO.getCiasCarsId());
@@ -563,6 +560,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         cias.setCustomerInscDoc(newCiasDocs);
 
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
+
+        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
+                existInty.getIntyName(),
+                carSeries.getCarModel().getCarBrand().getCabrName(),
+                existCity.getProvinsi().getZones().getZonesId(),
+                ciasUpdateDTO.getCurrentPrice(),
+                updatedCustomerInscExtend
+        );
+
+        cias.setCiasTotalPremi(premiPrice);
 
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
