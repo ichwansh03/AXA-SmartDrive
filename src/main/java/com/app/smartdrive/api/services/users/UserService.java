@@ -16,6 +16,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 
 public interface UserService extends BaseService<User, Long> {
+  @Transactional
+  User createAdmin(CreateUserDto userPost);
+
   public User save(User user);
 
   public User createUserCustomer(CreateUserDto userPost);
