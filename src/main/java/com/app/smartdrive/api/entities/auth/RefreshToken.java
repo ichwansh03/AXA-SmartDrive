@@ -19,7 +19,7 @@ public class RefreshToken {
   @Column(name = "reto_id")
   private Long retoId;
 
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "reto_user_id", referencedColumnName = "user_entityid")
   private User user;
 

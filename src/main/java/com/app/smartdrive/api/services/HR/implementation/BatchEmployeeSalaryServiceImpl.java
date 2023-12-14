@@ -10,8 +10,6 @@ import com.app.smartdrive.api.entities.hr.BatchEmployeeSalary;
 import com.app.smartdrive.api.entities.hr.BatchEmployeeSalaryId;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
 import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.entities.partner.BatchPartnerInvoice;
-import com.app.smartdrive.api.entities.partner.BpinStatus;
 import com.app.smartdrive.api.repositories.HR.BatchEmployeeSalaryRepository;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.services.HR.BatchEmployeeSalaryService;
@@ -33,7 +31,7 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
         BatchEmployeeSalaryId batchEmployeeSalaryId = new BatchEmployeeSalaryId();
         batchEmployeeSalaryId.setBesaEmpEntityid(id);
         batchEmployeeSalaryId.setBesaCreatedDate(LocalDateTime.now());
-        Double salary = calculateTotalSubtotal(employees.getEmployeeSalaryDetails())+employees.getEmpNetSalary();
+        Double salary = calculateTotalCommission(employees.getEmployeeSalaryDetails())+employees.getEmpNetSalary();
         BatchEmployeeSalary batchEmployeeSalary = BatchEmployeeSalary.builder()
         .batchEmployeeSalaryId(batchEmployeeSalaryId)
         .employees(employees)
@@ -52,10 +50,11 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
     }
 
 
-    public Double calculateTotalSubtotal(List<EmployeeSalaryDetail> employeeSalaryDetails) {
-        return employeeSalaryDetails.stream()
-                .map(EmployeeSalaryDetail::getEmsaSubtotal)
-                .reduce(0.0, Double::sum);
+    public Double calculateTotalCommission(List<EmployeeSalaryDetail> salaryDetails) {
+        return salaryDetails.stream()
+                .filter(detail -> detail.getEmsaName().startsWith("komisi"))
+                .mapToDouble(EmployeeSalaryDetail::getEmsaSubtotal)
+                .sum();
     }
 
 

@@ -1,9 +1,7 @@
 package com.app.smartdrive.api.Exceptions;
 
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.Locale;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 
 
@@ -13,18 +11,34 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
 
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.Locale;
+
 @RestControllerAdvice
 public class GlobalExceptions {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptions.class);
+
+    @ExceptionHandler(value = TokenRefreshException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<Error> handleTokenRefreshException(TokenRefreshException ex, WebRequest request) {
+        Error error = ErrorUtils.createError(
+                ex.getMessage(),
+                ex.getLocalizedMessage(),HttpStatus.FORBIDDEN.value());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleAllExceptionMethod(MethodArgumentNotValidException ex, WebRequest requset) {
@@ -164,6 +178,32 @@ public class GlobalExceptions {
     public ResponseEntity<?> typeTransaksiNotFound(TypeTransaksiNotFoundException ex){
         Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(
+            AccessDeniedException ex, WebRequest request) {
+        Error error = ErrorUtils.createError(
+                ex.getMessage(),ex.getLocalizedMessage(),HttpStatus.FORBIDDEN.value()
+        );
+        return new ResponseEntity<Object>(
+                error, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<?> jwtExpired(ExpiredJwtException ex){
+        Error error = ErrorUtils.createError("Token expired, you can refresh with refreshtoken in /auth/refreshtoken",
+                ex.getLocalizedMessage(), HttpStatus.FORBIDDEN.value());
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    public ResponseEntity<?> handleAuthenticationException(Exception ex) {
+
+        Error re = ErrorUtils.createError("Authentication failed at controller advice",
+                ex.getLocalizedMessage(), HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(re);
     }
 }
 

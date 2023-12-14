@@ -1,10 +1,8 @@
 package com.app.smartdrive.api.services.users.implementation;
 
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
-import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
-import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.User;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +31,6 @@ public class UserServiceImpl implements UserService {
   private final UserAddressService userAddressService;
   private final UserUserAccountService userAccountService;
   private final RefreshTokenService refreshTokenService;
-//  private final PasswordEncoder passwordEncoder;
 
   @Override
   public User createUser(ProfileRequestDto userPost) {
@@ -78,7 +74,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public User save(User user) {
     User newUser = userRepo.save(user);
-//    userRepo.flush();
     return newUser;
   }
 
@@ -86,12 +81,8 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id){
     User user = userRepo.findById(id).orElseThrow(
-      () -> new EntityNotFoundException("User not found")
-      );
+      () -> new EntityNotFoundException("User not found"));
     TransactionMapper.mapDtoToEntity(userPost, user);
-    // String path = "src/test/resources/image/";
-    // Path filePath = Paths.get(path+user.getUserPhoto());
-    // Files.delete(filePath);
     save(user);
     return TransactionMapper.mapEntityToDto(user, UpdateUserRequestDto.class);
   }
@@ -99,21 +90,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public Optional<User> getUserById(Long id) {
     return userRepo.findById(id);
-  }
-
-  @Override
-  @Transactional
-  public String changePassword(Long id,PasswordRequestDto passwordRequestDto) {
-    User user = userRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
-    if(true){
-      if(passwordRequestDto.getNewPassword().equals(passwordRequestDto.getConfirmPassword())){
-        user.setUserPassword("true");
-        save(user);
-        return "password has been changed";
-      }
-      return "Confirm password must be the same as the new password";
-    }
-    return "Current password is wrong";
   }
 
   @Override

@@ -15,20 +15,19 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@EnableMethodSecurity
 @RequestMapping("/user/{id}/address")
 public class UserAddressController {
   private final UserAddressService userAddressService;
 
   @PostMapping
-  @PreAuthorize("principal.getUserEntityId() == #id")
+  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> createUserAddress(@PathVariable("id") Long id, @Valid @RequestBody UserAddressRequestDto userPost){
     UserAddress userAddress = userAddressService.addUserAddress(id, userPost);
     return ResponseEntity.status(HttpStatus.CREATED).body(userAddress);
   }
 
   @PatchMapping("/{addressId}")
-  @PreAuthorize("principal.getUserEntityId() == #id")
+  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> updateUserAddress(@PathVariable("id") Long id,
       @PathVariable("addressId") Long addressId, @Valid @RequestBody UserAddressRequestDto userPost) {
 
@@ -37,7 +36,7 @@ public class UserAddressController {
   }
 
   @DeleteMapping("/{addressId}")
-  @PreAuthorize("principal.getUserEntityId() == #id")
+  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> deleteAddress(@PathVariable("id") Long id, @PathVariable("addressId") Long addressId){
     userAddressService.deleteAddressById(id, addressId);
     return ResponseEntity.status(HttpStatus.OK).body("Address has been deleted");

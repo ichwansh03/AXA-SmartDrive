@@ -30,7 +30,8 @@ import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
-
+import com.app.smartdrive.api.services.HR.EmployeesService;
+import com.app.smartdrive.api.services.master.ArwgService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -39,105 +40,51 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupService {
 
-    private final ArwgRepository areaWorkGroupRepository;
-    
-    private final EmployeesRepository employeesRepository;
 
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
-      
-    private final CityRepository cityRepository;
+
+    private final ArwgService arwgService;
+
+    private final EmployeesService employeesService;
  
-    
 
     @Override
     @Transactional
-    public EmployeeAreaWorkgroupDto addEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto) {
-        Employees existingEmployee = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid())
-        .orElseThrow(() -> new EmployeesNotFoundException("Employee not found : " + employeeAreaWorkgroupDto.getEmpEntityid()));
-    
+    public EmployeeAreaWorkgroup createEawg(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto){
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
-    
-        employeeAreaWorkgroup.setEawgEntityid(existingEmployee.getEmpEntityid());
-        employeeAreaWorkgroup.setEmployees(existingEmployee);
-    
-        if (employeeAreaWorkgroupDto.getCityId() != null) {
-            Cities city = cityRepository.findById(employeeAreaWorkgroupDto.getCityId()) 
-            .orElseThrow(() -> new EntityNotFoundException("City not found : " + employeeAreaWorkgroupDto.getCityId()));
-    
-            if (city != null) {
-                Provinsi provinsi = city.getProvinsi();
-                String provName = provinsi.getProvName();
-                Zones zones = provinsi.getZones();
-                String zonesName = zones.getZonesName();
-                
-                employeeAreaWorkgroupDto.setProvinsi(provName);
-                employeeAreaWorkgroupDto.setZoneName(zonesName);
-                employeeAreaWorkgroupDto.setCityId(city.getCityId());
-    
-                AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findById(employeeAreaWorkgroupDto.getArwgCode()).orElseThrow(() -> new EntityNotFoundException("AreaWorkGroup not found : " + employeeAreaWorkgroupDto.getArwgCode()));
-                if (areaWorkGroup != null) {
-                    employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
-                    employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
-                }
-                Cities cityInAreaWorkGroup = areaWorkGroup != null ? areaWorkGroup.getCities() : null;
-                if (cityInAreaWorkGroup != null) {
-                    employeeAreaWorkgroupDto.setCityId(cityInAreaWorkGroup.getCityId());
-                }
-            }
-        }
-    
-        employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
-        employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
 
-        return employeeAreaWorkgroupDto;
+        AreaWorkGroup areaWorkGroup = arwgService.getById(employeeAreaWorkgroupDto.getArwgCode());
+        
+        Employees employees = employeesService.getById(employeeAreaWorkgroupDto.getEmpEntityid());
+
+        employeeAreaWorkgroup.setEmployees(employees);
+        employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
+        employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
+        employeeAreaWorkgroup.setEawgEntityid(employees.getEmpEntityid());
+        employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
+        
+        return employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
+        
     }
-    
+
     @Override
     @Transactional
-    public EmployeeAreaWorkgroupDto updateEmployeeAreaWorkgroup(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, Long id) {
-        Optional<EmployeeAreaWorkgroup> optionalEmployeeAreaWorkgroup = employeeAreaWorkgroupRepository.findByEawgId(id);
-         if (employeeAreaWorkgroupDto.getCityId() != null) {
-            Cities city = cityRepository.findById(employeeAreaWorkgroupDto.getCityId()) 
-            .orElseThrow(() -> new EntityNotFoundException("City not found : " + employeeAreaWorkgroupDto.getCityId()));
+    public EmployeeAreaWorkgroup updateEawg(Long eawgId, EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto) {
 
-                Provinsi provinsi = city.getProvinsi();
-                String provName = provinsi.getProvName();
-                Zones zones = provinsi.getZones();
-                String zonesName = zones.getZonesName();
-                
-                employeeAreaWorkgroupDto.setProvinsi(provName);
-                employeeAreaWorkgroupDto.setZoneName(zonesName);
-                employeeAreaWorkgroupDto.setCityId(city.getCityId());
+        EmployeeAreaWorkgroup existingEawg = employeeAreaWorkgroupRepository.findByEawgId(eawgId).orElseThrow(() -> new EntityNotFoundException("EmployeeAreaWorkgroup not found with id: " + eawgId));
 
-        if (optionalEmployeeAreaWorkgroup.isPresent()) {
-            EmployeeAreaWorkgroup employeeAreaWorkgroup = optionalEmployeeAreaWorkgroup.get();
-
-            if (!Objects.equals(employeeAreaWorkgroupDto.getArwgCode(), employeeAreaWorkgroup.getEawgArwgCode())) {
-                AreaWorkGroup areaWorkGroup = areaWorkGroupRepository.findByArwgCode(employeeAreaWorkgroupDto.getArwgCode());
-                if (areaWorkGroup != null) {
-                    employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
-                    employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
-                }else{
-                     throw new AreaWorkGroupNotFoundException("AreaWorkGroup not found with Code: " + employeeAreaWorkgroupDto.getArwgCode());
-                }
-            }
-
-            if (!Objects.equals(employeeAreaWorkgroupDto.getEmpEntityid(), employeeAreaWorkgroup.getEawgEntityid())) {
-                Employees employees = employeesRepository.findById(employeeAreaWorkgroupDto.getEmpEntityid()).orElseThrow(() -> new EmployeesNotFoundException("Employee not found with ID: " + employeeAreaWorkgroupDto.getEmpEntityid()));
-
-                if (employees != null) {
-                    employeeAreaWorkgroupRepository.setEawgEntityid(employeeAreaWorkgroupDto.getEmpEntityid(), employeeAreaWorkgroup.getEawgEntityid());
-                }
-            }
-            employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
-            employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
-        }else{
-            throw new EmployeeAreaWorkgroupNotFoundException("EmployeeAreaWorkGroup not found with Code: " + employeeAreaWorkgroupDto.getArwgCode());
+        if (existingEawg.getEawgArwgCode() != null) {
+            AreaWorkGroup areaWorkGroup = arwgService.getById(employeeAreaWorkgroupDto.getArwgCode());
+            existingEawg.setAreaWorkGroup(areaWorkGroup);
+            existingEawg.setEawgArwgCode(areaWorkGroup.getArwgCode());
         }
-    }
-
-            return employeeAreaWorkgroupDto;
+        if (existingEawg.getEawgEntityid() != null) {
+            employeeAreaWorkgroupRepository.setEawgEntityid(employeeAreaWorkgroupDto.getEmpEntityid(), existingEawg.getEawgEntityid());
         }
+
+        existingEawg.setEawgModifiedDate(LocalDateTime.now());
+        return employeeAreaWorkgroupRepository.save(existingEawg);
+    }   
 
    
 
@@ -163,7 +110,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
       return empDto;
     }
     
-    
     @Override
     public EmployeeAreaWorkgroup getById(Long id) {
         // TODO Auto-generated method stub
@@ -172,8 +118,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
     @Override
     public List<EmployeeAreaWorkgroup> getAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+        return employeeAreaWorkgroupRepository.findAll();
     }
 
     @Override
