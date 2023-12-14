@@ -74,6 +74,6 @@ public class CustomerRequest {
     private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
 //
-    @OneToOne(mappedBy = "customer")
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
     private Services services;
 }
