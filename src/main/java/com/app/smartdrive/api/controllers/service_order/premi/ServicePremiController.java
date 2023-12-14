@@ -15,13 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ServicePremiController {
 
-    private final ServPremiService servPremiService;
     private final ServPremiCreditService servPremiCreditService;
-
-    @GetMapping("/credit")
-    public ResponseEntity<?> getServicePremiCredit(){
-        return new ResponseEntity<>(servPremiCreditService.findByDueDate(), HttpStatus.OK);
-    }
 
     @PutMapping("/credit/update/{secrServId}/{secrId}")
     public ResponseEntity<?> updatePremiByDuedate(@Valid @RequestBody SecrReqDto secrReqDto,
