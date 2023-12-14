@@ -27,7 +27,6 @@ public interface UserService extends BaseService<User, Long> {
 
   public Optional<User> getUserById(Long id);
 
-  public String changePassword(Long id, PasswordRequestDto passwordRequestDto);
-
   public UserDetailsService userDetailsService();
+
 }

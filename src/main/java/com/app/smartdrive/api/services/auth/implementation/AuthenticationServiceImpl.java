@@ -5,12 +5,15 @@ import com.app.smartdrive.api.Exceptions.UserPhoneExistException;
 import com.app.smartdrive.api.Exceptions.UsernameExistException;
 import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.users.UserService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,18 +50,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     User user = userService.createUserCustomer(request);
     user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
     userRepository.save(user);
-    String jwt = jwtService.generateToken(user);
 //    return JwtAuthenticationResponse.builder().token(jwt).build();
   }
 
   @Override
-  public User signin(SignInRequest request) {
+  public User signinCustomer(SignInRequest request) {
     authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
     User user = userRepository.findUserByIden(request.getUsername())
             .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-
-    userRepository.save(user);
     return user;
+  }
+
+  @Override
+  @Transactional
+  public String changePassword(Long id, PasswordRequestDto passwordRequestDto) {
+    User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    if(passwordEncoder.matches(passwordRequestDto.getCurrentPassword(), user.getPassword())){
+      if(passwordRequestDto.getNewPassword().equals(passwordRequestDto.getConfirmPassword())){
+        user.setUserPassword("true");
+        userRepository.save(user);
+        return "password has been changed";
+      }
+      return "Confirm password must be the same as the new password";
+    }
+    return "Current password is wrong";
   }
 }

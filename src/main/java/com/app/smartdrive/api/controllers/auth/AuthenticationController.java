@@ -5,7 +5,6 @@ import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import com.app.smartdrive.api.dto.user.ProfileDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
-import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.auth.RefreshToken;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -16,6 +15,7 @@ import com.app.smartdrive.api.services.users.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -34,10 +34,15 @@ public class AuthenticationController {
   private final JwtService jwtService;
   private final RefreshTokenService refreshTokenService;
   private final UserService userService;
+  @Value("${jwt.refresh.cookie}")
+  private String jwtRefreshCookie;
+
+  @Value("${jwt.cookie.name}")
+  private String jwtCookie;
 
   @PostMapping("/signin")
   public ResponseEntity<?> loginCustomer(@Valid @RequestBody SignInRequest login){
-    User user = authenticationService.signin(login);
+    User user = authenticationService.signinCustomer(login);
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserEntityId());
     ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
     ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getRetoToken());
@@ -65,14 +70,18 @@ public class AuthenticationController {
 
   @PostMapping("/signout")
   public ResponseEntity<?> logout(){
-    ResponseCookie cookie = jwtService.getCleanJwtCookie();
-    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+
+    ResponseCookie cookie = jwtService.getCleanJwtCookie(jwtCookie, "/api");
+    ResponseCookie refreshCookie = jwtService.getCleanJwtCookie(jwtRefreshCookie, "/api/auth/refreshtoken");
+    return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
             .body(new MessageResponse("You've been sign out!"));
   }
 
   @PostMapping("/refreshtoken")
   public ResponseEntity<?> refreshToken(HttpServletRequest request){
-    String refreshToken = jwtService.getJwtFromCookies(request);
+    String refreshToken = jwtService.getJwtFromCookies(request, jwtRefreshCookie);
     if(StringUtils.hasLength(refreshToken)){
       return refreshTokenService.findByToken(refreshToken)
               .map(token -> refreshTokenService.verifyExpiration(token))
