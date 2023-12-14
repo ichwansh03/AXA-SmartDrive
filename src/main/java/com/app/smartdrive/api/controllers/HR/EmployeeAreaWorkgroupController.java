@@ -33,25 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class EmployeeAreaWorkgroupController {
         private final EmployeeAreaWorkgroupService employeeAreaWorkgroupService;
     
-    private final EmployeeAreaWorkgroupService employeeAreaWorkgroupService;
-    
-    @PostMapping("/add")
-    @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<EmployeeAreaWorkgroupDto> addEmployeeAreaWorkgroup(@RequestBody EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto) {
-        
-            EmployeeAreaWorkgroupDto resultDto = employeeAreaWorkgroupService.addEmployeeAreaWorkgroup(employeeAreaWorkgroupDto);
-            return new ResponseEntity<>(resultDto, HttpStatus.CREATED);       
-    }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<EmployeeAreaWorkgroupDto> updateEmployeeAreaWorkgroup(
-            @RequestBody EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto,
-            @PathVariable("id") Long id) {
-            EmployeeAreaWorkgroupDto updatedDto = employeeAreaWorkgroupService.updateEmployeeAreaWorkgroup(employeeAreaWorkgroupDto, id);
-            return ResponseEntity.ok(updatedDto);
-        
-    }
+    
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('Admin')")
@@ -78,14 +61,15 @@ public class EmployeeAreaWorkgroupController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<EmployeesAreaWorkgroupResponseDto> addPartnerAreaWorkGroup(@Valid @RequestBody EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto){
 
         EmployeeAreaWorkgroup eawg = employeeAreaWorkgroupService.createEawg(employeeAreaWorkgroupDto);
         return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class));
     }
 
-    @Transactional
-    @PutMapping("update/{id}")
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<EmployeesAreaWorkgroupResponseDto> updateEawg(
         @RequestBody EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, @PathVariable("id") Long id){
         EmployeeAreaWorkgroup employeeAreaWorkgroup = employeeAreaWorkgroupService.updateEawg(id, employeeAreaWorkgroupDto);
