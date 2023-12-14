@@ -3,6 +3,7 @@ package com.app.smartdrive.api.services.auth;
 import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
+import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.users.User;
 import jakarta.transaction.Transactional;
 
@@ -12,4 +13,6 @@ public interface AuthenticationService {
 
   @Transactional
   String changePassword(Long id, PasswordRequestDto passwordRequestDto);
+
+  User createAdmin(CreateUserDto profileRequestDto);
 }

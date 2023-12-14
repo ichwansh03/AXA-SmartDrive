@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import com.app.smartdrive.api.dto.user.ProfileDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.auth.RefreshToken;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -68,9 +69,15 @@ public class AuthenticationController {
             body(new MessageResponse("User registered successfully!"));
   }
 
+  @PostMapping("/createAdmin")
+  public ResponseEntity<?> createAdmin(@RequestBody CreateUserDto profileRequestDto){
+    User user = authenticationService.createAdmin(profileRequestDto);
+    userService.save(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+  }
+
   @PostMapping("/signout")
   public ResponseEntity<?> logout(){
-
     ResponseCookie cookie = jwtService.getCleanJwtCookie(jwtCookie, "/api");
     ResponseCookie refreshCookie = jwtService.getCleanJwtCookie(jwtRefreshCookie, "/api/auth/refreshtoken");
     return ResponseEntity.ok()

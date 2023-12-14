@@ -70,6 +70,25 @@ public class UserServiceImpl implements UserService {
     return user;
   }
 
+  @Override
+  @Transactional
+  public User createAdmin(CreateUserDto userPost){
+    User user = createUser(userPost.getProfile());
+
+    userRolesService.createUserRole(RoleName.AD, user);
+
+    userPhoneService.createUserPhone(user, userPost.getUserPhone());
+
+    userAddressService.createUserAddress(user, userPost.getUserAddress(), userPost.getCityId());
+
+    Long paymentId = (userPost.getBankId() != null) ? userPost.getBankId()
+            : (userPost.getFintechId() != null) ? userPost.getFintechId() : null;
+
+    userAccountService.createUserAccounts(userPost.getUserAccounts(), user, paymentId);
+
+    return user;
+  }
+
   @Transactional
   @Override
   public User save(User user) {
