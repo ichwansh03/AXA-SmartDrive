@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.dto.EmailReq;
+import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
@@ -16,7 +17,6 @@ import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
-import com.app.smartdrive.api.services.partner.BatchPartnerInvoiceService;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     private final PartnerRepository partnerRepository;
 
     private final EmailService emailService;
-    private final BatchPartnerInvoiceService bpinService;
 
     @Transactional
     @Override
@@ -120,16 +119,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                     serviceOrders, null));
 
             switch (templateServiceTasks.get(i).getTestaName()){
-                //pilih partner berdasarkan area workgroup
-                //wo1-pilih partner
-                //wo2-call method add partner(so, partner)
-                //wo3-notify to repair or ganti suku cadang or keduanya
-                case "CLAIM DOCUMENT APPROVED" -> {
-                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED){
-                        List<Partner> allPartner = findAllPartner(serviceOrders.getSeroId());
-                        soOrderRepository.selectPartner(allPartner.get(0), serviceOrders.getSeroId());
-                    }
-                }
                 case "NOTIFY PARTNER TO REPAIR" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
@@ -137,8 +126,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                                 "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
                     }
                 }
-                //task calculate sparepart call createOne(String seroId) => BPIN Service
-                case "CALCULATE SPARE PART" -> bpinService.createOne(serviceOrders.getSeroId());
                 case "NOTIFY AGENT CLAIM" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
@@ -169,6 +156,30 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, seotId);
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
         return updateSeot;
+    }
+
+    @Transactional
+    @Override
+    public SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId) {
+        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId).get();
+        SeotPartnerDto seotPartner = SeotPartnerDto.builder()
+                        .partnerId(seotPartnerDto.getPartnerId())
+                .isRepair(seotPartnerDto.isRepair())
+                .isSparepart(seotPartnerDto.isSparepart())
+                .seotStatus(seotPartnerDto.getSeotStatus()).build();
+
+        Partner partner = partnerRepository.findById(seotPartner.getPartnerId()).get();
+        soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
+
+        if (seotPartner.isRepair()) {
+            log.info("add workorder repair");
+        }
+
+        if (seotPartner.isSparepart()) {
+            log.info("add workorder sparepart");
+        }
+
+        return seotPartner;
     }
 
     private void notifyTask(EmailReq emailReq, ServiceOrders serviceOrders, String subject, String message){
