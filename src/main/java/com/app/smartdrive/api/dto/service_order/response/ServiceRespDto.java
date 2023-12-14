@@ -28,6 +28,6 @@ public class ServiceRespDto {
     private UserDto userDto;
     private CustomerResponseDTO customerResponseDTO;
     private List<ServiceOrderRespDto> serviceOrdersList;
-    private List<SemiDto> semiDtoList;
+    private SemiDto semiDto;
 
 }

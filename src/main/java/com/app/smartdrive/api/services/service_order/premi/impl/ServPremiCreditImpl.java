@@ -4,10 +4,13 @@ import com.app.smartdrive.api.Exceptions.CheckPaymentException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCreditId;
 import com.app.smartdrive.api.entities.service_order.Services;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
@@ -41,11 +44,6 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         return secrRepository.findByServices_ServId(servId);
     }
 
-    @Override
-    public ServicePremiCredit findByDueDate() {
-        return secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
-    }
-
     @Transactional
     @Override
     public List<ServicePremiCredit> addSecr(ServicePremi servicePremi) {
@@ -72,6 +70,8 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     @Override
     public boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId) {
         ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId)).get();
+        ServicePremi premi = semiRepository.findById(secrServId).get();
+        Double premiMonthly = secrRepository.totalPremiMonthly();
 
         ServicePremiCredit newSecr = ServicePremiCredit.builder()
                 .secrId(existSecr.getSecrId())
@@ -82,26 +82,25 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
                 .secrTrxDate(LocalDateTime.now())
                 .secrDuedate(existSecr.getSecrDuedate()).build();
 
-        if (checkPremiPayment(newSecr)){
-            semiRepository.updateSemiStatus("INACTIVE", existSecr.getSecrServId());
+        if (checkDueDatePayment(newSecr)){
+            semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), existSecr.getSecrServId());
             throw new CheckPaymentException("your payment has passed deadline");
-        } else {
-            log.info("ServPremiImpl::updateSecr successfully updated");
-            secrRepository.save(newSecr);
-            return true;
         }
+
+        if (premi.getSemiPremiDebet() <= premiMonthly){
+            semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.PAID.toString(), existSecr.getSecrServId());
+            throw new CheckPaymentException("your payment has been paid");
+        }
+
+        log.info("ServPremiImpl::updateSecr successfully updated");
+        secrRepository.save(newSecr);
+        return true;
     }
 
-    /**
-     * Scenario 1 : cek pembayaran premi apakah dibulan ini sudah bayar
-     * Scenario 2 : cek total premi yang sudah dibayar apakah sudah sama dengan total tagihan di table service premi
-     * Scenario 3 : jika sudah lanjutkan, namun jika due date minusDays(2) kirim notifikasi ke customer (get email)
-     * Scenario 4 : jika sudah melewati due date maka ubah semi status menjadi INACTIVE
-     */
-    @Override
-    public boolean checkPremiPayment(ServicePremiCredit servicePremiCredit) {
-        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
-        return existSecr.getSecrPremiDebet() == null && LocalDateTime.now().isAfter(existSecr.getSecrDuedate());
+    public boolean checkDueDatePayment(ServicePremiCredit servicePremiCredit) {
+        servicePremiCredit = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+        return servicePremiCredit.getSecrPremiDebet() == null
+                && LocalDateTime.now().isAfter(servicePremiCredit.getSecrDuedate());
     }
 
 //    @Async

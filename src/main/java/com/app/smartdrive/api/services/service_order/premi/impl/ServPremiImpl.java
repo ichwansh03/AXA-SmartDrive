@@ -8,7 +8,6 @@ import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditServic
 import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +24,9 @@ public class ServPremiImpl implements ServPremiService {
 
     private final ServPremiCreditService servPremiCreditService;
 
-    @Transactional(readOnly = true)
     @Override
-    public List<ServicePremi> findByServId(Long servId) {
-        List<ServicePremi> allBySemiServId = semiRepository.findByServices_ServId(servId);
-        log.info("ServPremiImpl::findAllBySemiServId successfully viewed");
-        return allBySemiServId;
+    public ServicePremi findByServId(Long servId) {
+        return semiRepository.findById(servId).get();
     }
 
     @Transactional
@@ -60,11 +56,5 @@ public class ServPremiImpl implements ServPremiService {
         log.info("ServPremiImpl::updateSemiStatus successfully updated {} ", updated);
         return updated;
     }
-
-//    @Scheduled(cron = "* * * * * *")
-//    public void dueDateSemi(){
-//        //check jika
-//        log.info("ServPremiImpl::update service premi");
-//    }
 
 }

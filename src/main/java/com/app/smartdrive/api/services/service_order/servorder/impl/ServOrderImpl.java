@@ -4,7 +4,6 @@ import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.*;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
@@ -29,7 +28,6 @@ public class ServOrderImpl implements ServOrderService {
     private final SoOrderRepository soOrderRepository;
     private final SoTasksRepository soTasksRepository;
     private final SoWorkorderRepository soWorkorderRepository;
-    private final PartnerRepository partnerRepository;
 
     private final ServOrderTaskService servOrderTaskService;
     private final ServOrderWorkorderService servOrderWorkorderService;
@@ -83,7 +81,7 @@ public class ServOrderImpl implements ServOrderService {
                 orders = generateSeroClaim(services);
                 servOrderTaskService.addClaimList(orders);
             }
-            default -> orders = generateSeroClose(services);
+            default -> orders = generateSeroClosePolis(services);
         }
 
         return orders;
@@ -112,13 +110,6 @@ public class ServOrderImpl implements ServOrderService {
         return soOrderRepository.findByServices_Users_UserEntityId(custId);
     }
 
-    @Override
-    public List<Partner> findAllPartner(String seroId) {
-        ServiceOrders orders = soOrderRepository.findById(seroId).get();
-        String eawgArwgCode = orders.getEmployees().getEawgArwgCode();
-        return partnerRepository.findPartnerByArwgCode(eawgArwgCode);
-    }
-
     public boolean checkAllTaskComplete(String seroId) {
 
         List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
@@ -138,7 +129,8 @@ public class ServOrderImpl implements ServOrderService {
     }
 
     @Transactional
-    private ServiceOrders generateSeroFeasiblity(Services services){
+    @Override
+    public ServiceOrders generateSeroFeasiblity(Services services){
         String formatSeroId = soAdapter.formatServiceOrderId(services);
 
         ServiceOrders serviceOrders = new ServiceOrders();
@@ -158,7 +150,8 @@ public class ServOrderImpl implements ServOrderService {
     }
 
     @Transactional
-    private ServiceOrders generateSeroPolis(Services services){
+    @Override
+    public ServiceOrders generateSeroPolis(Services services){
         String formatSeroId = soAdapter.formatServiceOrderId(services);
         ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
         ServiceOrders serviceOrders = new ServiceOrders();
@@ -179,7 +172,8 @@ public class ServOrderImpl implements ServOrderService {
     }
 
     @Transactional
-    private ServiceOrders generateSeroClaim(Services services){
+    @Override
+    public ServiceOrders generateSeroClaim(Services services){
         String formatSeroId = soAdapter.formatServiceOrderId(services);
         ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndServices_ServId("PL%", services.getServId());
         ServiceOrders serviceOrders = new ServiceOrders();
@@ -196,16 +190,14 @@ public class ServOrderImpl implements ServOrderService {
                 .services(services).build();
 
         ServiceOrders saved = soOrderRepository.save(serviceOrders);
-        String eawgArwgCode = saved.getEmployees().getEawgArwgCode();
         log.info("ServOrderTaskImpl::generateSeroClaim successfully added {} ", saved.getSeroId());
 
         return saved;
     }
 
     @Transactional
-    private ServiceOrders generateSeroClose(Services services){
-        String formatSeroId = soAdapter.formatServiceOrderId(services);
-
+    @Override
+    public ServiceOrders generateSeroClosePolis(Services services){
         ServiceOrders saved = new ServiceOrders();
         Map<String, ServiceOrders> orderMap = new HashMap<>();
         orderMap.put("FS", soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId()));
@@ -215,17 +207,22 @@ public class ServOrderImpl implements ServOrderService {
         for (Map.Entry<String, ServiceOrders> entry : orderMap.entrySet()) {
             ServiceOrders order = entry.getValue();
             if (order != null && order.getSeroStatus() == EnumModuleServiceOrders.SeroStatus.OPEN) {
-                order.setSeroId(formatSeroId);
+                order.setSeroId(order.getSeroId());
                 order.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
                 order.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
-                order.setSeroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId());
-                order.setEmployees(services.getCustomer().getEmployeeAreaWorkgroup());
-                order.setServices(services);
-                saved = soOrderRepository.save(order);
+                order.setSeroAgentEntityid(order.getSeroAgentEntityid());
+                order.setEmployees(order.getEmployees());
+                order.setServices(order.getServices());
+                soOrderRepository.save(order);
                 log.info("ServOrderTaskImpl::generateSeroClose successfully updated {} to CLOSED", order.getSeroId());
             }
         }
-
         return saved;
+    }
+
+    @Transactional
+    @Override
+    public int selectPartner(Partner partner, String seroId) {
+        return soOrderRepository.selectPartner(partner, seroId);
     }
 }

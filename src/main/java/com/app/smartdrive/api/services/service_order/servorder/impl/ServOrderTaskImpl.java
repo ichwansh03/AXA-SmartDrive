@@ -12,9 +12,11 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TestaRepository;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
+import com.app.smartdrive.api.services.partner.BatchPartnerInvoiceService;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +33,16 @@ import java.util.List;
 @Slf4j
 public class ServOrderTaskImpl implements ServOrderTaskService {
 
+    private final SoOrderRepository soOrderRepository;
     private final SoTasksRepository soTasksRepository;
     private final SoWorkorderRepository soWorkorderRepository;
+
     private final TestaRepository testaRepository;
     private final TewoRepository tewoRepository;
+    private final PartnerRepository partnerRepository;
+
     private final EmailService emailService;
+    private final BatchPartnerInvoiceService bpinService;
 
     @Transactional
     @Override
@@ -117,14 +124,21 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                 //wo1-pilih partner
                 //wo2-call method add partner(so, partner)
                 //wo3-notify to repair or ganti suku cadang or keduanya
+                case "CLAIM DOCUMENT APPROVED" -> {
+                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED){
+                        List<Partner> allPartner = findAllPartner(serviceOrders.getSeroId());
+                        soOrderRepository.selectPartner(allPartner.get(0), serviceOrders.getSeroId());
+                    }
+                }
                 case "NOTIFY PARTNER TO REPAIR" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
-                                "Check Vehicle Condition",
-                                "Check condition of customer vehicle from "+serviceOrders.getServices().getUsers().getUserFullName());
+                                "Repair Sparepart from Customer",
+                                "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
                     }
                 }
                 //task calculate sparepart call createOne(String seroId) => BPIN Service
+                case "CALCULATE SPARE PART" -> bpinService.createOne(serviceOrders.getSeroId());
                 case "NOTIFY AGENT CLAIM" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
@@ -153,13 +167,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     @Override
     public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
         int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, seotId);
-        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId).get();
-
-        switch (orderTasks.getSeotName()){
-            case "CLAIM DOCUMENT APPROVED" -> {
-                //call partner
-            }
-        }
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
         return updateSeot;
     }
@@ -170,5 +177,12 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         emailReq.setBody(message);
         log.info("Email has been send");
         emailService.sendMail(emailReq);
+    }
+
+    @Override
+    public List<Partner> findAllPartner(String seroId) {
+        ServiceOrders orders = soOrderRepository.findById(seroId).get();
+        String eawgArwgCode = orders.getEmployees().getEawgArwgCode();
+        return partnerRepository.findPartnerByArwgCode(eawgArwgCode);
     }
 }
