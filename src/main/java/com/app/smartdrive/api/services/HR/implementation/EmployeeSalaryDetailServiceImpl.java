@@ -43,20 +43,22 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         List<TemplateSalary> templateSalaries = templateSalaryRepository.findAll();
         List<EmployeeSalaryDetail> salaryDetails = new ArrayList<>();
 
-        // BigDecimal totalPremi = new BigDecimal("1000000"); 
+        Double totalPremi = 1000000.0;
 
         // List<ServiceOrders> listServiceOrders = soOrderRepository.findByServices_Users_UserEntityId(entityId);
         
         // List<Long> listEntityId = listServiceOrders.stream().map(so -> so.getEmployees().getEawgEntityid()).toList();
 
+        // List<Double> listPremi = services.getServicePremiSet().stream().map(prem -> prem.getSemiPremiDebet()).toList();
+        // List<ServicePremi> listServicePremi = semiRepository.findAllBySemiServId(pl.getServices().getServId());
+
         ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndEmployees_EawgEntityid(entityId);
 
         Long services = pl.getServices().getServId();
         Optional<ServicePremi> semiID = semiRepository.findById(services);
-
-        // List<Double> listPremi = services.getServicePremiSet().stream().map(prem -> prem.getSemiPremiDebet()).toList();
-        // List<ServicePremi> listServicePremi = semiRepository.findAllBySemiServId(pl.getServices().getServId());
+        
         Double servicePremi = semiID.get().getSemiPremiDebet();
+
         Employees employees = employeesRepository.findById(entityId).get();
 
         for (TemplateSalary templateSalary : templateSalaries) {
@@ -81,7 +83,6 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
 
             salaryDetail.setEmsaSubtotal(calculatedSubtotal);
             salaryDetail.setEmployees(employees);
-
             salaryDetail = employeeSalaryDetailRepository.save(salaryDetail);
             salaryDetails.add(salaryDetail);
 
