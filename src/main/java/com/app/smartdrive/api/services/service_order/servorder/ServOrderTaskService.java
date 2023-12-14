@@ -19,4 +19,5 @@ public interface ServOrderTaskService {
 
     int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId);
 
+    List<Partner> findAllPartner(String seroId);
 }

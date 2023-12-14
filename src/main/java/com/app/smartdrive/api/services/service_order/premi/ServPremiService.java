@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ServPremiService {
 
-    List<ServicePremi> findByServId(Long servId);
+    ServicePremi findByServId(Long servId);
 
     ServicePremi addSemi(ServicePremi servicePremi, Long servId);
 

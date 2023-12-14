@@ -19,6 +19,9 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
+@NamedQuery(
+        name = "ServiceOrders.selectPartner",
+        query = "UPDATE ServiceOrders sero SET sero.partner = :partner WHERE sero.seroId = :seroId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrders {

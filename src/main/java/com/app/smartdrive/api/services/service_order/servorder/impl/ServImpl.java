@@ -71,13 +71,13 @@ public class ServImpl implements ServService {
                 .servCreatedOn(cr.getCreqCreateDate())
                 .servStartDate(LocalDateTime.now())
                 .servEndDate(LocalDateTime.now().plusDays(7))
+                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
                 .users(cr.getCustomer())
                 .customer(cr)
                 .build();
     }
 
     private Services generatePolisType(CustomerRequest cr) {
-
         Services existingService = soRepository.findById(cr.getServices().getServId())
                 .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
 
@@ -120,19 +120,27 @@ public class ServImpl implements ServService {
     }
 
     private Services generateTypeInactive(CustomerRequest cr){
+        Services existingService = soRepository.findById(cr.getServices().getServId())
+                .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
+
+        servPremiService.updateSemiStatus("INACTIVE", existingService.getServId());
+
         return Services.builder()
+                .servId(existingService.getServId())
                 .servType(cr.getCreqType())
                 .servCreatedOn(cr.getCreqCreateDate())
                 .servStatus(EnumModuleServiceOrders.ServStatus.INACTIVE)
+                .users(existingService.getUsers())
+                .customer(existingService.getCustomer())
                 .build();
     }
 
     private void generateServPremi(Services services, CustomerRequest cr){
         ServicePremi servicePremi = ServicePremi.builder()
                 .semiServId(services.getServId())
-                .semiPremiDebet(cr.getCustomerInscAssets().getCiasInsurancePrice())
+                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
                 .semiPaidType(cr.getCustomerInscAssets().getCiasPaidType().toString())
-                .semiStatus("ACTIVE").build();
+                .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
 
         servPremiService.addSemi(servicePremi, services.getServId());
     }

@@ -24,4 +24,10 @@ public class EnumModuleServiceOrders {
         ACTIVE,
         INACTIVE
     }
+
+    public enum SemiStatus {
+        PAID,
+        UNPAID,
+        INACTIVE
+    }
 }

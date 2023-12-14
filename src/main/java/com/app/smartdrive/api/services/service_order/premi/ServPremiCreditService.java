@@ -19,7 +19,4 @@ public interface ServPremiCreditService {
 
     boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId);
 
-    boolean checkPremiPayment(ServicePremiCredit servicePremiCredit);
-
-    ServicePremiCredit findByDueDate();
 }
