@@ -25,6 +25,7 @@ public class ProfileRequestDto {
   private String userBirthPlace;
 
   private LocalDateTime userBirthDate;
+  private String userByAgenBirthDate;
   @NotBlank(message = "NationalId may not be blank")
   private String userNationalId;
   @NotBlank(message = "NPWP may not be blank")

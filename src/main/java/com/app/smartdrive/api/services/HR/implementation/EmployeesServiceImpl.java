@@ -3,10 +3,16 @@ package com.app.smartdrive.api.services.HR.implementation;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
@@ -52,6 +58,8 @@ public class EmployeesServiceImpl implements EmployeesService {
   
     private final UserService userService;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     @Transactional
@@ -63,7 +71,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         
         employee.setEmpName(employeesDto.getEmpName());
         employee.setEmpJoinDate(empJoinDate);
-        employee.setEmpStatus(EnumClassHR.status.ACTIVE);
+        employee.setEmpStatus(EnumClassHR.status.INACTIVE);
         employee.setEmpType(emp_type.PERMANENT);
         employee.setEmpGraduate(employeesDto.getEmpGraduate());
         employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
@@ -77,23 +85,23 @@ public class EmployeesServiceImpl implements EmployeesService {
         
         User user = userService.createUser(profileRequestDto);
         
-        
             user.setUserEmail(employeesDto.getEmail());
             if(employeesDto.getGrantAccessUser()==true){
             user.setUserName(employeesDto.getEmail());
-            user.setUserPassword(employeesDto.getEmpPhone().getUsphPhoneNumber());
+            user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
+            employee.setEmpStatus(EnumClassHR.status.ACTIVE);
             }
             user.setUserFullName(employeesDto.getEmpName());
             user.setUserNationalId("idn"+user.getUserEntityId());
             user.setUserNPWP("npwp"+user.getUserEntityId());
         
-            
             userRolesService.createUserRole(RoleName.EM, user);
-            
+
             UserPhoneDto userPhoneDto = new UserPhoneDto();
             UserPhoneIdDto userPhoneIdDto = new UserPhoneIdDto();
             userPhoneIdDto.setUsphPhoneNumber(employeesDto.getEmpPhone().getUsphPhoneNumber());
             userPhoneDto.setUserPhoneId(userPhoneIdDto);
+            userPhoneDto.setUsphPhoneType("HP");
             List<UserPhoneDto> listPhone = new ArrayList<>();
             listPhone.add(userPhoneDto);
             userPhoneService.createUserPhone(user, listPhone);
@@ -103,25 +111,20 @@ public class EmployeesServiceImpl implements EmployeesService {
             userAddressDto.setUsdrAddress2(employeesDto.getEmpAddress().getUsdrAddress2());
             List<UserAddressDto> listAddress = new ArrayList<>();
             listAddress.add(userAddressDto);
-            userAddressService.createUserAddress(user, listAddress, employeesDto.getEmpAddress().getCityId());
-
-            
+            userAddressService.createUserAddress(user, listAddress, employeesDto.getEmpAddress().getCityId());     
 
             UserUserAccountDto userAccountDto = new UserUserAccountDto();
             userAccountDto.setUsac_accountno(employeesDto.getEmpAccountNumber());
             userAccountDto.setEnumPaymentType(EnumPaymentType.BANK);
             List<UserUserAccountDto> listUserAccount = new ArrayList<>();
             listUserAccount.add(userAccountDto);
-            userAccountService.createUserAccounts(listUserAccount, user, 5L);
+            userAccountService.createUserAccounts(listUserAccount, user, 1L);
         
         
         employee.setEmpEntityid(user.getUserEntityId());
-        employee.setUser(user);
-    
-        
+        employee.setUser(user);    
 
         employeesRepository.save(employee);
-        
 
         return employeesDto;
     }
@@ -131,7 +134,7 @@ public class EmployeesServiceImpl implements EmployeesService {
     public EmployeesRequestDto editEmployee(Long employeeId, EmployeesRequestDto employeesDto) {
     
     Employees existingEmployee = employeesRepository.findById(employeeId)
-            .orElseThrow(() -> new EntityNotFoundException("Employee not found with id: " + employeeId));
+            .orElseThrow(() -> new EmployeesNotFoundException("Employee not found with id: " + employeeId));
 
     LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
 
@@ -140,6 +143,12 @@ public class EmployeesServiceImpl implements EmployeesService {
     user.setUserName(employeesDto.getEmail());
     user.setUserPassword(employeesDto.getEmpPhone().getUsphPhoneNumber());
     user.setUserFullName(employeesDto.getEmpName());
+
+    if(employeesDto.getGrantAccessUser()==true){
+            user.setUserName(employeesDto.getEmail());
+            user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
+            existingEmployee.setEmpStatus(EnumClassHR.status.ACTIVE);
+            }
 
     String empPhone = user.getUserPhone().get(0).getUserPhoneId().getUsphPhoneNumber();
     UserPhoneRequestDto userPhoneDto = employeesDto.getEmpPhone();
@@ -154,7 +163,6 @@ public class EmployeesServiceImpl implements EmployeesService {
     userAddressRequestDto.setCityId(employeesDto.getEmpAddress().getCityId());
     userAddressService.updateUserAddress(employeeId, userAddress.getUsdrId(), userAddressRequestDto);
 
-    
     existingEmployee.setEmpName(employeesDto.getEmpName());
     existingEmployee.setEmpJoinDate(empJoinDate);
     existingEmployee.setEmpStatus(EnumClassHR.status.ACTIVE);
@@ -194,6 +202,15 @@ public class EmployeesServiceImpl implements EmployeesService {
     
 
 
+
+    @Override
+  public void deleteEmployeesById(Long empEntitiyid) {
+    Optional<Employees> emp = employeesRepository.findById(empEntitiyid);
+    if(emp.isPresent()){
+      employeesRepository.delete(emp.get());
+    }
+  }
+
     
 
     @Override
@@ -211,14 +228,17 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     @Override
     public Employees getById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+
+        Employees existEmployees = this.employeesRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Employee with id : " + id + " is not found")
+        );
+
+        return existEmployees;
     }
 
     @Override
     public List<Employees> getAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+        return employeesRepository.findAll();
     }
 
     @Override

@@ -1,8 +1,6 @@
 package com.app.smartdrive.api.entities.service_order;
 
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
-import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -52,6 +50,7 @@ public class ServiceOrders {
     @Column(name = "sero_agent_entityid")
     private Long seroAgentEntityid;
 
+    //should be to partner area workgroup
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "sero_part_id")
@@ -74,11 +73,6 @@ public class ServiceOrders {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "eawg_id", insertable = false, updatable = false)
     private EmployeeAreaWorkgroup employees;
-
-//    @JsonIgnore
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "sero_arwg_code")
-//    private AreaWorkGroup areaWorkGroup;
 
     @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
     private List<ServiceOrderTasks> serviceOrderTasks;

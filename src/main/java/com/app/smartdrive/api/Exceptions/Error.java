@@ -4,6 +4,17 @@ import java.time.LocalDateTime;
 import org.apache.logging.log4j.util.Strings;
 
 public class Error {
+  @Override
+  public String toString() {
+    return "Error{" +
+            "errorCode='" + errorCode + '\'' +
+            ", message='" + message + '\'' +
+            ", status=" + status +
+            ", url='" + url + '\'' +
+            ", reqMethod='" + reqMethod + '\'' +
+            ", timestamp=" + timestamp +
+            '}';
+  }
 
   private static final long serialVersionUID = 1L;
   /** Application error code, which is different from HTTP error code. */

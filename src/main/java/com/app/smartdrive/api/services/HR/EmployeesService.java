@@ -15,4 +15,5 @@ public interface EmployeesService extends BaseService<Employees, Long>  {
  public EmployeesRequestDto createEmployee(EmployeesRequestDto employeesDto);
  public EmployeesRequestDto editEmployee(Long employeeId, EmployeesRequestDto employeesDto); 
  public List<EmployeesDto> getAllDto();
+ public void deleteEmployeesById(Long empEntitiyid) ;
 }
