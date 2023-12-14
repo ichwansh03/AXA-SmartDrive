@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.config;
 
+import com.app.smartdrive.api.dto.auth.response.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,23 +11,19 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
   @Override
-  public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-    final Map<String, Object> body = new HashMap<>();
-    body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-    body.put("error", "Unauthorized");
-    body.put("message", authException.getMessage());
-    body.put("path", request.getServletPath());
-
-    final ObjectMapper mapper = new ObjectMapper();
-    mapper.writeValue(response.getOutputStream(), body);
+  public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
+    ApiResponse response = new ApiResponse(401, "Unauthorised");
+    response.setMessage("Unauthorised");
+    OutputStream out = httpServletResponse.getOutputStream();
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.writeValue(out, response);
+    out.flush();
   }
 }
