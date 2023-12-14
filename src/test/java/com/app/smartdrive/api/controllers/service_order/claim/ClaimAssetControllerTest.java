@@ -1,16 +1,35 @@
 package com.app.smartdrive.api.controllers.service_order.claim;
 
+import com.app.smartdrive.api.dto.customer.request.CiasDTO;
+import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
+import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
+import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ClaimAssetEvidence;
 import com.app.smartdrive.api.entities.service_order.ClaimAssetSparepart;
+import com.app.smartdrive.api.entities.service_order.ServiceOrders;
+import com.app.smartdrive.api.entities.service_order.Services;
+import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.CaevRepository;
 import com.app.smartdrive.api.repositories.service_orders.CaspRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
+import com.app.smartdrive.api.repositories.users.UserRepository;
+import com.app.smartdrive.api.services.customer.CustomerRequestService;
+import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetServiceImpl;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
+import com.app.smartdrive.api.services.service_order.servorder.ServService;
+import com.app.smartdrive.api.services.users.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +39,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,26 +61,105 @@ class ClaimAssetControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
-
     @Autowired
     MockMvc mockMvc;
     @Autowired
     ClaimAssetServiceImpl claimAssetService;
-
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    UserService userService;
+    @Autowired
+    CustomerRequestService customerRequestService;
+    @Autowired
+    ServService servService;
+    @Autowired
+    SoOrderRepository soOrderRepository;
+    @Autowired
+    ServOrderService servOrderService;
     @Autowired
     CaspRepository caspRepository;
-
+    @Autowired
+    PartnerService partnerService;
     @Autowired
     CaevRepository caevRepository;
+    @Autowired
+    PartnerRepository partnerRepository;
+
+    User user;
+    Partner partner;
+    ServiceOrders serviceOrders;
+    void deleteUser(User user, Partner partner){
+        userRepository.deleteByUserName(user.getUsername());
+        userRepository.deleteById(partner.getPartEntityid());
+        partnerRepository.delete(partner);
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        deleteUser(user, partner);
+        FileUtils.deleteDirectory(new File("src/main/resources/images/caev"));
+
+    }
 
     @BeforeEach
-    void setUp() throws IOException {
-        FileUtils.deleteDirectory(new File("src/main/resources/images/caev"));
-        //caevRepository.deleteAll();
-        caspRepository.deleteAll();
+    void setUp() throws Exception {
         claimAssetService.init();
 
+        partner = create();
+        user = userService.save(createUser("TEST405"));
+        CustomerRequest customerRequest = createCustomerRequest("CREQTEST123", user);
+        Services services = servService.addService(customerRequest.getCreqEntityId());
+        serviceOrders = servOrderService.addServiceOrders(services.getServId());
+        serviceOrders.setPartner(partner);
+        soOrderRepository.save(serviceOrders);
 
+    }
+
+    User createUser(String test){
+        ProfileRequestDto profil = new ProfileRequestDto();
+        profil.setUserName(test);
+        profil.setUserPassword(test);
+        profil.setUserEmail(test);
+        profil.setUserNpwp(test);
+        profil.setUserNationalId(test);
+        profil.setUserFullName(test);
+
+        return userService.createUser(profil);
+    }
+
+    CustomerRequest createCustomerRequest(String test, User user) throws Exception {
+        CiasDTO ciasDTO = new CiasDTO();
+        ciasDTO.setCiasPoliceNumber(test);
+        ciasDTO.setCiasYear("2010");
+        ciasDTO.setCiasIsNewChar('Y');
+        ciasDTO.setCiasPaidType("CASH");
+        ciasDTO.setCiasCarsId(1L);
+        ciasDTO.setCiasCityId(1L);
+        ciasDTO.setCiasIntyName("Comprehensive");
+        ciasDTO.setCiasStartdate("2023-01-01 15:02:00");
+        ciasDTO.setCurrentPrice(120000000D);
+        ciasDTO.setCuexIds(new Long[]{7L,8L,9L});
+        CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();
+        customerRequestDTO.setCustomerId(user.getUserEntityId());
+        customerRequestDTO.setAgenId(1L);
+        customerRequestDTO.setEmployeeId(1L);
+        customerRequestDTO.setCiasDTO(ciasDTO);
+
+        return TransactionMapper.mapDtoToEntity(customerRequestService.create(customerRequestDTO,
+                new MultipartFile[]{new MockMultipartFile("TEST", "TEST", MediaType.TEXT_PLAIN_VALUE, "TEST".getBytes())}
+        ), new CustomerRequest());
+    }
+    Partner create(){
+        PartnerRequest request = new PartnerRequest();
+        request.setPartName("COMPANY 123");
+        request.setCityId(1L);
+        request.setPartNpwp("111111111");
+        request.setPartAddress("JL BENGKEL");
+        request.setPartAccountNo("1111");
+
+        Partner partner = partnerService.save(request);
+        return partnerService.save(partner);
     }
 
     @Test
@@ -73,15 +172,15 @@ class ClaimAssetControllerTest {
                 multipart("/claim-asset/evidence")
                         .file(file1)
                         .param("claimAssets[0].note", "Note A")
-                        .param("partnerId", "10")
-                        .param("serviceOrderId", "CL0001-20231010")
+                        .param("partnerId", partner.getPartEntityid().toString())
+                        .param("serviceOrderId", serviceOrders.getSeroId())
                         .param("claimAssets[0].serviceFee", "2500000")
                         .contentType(MediaType.MULTIPART_FORM_DATA)
         ).andExpectAll(
                 status().isCreated()
         ).andDo(result -> {
-            // List<ClaimAssetEvidence> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<ClaimAssetEvidence>>() {});
-            // log.info(objectMapper.enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(response));
+            List<ClaimAssetEvidence> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<ClaimAssetEvidence>>() {});
+            log.info(objectMapper.enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(response));
         });
     }
 
@@ -91,8 +190,8 @@ class ClaimAssetControllerTest {
         mockMvc.perform(
                 post("/claim-asset/spare-part")
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .param("partnerId", "10")
-                        .param("serviceOrderId", "CL0001-20231010")
+                        .param("partnerId", partner.getPartEntityid().toString())
+                        .param("serviceOrderId", serviceOrders.getSeroId())
                         .param("claimAssets[0].item", "KACA DEPAN")
                         .param("claimAssets[0].Qty", "1")
                         .param("claimAssets[0].price", "500000")
@@ -104,9 +203,9 @@ class ClaimAssetControllerTest {
         ).andExpectAll(
                 status().isCreated()
         ).andDo(result -> {
-            // List<ClaimAssetSparepart> caspList = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<ClaimAssetSparepart>>() {});
-            // Assertions.assertEquals(2, caspList.size());
-            // Assertions.assertEquals(1000000.0, caspList.get(1).getCaspSubtotal());
+            List<ClaimAssetSparepart> caspList = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<ClaimAssetSparepart>>() {});
+            Assertions.assertEquals(2, caspList.size());
+            Assertions.assertEquals(1000000.0, caspList.get(1).getCaspSubtotal());
         });
     }
 }
