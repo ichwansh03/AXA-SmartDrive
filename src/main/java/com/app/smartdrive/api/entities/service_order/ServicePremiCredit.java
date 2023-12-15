@@ -43,10 +43,10 @@ public class ServicePremiCredit {
     private String secrYear;
 
     @Column(name = "secr_premi_debet")
-    private BigDecimal secrPremiDebet;
+    private Double secrPremiDebet;
 
     @Column(name = "secr_premi_credit")
-    private BigDecimal secrPremiCredit;
+    private Double secrPremiCredit;
 
     @Column(name = "secr_trx_date")
     private LocalDateTime secrTrxDate;
