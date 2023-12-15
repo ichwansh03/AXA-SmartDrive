@@ -1,6 +1,6 @@
 package com.app.smartdrive.api.mapper.hr;
 
-import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesJobTypeResponseDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
@@ -11,8 +11,8 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 
 
 public class EmployeesMapper {
-    public static EmployeesDto convertEntityToDtoEmp(Employees employees){
-        EmployeesDto employeesDto = EmployeesDto.builder()
+    public static EmployeesResponseDto convertEntityToDtoEmp(Employees employees){
+        EmployeesResponseDto employeesDto = EmployeesResponseDto.builder()
         .user(TransactionMapper.mapEntityToDto(employees.getUser(), UserDto.class))
         .empName(employees.getEmpName())
         .empJoinDate(employees.getEmpJoinDate())

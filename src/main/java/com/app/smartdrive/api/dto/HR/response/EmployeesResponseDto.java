@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EmployeesDto {
+public class EmployeesResponseDto {
     private UserDto user;
     private String empName;
     private LocalDateTime empJoinDate;

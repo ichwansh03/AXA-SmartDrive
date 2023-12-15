@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmployeeAreaWorkgroupDto {
+public class EmployeeAreaWorkgroupRequestDto {
     private String zoneName;
     private String provinsi;
     private Long cityId;
