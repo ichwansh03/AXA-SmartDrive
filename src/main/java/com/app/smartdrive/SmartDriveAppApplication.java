@@ -25,6 +25,8 @@ import java.nio.file.Files;
 @EnableAsync
 public class SmartDriveAppApplication implements CommandLineRunner {
 
+	@Autowired
+	ClaimAssetService claimAssetService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SmartDriveAppApplication.class, args);
@@ -33,7 +35,7 @@ public class SmartDriveAppApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		//claimAssetService.init();
+		claimAssetService.init();
 
 	}
 }
