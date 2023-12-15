@@ -28,17 +28,22 @@ public class ServOrderTaskController {
         return new ResponseEntity<>(seotBySeroId, HttpStatus.OK);
     }
 
-//    @PutMapping("/update/{seotId}")
-//    public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SoTasksDto soTasksDto, @PathVariable("seotId") Long seotId) {
-//        int updated = servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
-//
-//        return new ResponseEntity<>(updated, HttpStatus.OK);
-//    }
-
     @PutMapping("/update/{seotId}")
+    public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SoTasksDto soTasksDto, @PathVariable("seotId") Long seotId) {
+        int updated = servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
+
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @PutMapping("/update/claim/{seotId}")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SeotPartnerDto soTasksDto, @PathVariable("seotId") Long seotId) {
 
-        SeotPartnerDto seotPartnerDto = servOrderTaskService.updateSeotPartner(soTasksDto, seotId);
+        SeotPartnerDto seotPartnerDto = new SeotPartnerDto();
+        seotPartnerDto.setPartnerId(soTasksDto.getPartnerId());
+        seotPartnerDto.setRepair(soTasksDto.getRepair());
+        seotPartnerDto.setSparepart(soTasksDto.getSparepart());
+        servOrderTaskService.updateSeotPartner(seotPartnerDto, seotId);
+
         servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
 
         return new ResponseEntity<>(seotPartnerDto, HttpStatus.OK);

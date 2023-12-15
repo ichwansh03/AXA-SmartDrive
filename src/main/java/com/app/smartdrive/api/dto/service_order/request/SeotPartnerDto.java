@@ -4,14 +4,13 @@ import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServic
 import lombok.*;
 
 @Builder
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeotPartnerDto {
 
     private Long partnerId;
-    private boolean isRepair;
-    private boolean isSparepart;
+    private Boolean repair;
+    private Boolean sparepart;
     private EnumModuleServiceOrders.SeotStatus seotStatus;
 }

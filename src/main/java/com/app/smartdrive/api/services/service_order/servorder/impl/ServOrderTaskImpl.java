@@ -5,8 +5,10 @@ import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
+import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,20 +167,20 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId).get();
         SeotPartnerDto seotPartner = SeotPartnerDto.builder()
                         .partnerId(seotPartnerDto.getPartnerId())
-                .isRepair(seotPartnerDto.isRepair())
-                .isSparepart(seotPartnerDto.isSparepart())
-                .seotStatus(seotPartnerDto.getSeotStatus()).build();
+                        .repair(seotPartnerDto.getRepair())
+                        .sparepart(seotPartnerDto.getSparepart())
+                        .seotStatus(seotPartnerDto.getSeotStatus()).build();
+
+        if (seotPartnerDto.getRepair()) {
+            createWorkorderTask("REPAIR", seotId);
+        }
+
+        if (seotPartnerDto.getSparepart()) {
+            createWorkorderTask("GANTI SUKU CADANG", seotId);
+        }
 
         Partner partner = partnerRepository.findById(seotPartner.getPartnerId()).get();
         soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
-
-        if (seotPartner.isRepair()) {
-            log.info("add workorder repair");
-        }
-
-        if (seotPartner.isSparepart()) {
-            log.info("add workorder sparepart");
-        }
 
         return seotPartner;
     }
@@ -188,6 +191,24 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         emailReq.setBody(message);
         log.info("Email has been send");
         emailService.sendMail(emailReq);
+    }
+
+    @Transactional
+    private void createWorkorderTask(String sowoName, Long seotId){
+        TemplateTaskWorkOrder workOrder = new TemplateTaskWorkOrder();
+        workOrder.setTewoTestaId(seotId);
+        workOrder.setTewoName(sowoName);
+        tewoRepository.save(workOrder);
+
+        ServiceOrderTasks tasks = soTasksRepository.findById(seotId).get();
+
+        ServiceOrderWorkorder soWorkorder = new ServiceOrderWorkorder();
+        soWorkorder.setSowoName(workOrder.getTewoName());
+        soWorkorder.setServiceOrderTasks(tasks);
+        soWorkorder.setSowoStatus(false);
+        soWorkorder.setSowoModDate(LocalDateTime.now());
+
+        soWorkorderRepository.save(soWorkorder);
     }
 
     @Override
