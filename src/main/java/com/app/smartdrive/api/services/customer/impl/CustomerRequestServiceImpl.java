@@ -85,6 +85,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final EmployeesService employeesService;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -636,7 +638,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         ProfileRequestDto profileRequestDto = userPost.getProfile();
 
         profileRequestDto.setUserName(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
-        profileRequestDto.setUserPassword(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
+        profileRequestDto.setUserPassword(this.passwordEncoder.encode(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber()));
         userPost.getProfile().setUserBirthDate(birthDate);
         User newCustomer = this.userService.createUserCustomerByAgen(userPost, isActive);
         return newCustomer;
