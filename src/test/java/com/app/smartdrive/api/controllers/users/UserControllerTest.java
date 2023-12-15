@@ -1,14 +1,15 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.config.WebSecurityConfig;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
-import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetService;
 import com.app.smartdrive.api.services.users.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,28 +25,32 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @Slf4j
 @WebMvcTest(UserController.class)
-@ImportAutoConfiguration(classes = {SecurityConfig.class})
+@AutoConfigureMockMvc
 class UserControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @MockBean
-  private UserService userService;
   @Autowired
-  private MockMvc mockMvc;
+  private Gson gson;
 
   @Autowired
-  TransactionMapper transactionMapper;
+  private MockMvc mockMvc;
+  @MockBean
+  private UserService userService;
+
+  @MockBean
+  private JwtService jwtService;
+
+  @MockBean
+  private ClaimAssetService claimAssetService;
 
   List<UserRoles> addRole(EnumUsers.RoleName roleName, User user) {
     UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
