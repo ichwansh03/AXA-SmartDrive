@@ -18,6 +18,8 @@ public class CreateCustomerRequestByAgenDTO {
 
     private Long agenId;
 
+    private Boolean accessGrantUser;
+
     @Valid
     @NotBlank
     private CiasDTO ciasDTO;
