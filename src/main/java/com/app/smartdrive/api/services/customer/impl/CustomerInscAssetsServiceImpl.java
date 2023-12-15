@@ -19,6 +19,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -99,28 +100,31 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
 
     @Transactional(readOnly = true)
     @Override
-    public Double getPremiPrice(String insuraceType, String carBrand, Long zonesId, Double currentPrice, List<CustomerInscExtend> cuexs){
+    public BigDecimal getPremiPrice(String insuraceType, String carBrand, Long zonesId, BigDecimal currentPrice, List<CustomerInscExtend> cuexs){
         TemplateInsurancePremi temiMain = this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(zonesId, insuraceType, 1L).orElseThrow(
                 () -> new EntityNotFoundException("Template Insurance Premi is not found")
         );
 
-        Double premiMain = (temiMain.getTemiRateMin() / 100) * currentPrice;
+        Double rate = temiMain.getTemiRateMin() / 100;
+        BigDecimal rateBig = BigDecimal.valueOf(rate);
+        BigDecimal premiMain = currentPrice.multiply(rateBig);
 
-        Double premiExtend = 0.0;
+        BigDecimal premiExtend = BigDecimal.valueOf(0);
 
-        Double materai = 10_000.0;
+        BigDecimal materai = BigDecimal.valueOf(10000);
 
         if(!cuexs.isEmpty()){
             for (CustomerInscExtend  cuex: cuexs) {
-                premiExtend += cuex.getCuexNominal();
+                premiExtend = premiExtend.add(cuex.getCuexNominal());
             }
 
         }
 
-        Double totalPremi = premiMain + premiExtend + materai;
+        BigDecimal totalPremi = premiMain.add(premiExtend);
+        BigDecimal result = totalPremi.add(materai);
 
         log.info("CustomerRequestServiceImpl:getPremiPrice, successfully calculate premi");
-        return totalPremi;
+        return result;
     }
 
     @Override

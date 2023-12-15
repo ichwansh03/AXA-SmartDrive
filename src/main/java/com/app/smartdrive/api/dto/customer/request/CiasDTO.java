@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,7 +32,7 @@ public class CiasDTO {
 
     private String ciasIntyName;
 
-    private Double currentPrice;
+    private BigDecimal currentPrice;
 
     private Long[] cuexIds;
 }

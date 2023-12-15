@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.customer.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -161,7 +162,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, cias.getCiasCurrentPrice());
 
 
-        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
+        BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
@@ -223,7 +224,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasDTO.getCurrentPrice());
 
 
-        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
+        BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
@@ -573,7 +574,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
-        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
+        BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 carSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),

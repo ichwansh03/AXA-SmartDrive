@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,19 +31,21 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
             Long[] cuexIds,
             CustomerInscAssets cias,
             Long entityId,
-            Double currentPrice
+            BigDecimal currentPrice
     ) {
         List<CustomerInscExtend> ciasCuexs = new ArrayList<>();
 
         for (Long i: cuexIds) {
-            Double nominal;
+            BigDecimal nominal;
 
             TemplateInsurancePremi temi = this.temiRepository.findById(i).orElseThrow(
                     () -> new EntityNotFoundException("Template Insurance Premi with id " + i + " is not found")
             );
 
             if(Objects.nonNull(temi.getTemiRateMin())){
-                nominal = (temi.getTemiRateMin() / 100) * currentPrice;
+                Double rate = temi.getTemiRateMin() / 100;
+                BigDecimal rateBig = BigDecimal.valueOf(rate);
+                nominal = currentPrice.multiply(rateBig);
             }else{
                 nominal = temi.getTemiNominal();
             }

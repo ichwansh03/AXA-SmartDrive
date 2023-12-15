@@ -109,7 +109,7 @@ public class ServImpl implements ServService {
     private void generateServPremi(Services services, CustomerRequest cr){
         ServicePremi servicePremi = ServicePremi.builder()
                 .semiServId(services.getServId())
-                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
+//                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
                 .semiPaidType(cr.getCustomerInscAssets().getCiasPaidType().toString())
                 .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
 
