@@ -82,7 +82,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
         cias.setCiasStartdate(ciasStartdate);
         cias.setCiasEnddate(ciasStartdate.plusYears(1));
         cias.setCiasCurrentPrice(ciasUpdateDTO.getCurrentPrice());
-        cias.setCiasTotalPremi(ciasUpdateDTO.getCurrentPrice());
+        cias.setCiasInsurancePrice(ciasUpdateDTO.getCurrentPrice());
         cias.setCiasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasUpdateDTO.getCiasPaidType()));
         cias.setCiasIsNewChar(ciasUpdateDTO.getCiasIsNewChar());
         cias.setCity(existCity);

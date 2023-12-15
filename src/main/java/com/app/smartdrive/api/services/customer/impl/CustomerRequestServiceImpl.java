@@ -14,12 +14,15 @@ import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.*;
+import com.app.smartdrive.api.entities.users.EnumUsers;
+import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
@@ -33,6 +36,7 @@ import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserService;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -179,6 +183,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         // prep
         CreateUserDto userPost = customerRequestDTO.getUserDTO();
+        ProfileRequestDto profileRequestDto = customerRequestDTO.getUserDTO().getProfile();
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
 
@@ -190,6 +195,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
         userPost.getProfile().setUserBirthDate(birthDate);
         User newCustomer = this.userService.createUserCustomer(userPost);
+
+        if(!customerRequestDTO.getAccessGrantUser()){
+            UserRoles userRoles = newCustomer.getUserRoles().stream()
+                    .filter(role -> role.getRoles().getRoleName().equals(EnumUsers.RoleName.CU))
+                    .findFirst()
+                    .get();
+
+            userRoles.setUsroStatus("INACTIVE");
+        }
+
 
 
         CarSeries existCarSeries = this.carsService.getById(ciasDTO.getCiasCarsId());
@@ -482,6 +497,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
 
+    @Transactional(readOnly = true)
     @Override
     public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable paging, String type, String status) {
         AreaWorkGroup existAreaWorkgroup = this.arwgService.getById(arwgCode);
@@ -528,17 +544,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CiasDTO ciasUpdateDTO = updateCustomerRequestDTO.getCiasDTO();
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
-//        existCustomerRequest.setEmployeeAreaWorkgroup(null);
 
-//        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
-//                .orElseThrow(
-//                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
-//                );
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
+                );
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findByEawgId(updateCustomerRequestDTO.getAgenId()).get();
 
         existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
-//        existCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
 
         CarSeries carSeries = this.carsService.getById(ciasUpdateDTO.getCiasCarsId());
@@ -563,6 +576,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         cias.setCustomerInscDoc(newCiasDocs);
 
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
+
+        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
+                existInty.getIntyName(),
+                carSeries.getCarModel().getCarBrand().getCabrName(),
+                existCity.getProvinsi().getZones().getZonesId(),
+                ciasUpdateDTO.getCurrentPrice(),
+                updatedCustomerInscExtend
+        );
+
+        cias.setCiasTotalPremi(premiPrice);
 
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
