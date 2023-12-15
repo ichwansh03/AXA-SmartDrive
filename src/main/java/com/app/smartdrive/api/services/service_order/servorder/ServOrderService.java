@@ -17,14 +17,6 @@ public interface ServOrderService {
 
     List<ServiceOrders> findAllSeroByUserId(Long custId);
 
-    ServiceOrders generateSeroFeasiblity(Services services);
-
-    ServiceOrders generateSeroPolis(Services services);
-
-    ServiceOrders generateSeroClaim(Services services);
-
-    ServiceOrders generateSeroClosePolis(Services services);
-
     int selectPartner(Partner partner, String seroId);
 
 }

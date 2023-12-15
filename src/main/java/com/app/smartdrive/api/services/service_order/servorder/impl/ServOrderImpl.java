@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -48,37 +46,23 @@ public class ServOrderImpl implements ServOrderService {
                 log.info("ServOrderImpl::addServiceOrders create FEASIBLITY tasks");
             }
             case "POLIS" -> {
-                orders = generateSeroPolis(services);
+                //for close previous sero
                 ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
+                //close feasiblity
+                closeExistingSero(fs);
 
-                if (checkAllTaskComplete(fs.getSeroId())){
-                    fs.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
-                    fs.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
-                    soOrderRepository.save(fs);
-                    servOrderTaskService.addPolisList(orders);
-                    log.info("ServOrderImpl::addServiceOrders create new POLIS tasks");
-                } else {
-                    throw new TasksNotCompletedException("Completed your feasiblity tasks before new request");
-                }
-
+                orders = handlePolisAndClaim(services, null, null, "FS%");
+                servOrderTaskService.addPolisList(orders);
             }
             case "CLAIM" -> {
+                //for close previous claim
                 ServiceOrders cl = soOrderRepository.findBySeroIdLikeAndServices_ServId("CL%", services.getServId());
                 if (cl != null){
-                    if (checkAllTaskComplete(cl.getSeroId())){
-                        cl.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
-                        cl.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
-                        soOrderRepository.save(cl);
-                    }
-                    else {
-                        throw new TasksNotCompletedException("Completed your another claim tasks before new request");
-                    }
-                    orders = generateSeroClaim(services);
-                    servOrderTaskService.addClaimList(orders);
-                    log.info("ServOrderImpl::addServiceOrders create new CLAIM tasks");
-                    break;
+                    //close second claim
+                    closeExistingSero(cl);
                 }
-                orders = generateSeroClaim(services);
+                //new claim
+                orders = handlePolisAndClaim(services, LocalDateTime.now(), LocalDateTime.now().plusDays(10), "PL%");
                 servOrderTaskService.addClaimList(orders);
             }
             default -> orders = generateSeroClosePolis(services);
@@ -129,8 +113,7 @@ public class ServOrderImpl implements ServOrderService {
     }
 
     @Transactional
-    @Override
-    public ServiceOrders generateSeroFeasiblity(Services services){
+    private ServiceOrders generateSeroFeasiblity(Services services){
         String formatSeroId = soAdapter.formatServiceOrderId(services);
 
         ServiceOrders serviceOrders = new ServiceOrders();
@@ -151,40 +134,44 @@ public class ServOrderImpl implements ServOrderService {
 
     @Transactional
     @Override
-    public ServiceOrders generateSeroPolis(Services services){
-        String formatSeroId = soAdapter.formatServiceOrderId(services);
-        ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
-        ServiceOrders serviceOrders = new ServiceOrders();
-        serviceOrders = ServiceOrders.builder()
-                .seroId(formatSeroId)
-                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
-                .seroStatus(serviceOrders.getSeroStatus())
-                .parentServiceOrders(fs)
-                .seroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId())
-                .employees(services.getCustomer().getEmployeeAreaWorkgroup())
-                .services(services).build();
-
-        ServiceOrders saved = soOrderRepository.save(serviceOrders);
-
-        log.info("ServOrderTaskImpl::generateSeroPolis successfully added {} ", saved.getSeroId());
-
-        return saved;
+    public int selectPartner(Partner partner, String seroId) {
+        return soOrderRepository.selectPartner(partner, seroId);
     }
 
     @Transactional
-    @Override
-    public ServiceOrders generateSeroClaim(Services services){
+    private ServiceOrders generateSeroClosePolis(Services services){
+        List<ServiceOrders> serviceOrders = soOrderRepository.findByServices_ServId(services.getServId());
+        List<ServiceOrders> updateSero = serviceOrders.stream()
+                .filter(order -> order.getSeroStatus() == EnumModuleServiceOrders.SeroStatus.OPEN)
+                .peek(order -> {
+                    order.setSeroId(order.getSeroId());
+                    order.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
+                    order.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
+                    order.setSeroReason(order.getServices().getCustomer().getCustomerClaim().getCuclReason());
+                    order.setSeroAgentEntityid(order.getSeroAgentEntityid());
+                    order.setEmployees(order.getEmployees());
+                    order.setServices(order.getServices());
+                })
+                .toList();
+
+        soOrderRepository.saveAll(updateSero);
+
+        return updateSero.isEmpty() ? null : updateSero.get(2);
+    }
+
+    @Transactional
+    private ServiceOrders handlePolisAndClaim(Services services, LocalDateTime startDate, LocalDateTime endDate, String prefixSeroId){
         String formatSeroId = soAdapter.formatServiceOrderId(services);
-        ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndServices_ServId("PL%", services.getServId());
+        ServiceOrders existingSero = soOrderRepository.findBySeroIdLikeAndServices_ServId(prefixSeroId, services.getServId());
         ServiceOrders serviceOrders = new ServiceOrders();
         serviceOrders = ServiceOrders.builder()
                 .seroId(formatSeroId)
                 .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
                 .seroStatus(serviceOrders.getSeroStatus())
                 .servClaimNo(services.getServInsuranceNo())
-                .servClaimStartdate(LocalDateTime.now())
-                .servClaimEnddate(LocalDateTime.now().plusDays(10))
-                .parentServiceOrders(pl)
+                .servClaimStartdate(startDate)
+                .servClaimEnddate(endDate)
+                .parentServiceOrders(existingSero)
                 .seroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId())
                 .employees(services.getCustomer().getEmployeeAreaWorkgroup())
                 .services(services).build();
@@ -195,34 +182,14 @@ public class ServOrderImpl implements ServOrderService {
         return saved;
     }
 
-    @Transactional
-    @Override
-    public ServiceOrders generateSeroClosePolis(Services services){
-        ServiceOrders saved = new ServiceOrders();
-        Map<String, ServiceOrders> orderMap = new HashMap<>();
-        orderMap.put("FS", soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId()));
-        orderMap.put("PL", soOrderRepository.findBySeroIdLikeAndServices_ServId("PL%", services.getServId()));
-        orderMap.put("CL", soOrderRepository.findBySeroIdLikeAndServices_ServId("CL%", services.getServId()));
-
-        for (Map.Entry<String, ServiceOrders> entry : orderMap.entrySet()) {
-            ServiceOrders order = entry.getValue();
-            if (order != null && order.getSeroStatus() == EnumModuleServiceOrders.SeroStatus.OPEN) {
-                order.setSeroId(order.getSeroId());
-                order.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
-                order.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
-                order.setSeroAgentEntityid(order.getSeroAgentEntityid());
-                order.setEmployees(order.getEmployees());
-                order.setServices(order.getServices());
-                soOrderRepository.save(order);
-                log.info("ServOrderTaskImpl::generateSeroClose successfully updated {} to CLOSED", order.getSeroId());
-            }
+    private void closeExistingSero(ServiceOrders existingSero){
+        if (checkAllTaskComplete(existingSero.getSeroId())){
+            existingSero.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
+            existingSero.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
+            soOrderRepository.save(existingSero);
+            log.info("ServOrderImpl::addServiceOrders create new POLIS tasks");
+        } else {
+            throw new TasksNotCompletedException("Completed your tasks before new request");
         }
-        return saved;
-    }
-
-    @Transactional
-    @Override
-    public int selectPartner(Partner partner, String seroId) {
-        return soOrderRepository.selectPartner(partner, seroId);
     }
 }
