@@ -6,13 +6,12 @@ import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
-import com.app.smartdrive.api.entities.master.CarSeries;
-import com.app.smartdrive.api.entities.master.Cities;
-import com.app.smartdrive.api.entities.master.InsuranceType;
-import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
+import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.repositories.customer.CustomerInscAssetsRepository;
+import com.app.smartdrive.api.repositories.master.CabrRepository;
 import com.app.smartdrive.api.repositories.master.TemiRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscAssetsService;
+import com.app.smartdrive.api.services.master.CarbService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.parameters.P;
@@ -100,12 +99,33 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
 
     @Transactional(readOnly = true)
     @Override
-    public BigDecimal getPremiPrice(String insuraceType, String carBrand, Long zonesId, BigDecimal currentPrice, List<CustomerInscExtend> cuexs){
+    public BigDecimal getPremiPrice(String insuraceType, String carBrand, Long zonesId, BigDecimal currentPrice, int ageOfBirth, List<CustomerInscExtend> cuexs){
+
+        List<String> carBrandRateMax = List.of("BMW", "MERCEDEZ BENZ", "AUDI", "VOLKSWAGEN", "LAND ROVER"
+                , "JAGUAR", "PEUGOT", "RENAULT", "SMART", "VOLVO",
+                "MINI", "FLAT", "OPEN", "MAZDA");
+
         TemplateInsurancePremi temiMain = this.temiRepository.findByTemiZonesIdAndTemiIntyNameAndTemiCateId(zonesId, insuraceType, 1L).orElseThrow(
                 () -> new EntityNotFoundException("Template Insurance Premi is not found")
         );
 
-        Double rate = temiMain.getTemiRateMin() / 100;
+        int yearsNow = LocalDateTime.now().getYear();
+        int userAge = yearsNow - ageOfBirth;
+
+        Double temiRate;
+
+        if(userAge >= 17 && userAge <= 27){
+            temiRate = temiMain.getTemiRateMax();
+        }else {
+            if (carBrandRateMax.contains(carBrand)){
+                temiRate = temiMain.getTemiRateMax();
+            }else{
+                temiRate = temiMain.getTemiRateMin();
+            }
+        }
+            
+
+        Double rate = temiRate / 100;
         BigDecimal rateBig = BigDecimal.valueOf(rate);
         BigDecimal premiMain = currentPrice.multiply(rateBig);
 

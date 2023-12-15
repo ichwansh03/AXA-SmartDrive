@@ -167,6 +167,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
                 ciasDTO.getCurrentPrice(),
+                entityUser.getUserBirthDate().getYear(),
                 ciasCuexs
         );
 
@@ -191,6 +192,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CreateUserDto userPost = customerRequestDTO.getUserDTO();
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
 
         if(this.customerInscAssetsService.isCiasAlreadyExist(ciasDTO.getCiasPoliceNumber())){
             throw new Exception("CustomerRequest with police number " + ciasDTO.getCiasPoliceNumber() + " is already exist");
@@ -229,6 +233,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
                 ciasDTO.getCurrentPrice(),
+                birthDate.getYear(),
                 ciasCuexs
         );
 
@@ -238,7 +243,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
 
 
-        User newCustomer = this.createNewUserByAgen(userPost, customerRequestDTO.getAccessGrantUser());
+        User newCustomer = this.createNewUserByAgen(userPost, birthDate, customerRequestDTO.getAccessGrantUser());
 
         // set and save
         newCustomerRequest.setCustomerClaim(newClaim);
@@ -579,6 +584,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 carSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
                 ciasUpdateDTO.getCurrentPrice(),
+                existCustomerRequest.getCustomer().getUserBirthDate().getYear(),
                 updatedCustomerInscExtend
         );
 
@@ -626,13 +632,11 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
     @Override
-    public User createNewUserByAgen(CreateUserDto userPost, Boolean isActive){
+    public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive){
         ProfileRequestDto profileRequestDto = userPost.getProfile();
 
         profileRequestDto.setUserName(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
         profileRequestDto.setUserPassword(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
         userPost.getProfile().setUserBirthDate(birthDate);
         User newCustomer = this.userService.createUserCustomerByAgen(userPost, isActive);
         return newCustomer;

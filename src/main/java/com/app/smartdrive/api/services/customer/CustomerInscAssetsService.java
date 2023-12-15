@@ -37,6 +37,7 @@ public interface CustomerInscAssetsService {
             String carBrand,
             Long zonesId,
             BigDecimal currentPrice,
+            int age,
             List<CustomerInscExtend> cuexs
     );
 
