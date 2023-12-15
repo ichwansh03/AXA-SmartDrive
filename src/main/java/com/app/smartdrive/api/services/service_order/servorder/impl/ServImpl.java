@@ -39,9 +39,12 @@ public class ServImpl implements ServService {
 
         switch (cr.getCreqType().toString()){
             case "FEASIBLITY" -> serv = generateFeasiblityType(cr);
-            case "POLIS" -> serv = generatePolisType(cr);
-            case "CLAIM" -> serv = generateClaimType(cr);
-            default -> serv = generateTypeInactive(cr);
+            case "POLIS" -> serv = handleServiceUpdate(cr,
+                    LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
+            case "CLAIM" -> serv = handleServiceUpdate(cr,
+                    LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
+            default -> serv = handleServiceUpdate(cr,
+                    LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
         }
 
         Services saved = soRepository.save(serv);
@@ -77,62 +80,30 @@ public class ServImpl implements ServService {
                 .build();
     }
 
-    private Services generatePolisType(CustomerRequest cr) {
+    private Services handleServiceUpdate(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus) {
         Services existingService = soRepository.findById(cr.getServices().getServId())
                 .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
 
         existingService = Services.builder()
-                .servId(existingService.getServId())
-                .servType(cr.getCreqType())
-                .servVehicleNumber(existingService.getServVehicleNumber())
-                .servCreatedOn(LocalDateTime.now())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusYears(1))
-                .servInsuranceNo(soAdapter.generatePolis(cr))
-                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
-                .users(existingService.getUsers())
-                .customer(existingService.getCustomer()).build();
-
-        log.info("ServImpl::updateService successfully updated");
-
-        generateServPremi(existingService, cr);
-
-        return existingService;
-    }
-
-    private Services generateClaimType(CustomerRequest cr){
-        Services existingService = soRepository.findById(cr.getServices().getServId())
-                .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
-
-        existingService = Services.builder()
-                .servId(existingService.getServId())
-                .servType(cr.getCreqType())
-                .servVehicleNumber(existingService.getServVehicleNumber())
-                .servCreatedOn(LocalDateTime.now())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusDays(10))
-                .servInsuranceNo(soAdapter.generatePolis(cr))
-                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
-                .users(existingService.getUsers())
-                .customer(existingService.getCustomer()).build();
-
-        return existingService;
-    }
-
-    private Services generateTypeInactive(CustomerRequest cr){
-        Services existingService = soRepository.findById(cr.getServices().getServId())
-                .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
-
-        servPremiService.updateSemiStatus("INACTIVE", existingService.getServId());
-
-        return Services.builder()
                 .servId(existingService.getServId())
                 .servType(cr.getCreqType())
                 .servCreatedOn(cr.getCreqCreateDate())
-                .servStatus(EnumModuleServiceOrders.ServStatus.INACTIVE)
-                .users(existingService.getUsers())
-                .customer(existingService.getCustomer())
+                .servInsuranceNo(soAdapter.generatePolis(cr))
+                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
+                .servStartDate(LocalDateTime.now())
+                .servEndDate(endDate)
+                .servStatus(servStatus)
+                .users(cr.getCustomer())
+                .customer(cr)
                 .build();
+
+        switch (existingService.getServType()) {
+            case POLIS -> generateServPremi(existingService, cr);
+            case CLOSE -> servPremiService.updateSemiStatus(
+                    EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), existingService.getServId());
+        }
+
+        return existingService;
     }
 
     private void generateServPremi(Services services, CustomerRequest cr){
@@ -144,4 +115,5 @@ public class ServImpl implements ServService {
 
         servPremiService.addSemi(servicePremi, services.getServId());
     }
+
 }
