@@ -198,11 +198,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         if(!customerRequestDTO.getAccessGrantUser()){
             UserRoles userRoles = newCustomer.getUserRoles().stream()
-                    .filter(role -> role.getRoles().getRoleName().equals(EnumUsers.RoleName.CU))
+                    .filter(role -> role.getRoles().getRoleName().equals(EnumUsers.RoleName.PC))
                     .findFirst()
                     .get();
 
             userRoles.setUsroStatus("INACTIVE");
+        }else{
+
         }
 
 

@@ -23,6 +23,8 @@ public interface UserService extends BaseService<User, Long> {
 
   public User createUserCustomer(CreateUserDto userPost);
 
+  public User createUserCustomerByAgen(CreateUserDto userPost, Boolean grantAccessUser);
+
   public User createUser(ProfileRequestDto userPost);
 
   @Transactional
