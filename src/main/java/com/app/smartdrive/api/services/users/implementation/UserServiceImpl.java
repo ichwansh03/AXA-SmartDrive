@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
   public User createUserCustomerByAgen(CreateUserDto userPost, Boolean grantAccessUser) {
     User user = createUser(userPost.getProfile());
 
-    userRolesService.createUserRole(RoleName.PC, user);
+    userRolesService.createUserRoleByAgen(RoleName.CU, user, grantAccessUser);
 
     userPhoneService.createUserPhone(user, userPost.getUserPhone());
 

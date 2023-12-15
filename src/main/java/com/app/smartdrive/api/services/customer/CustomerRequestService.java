@@ -36,6 +36,8 @@ public interface CustomerRequestService {
 
     public CustomerRequest createCustomerRequest(BusinessEntity newEntity, User customer, Long entityId);
 
+    public User createNewUserByAgen(CreateUserDto userPost, Boolean isActive);
+
     public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO);
 
     public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO);

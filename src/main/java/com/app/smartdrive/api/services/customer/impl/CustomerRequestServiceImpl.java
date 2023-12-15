@@ -39,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -125,6 +126,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
 
+        if(this.customerInscAssetsService.isCiasAlreadyExist(ciasDTO.getCiasPoliceNumber())){
+            throw new Exception("CustomerRequest with police number " + ciasDTO.getCiasPoliceNumber() + " is already exist");
+        }
+
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
 
@@ -183,30 +188,15 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         // prep
         CreateUserDto userPost = customerRequestDTO.getUserDTO();
-        ProfileRequestDto profileRequestDto = customerRequestDTO.getUserDTO().getProfile();
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
 
+        if(this.customerInscAssetsService.isCiasAlreadyExist(ciasDTO.getCiasPoliceNumber())){
+            throw new Exception("CustomerRequest with police number " + ciasDTO.getCiasPoliceNumber() + " is already exist");
+        }
 
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
-        userPost.getProfile().setUserBirthDate(birthDate);
-        User newCustomer = this.userService.createUserCustomer(userPost);
-
-        if(!customerRequestDTO.getAccessGrantUser()){
-            UserRoles userRoles = newCustomer.getUserRoles().stream()
-                    .filter(role -> role.getRoles().getRoleName().equals(EnumUsers.RoleName.PC))
-                    .findFirst()
-                    .get();
-
-            userRoles.setUsroStatus("INACTIVE");
-        }else{
-
-        }
-
 
 
         CarSeries existCarSeries = this.carsService.getById(ciasDTO.getCiasCarsId());
@@ -221,7 +211,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 );
 
 
-        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, newCustomer, entityId);
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, null, entityId);
         newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
@@ -246,9 +236,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
 
+
+        User newCustomer = this.createNewUserByAgen(userPost, customerRequestDTO.getAccessGrantUser());
+
         // set and save
         newCustomerRequest.setCustomerClaim(newClaim);
         newCustomerRequest.setCustomerInscAssets(cias);
+        newCustomerRequest.setCustomer(newCustomer);
 
         CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
@@ -629,6 +623,20 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         log.info("CustomerRequestServiceImpl:createCustomerRequest, create new customerRequest");
         return customerRequest;
     }
+
+    @Override
+    public User createNewUserByAgen(CreateUserDto userPost, Boolean isActive){
+        ProfileRequestDto profileRequestDto = userPost.getProfile();
+
+        profileRequestDto.setUserName(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
+        profileRequestDto.setUserPassword(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
+        userPost.getProfile().setUserBirthDate(birthDate);
+        User newCustomer = this.userService.createUserCustomerByAgen(userPost, isActive);
+        return newCustomer;
+    }
+
 
     @Transactional
     @Override

@@ -10,10 +10,12 @@ import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
+import com.app.smartdrive.api.repositories.customer.CustomerInscAssetsRepository;
 import com.app.smartdrive.api.repositories.master.TemiRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscAssetsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -28,6 +31,8 @@ import java.util.Objects;
 public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService {
 
     private final TemiRepository temiRepository;
+
+    private final CustomerInscAssetsRepository customerInscAssetsRepository;
 
     @Override
     public CustomerInscAssets createCustomerInscAssets(
@@ -116,6 +121,13 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
 
         log.info("CustomerRequestServiceImpl:getPremiPrice, successfully calculate premi");
         return totalPremi;
+    }
+
+    @Override
+    public boolean isCiasAlreadyExist(String ciasPoliceNumber) {
+        Optional<CustomerInscAssets> customerInscAssets = this.customerInscAssetsRepository.findByCiasPoliceNumber(ciasPoliceNumber);
+
+        return customerInscAssets.isPresent();
     }
 
 }

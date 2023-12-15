@@ -39,7 +39,7 @@ public class UserRolesImpl implements UserRolesService{
 
   @Override
   @Transactional
-  public List<UserRoles> createUserRole(RoleName roleName, User user, Boolean isActive) {
+  public List<UserRoles> createUserRoleByAgen(RoleName roleName, User user, Boolean isActive) {
     UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
 
     String roleStatus;
