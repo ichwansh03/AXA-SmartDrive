@@ -38,4 +38,6 @@ public interface CustomerInscAssetsService {
             Double currentPrice,
             List<CustomerInscExtend> cuexs
     );
+
+    public boolean isCiasAlreadyExist(String ciasPoliceNumber);
 }

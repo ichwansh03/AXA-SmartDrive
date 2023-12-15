@@ -12,6 +12,7 @@ import com.app.smartdrive.api.entities.users.UserRoles;
 import com.app.smartdrive.api.entities.users.UserRolesId;
 import com.app.smartdrive.api.services.users.UserRolesService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,33 @@ public class UserRolesImpl implements UserRolesService{
     userRoles.setUsroModifiedDate(LocalDateTime.now());
     userRoles.setUser(user);
     
+    List<UserRoles> listRole = new ArrayList<>();
+    listRole.add(userRoles);
+    user.setUserRoles(listRole);
+    return listRole;
+  }
+
+  @Override
+  @Transactional
+  public List<UserRoles> createUserRoleByAgen(RoleName roleName, User user, Boolean isActive) {
+    UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
+
+    String roleStatus;
+
+    if(isActive){
+      roleStatus = "ACTIVE";
+    }else{
+      roleStatus = "INACTIVE";
+    }
+
+    Roles roles = rolesRepository.findById(roleName).get();
+    UserRoles userRoles = new UserRoles();
+    userRoles.setRoles(roles);
+    userRoles.setUserRolesId(userRolesId);
+    userRoles.setUsroStatus(roleStatus);
+    userRoles.setUsroModifiedDate(LocalDateTime.now());
+    userRoles.setUser(user);
+
     List<UserRoles> listRole = new ArrayList<>();
     listRole.add(userRoles);
     user.setUserRoles(listRole);
