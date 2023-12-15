@@ -2,7 +2,7 @@ HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
-!**/src/main/resources/images/cadoc/
+!**/src/main/resources/images/cadoc/**
 !**/src/test/**/target/
 
 ### STS ###
