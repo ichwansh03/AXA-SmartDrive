@@ -88,14 +88,10 @@ public class SoAdapter {
     }
 
     public ServiceRespDto responseServices(Services services) {
-        UserDto userDto = mapUserToDto(services.getUsers().getUserEntityId());
-        CustomerResponseDTO creqDto = customerRequestService.getCustomerRequestById(services.getCustomer().getCreqEntityId());
         List<ServiceOrderRespDto> serviceOrderRespDtoList = mapServiceOrdersToDtoList(services.getServId());
         SemiDto semiDto = mapServPremiToDto(services.getServId());
 
         ServiceRespDto serviceDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
-        serviceDto.setUserDto(userDto);
-        serviceDto.setCustomerResponseDTO(creqDto);
         serviceDto.setServiceOrdersList(serviceOrderRespDtoList);
         serviceDto.setSemiDto(semiDto);
 

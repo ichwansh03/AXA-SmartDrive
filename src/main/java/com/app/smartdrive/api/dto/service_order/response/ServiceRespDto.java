@@ -25,7 +25,7 @@ public class ServiceRespDto {
     private LocalDateTime servStartDate;
     private LocalDateTime servEndDate;
     private EnumModuleServiceOrders.ServStatus servStatus;
-    private UserDto userDto;
+    //private UserDto userDto;
     private CustomerResponseDTO customerResponseDTO;
     private List<ServiceOrderRespDto> serviceOrdersList;
     private SemiDto semiDto;
