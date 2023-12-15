@@ -15,14 +15,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
-import com.app.smartdrive.api.dto.HR.response.EmployeesDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.entities.hr.Employees;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.HR.EmployeesService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/master/hr")
+@RequestMapping("/employees")
 public class EmployeesController {
      private final EmployeesService employeesService;
 
@@ -35,17 +38,18 @@ public class EmployeesController {
 
     @PutMapping("/{employeeId}")
     @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<EmployeesRequestDto> updateEmployee(
+    public ResponseEntity<EmployeesResponseDto> updateEmployee(
             @PathVariable("employeeId") Long employeeId,
             @RequestBody EmployeesRequestDto updatedEmployeeDto) {
-        EmployeesRequestDto updatedEmployee = employeesService.editEmployee(employeeId, updatedEmployeeDto);
-        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+        Employees employees = employeesService.editEmployee(employeeId, updatedEmployeeDto);
+        return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(employees, EmployeesResponseDto.class));
     }
 
     @PostMapping("/create")
-        public ResponseEntity<?> createEmployee(@RequestBody EmployeesRequestDto employeesDto) {
-        EmployeesRequestDto createdEmployee = employeesService.createEmployee(employeesDto);
-        return new ResponseEntity<>(createdEmployee, HttpStatus.OK);
+    @PreAuthorize("hasAuthority('Admin')")
+    public ResponseEntity<EmployeesResponseDto> createEmployee(@Valid @RequestBody EmployeesRequestDto employeesRequestDto) {
+        Employees employees = employeesService.createEmployee(employeesRequestDto);
+        return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(employees, EmployeesResponseDto.class));
     }
 
 
@@ -61,7 +65,7 @@ public class EmployeesController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('Admin')")
-    public List<EmployeesDto> getAllEmployees() {
+    public List<EmployeesResponseDto> getAllEmployees() {
       return employeesService.getAllDto();
     }
     
