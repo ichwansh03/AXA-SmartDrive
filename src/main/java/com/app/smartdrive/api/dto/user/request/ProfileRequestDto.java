@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProfileRequestDto {
   private String userName;
   private String userPassword;

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
+  private Long userEntityId;
   private String userPhoto;
   private String userFullName;
   private List<UserRoleDto> userRoles;
