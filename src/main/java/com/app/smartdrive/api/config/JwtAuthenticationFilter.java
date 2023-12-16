@@ -30,8 +30,7 @@ import java.io.OutputStream;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-  @Autowired
-  private  JwtService jwtServiceImpl;
+  private final JwtService jwtServiceImpl;
   private final UserService userService;
   @Value("${jwt.refresh.cookie}")
   private String jwtRefreshCookie;
