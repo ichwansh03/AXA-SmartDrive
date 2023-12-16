@@ -37,6 +37,8 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
 
     private static final long PERIOD_IN_MILLIS = 24 * 60 * 60 * 1000;
 
+
+    @Transactional(readOnly = true)
     @Override
     public List<ServicePremiCredit> findByServId(Long servId) {
         return secrRepository.findByServices_ServId(servId);
@@ -65,6 +67,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         return servicePremiCredits;
     }
 
+    @Transactional
     @Override
     public boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId) {
         ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId)).get();

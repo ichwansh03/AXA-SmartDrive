@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,11 +29,11 @@ public class CiasResponseDTO {
 
     private LocalDateTime ciasEnddate;
 
-    private Double ciasCurrentPrice;
+    private BigDecimal ciasCurrentPrice;
 
-    private Double ciasInsurancePrice;
+    private BigDecimal ciasInsurancePrice;
 
-    private Double ciasTotalPremi;
+    private BigDecimal ciasTotalPremi;
 
     private EnumCustomer.CreqPaidType ciasPaidType;
 

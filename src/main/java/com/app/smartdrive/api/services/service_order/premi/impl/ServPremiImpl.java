@@ -50,6 +50,7 @@ public class ServPremiImpl implements ServPremiService {
         return save;
     }
 
+    @Transactional
     @Override
     public int updateSemiStatus(String semiStatus, Long semiServId) {
         int updated = semiRepository.updateSemiStatus(semiStatus, semiServId);

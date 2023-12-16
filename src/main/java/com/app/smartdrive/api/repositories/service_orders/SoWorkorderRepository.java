@@ -19,7 +19,6 @@ public interface SoWorkorderRepository extends JpaRepository<ServiceOrderWorkord
     @Override
     ServiceOrderWorkorder save(ServiceOrderWorkorder entity);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<ServiceOrderWorkorder> findSowoBySeotId(@Param("seotId") Long seotId);
 
     @Modifying(clearAutomatically = true)

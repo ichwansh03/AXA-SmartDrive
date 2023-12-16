@@ -15,7 +15,6 @@ import java.util.List;
 @Repository
 public interface SoTasksRepository extends JpaRepository<ServiceOrderTasks, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<ServiceOrderTasks> findByServiceOrders_SeroId(String seroId);
 
     @Modifying(clearAutomatically = true)

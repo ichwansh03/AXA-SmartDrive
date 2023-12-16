@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -45,13 +46,13 @@ public class CustomerInscAssets {
     private LocalDateTime ciasEnddate;
 
     @Column(name = "cias_current_price")
-    private Double ciasCurrentPrice;
+    private BigDecimal ciasCurrentPrice;
 
     @Column(name = "cias_insurance_price")
-    private Double ciasInsurancePrice;
+    private BigDecimal ciasInsurancePrice;
 
     @Column(name = "cias_total_premi")
-    private Double ciasTotalPremi;
+    private BigDecimal ciasTotalPremi;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "cias_paid_type", length = 15)

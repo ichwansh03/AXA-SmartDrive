@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -44,7 +46,7 @@ public class CustomerInscExtend {
     private int cuexTotalItem;
 
     @Column(name = "cuex_nominal")
-    private double cuexNominal;
+    private BigDecimal cuexNominal;
 
 
 }
