@@ -1,31 +1,27 @@
 package com.app.smartdrive.api.controllers.users;
 
-import com.app.smartdrive.api.config.WebSecurityConfig;
-import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
-import com.app.smartdrive.api.entities.users.*;
+import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetService;
 import com.app.smartdrive.api.services.users.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.File;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -33,93 +29,54 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @WebMvcTest(UserController.class)
-@AutoConfigureMockMvc
+@ImportAutoConfiguration({SecurityConfig.class})
+@DisplayName("User Controller Test")
 class UserControllerTest {
-  @Autowired
-  private ObjectMapper objectMapper;
 
   @Autowired
-  private Gson gson;
-
+  ObjectMapper objectMapper;
   @Autowired
   private MockMvc mockMvc;
   @MockBean
   private UserService userService;
-
   @MockBean
   private JwtService jwtService;
-
   @MockBean
   private ClaimAssetService claimAssetService;
 
-  List<UserRoles> addRole(EnumUsers.RoleName roleName, User user) {
-    UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
+  private RequestBuilder requestBuilder;
 
-    Roles roles = new Roles();
-    roles.setRoleDescription("customer");
-    roles.setRoleName(roleName);
-
-    UserRoles userRoles = new UserRoles();
-    userRoles.setRoles(roles);
-    userRoles.setUserRolesId(userRolesId);
-    userRoles.setUsroStatus("ACTIVE");
-    userRoles.setUsroModifiedDate(LocalDateTime.now());
-
-    List<UserRoles> listRole = new ArrayList<>();
-    listRole.add(userRoles);
-    user.setUserRoles(listRole);
-    return listRole;
+  @BeforeEach
+  void configurationSystemUnderTest(){
+    requestBuilder = new RequestBuilder(mockMvc, objectMapper);
   }
 
-  User createUser() throws Exception{
-    CreateUserDto createUserDto = objectMapper.readValue(
-            new File("src/main/resources/request/CreateUserDto.json"),
-            CreateUserDto.class);
-    User user = new User();
-    user.setUserEntityId(1L);
-    user.setUserPhoto("test.png");
-    TransactionMapper.mapDtoToEntity(createUserDto.getProfile(), user);
-    TransactionMapper.mapDtoToEntity(createUserDto, user);
-
-    addRole(EnumUsers.RoleName.CU, user);
-
-    return user;
-  }
-
-  @Test
-  @WithMockUser(authorities = {"Admin"})
-  void shouldReturnUser() throws Exception{
-    Long id = 1L;
-    User user = createUser();
-    UserDto userDto = TransactionMapper.mapEntityToDto(user, UserDto.class);
-    when(userService.getById(1L)).thenReturn(user);
-    mockMvc.perform(get("/user/{id}", id))
-            .andExpect(jsonPath("$.userEntityId").value(id))
-            .andExpect(jsonPath("$.userPhoto").value(userDto.getUserPhoto()))
-            .andExpect(jsonPath("$.userFullName").value(userDto.getUserFullName()))
-            .andExpect(jsonPath("$.userEmail").value(userDto.getUserEmail()))
-            .andExpect(jsonPath("$.userAddress").value(userDto.getUserAddress()))
-            .andExpect(jsonPath("$.userPhone").value(userDto.getUserPhone()))
-            .andExpect(jsonPath("$.userAccounts").value(userDto.getUserPhone()))
-            .andExpect(jsonPath("$.userRoles").value(userDto.getUserRoles()))
-            .andDo(print());
-
-  }
-
-
-  void testCreateUser() throws Exception {
-    CreateUserDto createUserDto = objectMapper.readValue(
-            new File("src/main/resources/request/CreateUserDto.json"),
-            CreateUserDto.class);
-    User user = new User();
-    user.setUserEntityId(1L);
-    user.setUserPhoto("test.png");
-    TransactionMapper.mapDtoToEntity(createUserDto.getProfile(), user);
-    TransactionMapper.mapDtoToEntity(createUserDto, user);
-//    user.setUserAddress(userAddress);
-//    TransactionMapper.mapDtoToEntity(createUserDto.getUserAccounts(), user.getUserAccounts());
-//    TransactionMapper.mapDtoToEntity(createUserDto.getUserPhone(), user.getUserPhone());
-
-    addRole(EnumUsers.RoleName.CU, user);
+  @Nested
+  @DisplayName("Test Get User")
+  class TestGetUser {
+      @Test
+      @WithMockUser(authorities = {"Admin"})
+      @DisplayName("Should return user by id")
+      void shouldReturnUser () throws Exception {
+      Long id = 1L;
+      User user = requestBuilder.createUser();
+      UserDto userDto = TransactionMapper.mapEntityToDto(user, UserDto.class);
+      when(userService.getById(1L)).thenReturn(user);
+      requestBuilder.getUserById(id)
+              .andExpect(jsonPath("$.userEntityId").value(id))
+              .andExpect(jsonPath("$.userPhoto").value(userDto.getUserPhoto()))
+              .andExpect(jsonPath("$.userFullName").value(userDto.getUserFullName()))
+              .andExpect(jsonPath("$.userEmail").value(userDto.getUserEmail()))
+              .andExpect(jsonPath("$.userAddress.size()").value(userDto.getUserAddress().size()))
+              .andExpect((jsonPath("$.userAddress[0]").value(userDto.getUserAddress().get(0))))
+              .andExpect(jsonPath("$.userAddress[1]").value(userDto.getUserAddress().get(1)))
+              .andExpect((jsonPath("$.userPhone.size()").value(userDto.getUserPhone().size())))
+              .andExpect(jsonPath("$.userPhone[0]").value(userDto.getUserPhone().get(0)))
+              .andExpect(jsonPath("$.userAccounts.size()").value(userDto.getUserAccounts().size()))
+              .andExpect(jsonPath("$.userAccounts[0]").value(userDto.getUserAccounts().get(0)))
+              .andExpect(jsonPath("$.userRoles.size()").value(userDto.getUserRoles().size()))
+              .andExpect(jsonPath("$.userRoles[0]").value(userDto.getUserRoles().get(0)))
+              .andDo(print());
+    }
   }
 }
