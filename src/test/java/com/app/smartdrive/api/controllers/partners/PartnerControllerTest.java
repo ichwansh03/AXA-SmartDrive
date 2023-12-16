@@ -112,7 +112,7 @@ class PartnerControllerTest {
         ciasDTO.setCiasCityId(1L);
         ciasDTO.setCiasIntyName("Comprehensive");
         ciasDTO.setCiasStartdate("2023-01-01 15:02:00");
-        ciasDTO.setCurrentPrice(120000000D);
+//        ciasDTO.setCurrentPrice(120000000D);
         ciasDTO.setCuexIds(new Long[]{7L,8L,9L});
         CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();
         customerRequestDTO.setCustomerId(user.getUserEntityId());
