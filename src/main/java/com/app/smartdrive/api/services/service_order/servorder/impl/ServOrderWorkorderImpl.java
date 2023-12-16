@@ -43,9 +43,7 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderWorkorder> findSowoBySeotId(Long seotId) {
-        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotId);
-        log.info("SoOrderServiceImpl::addSoWorkorder created {} ", sowoBySeotId);
-        return sowoBySeotId;
+        return soWorkorderRepository.findSowoBySeotId(seotId);
     }
 
     @Transactional

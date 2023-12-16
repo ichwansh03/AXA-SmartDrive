@@ -68,7 +68,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository, tewoRepository);
         servOrderWorkorder.addSowoList(serviceOrderTasks);
 
-        log.info("ServOrderTaskImpl::addFeasiblityList successfully saved {} ",serviceOrderTasks);
         return serviceOrderTasks;
     }
 
@@ -95,7 +94,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                 case "NOTIFY TO CUSTOMER" -> notifyTask(emailReq, serviceOrders,
                         "POLIS has been created",
                         "Your request POLIS has been created, check your dashboard page");
-                default -> log.info("ServOrderTaskImpl::addPolisList all notify in POLIS has been created");
 
             }
         }
@@ -136,7 +134,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                                 "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
                     }
                 }
-                default -> log.info("ServOrderTaskImpl::addClaimList all notify in CLAIM has been created");
             }
         }
 
@@ -148,9 +145,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderTasks> findSeotBySeroId(String seroId) {
-        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
-        log.info("SoOrderServiceImpl::findSeotById in ID start from {} ", seotBySeroId.get(0));
-        return seotBySeroId;
+        return soTasksRepository.findByServiceOrders_SeroId(seroId);
     }
 
     @Transactional
@@ -173,10 +168,12 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
         if (seotPartnerDto.getRepair()) {
             createWorkorderTask("REPAIR", seotId);
+            log.info("SoOrderServiceImpl::updateSeotPartner add REPAIR to workorder");
         }
 
         if (seotPartnerDto.getSparepart()) {
             createWorkorderTask("GANTI SUKU CADANG", seotId);
+            log.info("SoOrderServiceImpl::updateSeotPartner add GANTI SUKU CADANG to workorder");
         }
 
         Partner partner = partnerRepository.findById(seotPartner.getPartnerId()).get();
@@ -211,10 +208,4 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         soWorkorderRepository.save(soWorkorder);
     }
 
-    @Override
-    public List<Partner> findAllPartner(String seroId) {
-        ServiceOrders orders = soOrderRepository.findById(seroId).get();
-        String eawgArwgCode = orders.getEmployees().getEawgArwgCode();
-        return partnerRepository.findPartnerByArwgCode(eawgArwgCode);
-    }
 }
