@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.HR.implementation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,7 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         Long services = pl.getServices().getServId();
         Optional<ServicePremi> semiID = semiRepository.findById(services);
         
-        Double servicePremi = semiID.get().getSemiPremiDebet();
+        BigDecimal servicePremi = semiID.get().getSemiPremiDebet();
 
         Employees employees = employeesRepository.findById(entityId).get();
 
@@ -73,15 +74,15 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
             // Double nominal = templateSalary.getTesalNominal();
 
             
-            Double calculatedSubtotal ;
+            BigDecimal calculatedSubtotal ;
             if(Objects.isNull(rateMin)){
                 calculatedSubtotal = servicePremi;
             }else{
-             calculatedSubtotal = servicePremi*(rateMin);
+             calculatedSubtotal = servicePremi.multiply(BigDecimal.valueOf(rateMin));
             }
 
 
-            salaryDetail.setEmsaSubtotal(calculatedSubtotal);
+            salaryDetail.setEmsaSubtotal(calculatedSubtotal.doubleValue());
             salaryDetail.setEmployees(employees);
             salaryDetail = employeeSalaryDetailRepository.save(salaryDetail);
             salaryDetails.add(salaryDetail);

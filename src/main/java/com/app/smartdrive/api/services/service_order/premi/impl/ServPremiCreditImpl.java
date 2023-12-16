@@ -21,6 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     public boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId) {
         ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId)).get();
         ServicePremi premi = semiRepository.findById(secrServId).get();
-        Double premiMonthly = secrRepository.totalPremiMonthly();
+        BigDecimal premiMonthly = secrRepository.totalPremiMonthly();
 
         ServicePremiCredit newSecr = ServicePremiCredit.builder()
                 .secrId(existSecr.getSecrId())
@@ -88,7 +89,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
             throw new CheckPaymentException("your payment has passed deadline");
         }
 
-        if (premi.getSemiPremiDebet() <= premiMonthly){
+        if (premi.getSemiPremiDebet().compareTo(premiMonthly) >= 0){
             semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.PAID.toString(), existSecr.getSecrServId());
             throw new CheckPaymentException("your payment has been paid");
         }

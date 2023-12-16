@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,8 +16,8 @@ import java.util.List;
 public class SemiDto {
 
     private Long semiServId;
-    private Double semiPremiDebet;
-    private Double semiPremiCredit;
+    private BigDecimal semiPremiDebet;
+    private BigDecimal semiPremiCredit;
     private String semiPaidType;
     private String semiStatus;
     private LocalDateTime semiModifiedDate;
