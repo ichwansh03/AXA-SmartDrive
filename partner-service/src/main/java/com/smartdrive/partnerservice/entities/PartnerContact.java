@@ -1,0 +1,33 @@
+package com.smartdrive.partnerservice.entities;
+
+import com.smartdrive.partnerservice.entities.enums.EnumClassHR;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+
+@Entity
+@Getter
+@Setter
+@Table(name = "partner_contacts", schema = "partners")
+public class PartnerContact {
+    @EmbeddedId
+    private PartnerContactEntityId id;
+    @Column(name = "paco_status")
+    @Enumerated(EnumType.STRING)
+    private EnumClassHR.status status;
+
+    {
+        status = EnumClassHR.status.ACTIVE;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paco_patrn_entityid", insertable = false, updatable = false)
+    private Partner partner;
+
+    @OneToMany(mappedBy = "partnerContact", fetch = FetchType.LAZY)
+    private List<PartnerAreaWorkgroup> partnerAreaWorkgroupList;
+}
