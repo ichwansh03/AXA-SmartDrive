@@ -461,7 +461,7 @@ public class CustomerServiceControllerTest {
         mockMvc.perform(builder
                 .file(file)
                 .param("client", this.objectMapper.writeValueAsString(customerRequestDTO))
-        ).andExpect(status().isCreated()
+        ).andExpect(status().isOk()
         ).andDo(result -> {
             CustomerResponseDTO response = this.objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
@@ -469,5 +469,55 @@ public class CustomerServiceControllerTest {
             assertNotNull(response);
             assertEquals(customerResponseDTO, response);
         });
+    }
+
+    @Test
+    void update_willFailed() throws Exception {
+        MockMultipartFile file =
+                new MockMultipartFile(
+                        "file",
+                        "contract.pdf",
+                        MediaType.APPLICATION_PDF_VALUE,
+                        "<<pdf data>>".getBytes(StandardCharsets.UTF_8));
+
+        MultipartFile[] multipartFiles = {file};
+
+
+
+        UpdateCustomerRequestDTO updateCustomerRequestDTO = UpdateCustomerRequestDTO.builder()
+                .creqEntityId(1L)
+                .employeeId(1L)
+                .agenId(1L)
+                .customerId(2L)
+                .build();
+
+        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+                .creqEntityId(updateCustomerRequestDTO.getCustomerId())
+                .build();
+
+        // custom http method for multipart
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart("/customer/service/request");
+        builder.with(new RequestPostProcessor() {
+            @Override
+            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                request.setMethod("PUT");
+                return request;
+            }
+        });
+
+        when(this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, multipartFiles))
+                .thenThrow(new EntityNotFoundException("User with id " + updateCustomerRequestDTO.getCustomerId() +" is not found"));
+
+        mockMvc.perform(builder
+                .file(file)
+                .param("client", this.objectMapper.writeValueAsString(updateCustomerRequestDTO))
+        ).andExpect(status().isNotFound()
+        ).andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException)
+        ).andExpect(result -> assertEquals(
+                "User with id " + updateCustomerRequestDTO.getCustomerId() + " is not found",
+                result.getResolvedException().getMessage())
+        ).andDo(print());
+
     }
 }
