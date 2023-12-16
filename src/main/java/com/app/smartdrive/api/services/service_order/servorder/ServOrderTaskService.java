@@ -22,5 +22,4 @@ public interface ServOrderTaskService {
 
     SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId);
 
-    List<Partner> findAllPartner(String seroId);
 }

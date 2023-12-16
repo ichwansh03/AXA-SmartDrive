@@ -33,16 +33,15 @@ import java.util.stream.Collectors;
 public class ServImpl implements ServService {
 
     private final SoRepository soRepository;
-    private final CustomerRequestRepository customerRequestRepository;
     private final ServOrderService servOrderService;
-    private final ServPremiService servPremiService;
-
-    private final CustomerRequestService customerRequestService;
-
     private final ServOrderTaskService servOrderTaskService;
     private final ServOrderWorkorderService servOrderWorkorderService;
 
+    private final ServPremiService servPremiService;
     private final ServPremiCreditService servPremiCreditService;
+
+    private final CustomerRequestRepository customerRequestRepository;
+    private final CustomerRequestService customerRequestService;
 
     SoAdapter soAdapter = new SoAdapter();
 
@@ -64,12 +63,12 @@ public class ServImpl implements ServService {
         }
 
         Services saved = soRepository.save(serv);
-        log.info("ServOrderServiceImpl::addService created service");
+        log.info("ServOrderServiceImpl::addService save services to db");
 
         servOrderService.addServiceOrders(saved.getServId());
 
-        log.info("ServOrderServiceImpl::addService created Service Orders");
         soRepository.flush();
+        log.info("ServOrderServiceImpl::addService sync data to db");
 
         return saved;
     }
