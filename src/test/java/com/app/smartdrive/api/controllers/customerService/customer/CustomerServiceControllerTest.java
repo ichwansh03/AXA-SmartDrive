@@ -1,18 +1,18 @@
 package com.app.smartdrive.api.controllers.customerService.customer;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.customer.request.CiasDTO;
-import com.app.smartdrive.api.dto.customer.request.CreateCustomerRequestByAgenDTO;
-import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
-import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.*;
+import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
+import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.customer.impl.CustomerRequestServiceImpl;
 import com.app.smartdrive.api.services.master.CarsService;
@@ -41,6 +41,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +61,9 @@ public class CustomerServiceControllerTest {
 
     @MockBean
     private CustomerRequestService customerRequestService;
+
+    @MockBean
+    private CustomerClaimService customerClaimService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -516,6 +520,173 @@ public class CustomerServiceControllerTest {
         ).andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException)
         ).andExpect(result -> assertEquals(
                 "User with id " + updateCustomerRequestDTO.getCustomerId() + " is not found",
+                result.getResolvedException().getMessage())
+        ).andDo(print());
+
+    }
+
+    @Test
+    void updateCustomerClaim_willSuccess() throws Exception {
+        ClaimRequestDTO claimRequestDTO = ClaimRequestDTO.builder()
+                .creqEntityId(1L)
+                .cuclSubtotal(new BigDecimal(100000))
+                .cuclEventPrice(new BigDecimal(3000))
+                .build();
+
+        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+                .creqEntityId(claimRequestDTO.getCreqEntityId())
+                .build();
+
+        when(this.customerClaimService.updateCustomerClaim(claimRequestDTO))
+                .thenReturn(customerResponseDTO);
+
+        mockMvc.perform(put("/customer/service/request/claim")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(claimRequestDTO))
+        ).andExpectAll(status().isOk()
+        ).andDo(result -> {
+            CustomerResponseDTO response = this.objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+
+            assertNotNull(response);
+            assertEquals(customerResponseDTO, response);
+        });
+
+
+    }
+
+    @Test
+    void updateCustomerClaim_willFailed() throws Exception {
+        ClaimRequestDTO claimRequestDTO = ClaimRequestDTO.builder()
+                .creqEntityId(1L)
+                .cuclSubtotal(new BigDecimal(100000))
+                .cuclEventPrice(new BigDecimal(3000))
+                .build();
+
+        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+                .creqEntityId(claimRequestDTO.getCreqEntityId())
+                .build();
+
+        when(this.customerClaimService.updateCustomerClaim(claimRequestDTO))
+                .thenThrow(new EntityNotFoundException("Customer Request with id " + claimRequestDTO.getCreqEntityId() + " is not found"));
+
+        mockMvc.perform(put("/customer/service/request/claim")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(claimRequestDTO))
+        ).andExpectAll(status().isNotFound()
+        ).andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException)
+        ).andExpect(result -> assertEquals(
+                "Customer Request with id " + claimRequestDTO.getCreqEntityId() + " is not found",
+                result.getResolvedException().getMessage()
+                )
+        ).andDo(print());
+
+    }
+
+    @Test
+    void getCustomerClaimById_willSuccess() throws Exception {
+
+        ClaimResponseDTO customerClaim = ClaimResponseDTO.builder()
+                .cuclCreqEntityId(1L)
+                .cuclEventPrice(new BigDecimal(10000))
+                .cuclSubtotal(new BigDecimal(2000))
+                .build();
+
+        when(this.customerClaimService.getCustomerClaimById(customerClaim.getCuclCreqEntityId()))
+                .thenReturn(customerClaim);
+
+        mockMvc.perform(get("/customer/service/request/claim")
+                .param("cuclCreqEntityId", String.valueOf(1L))
+        ).andExpectAll(status().isOk()
+        ).andDo(result -> {
+            ClaimResponseDTO response = this.objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+
+           assertNotNull(response);
+           assertEquals(customerClaim, response);
+        });
+
+
+    }
+
+    @Test
+    void getCustomerClaimById_willFailed() throws Exception {
+
+        ClaimResponseDTO customerClaim = ClaimResponseDTO.builder()
+                .cuclCreqEntityId(1L)
+                .cuclEventPrice(new BigDecimal(10000))
+                .cuclSubtotal(new BigDecimal(2000))
+                .build();
+
+        when(this.customerClaimService.getCustomerClaimById(customerClaim.getCuclCreqEntityId()))
+                .thenThrow(new EntityNotFoundException("Customer Claim with id " + customerClaim.getCuclCreqEntityId() + " is not found"));
+
+        mockMvc.perform(get("/customer/service/request/claim")
+                .param("cuclCreqEntityId", String.valueOf(1L))
+        ).andExpect(status().isNotFound()
+        ).andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException)
+        ).andExpect(result -> assertEquals(
+                "Customer Claim with id " + customerClaim.getCuclCreqEntityId() + " is not found",
+                result.getResolvedException().getMessage())
+        ).andDo(print());
+
+    }
+
+    @Test
+    void requestClosePolis_willSuccess() throws Exception{
+
+        CloseRequestDTO closeRequestDTO = CloseRequestDTO.builder()
+                .creqEntityId(1L)
+                .cuclReason("G ada duit")
+                .build();
+
+        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+                .creqEntityId(closeRequestDTO.getCreqEntityId())
+                .build();
+
+        when(this.customerClaimService.closePolis(closeRequestDTO))
+                .thenReturn(customerResponseDTO);
+
+        mockMvc.perform(put("/customer/service/request/close")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(closeRequestDTO))
+        ).andExpectAll(status().isOk()
+        ).andDo(result -> {
+            CustomerResponseDTO response = this.objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+
+            assertNotNull(response);
+            assertEquals(customerResponseDTO, response);
+        });
+
+    }
+
+    @Test
+    void requestClosePolis_willFailed() throws Exception{
+
+        CloseRequestDTO closeRequestDTO = CloseRequestDTO.builder()
+                .creqEntityId(1L)
+                .cuclReason("G ada duit")
+                .build();
+
+        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+                .creqEntityId(closeRequestDTO.getCreqEntityId())
+                .build();
+
+        when(this.customerClaimService.closePolis(closeRequestDTO))
+                .thenThrow(new EntityNotFoundException("Customer Request with id " + closeRequestDTO.getCreqEntityId() + " is not found"));
+
+        mockMvc.perform(put("/customer/service/request/close")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(closeRequestDTO))
+        ).andExpect(status().isNotFound()
+        ).andExpect(result -> assertTrue(result.getResolvedException() instanceof  EntityNotFoundException)
+        ).andExpect(result -> assertEquals(
+                "Customer Request with id " + closeRequestDTO.getCreqEntityId() + " is not found",
                 result.getResolvedException().getMessage())
         ).andDo(print());
 

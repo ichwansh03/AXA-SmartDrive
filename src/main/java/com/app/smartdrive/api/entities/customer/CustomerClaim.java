@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -33,10 +34,10 @@ public class CustomerClaim {
     private int cuclEvents;
 
     @Column(name = "cucl_event_price")
-    private Double cuclEventPrice;
+    private BigDecimal cuclEventPrice;
 
     @Column(name = "cucl_subtotal")
-    private Double cuclSubtotal;
+    private BigDecimal cuclSubtotal;
 
     @Column(name = "cucl_reason", length = 256)
     private String cuclReason;
