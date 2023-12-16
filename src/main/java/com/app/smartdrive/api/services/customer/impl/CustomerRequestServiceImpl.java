@@ -542,12 +542,17 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                         () -> new EntityNotFoundException("Customer Request with id " + updateCustomerRequestDTO.getCreqEntityId() + " is not found")
                 );
 
+
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
         CustomerInscAssets cias = existCustomerRequest.getCustomerInscAssets();
 
         CiasDTO ciasUpdateDTO = updateCustomerRequestDTO.getCiasDTO();
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
+
+        User customer = this.userService.getUserById(updateCustomerRequestDTO.getCustomerId()).orElseThrow(
+                () -> new EntityNotFoundException("User with id " + updateCustomerRequestDTO.getCustomerId() + " is not found")
+        );
 
         EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
                 .orElseThrow(
@@ -556,6 +561,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
 
         existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
+        existCustomerRequest.setCustomer(customer);
 
 
         CarSeries carSeries = this.carsService.getById(ciasUpdateDTO.getCiasCarsId());

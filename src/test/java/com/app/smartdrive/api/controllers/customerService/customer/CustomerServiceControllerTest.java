@@ -4,6 +4,7 @@ import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.request.CiasDTO;
 import com.app.smartdrive.api.dto.customer.request.CreateCustomerRequestByAgenDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -419,8 +420,6 @@ public class CustomerServiceControllerTest {
         ).andDo(print());
     }
 
-
-
     @Test
     void update_willSuccess() throws Exception {
         MockMultipartFile file =
@@ -434,7 +433,8 @@ public class CustomerServiceControllerTest {
 
 
 
-        CustomerRequestDTO customerRequestDTO = CustomerRequestDTO.builder()
+        UpdateCustomerRequestDTO customerRequestDTO = UpdateCustomerRequestDTO.builder()
+                .creqEntityId(1L)
                 .employeeId(1L)
                 .agenId(1L)
                 .customerId(2L)
@@ -455,10 +455,10 @@ public class CustomerServiceControllerTest {
             }
         });
 
-        when(this.customerRequestService.create(customerRequestDTO, multipartFiles))
+        when(this.customerRequestService.updateCustomerRequest(customerRequestDTO, multipartFiles))
                 .thenReturn(customerResponseDTO);
 
-        mockMvc.perform(multipart("/customer/service/request")
+        mockMvc.perform(builder
                 .file(file)
                 .param("client", this.objectMapper.writeValueAsString(customerRequestDTO))
         ).andExpect(status().isCreated()
