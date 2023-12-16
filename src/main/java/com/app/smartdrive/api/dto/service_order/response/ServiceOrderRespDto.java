@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -19,8 +20,8 @@ public class ServiceOrderRespDto {
     private EnumModuleServiceOrders.SeroStatus seroStatus;
     private String seroReason;
     private String servClaimNo;
-    private String servClaimStartDate;
-    private String servClaimEndDate;
+    private LocalDateTime servClaimStartDate;
+    private LocalDateTime servClaimEndDate;
     private ServiceRespDto services;
     private EmployeesAreaWorkgroupResponseDto employees;
     private PartnerDto partner;

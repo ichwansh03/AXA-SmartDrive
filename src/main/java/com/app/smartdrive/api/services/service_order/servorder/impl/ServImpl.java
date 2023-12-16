@@ -1,15 +1,21 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
+import com.app.smartdrive.api.dto.service_order.response.*;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.service_order.ServicePremi;
-import com.app.smartdrive.api.entities.service_order.Services;
+import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.service_orders.*;
+import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
+import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +36,13 @@ public class ServImpl implements ServService {
     private final CustomerRequestRepository customerRequestRepository;
     private final ServOrderService servOrderService;
     private final ServPremiService servPremiService;
+
+    private final CustomerRequestService customerRequestService;
+
+    private final ServOrderTaskService servOrderTaskService;
+    private final ServOrderWorkorderService servOrderWorkorderService;
+
+    private final ServPremiCreditService servPremiCreditService;
 
     SoAdapter soAdapter = new SoAdapter();
 
@@ -60,11 +76,63 @@ public class ServImpl implements ServService {
 
     @Transactional(readOnly = true)
     @Override
-    public Services findServicesById(Long servId) {
+    public ServiceRespDto findServicesById(Long servId) {
         Services services = soRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("Service with ID " + servId + " not found"));
         log.info("SoOrderServiceImpl::findServicesById in ID {} ",services.getServId());
-        return services;
+
+        CustomerResponseDTO customerRequestById = customerRequestService.getCustomerRequestById(services.getCustomer().getCreqEntityId());
+        List<ServiceOrders> allSeroByServId = servOrderService.findAllSeroByServId(services.getServId());
+        List<ServiceOrderRespDto> serviceOrderRespDtos = allSeroByServId.stream()
+                .map(serviceOrders -> TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class))
+                .collect(Collectors.toList());
+
+        for (ServiceOrderRespDto serviceOrderRespDto : serviceOrderRespDtos) {
+            List<ServiceOrderTasks> seotBySeroId = servOrderTaskService.findSeotBySeroId(serviceOrderRespDto.getSeroId());
+            List<SoTasksDto> soTasksDtos = TransactionMapper.mapEntityListToDtoList(seotBySeroId, SoTasksDto.class);
+            List<SoTasksDto> serviceOrderTaskDtoList = new ArrayList<>();
+
+            for (SoTasksDto soTasksDto : soTasksDtos) {
+                SoTasksDto serviceOrderTaskDto = new SoTasksDto();
+                serviceOrderTaskDto.setSeotId(soTasksDto.getSeotId());
+                serviceOrderTaskDto.setSeotName(soTasksDto.getSeotName());
+                serviceOrderTaskDto.setSeotStartDate(soTasksDto.getSeotStartDate());
+                serviceOrderTaskDto.setSeotEndDate(soTasksDto.getSeotEndDate());
+                serviceOrderTaskDto.setSeotStatus(soTasksDto.getSeotStatus());
+
+                List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(soTasksDto.getSeotId());
+                List<SoWorkorderDto> soWorkorderDtos = TransactionMapper.mapEntityListToDtoList(sowoBySeotId, SoWorkorderDto.class);
+                List<SoWorkorderDto> serviceWorkorderDtoList = new ArrayList<>();
+
+                for (SoWorkorderDto soWorkorderDto : soWorkorderDtos) {
+                    SoWorkorderDto workorderDto = new SoWorkorderDto();
+                    workorderDto.setSowoId(soWorkorderDto.getSowoId());
+                    workorderDto.setSowoName(soWorkorderDto.getSowoName());
+                    workorderDto.setSowoStatus(soWorkorderDto.getSowoStatus());
+                    serviceWorkorderDtoList.add(workorderDto);
+                }
+
+                serviceOrderTaskDto.setServiceOrderWorkorders(soWorkorderDtos);
+
+                serviceOrderTaskDtoList.add(serviceOrderTaskDto);
+            }
+
+            serviceOrderRespDto.setSoTasksDtoList(serviceOrderTaskDtoList);
+        }
+
+        ServicePremi servicePremi = servPremiService.findByServId(services.getServId());
+        SemiDto semiDto = TransactionMapper.mapEntityToDto(servicePremi, SemiDto.class);
+
+        List<ServicePremiCredit> servicePremiCredits = servPremiCreditService.findByServId(services.getServId());
+        List<SecrDto> secrDtoList = TransactionMapper.mapEntityListToDtoList(servicePremiCredits, SecrDto.class);
+        semiDto.setSecrDtoList(secrDtoList);
+
+        ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
+        serviceRespDto.setCustomerResponseDTO(customerRequestById);
+        serviceRespDto.setServiceOrdersList(serviceOrderRespDtos);
+        serviceRespDto.setSemiDto(semiDto);
+
+        return serviceRespDto;
     }
 
     private Services generateFeasiblityType(CustomerRequest cr){
@@ -109,7 +177,7 @@ public class ServImpl implements ServService {
     private void generateServPremi(Services services, CustomerRequest cr){
         ServicePremi servicePremi = ServicePremi.builder()
                 .semiServId(services.getServId())
-//                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
+                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
                 .semiPaidType(cr.getCustomerInscAssets().getCiasPaidType().toString())
                 .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
 
