@@ -17,8 +17,8 @@ public class SecrReqDto {
 
     private Long secrServId;
     private String secrYear;
-    private Double secrPremiDebet;
-    private Double secrPremiCredit;
+    private BigDecimal secrPremiDebet;
+    private BigDecimal secrPremiCredit;
     private LocalDateTime secrTrxDate;
     private LocalDateTime secrDueDate;
     //private String secrPatrTrxno;

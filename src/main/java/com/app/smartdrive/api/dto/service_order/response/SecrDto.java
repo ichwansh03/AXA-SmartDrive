@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Builder
@@ -17,8 +18,8 @@ public class SecrDto {
     private Long secrId;
     private Long secrServId;
     private String secrYear;
-    private Double secrPremiDebet;
-    private Double secrPremiCredit;
+    private BigDecimal secrPremiDebet;
+    private BigDecimal secrPremiCredit;
     private LocalDate secrTrxDate;
     private LocalDate secrDuedate;
     private PaymentTransactionsDto secrPatrTrxno;

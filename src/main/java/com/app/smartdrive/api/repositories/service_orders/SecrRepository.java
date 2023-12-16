@@ -19,13 +19,12 @@ import java.util.List;
 @Repository
 public interface SecrRepository extends JpaRepository<ServicePremiCredit, ServicePremiCreditId> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<ServicePremiCredit> findByServices_ServId(Long servId);
 
     ServicePremiCredit findBySecrDuedateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     @Query(value = "SELECT SUM(so.service_premi_credit.secr_premi_debet) FROM so.service_premi_credit", nativeQuery = true)
-    Double totalPremiMonthly();
+    BigDecimal totalPremiMonthly();
 
     @Modifying(clearAutomatically = true)
     @Transactional
