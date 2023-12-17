@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
@@ -145,13 +147,25 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderTasks> findSeotBySeroId(String seroId) {
-        return soTasksRepository.findByServiceOrders_SeroId(seroId);
+        List<ServiceOrderTasks> orderTasks = soTasksRepository.findByServiceOrders_SeroId(seroId);
+
+        if (orderTasks.isEmpty()) {
+            throw new EntityNotFoundException("ID "+seroId+" is not found");
+        }
+
+        log.info("SoOrderServiceImpl::findSeotBySeroId in ID {} ",seroId);
+
+        return orderTasks;
     }
 
     @Transactional
     @Override
     public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
         int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, seotId);
+
+        if (updateSeot == 0) {
+            throw new ValidasiRequestException("Failed to update data",400);
+        }
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
         return updateSeot;
     }
@@ -161,10 +175,10 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     public SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId) {
         ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId).get();
         SeotPartnerDto seotPartner = SeotPartnerDto.builder()
-                        .partnerId(seotPartnerDto.getPartnerId())
-                        .repair(seotPartnerDto.getRepair())
-                        .sparepart(seotPartnerDto.getSparepart())
-                        .seotStatus(seotPartnerDto.getSeotStatus()).build();
+                .partnerId(seotPartnerDto.getPartnerId())
+                .repair(seotPartnerDto.getRepair())
+                .sparepart(seotPartnerDto.getSparepart())
+                .seotStatus(seotPartnerDto.getSeotStatus()).build();
 
         if (seotPartnerDto.getRepair()) {
             createWorkorderTask("REPAIR", seotId);

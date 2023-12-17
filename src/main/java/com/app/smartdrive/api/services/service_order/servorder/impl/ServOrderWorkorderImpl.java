@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.service_order.request.ServiceWorkorderReqDto;
 import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
@@ -43,14 +45,25 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderWorkorder> findSowoBySeotId(Long seotId) {
-        return soWorkorderRepository.findSowoBySeotId(seotId);
+        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotId);
+
+        if (sowoBySeotId.isEmpty()) {
+            throw new EntityNotFoundException("ID "+seotId+" is not found");
+        }
+
+        return sowoBySeotId;
     }
 
     @Transactional
     @Override
     public int updateSowoStatus(Boolean sowoStatus, Long sowoId) {
         int updatedSowoStatus = soWorkorderRepository.updateSowoStatus(sowoStatus, LocalDateTime.now(), sowoId);
-        log.info("SoOrderServiceImpl::addSoWorkorder updated {} ", updatedSowoStatus);
+
+        if (updatedSowoStatus == 0) {
+            throw new ValidasiRequestException("Failed to update data ",400);
+        }
+
+        log.info("SoOrderServiceImpl::addSoWorkorder updated in ID {} ", sowoId);
         return updatedSowoStatus;
     }
 
