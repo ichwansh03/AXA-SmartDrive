@@ -37,6 +37,7 @@ public class CustomerServiceController {
     private final ServOrderService servOrderService;
 
     @GetMapping("/request")
+    @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllCustomersRequest(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "3") int size,
@@ -60,6 +61,7 @@ public class CustomerServiceController {
     }
 
     @GetMapping("/request/customer")
+    @PreAuthorize("hasAuthority('Customer')")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllUserCustomersRequest(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "3") int size,
