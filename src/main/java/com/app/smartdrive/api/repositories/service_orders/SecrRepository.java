@@ -28,5 +28,5 @@ public interface SecrRepository extends JpaRepository<ServicePremiCredit, Servic
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    int updateWithPatrNo(@Param("paymentTransactions") PaymentTransactions paymentTransactions, @Param("secrId") Long secrId);
+    int updateWithPatrNo(@Param("patrTrxno") String patrTrxno, @Param("secrId") Long secrId);
 }
