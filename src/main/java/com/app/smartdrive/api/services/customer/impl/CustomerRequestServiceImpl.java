@@ -585,7 +585,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscDoc> newCiasDocs = this.customerInscDocService.fileCheck(files, entityId);
         cias.setCustomerInscDoc(newCiasDocs);
 
-        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
         BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
@@ -598,6 +597,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         cias.setCiasTotalPremi(premiPrice);
 
+        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
