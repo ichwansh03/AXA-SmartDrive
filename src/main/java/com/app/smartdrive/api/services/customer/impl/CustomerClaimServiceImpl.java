@@ -91,12 +91,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
 
         CustomerClaim existCustomerClaim = existCustomerRequest.getCustomerClaim();
 
-        LocalDateTime cuclCreateDate = existCustomerClaim.getCuclCreateDate();
-
-        if(Objects.isNull(cuclCreateDate)){
-            existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
-        }
-
+        existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
 
         BigDecimal cuclEventPrice = existCustomerClaim.getCuclEventPrice();
         cuclEventPrice = cuclEventPrice.add(claimRequestDTO.getCuclEventPrice());
@@ -124,6 +119,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
+        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
         CustomerClaim customerClaim = existCustomerRequest.getCustomerClaim();
         customerClaim.setCuclReason(closeRequestDTO.getCuclReason());
