@@ -58,7 +58,7 @@ public class EmployeeSalaryDetail {
      private String emsaName;
 
      @Column(name="emsa_subtotal")
-     private Double emsaSubtotal;
+     private BigDecimal emsaSubtotal;
 
     @ManyToOne
     @JoinColumn(name = "emsa_emp_entityid",insertable=false, updatable=false)
