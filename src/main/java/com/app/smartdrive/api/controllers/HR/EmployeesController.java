@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
+import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.entities.hr.Employees;
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 
@@ -33,15 +35,15 @@ public class EmployeesController {
     @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> deleteEmployeesById (@PathVariable("id") Long emp_entityid) {
         employeesService.deleteById(emp_entityid);
-        return new ResponseEntity<>("Employees deleted successfully", HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping("/{employeeId}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<EmployeesResponseDto> updateEmployee(
-            @PathVariable("employeeId") Long employeeId,
+            @PathVariable("id") Long id,
             @RequestBody EmployeesRequestDto updatedEmployeeDto) {
-        Employees employees = employeesService.editEmployee(employeeId, updatedEmployeeDto);
+        Employees employees = employeesService.editEmployee(id, updatedEmployeeDto);
         return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(employees, EmployeesResponseDto.class));
     }
 
@@ -63,10 +65,10 @@ public class EmployeesController {
         return employeesService.searchEmployees(value, page, size);
     }
 
-    @GetMapping("/all")
-    @PreAuthorize("hasAuthority('Admin')")
-    public List<EmployeesResponseDto> getAllEmployees() {
-      return employeesService.getAllDto();
+    @GetMapping
+    public ResponseEntity<List<EmployeesResponseDto>> getAll(){
+        List<Employees> employees = employeesService.getAll();
+        return ResponseEntity.ok(employees.stream().map(emp -> TransactionMapper.mapEntityToDto(emp, EmployeesResponseDto.class)).toList());
     }
     
 }

@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.hr;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -37,7 +38,7 @@ public class BatchEmployeeSalary {
     private LocalDateTime emsTrasferDate;
 
     @Column(name="besa_total_salary")
-    private Double besaTotalSalary;
+    private BigDecimal besaTotalSalary;
 
     @Column(name="besa_account_number", length = 35)
     private String besaAccountNumber;

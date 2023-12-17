@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 
@@ -32,8 +34,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/eawg")
 public class EmployeeAreaWorkgroupController {
         private final EmployeeAreaWorkgroupService employeeAreaWorkgroupService;
-    
-
     
 
     @DeleteMapping("/{id}")
@@ -54,15 +54,15 @@ public class EmployeeAreaWorkgroupController {
         return employeeAreaWorkgroupService.searchEawg(value, page, size);
     }
 
-    @GetMapping("/all")
-    @PreAuthorize("hasAuthority('Admin')")
-    public List<EmployeesAreaWorkgroupResponseDto> getAllEmployees() {
-      return employeeAreaWorkgroupService.getAllDto();
+    @GetMapping
+    public ResponseEntity<List<EmployeesAreaWorkgroupResponseDto>> getAll(){
+        List<EmployeeAreaWorkgroup> employeeAreaWorkgroups = employeeAreaWorkgroupService.getAll();
+        return ResponseEntity.ok(employeeAreaWorkgroups.stream().map(eawg -> TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class)).toList());
     }
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<EmployeesAreaWorkgroupResponseDto> addPartnerAreaWorkGroup(@Valid @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto){
+    public ResponseEntity<EmployeesAreaWorkgroupResponseDto> addEawg(@Valid @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto){
         EmployeeAreaWorkgroup eawg = employeeAreaWorkgroupService.createEawg(employeeAreaWorkgroupDto);
         return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class));
     }
