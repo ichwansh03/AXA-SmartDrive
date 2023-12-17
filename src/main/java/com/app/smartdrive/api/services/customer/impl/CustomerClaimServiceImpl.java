@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -33,8 +34,8 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
     public CustomerClaim createNewClaim(CustomerRequest customerRequest) {
 
         CustomerClaim newCustomerClaim = CustomerClaim.builder()
-                .cuclEventPrice(0.0)
-                .cuclSubtotal(0.0)
+                .cuclEventPrice(new BigDecimal(0))
+                .cuclSubtotal(new BigDecimal(0))
                 .cuclEvents(0)
                 .cuclCreqEntityid(customerRequest.getCreqEntityId())
                 .customerRequest(customerRequest)
@@ -97,11 +98,11 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         }
 
 
-        Double cuclEventPrice = existCustomerClaim.getCuclEventPrice();
-        cuclEventPrice += claimRequestDTO.getCuclEventPrice();
+        BigDecimal cuclEventPrice = existCustomerClaim.getCuclEventPrice();
+        cuclEventPrice = cuclEventPrice.add(claimRequestDTO.getCuclEventPrice());
 
-        Double cuclSubtotal = existCustomerClaim.getCuclSubtotal();
-        cuclSubtotal += claimRequestDTO.getCuclSubtotal();
+        BigDecimal cuclSubtotal = existCustomerClaim.getCuclSubtotal();
+        cuclSubtotal = cuclSubtotal.add(claimRequestDTO.getCuclSubtotal());
 
         int cuclEvents = existCustomerClaim.getCuclEvents();
         cuclEvents += 1;

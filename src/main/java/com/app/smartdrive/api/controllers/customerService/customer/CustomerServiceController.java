@@ -137,9 +137,9 @@ public class CustomerServiceController {
     ) throws Exception{
 
         ObjectMapper mapper = new ObjectMapper();
-        CreateCustomerRequestByAgenDTO customerRequestDTO = mapper.readValue(client, CreateCustomerRequestByAgenDTO.class);
+        CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = mapper.readValue(client, CreateCustomerRequestByAgenDTO.class);
 
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.createByAgen(customerRequestDTO, files);
+        CustomerResponseDTO customerResponseDTO = this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, files);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
     }
