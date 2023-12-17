@@ -25,8 +25,6 @@ public interface CustomerRequestService {
 
     public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
-    public CustomerResponseDTO convert(CustomerRequest customerRequest);
-
     public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status);
 
     public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable pageable, String type, String status);
