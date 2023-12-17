@@ -4,6 +4,7 @@ import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.*;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,6 +62,10 @@ public class ServImpl implements ServService {
                     LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
             default -> serv = handleServiceUpdate(cr,
                     LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
+        }
+
+        if(Objects.equals(cr.getCreqType().toString(), "CLOSE")){
+            cr.setCreqStatus(EnumCustomer.CreqStatus.CLOSED);
         }
 
         Services saved = soRepository.save(serv);
