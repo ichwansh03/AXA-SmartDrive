@@ -1,9 +1,13 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
+import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
+import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.*;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
@@ -11,11 +15,14 @@ import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskServ
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +44,7 @@ public class ServOrderImpl implements ServOrderService {
     public ServiceOrders addServiceOrders(Long servId) throws Exception {
 
         Services services = soRepository.findById(servId).get();
-        ServiceOrders orders;
+        ServiceOrders orders = new ServiceOrders();
 
         switch (services.getServType().toString()){
             case "FEASIBLITY" -> {
@@ -66,7 +73,7 @@ public class ServOrderImpl implements ServOrderService {
                 orders = handlePolisAndClaim(services, LocalDateTime.now(), LocalDateTime.now().plusDays(10), "PL%");
                 servOrderTaskService.addClaimList(orders);
             }
-            default -> orders = generateSeroClosePolis(services);
+            default -> requestClosePolis(services);
         }
 
         return orders;
@@ -75,7 +82,8 @@ public class ServOrderImpl implements ServOrderService {
     @Transactional(readOnly = true)
     @Override
     public ServiceOrders findServiceOrdersById(String seroId) {
-        ServiceOrders serviceOrdersById = soOrderRepository.findById(seroId).get();
+        ServiceOrders serviceOrdersById = soOrderRepository.findById(seroId)
+                .orElseThrow(() -> new EntityNotFoundException("ID "+seroId+" is not found"));
         log.info("SoOrderServiceImpl::findServiceOrdersById in ID {} ",serviceOrdersById);
         return serviceOrdersById;
     }
@@ -85,14 +93,42 @@ public class ServOrderImpl implements ServOrderService {
     public List<ServiceOrders> findAllSeroByServId(Long servId) {
         List<ServiceOrders> allSeroByServId = soOrderRepository.findByServices_ServId(servId);
 
-        log.info("SoOrderServiceImpl::findAllSeroByServId in ID {} ",allSeroByServId);
+        if (allSeroByServId.isEmpty()){
+            throw new EntityNotFoundException("Service ID is not found");
+        }
+
+        log.info("SoOrderServiceImpl::findAllSeroByServId from service ID {} ",servId);
 
         return allSeroByServId;
     }
 
     @Override
     public List<ServiceOrders> findAllSeroByUserId(Long custId) {
-        return soOrderRepository.findByServices_Users_UserEntityId(custId);
+        List<ServiceOrders> entityId = soOrderRepository.findByServices_Users_UserEntityId(custId);
+
+        if (entityId.isEmpty()) {
+            throw new EntityNotFoundException("User ID is not found");
+        }
+
+        log.info("SoOrderServiceImpl::findAllSeroByServId from user ID {} ",custId);
+
+        return entityId;
+    }
+
+    @Override
+    public Page<ServiceOrderRespDto> pageServiceOrderByUserId(Pageable pageable, String seroOrdtType, String seroStatus) {
+
+        EnumModuleServiceOrders.SeroStatus status = EnumModuleServiceOrders.SeroStatus.valueOf(seroStatus);
+        Page<ServiceOrders> serviceOrdersPage;
+
+        if (Objects.equals(seroStatus, "ALL")) {
+            serviceOrdersPage = soOrderRepository.findBySeroStatus(pageable, status);
+        } else {
+            EnumModuleServiceOrders.SeroOrdtType type = EnumModuleServiceOrders.SeroOrdtType.valueOf(seroOrdtType);
+            serviceOrdersPage = soOrderRepository.findBySeroOrdtTypeAndSeroStatus(pageable, type, status);
+        }
+
+        return serviceOrdersPage.map(serviceOrders -> TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class));
     }
 
     public boolean checkAllTaskComplete(String seroId) {
@@ -136,14 +172,31 @@ public class ServOrderImpl implements ServOrderService {
     @Transactional
     @Override
     public int selectPartner(Partner partner, String seroId) {
-        return soOrderRepository.selectPartner(partner, seroId);
+        int selected = soOrderRepository.selectPartner(partner, seroId);
+
+        if (selected == 0) {
+            throw new ValidasiRequestException("Failed to update data", 400);
+        }
+
+        return selected;
+    }
+
+    @Override
+    public int requestClosePolis(EnumModuleServiceOrders.SeroStatus seroStatus, String seroId) {
+        int requested = soOrderRepository.requestClosePolis(seroStatus, seroId);
+
+        if (requested == 0) {
+            throw new ValidasiRequestException("Failed to update data", 400);
+        }
+
+        return requested;
     }
 
     /**
      * when request is TP (CLOSE), close all active sero
      */
     @Transactional
-    private ServiceOrders generateSeroClosePolis(Services services){
+    private void requestClosePolis(Services services){
         //get all service order by servId
         List<ServiceOrders> serviceOrders = soOrderRepository.findByServices_ServId(services.getServId());
         List<ServiceOrders> updateSero = serviceOrders.stream()
@@ -155,15 +208,10 @@ public class ServOrderImpl implements ServOrderService {
                     order.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
                     order.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
                     order.setSeroReason(order.getServices().getCustomer().getCustomerClaim().getCuclReason());
-                    order.setSeroAgentEntityid(order.getSeroAgentEntityid());
-                    order.setEmployees(order.getEmployees());
-                    order.setServices(order.getServices());
                 })
                 .toList();
 
         soOrderRepository.saveAll(updateSero);
-
-        return updateSero.isEmpty() ? null : updateSero.get(2);
     }
 
     @Transactional

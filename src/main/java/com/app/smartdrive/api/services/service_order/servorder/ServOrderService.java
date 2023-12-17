@@ -1,9 +1,11 @@
 package com.app.smartdrive.api.services.service_order.servorder;
 
+import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.Services;
-import org.springframework.data.repository.query.Param;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,6 +19,9 @@ public interface ServOrderService {
 
     List<ServiceOrders> findAllSeroByUserId(Long custId);
 
+    Page<ServiceOrderRespDto> pageServiceOrderByUserId(Pageable pageable, String seroOrdtType, String seroStatus);
+
     int selectPartner(Partner partner, String seroId);
 
+    int requestClosePolis(EnumModuleServiceOrders.SeroStatus seroStatus, String seroId);
 }
