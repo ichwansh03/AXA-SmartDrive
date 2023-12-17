@@ -1,5 +1,6 @@
 package com.smartdrive.partnerservice.services.implementation;
 
+import com.smartdrive.partnerservice.clients.MasterClient;
 import com.smartdrive.partnerservice.dto.ArwgRes;
 import com.smartdrive.partnerservice.dto.request.PartnerAreaWorkgroupRequest;
 import com.smartdrive.partnerservice.entities.PartnerAreaWorkGroupId;
@@ -11,7 +12,6 @@ import com.smartdrive.partnerservice.services.PartnerContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ import java.util.List;
 public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupService {
     private final PartnerAreaWorkGroupRepository partnerAreaWorkGroupRepository;
     private final PartnerContactService partnerContactService;
+    private final MasterClient masterClient;
 
 
     @Override
@@ -40,10 +41,8 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
     @Override
     @Transactional
     public PartnerAreaWorkgroup create(PartnerAreaWorkgroupRequest request) {
-        RestTemplate restTemplate = new RestTemplate();
         PartnerAreaWorkgroup pawo = new PartnerAreaWorkgroup();
-        String areaWorkGroupUrl = "http://localhost:8222/master/arwg/" + request.getAreaWorkgroupId();
-        ArwgRes arwgRes = restTemplate.getForObject(areaWorkGroupUrl, ArwgRes.class);
+        ArwgRes arwgRes = masterClient.findArwgByCode(request.getAreaWorkgroupId());
 
         PartnerContact partnerContact = partnerContactService.getById(request.getPartnerContactId());
 

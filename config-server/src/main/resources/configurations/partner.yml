@@ -23,6 +23,9 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.LongSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+application:
+  config:
+    master-url: http://localhost:8222/master
 #    consumer:
 #      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
 #      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
