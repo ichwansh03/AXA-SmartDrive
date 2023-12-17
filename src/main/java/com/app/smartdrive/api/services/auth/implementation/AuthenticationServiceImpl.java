@@ -17,6 +17,7 @@ import com.app.smartdrive.api.services.users.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
   private final UserRepository userRepository;
   private final UserService userService;
@@ -52,6 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     User user = userService.createUserCustomer(request);
     user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
     userRepository.save(user);
+    log.info("Save atau ngga");
   }
 
   @Override

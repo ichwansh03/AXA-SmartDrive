@@ -1,13 +1,13 @@
 {
   "profile"       :   {
-    "userName"      :   "randahaa",
+    "userName"      :   "test",
     "userPassword"  :   "asd123",
     "userFullName"  :   "izhasmayranda",
-    "userEmail"     :   "ran2332@gmail.com",
+    "userEmail"     :   "test@gmail.com",
     "userBirthPlace":   "ketapang",
     "userBirthDate" :   "2023-01-01T00:00:00",
-    "userNationalId":   "is2a1123s",
-    "userNpwp"      :   "2223215123123"
+    "userNationalId":   "sdss",
+    "userNpwp"      :   "223123"
   },
   "cityId"        :   1,
   "bankId"        :   1,
@@ -15,7 +15,7 @@
   "userPhone"     :   [
     {
       "userPhoneId": {
-        "usphPhoneNumber": "0834"
+        "usphPhoneNumber": "123345"
       },
       "usphPhoneType": "HP"
     }
@@ -33,7 +33,7 @@
   "userAccounts"  :   [
     {
       "enumPaymentType": "BANK",
-      "usac_accountno": "1235412325"
+      "usac_accountno": "1234522"
     }
   ]
 }
