@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PartnerContactRepository extends JpaRepository<PartnerContact, PartnerContactEntityId> {
-    Optional<PartnerContact> findByUser_UserFullName(String name);
+//    Optional<PartnerContact> findByUser_UserFullName(String name);
 }

@@ -1,5 +1,6 @@
 package com.smartdrive.partnerservice.services.implementation;
 
+import com.smartdrive.partnerservice.dto.ArwgRes;
 import com.smartdrive.partnerservice.dto.request.PartnerAreaWorkgroupRequest;
 import com.smartdrive.partnerservice.entities.PartnerAreaWorkGroupId;
 import com.smartdrive.partnerservice.entities.PartnerAreaWorkgroup;
@@ -10,13 +11,13 @@ import com.smartdrive.partnerservice.services.PartnerContactService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupService {
-
     private final PartnerAreaWorkGroupRepository partnerAreaWorkGroupRepository;
 //    private final ArwgService arwgService;
     private final PartnerContactService partnerContactService;
@@ -45,16 +46,17 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
     @Override
     @Transactional
     public PartnerAreaWorkgroup create(PartnerAreaWorkgroupRequest request) {
+        RestTemplate restTemplate = new RestTemplate();
         PartnerAreaWorkgroup pawo = new PartnerAreaWorkgroup();
+        String areaWorkGroupUrl = "http://localhost:8222/master/arwg/" + request.getAreaWorkgroupId();
+        ArwgRes arwgRes = restTemplate.getForObject(areaWorkGroupUrl, ArwgRes.class);
 
-//        AreaWorkGroup areaWorkGroup = arwgService.getById(request.getAreaWorkgroupId());
         PartnerContact partnerContact = partnerContactService.getById(request.getPartnerContactId());
 
         pawo.setPartnerContact(partnerContact);
-//        pawo.setAreaWorkGroup(areaWorkGroup);
         PartnerAreaWorkGroupId id = new PartnerAreaWorkGroupId();
         id.setPartnerId(partnerContact.getId().getPartnerId());
-//        id.setAreaWorkGroup(areaWorkGroup.getArwgCode());
+        id.setAreaWorkGroup(arwgRes.getArwgCode());
         id.setUserId(partnerContact.getId().getUserId());
         pawo.setId(id);
 
