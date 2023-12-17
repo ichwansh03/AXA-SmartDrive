@@ -46,22 +46,23 @@ public class ServOrderImpl implements ServOrderService {
                 log.info("ServOrderImpl::addServiceOrders create FEASIBLITY tasks");
             }
             case "POLIS" -> {
-                //for close previous sero
+                //get previous service order (FS)
                 ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
-                //close feasiblity
+                //close previous service order
                 closeExistingSero(fs);
 
                 orders = handlePolisAndClaim(services, null, null, "FS%");
                 servOrderTaskService.addPolisList(orders);
             }
             case "CLAIM" -> {
-                //for close previous claim
+                //get previous service order (CL)
                 ServiceOrders cl = soOrderRepository.findBySeroIdLikeAndServices_ServId("CL%", services.getServId());
+                //if user second time request claim
                 if (cl != null){
                     //close second claim
                     closeExistingSero(cl);
                 }
-                //new claim
+                //first time to request claim
                 orders = handlePolisAndClaim(services, LocalDateTime.now(), LocalDateTime.now().plusDays(10), "PL%");
                 servOrderTaskService.addClaimList(orders);
             }
@@ -138,11 +139,17 @@ public class ServOrderImpl implements ServOrderService {
         return soOrderRepository.selectPartner(partner, seroId);
     }
 
+    /**
+     * when request is TP (CLOSE), close all active sero
+     */
     @Transactional
     private ServiceOrders generateSeroClosePolis(Services services){
+        //get all service order by servId
         List<ServiceOrders> serviceOrders = soOrderRepository.findByServices_ServId(services.getServId());
         List<ServiceOrders> updateSero = serviceOrders.stream()
+
                 .filter(order -> order.getSeroStatus() == EnumModuleServiceOrders.SeroStatus.OPEN)
+                //change data without creating a new copy
                 .peek(order -> {
                     order.setSeroId(order.getSeroId());
                     order.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
@@ -182,6 +189,9 @@ public class ServOrderImpl implements ServOrderService {
         return saved;
     }
 
+    /**
+     * when tasks is completed, close previous sero
+     */
     private void closeExistingSero(ServiceOrders existingSero){
         if (checkAllTaskComplete(existingSero.getSeroId())){
             existingSero.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);

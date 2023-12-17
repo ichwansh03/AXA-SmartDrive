@@ -23,8 +23,12 @@ public class RequestBuilder {
   private final MockMvc mockMvc;
   private final ObjectMapper objectMapper;
 
-  ResultActions getUserById(Long id) throws  Exception{
+  ResultActions getUserByIdMock(Long id) throws  Exception{
     return mockMvc.perform(get("/user/{id}", id));
+  }
+
+  ResultActions createUserMock(){
+    return null;
   }
 
   List<UserRoles> addRole(EnumUsers.RoleName roleName, User user) {
@@ -51,7 +55,7 @@ public class RequestBuilder {
             new File("src/main/resources/request/CreateUserDto.json"),
             CreateUserDto.class);
     User user = new User();
-    user.setUserEntityId(1L);
+    user.setUserEntityId(2L);
     user.setUserPhoto("test.png");
     TransactionMapper.mapDtoToEntity(createUserDto.getProfile(), user);
     TransactionMapper.mapDtoToEntity(createUserDto, user);

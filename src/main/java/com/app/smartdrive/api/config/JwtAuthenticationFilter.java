@@ -40,7 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //  private final UserDetailsService userDetailsService;
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                  @NonNull HttpServletResponse response,@NonNull FilterChain filterChain) throws ServletException, IOException {
+                                  @NonNull HttpServletResponse response,
+                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
 
     final String jwt = jwtServiceImpl.getJwtFromCookies(request, jwtCookie);
     if(!StringUtils.hasLength(jwt)){

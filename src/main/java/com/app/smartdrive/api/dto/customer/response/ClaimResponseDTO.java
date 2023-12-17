@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,9 +20,9 @@ public class ClaimResponseDTO {
 
     private int cuclEvents;
 
-    private Double cuclEventPrice;
+    private BigDecimal cuclEventPrice;
 
-    private Double cuclSubtotal;
+    private BigDecimal cuclSubtotal;
 
     private String cuclReason;
 }
