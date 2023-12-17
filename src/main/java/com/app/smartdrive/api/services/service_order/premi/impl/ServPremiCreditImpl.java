@@ -73,7 +73,11 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     public boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId) {
         ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId)).get();
         ServicePremi premi = semiRepository.findById(secrServId).get();
-        BigDecimal premiMonthly = secrRepository.totalPremiMonthly();
+
+        List<ServicePremiCredit> allCredits = secrRepository.findAll();
+        BigDecimal countPremiMonthly = allCredits.stream()
+                .map(ServicePremiCredit::getSecrPremiDebet)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         ServicePremiCredit newSecr = ServicePremiCredit.builder()
                 .secrId(existSecr.getSecrId())
@@ -89,7 +93,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
             throw new CheckPaymentException("your payment has passed deadline");
         }
 
-        if (premi.getSemiPremiDebet().compareTo(premiMonthly) >= 0){
+        if (premi.getSemiPremiDebet().compareTo(countPremiMonthly) >= 0){
             semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.PAID.toString(), existSecr.getSecrServId());
             throw new CheckPaymentException("your payment has been paid");
         }
