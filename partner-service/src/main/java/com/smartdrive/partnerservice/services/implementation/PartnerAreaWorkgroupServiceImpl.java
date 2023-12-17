@@ -19,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupService {
     private final PartnerAreaWorkGroupRepository partnerAreaWorkGroupRepository;
-//    private final ArwgService arwgService;
     private final PartnerContactService partnerContactService;
 
 
@@ -39,11 +38,6 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
     }
 
     @Override
-    public void deleteById(Long aLong) {
-
-    }
-
-    @Override
     @Transactional
     public PartnerAreaWorkgroup create(PartnerAreaWorkgroupRequest request) {
         RestTemplate restTemplate = new RestTemplate();
@@ -56,7 +50,9 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
         pawo.setPartnerContact(partnerContact);
         PartnerAreaWorkGroupId id = new PartnerAreaWorkGroupId();
         id.setPartnerId(partnerContact.getId().getPartnerId());
-        id.setAreaWorkGroup(arwgRes.getArwgCode());
+        if (arwgRes != null) {
+            id.setAreaWorkGroup(arwgRes.getArwgCode());
+        }
         id.setUserId(partnerContact.getId().getUserId());
         pawo.setId(id);
 
