@@ -1,7 +1,9 @@
 package com.app.smartdrive.api.controllers.users;
 
 import com.app.smartdrive.api.controllers.auth.AuthenticationController;
+import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.LoginDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
@@ -11,6 +13,7 @@ import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetService;
 import com.app.smartdrive.api.services.users.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -157,6 +160,24 @@ class UserControllerTest {
                       .with(user("users")
                               .authorities(List.of(new SimpleGrantedAuthority("Admin"))))
                       .with(csrf()))
+              .andExpect(status().isOk())
+              .andDo(print());
+    }
+  }
+
+  @Nested
+  @DisplayName("Test Sign In")
+  class SignIn{
+    @Test
+    void shouldSignIn() throws Exception {
+      SignInRequest loginDto = SignInRequest.builder()
+              .username("admin")
+              .password("admin")
+              .build();
+      mockMvc.perform(post("/auth/signin").contentType(MediaType.APPLICATION_JSON)
+                      .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
+                      .with(csrf())
+                      .content(objectMapper.writeValueAsString(loginDto)))
               .andExpect(status().isOk())
               .andDo(print());
     }
