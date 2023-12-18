@@ -6,38 +6,33 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
-import com.app.smartdrive.api.dto.master.response.ArwgRes;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.*;
-import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.*;
-import com.app.smartdrive.api.entities.users.EnumUsers;
-import com.app.smartdrive.api.entities.users.UserRoles;
+import com.app.smartdrive.api.entities.users.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
-import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
-import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
-import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
-import com.app.smartdrive.api.repositories.master.*;
+import com.app.smartdrive.api.repositories.users.RolesRepository;
+import com.app.smartdrive.api.repositories.users.UserRepository;
+import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
 import com.app.smartdrive.api.services.master.*;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
+import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
-import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,11 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
-import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
-import com.app.smartdrive.api.repositories.users.UserRepository;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -86,6 +77,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final EmployeesService employeesService;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final UserRolesService userRolesService;
+
+    private final UserRoleRepository userRoleRepository;
+
+    private final UserRepository userRepository;
 
 
     @Transactional(readOnly = true)
@@ -136,7 +133,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
 
-        User entityUser = this.userService.getUserById(customerRequestDTO.getCustomerId()).orElseThrow(
+        User customer = this.userService.getUserById(customerRequestDTO.getCustomerId()).orElseThrow(
                 () -> new EntityNotFoundException("User with id " + customerRequestDTO.getCustomerId() + " is not found")
         );
 
@@ -152,7 +149,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 );
 
 
-        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, customer, entityId);
         newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
@@ -169,7 +166,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
                 ciasDTO.getCurrentPrice(),
-                entityUser.getUserBirthDate().getYear(),
+                customer.getUserBirthDate().getYear(),
                 ciasCuexs
         );
 
@@ -438,9 +435,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             Long entityId
     ){
 
+        User updatedCustomer = this.userRolesService.updateRoleFromPcToCu(customer);
+
+
         CustomerRequest customerRequest = CustomerRequest.builder()
                 .businessEntity(newEntity)
-                .customer(customer)
+                .customer(updatedCustomer)
                 .creqCreateDate(LocalDateTime.now())
                 .creqStatus(EnumCustomer.CreqStatus.OPEN)
                 .creqType(EnumCustomer.CreqType.FEASIBLITY)
