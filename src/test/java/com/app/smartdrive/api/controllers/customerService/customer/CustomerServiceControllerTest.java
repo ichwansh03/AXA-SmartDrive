@@ -73,6 +73,7 @@ public class CustomerServiceControllerTest {
 
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void getAllCustomersRequest_willSuccess() throws Exception {
         List<CustomerResponseDTO> customerResponseDTOList = List.of(new CustomerResponseDTO(), new CustomerResponseDTO());
         Page<CustomerResponseDTO> pagedResponse = new PageImpl(customerResponseDTOList);
@@ -90,6 +91,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void getAllCustomersRequest_willFailed() throws Exception {
         List<CustomerResponseDTO> customerResponseDTOList = List.of(new CustomerResponseDTO(), new CustomerResponseDTO());
         Page<CustomerResponseDTO> pagedResponse = new PageImpl(customerResponseDTOList);
@@ -109,6 +111,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void getAllUserCustomersRequest_willSuccess() throws Exception {
         User user = new User();
         user.setUserEntityId(1L);
@@ -130,6 +133,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void getAllUserCustomersRequest_willFailed() throws Exception{
        Long customerId = 1L;
 
@@ -148,6 +152,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Employee")
     void getAllAgenCustomersRequest_willSuccess() throws Exception {
         AreaWorkGroup areaWorkGroup = new AreaWorkGroup();
         areaWorkGroup.setArwgCode("BCI-0001");
@@ -177,6 +182,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Employee")
     void getAllAgenCustomersRequest_willFailed() throws Exception {
         AreaWorkGroup areaWorkGroup = new AreaWorkGroup();
         areaWorkGroup.setArwgCode("BCI-0001");
@@ -208,6 +214,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void getById_willSuccess() throws Exception {
 
         CustomerRequest customerRequest = CustomerRequest.builder()
@@ -236,6 +243,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = {"Customer", "Employee"})
     void getById_willFailed() throws Exception {
 
         Long creqEntityId = 2L;
@@ -265,6 +273,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Potential Customer")
     void create_willSuccess() throws Exception {
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -304,6 +313,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Potential Customer")
     void create_willFailed() throws Exception {
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -339,6 +349,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Employee")
     void createByAgen_willSuccess() throws Exception {
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -381,6 +392,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Employee")
     void createByAgen_willFailed() throws Exception {
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -425,6 +437,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void update_willSuccess() throws Exception {
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -476,6 +489,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void update_willFailed() throws Exception {
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -526,6 +540,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void updateCustomerClaim_willSuccess() throws Exception {
         ClaimRequestDTO claimRequestDTO = ClaimRequestDTO.builder()
                 .creqEntityId(1L)
@@ -557,6 +572,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void updateCustomerClaim_willFailed() throws Exception {
         ClaimRequestDTO claimRequestDTO = ClaimRequestDTO.builder()
                 .creqEntityId(1L)
@@ -586,6 +602,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void getCustomerClaimById_willSuccess() throws Exception {
 
         ClaimResponseDTO customerClaim = ClaimResponseDTO.builder()
@@ -612,6 +629,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void getCustomerClaimById_willFailed() throws Exception {
 
         ClaimResponseDTO customerClaim = ClaimResponseDTO.builder()
@@ -635,6 +653,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void requestClosePolis_willSuccess() throws Exception{
 
         CloseRequestDTO closeRequestDTO = CloseRequestDTO.builder()
@@ -665,6 +684,7 @@ public class CustomerServiceControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
     void requestClosePolis_willFailed() throws Exception{
 
         CloseRequestDTO closeRequestDTO = CloseRequestDTO.builder()

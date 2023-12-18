@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.dto.service_order.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SecrReqDto {
 
+    private Long secrId;
     private Long secrServId;
     private String secrYear;
     private BigDecimal secrPremiDebet;

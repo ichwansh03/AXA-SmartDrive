@@ -43,7 +43,8 @@ public class ServOrderImpl implements ServOrderService {
     @Override
     public ServiceOrders addServiceOrders(Long servId) throws Exception {
 
-        Services services = soRepository.findById(servId).get();
+        Services services = soRepository.findById(servId)
+                .orElseThrow(() -> new EntityNotFoundException("addServiceOrders(Long servId)::servId "+servId+ "is not found"));
         ServiceOrders orders = new ServiceOrders();
 
         switch (services.getServType().toString()){
@@ -94,7 +95,7 @@ public class ServOrderImpl implements ServOrderService {
         List<ServiceOrders> allSeroByServId = soOrderRepository.findByServices_ServId(servId);
 
         if (allSeroByServId.isEmpty()){
-            throw new EntityNotFoundException("Service ID is not found");
+            throw new EntityNotFoundException("findAllSeroByServId(Long servId)::Service ID is not found");
         }
 
         log.info("SoOrderServiceImpl::findAllSeroByServId from service ID {} ",servId);
@@ -107,7 +108,7 @@ public class ServOrderImpl implements ServOrderService {
         List<ServiceOrders> entityId = soOrderRepository.findByServices_Users_UserEntityId(custId);
 
         if (entityId.isEmpty()) {
-            throw new EntityNotFoundException("User ID is not found");
+            throw new EntityNotFoundException("findAllSeroByUserId(Long custId)::custId is not found");
         }
 
         log.info("SoOrderServiceImpl::findAllSeroByServId from user ID {} ",custId);

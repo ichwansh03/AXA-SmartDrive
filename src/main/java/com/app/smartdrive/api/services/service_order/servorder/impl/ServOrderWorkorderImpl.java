@@ -45,13 +45,7 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderWorkorder> findSowoBySeotId(Long seotId) {
-        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotId);
-
-        if (sowoBySeotId.isEmpty()) {
-            throw new EntityNotFoundException("ID "+seotId+" is not found");
-        }
-
-        return sowoBySeotId;
+        return soWorkorderRepository.findSowoBySeotId(seotId);
     }
 
     @Transactional

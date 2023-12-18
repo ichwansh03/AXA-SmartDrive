@@ -37,7 +37,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
                 .cuclEventPrice(new BigDecimal(0))
                 .cuclSubtotal(new BigDecimal(0))
                 .cuclEvents(0)
-                .cuclCreqEntityid(customerRequest.getCreqEntityId())
+                .cuclCreqEntityId(customerRequest.getCreqEntityId())
                 .customerRequest(customerRequest)
                 .build();
 
@@ -54,13 +54,8 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         );
 
 
-        ClaimResponseDTO claimResponseDTO = ClaimResponseDTO.builder()
-                .cuclCreqEntityId(existCustomerClaim.getCuclCreqEntityid())
-                .cuclCreateDate(existCustomerClaim.getCuclCreateDate())
-                .cuclReason(existCustomerClaim.getCuclReason())
-                .cuclEventPrice(existCustomerClaim.getCuclEventPrice())
-                .cuclSubtotal(existCustomerClaim.getCuclSubtotal())
-                .build();
+        ClaimResponseDTO claimResponseDTO = TransactionMapper.mapEntityToDto(existCustomerClaim, ClaimResponseDTO.class);
+
 
         log.info("CustomerClaimImpl::getCustomerClaimById, find customer claim with id: {}", cuclCreqEntityId);
         return claimResponseDTO;
