@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class CustomerClaim {
     @Id
     @Column(name = "cucl_creq_entityid")
-    private Long  cuclCreqEntityid;
+    private Long  cuclCreqEntityId;
 
     @JsonBackReference
     @OneToOne
