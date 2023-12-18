@@ -63,7 +63,7 @@ public class ServImpl implements ServService {
             case "CLAIM" -> serv = handleServiceUpdate(cr,
                     LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
             default -> serv = handleServiceUpdate(cr,
-                    LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
+                    LocalDateTime.now(), EnumModuleServiceOrders.ServStatus.INACTIVE);
         }
 
         if(Objects.equals(cr.getCreqType().toString(), "CLOSE")){
@@ -153,7 +153,7 @@ public class ServImpl implements ServService {
                 .build();
 
         switch (existingService.getServType()) {
-            case POLIS -> generateServPremi(existingService, cr);
+            case POLIS -> generateServPremi(existingService);
             case CLOSE -> servPremiService.updateSemiStatus(
                     EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), existingService.getServId());
         }
@@ -161,11 +161,11 @@ public class ServImpl implements ServService {
         return existingService;
     }
 
-    private void generateServPremi(Services services, CustomerRequest cr){
+    private void generateServPremi(Services services){
         ServicePremi servicePremi = ServicePremi.builder()
                 .semiServId(services.getServId())
-                .semiPremiDebet(cr.getCustomerInscAssets().getCiasTotalPremi())
-                .semiPaidType(cr.getCustomerInscAssets().getCiasPaidType().toString())
+                .semiPremiDebet(services.getCustomer().getCustomerInscAssets().getCiasTotalPremi())
+                .semiPaidType(services.getCustomer().getCustomerInscAssets().getCiasPaidType().toString())
                 .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
 
         servPremiService.addSemi(servicePremi, services.getServId());

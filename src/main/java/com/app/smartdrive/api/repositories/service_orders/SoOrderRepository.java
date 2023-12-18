@@ -41,7 +41,8 @@ public interface SoOrderRepository extends JpaRepository<ServiceOrders, String> 
     @Query(value = "select * from so.service_orders where sero_id like 'PL%' and sero_agent_entityid = ?1", nativeQuery = true)
     ServiceOrders findBySeroIdLikeAndEmployees_EawgEntityid(Long eawgEntityid);
 
-    int requestClosePolis(@Param("seroStatus") EnumModuleServiceOrders.SeroStatus seroStatus, @Param("seroId") String seroId);
+    @Modifying(clearAutomatically = true)
+    int requestClosePolis(@Param("seroStatus") EnumModuleServiceOrders.SeroStatus seroStatus, @Param("seroReason") String seroReason, @Param("seroId") String seroId);
 
     Page<ServiceOrders> findBySeroStatus(Pageable pageable, EnumModuleServiceOrders.SeroStatus seroStatus);
 
