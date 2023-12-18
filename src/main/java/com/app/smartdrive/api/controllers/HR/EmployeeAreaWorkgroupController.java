@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,10 +58,20 @@ public class EmployeeAreaWorkgroupController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmployeesAreaWorkgroupResponseDto>> getAll(){
-        List<EmployeeAreaWorkgroup> employeeAreaWorkgroups = employeeAreaWorkgroupService.getAll();
-        return ResponseEntity.ok(employeeAreaWorkgroups.stream().map(eawg -> TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class)).toList());
+    public ResponseEntity<Page<EmployeesAreaWorkgroupResponseDto>> getAll(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<EmployeeAreaWorkgroup> eawgPage = employeeAreaWorkgroupService.getAll(pageable);
+
+        List<EmployeesAreaWorkgroupResponseDto> listResponse = eawgPage.getContent().stream()
+                .map(eawg -> TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class))
+                .toList();
+
+        return ResponseEntity.ok(new PageImpl<>(listResponse, pageable, eawgPage.getTotalElements()));
     }
+
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('Admin')")

@@ -100,15 +100,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
         return new PageImpl<>(dtos, pageable, resultPage.getTotalElements());
     }
-
-   
-
-    @Override
-    public List<EmployeesAreaWorkgroupResponseDto> getAllDto() {
-      List<EmployeeAreaWorkgroup> employeeAreaWorkgroups = employeeAreaWorkgroupRepository.findAll();
-      List<EmployeesAreaWorkgroupResponseDto> empDto = TransactionMapper.mapEntityListToDtoList(employeeAreaWorkgroups, EmployeesAreaWorkgroupResponseDto.class);
-      return empDto;
-    }
     
     @Override
     public EmployeeAreaWorkgroup getById(Long id) {
@@ -118,8 +109,14 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     }
 
     @Override
+    @Transactional
+    public Page<EmployeeAreaWorkgroup> getAll(Pageable pageable) {
+        return employeeAreaWorkgroupRepository.findAll(pageable);
+    }
+
+    @Override
     public List<EmployeeAreaWorkgroup> getAll() {
-        return employeeAreaWorkgroupRepository.findAll();
+        return null;
     }
 
     @Override
@@ -130,7 +127,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
     @Override
     public void deleteById(Long eawg_id) {
-        // TODO Auto-generated method stub
          employeeAreaWorkgroupRepository.deleteEawgById(eawg_id);
     }
 
