@@ -45,9 +45,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -123,6 +125,7 @@ class ClaimAssetControllerTest {
         profil.setUserPassword(test);
         profil.setUserEmail(test);
         profil.setUserNpwp(test);
+        profil.setUserBirthDate(LocalDateTime.now().minusYears(30));
         profil.setUserNationalId(test);
         profil.setUserFullName(test);
 
@@ -139,7 +142,7 @@ class ClaimAssetControllerTest {
         ciasDTO.setCiasCityId(1L);
         ciasDTO.setCiasIntyName("Comprehensive");
         ciasDTO.setCiasStartdate("2023-01-01 15:02:00");
-//        ciasDTO.setCurrentPrice(120000000D);
+        ciasDTO.setCurrentPrice(new BigDecimal("120000000"));
         ciasDTO.setCuexIds(new Long[]{7L,8L,9L});
         CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();
         customerRequestDTO.setCustomerId(user.getUserEntityId());
