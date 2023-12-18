@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
+import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
@@ -39,8 +40,14 @@ public class ServOrderController {
         return new ResponseEntity<>(partner, HttpStatus.OK);
     }
 
+    @PutMapping("/close/{seroId}")
+    public ResponseEntity<?> updateToCloseOrder(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId){
+        int requested = servOrderService.requestClosePolis(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
+        return new ResponseEntity<>(requested, HttpStatus.OK);
+    }
+
     @GetMapping("/request")
-    public ResponseEntity<Page<ServiceOrderRespDto>> getPageServiceOrders(
+    public ResponseEntity<?> getPageServiceOrders(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "3") int size,
             @RequestParam(value = "type", defaultValue = "ALL") String type,
@@ -59,7 +66,7 @@ public class ServOrderController {
 
         Page<ServiceOrderRespDto> orderRespDtoPage = servOrderService.pageServiceOrderByUserId(paging, type, status);
 
-        return ResponseEntity.status(HttpStatus.OK).body(orderRespDtoPage);
+        return new ResponseEntity<>(orderRespDtoPage, HttpStatus.OK);
     }
 
 }

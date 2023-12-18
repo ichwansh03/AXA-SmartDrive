@@ -25,8 +25,7 @@ import java.util.List;
                 query = "UPDATE ServiceOrders sero SET sero.partner = :partner WHERE sero.seroId = :seroId", lockMode = LockModeType.PESSIMISTIC_WRITE),
         @NamedQuery(
                 name = "ServiceOrders.requestClosePolis",
-                query = "UPDATE ServiceOrders sero SET sero.seroStatus = :seroStatus WHERE sero.seroId = :seroId", lockMode = LockModeType.PESSIMISTIC_WRITE),
-
+                query = "UPDATE ServiceOrders sero SET sero.seroStatus = :seroStatus, sero.seroReason = :seroReason WHERE sero.seroId = :seroId", lockMode = LockModeType.PESSIMISTIC_WRITE),
 })
 @DynamicInsert
 @DynamicUpdate

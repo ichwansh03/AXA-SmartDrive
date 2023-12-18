@@ -58,9 +58,9 @@ public class ServOrderImpl implements ServOrderService {
                 ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
                 //close previous service order
                 closeExistingSero(fs);
-
                 orders = handlePolisAndClaim(services, null, null, "FS%");
                 servOrderTaskService.addPolisList(orders);
+                log.info("ServOrderImpl::addServiceOrders create POLIS tasks");
             }
             case "CLAIM" -> {
                 //get previous service order (CL)
@@ -73,6 +73,7 @@ public class ServOrderImpl implements ServOrderService {
                 //first time to request claim
                 orders = handlePolisAndClaim(services, LocalDateTime.now(), LocalDateTime.now().plusDays(10), "PL%");
                 servOrderTaskService.addClaimList(orders);
+                log.info("ServOrderImpl::addServiceOrders create CLAIM tasks");
             }
             default -> requestClosePolis(services);
         }
@@ -165,7 +166,7 @@ public class ServOrderImpl implements ServOrderService {
 
         ServiceOrders saved = soOrderRepository.save(serviceOrders);
 
-        log.info("ServOrderTaskImpl::generateSeroFeasiblity successfully added {} ", saved.getSeroId());
+        log.info("ServOrderTaskImpl::generateSeroFeasiblity successfully added in ID {} ", saved.getSeroId());
 
         return saved;
     }
@@ -183,8 +184,8 @@ public class ServOrderImpl implements ServOrderService {
     }
 
     @Override
-    public int requestClosePolis(EnumModuleServiceOrders.SeroStatus seroStatus, String seroId) {
-        int requested = soOrderRepository.requestClosePolis(seroStatus, seroId);
+    public int requestClosePolis(EnumModuleServiceOrders.SeroStatus seroStatus, String seroReason, String seroId) {
+        int requested = soOrderRepository.requestClosePolis(seroStatus, seroReason, seroId);
 
         if (requested == 0) {
             throw new ValidasiRequestException("Failed to update data", 400);

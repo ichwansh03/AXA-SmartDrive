@@ -23,6 +23,7 @@ import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     private final TewoRepository tewoRepository;
     private final PartnerRepository partnerRepository;
 
+    private final ServOrderWorkorderService servOrderWorkorderService;
     private final EmailService emailService;
 
     @Transactional
@@ -67,8 +69,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
         List<ServiceOrderTasks> serviceOrderTasks = soTasksRepository.saveAll(mapperTaskList);
 
-        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository, tewoRepository);
-        servOrderWorkorder.addSowoList(serviceOrderTasks);
+        servOrderWorkorderService.addSowoList(serviceOrderTasks);
 
         return serviceOrderTasks;
     }
@@ -173,7 +174,8 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     @Transactional
     @Override
     public SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId) {
-        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId).get();
+        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("::updateSeotPartner() ID "+seotId+" is not found"));
         SeotPartnerDto seotPartner = SeotPartnerDto.builder()
                 .partnerId(seotPartnerDto.getPartnerId())
                 .repair(seotPartnerDto.getRepair())
@@ -190,7 +192,8 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
             log.info("SoOrderServiceImpl::updateSeotPartner add GANTI SUKU CADANG to workorder");
         }
 
-        Partner partner = partnerRepository.findById(seotPartner.getPartnerId()).get();
+        Partner partner = partnerRepository.findById(seotPartner.getPartnerId())
+                .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID "+seotPartner.getPartnerId()+" is not found"));
         soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
 
         return seotPartner;
@@ -211,7 +214,8 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         workOrder.setTewoName(sowoName);
         tewoRepository.save(workOrder);
 
-        ServiceOrderTasks tasks = soTasksRepository.findById(seotId).get();
+        ServiceOrderTasks tasks = soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("::createWorkorderTask ID is not found"));
 
         ServiceOrderWorkorder soWorkorder = new ServiceOrderWorkorder();
         soWorkorder.setSowoName(workOrder.getTewoName());
