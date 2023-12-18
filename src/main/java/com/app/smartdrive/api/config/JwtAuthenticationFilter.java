@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           SecurityContextHolder.setContext(context);
         }
       }
-    } catch (ExpiredJwtException e) {
+    } catch (Exception e) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       response.setContentType(MediaType.APPLICATION_JSON_VALUE);
       ApiResponse res = new ApiResponse(401, "Unauthorised");
