@@ -24,10 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +52,8 @@ public class ServImpl implements ServService {
     @Override
     public Services addService(Long creqId) throws Exception {
 
-        CustomerRequest cr = customerRequestRepository.findById(creqId).get();
+        CustomerRequest cr = customerRequestRepository.findById(creqId)
+                .orElseThrow(() -> new EntityNotFoundException("addService(Long creqId)::creqId "+creqId+" is not found"));
         Services serv;
 
         switch (cr.getCreqType().toString()){
@@ -88,48 +90,28 @@ public class ServImpl implements ServService {
 
         CustomerResponseDTO customerRequestById = customerRequestService.getCustomerRequestById(services.getCustomer().getCreqEntityId());
         List<ServiceOrders> allSeroByServId = servOrderService.findAllSeroByServId(services.getServId());
+
         List<ServiceOrderRespDto> serviceOrderRespDtos = allSeroByServId.stream()
-                .map(serviceOrders -> TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class))
+                .map(serviceOrders -> {
+                    ServiceOrderRespDto dto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
+                    List<SoTasksDto> soTasksDtoList = servOrderTaskService.findSeotBySeroId(dto.getSeroId()).stream()
+                            .map(seot -> {
+                                SoTasksDto soTasksDto = TransactionMapper.mapEntityToDto(seot, SoTasksDto.class);
+                                List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(soTasksDto.getSeotId());
+                                soTasksDto.setServiceOrderWorkorders(TransactionMapper.mapEntityListToDtoList(sowoBySeotId, SoWorkorderDto.class));
+                                return soTasksDto;
+                            })
+                            .collect(toList());
+                    dto.setSoTasksDtoList(soTasksDtoList);
+                    return dto;
+                })
                 .collect(Collectors.toList());
-
-        for (ServiceOrderRespDto serviceOrderRespDto : serviceOrderRespDtos) {
-            List<ServiceOrderTasks> seotBySeroId = servOrderTaskService.findSeotBySeroId(serviceOrderRespDto.getSeroId());
-            List<SoTasksDto> soTasksDtos = TransactionMapper.mapEntityListToDtoList(seotBySeroId, SoTasksDto.class);
-            List<SoTasksDto> serviceOrderTaskDtoList = new ArrayList<>();
-
-            for (SoTasksDto soTasksDto : soTasksDtos) {
-                SoTasksDto serviceOrderTaskDto = new SoTasksDto();
-                serviceOrderTaskDto.setSeotId(soTasksDto.getSeotId());
-                serviceOrderTaskDto.setSeotName(soTasksDto.getSeotName());
-                serviceOrderTaskDto.setSeotStartDate(soTasksDto.getSeotStartDate());
-                serviceOrderTaskDto.setSeotEndDate(soTasksDto.getSeotEndDate());
-                serviceOrderTaskDto.setSeotStatus(soTasksDto.getSeotStatus());
-
-                List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(soTasksDto.getSeotId());
-                List<SoWorkorderDto> soWorkorderDtos = TransactionMapper.mapEntityListToDtoList(sowoBySeotId, SoWorkorderDto.class);
-                List<SoWorkorderDto> serviceWorkorderDtoList = new ArrayList<>();
-
-                for (SoWorkorderDto soWorkorderDto : soWorkorderDtos) {
-                    SoWorkorderDto workorderDto = new SoWorkorderDto();
-                    workorderDto.setSowoId(soWorkorderDto.getSowoId());
-                    workorderDto.setSowoName(soWorkorderDto.getSowoName());
-                    workorderDto.setSowoStatus(soWorkorderDto.getSowoStatus());
-                    serviceWorkorderDtoList.add(workorderDto);
-                }
-
-                serviceOrderTaskDto.setServiceOrderWorkorders(soWorkorderDtos);
-
-                serviceOrderTaskDtoList.add(serviceOrderTaskDto);
-            }
-
-            serviceOrderRespDto.setSoTasksDtoList(serviceOrderTaskDtoList);
-        }
 
         ServicePremi servicePremi = servPremiService.findByServId(services.getServId());
         SemiDto semiDto = TransactionMapper.mapEntityToDto(servicePremi, SemiDto.class);
-
-        List<ServicePremiCredit> servicePremiCredits = servPremiCreditService.findByServId(services.getServId());
-        List<SecrDto> secrDtoList = TransactionMapper.mapEntityListToDtoList(servicePremiCredits, SecrDto.class);
+        List<SecrDto> secrDtoList = servPremiCreditService.findByServId(services.getServId()).stream()
+                .map(secr -> TransactionMapper.mapEntityToDto(secr, SecrDto.class))
+                .collect(Collectors.toList());
         semiDto.setSecrDtoList(secrDtoList);
 
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
