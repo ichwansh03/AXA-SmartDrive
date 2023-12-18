@@ -1,17 +1,12 @@
 package com.app.smartdrive.api.services.refreshToken;
 
 import com.app.smartdrive.api.Exceptions.TokenRefreshException;
-import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import com.app.smartdrive.api.entities.auth.RefreshToken;
 import com.app.smartdrive.api.repositories.auth.RefreshTokenRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
-import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

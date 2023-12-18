@@ -1,37 +1,29 @@
 package com.app.smartdrive.api.config;
 
 import com.app.smartdrive.api.Exceptions.Error;
-import com.app.smartdrive.api.Exceptions.JwtExpiredException;
 import com.app.smartdrive.api.dto.auth.response.ApiResponse;
-import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.jwt.JwtUtils;
 import com.app.smartdrive.api.services.users.UserService;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -39,7 +31,6 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-  private final JwtService jwtServiceImpl;
   private final UserService userService;
   private final ObjectMapper objectMapper;
   @Value("${jwt.refresh.cookie}")
