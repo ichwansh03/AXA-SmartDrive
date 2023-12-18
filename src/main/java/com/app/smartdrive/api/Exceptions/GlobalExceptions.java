@@ -190,20 +190,12 @@ public class GlobalExceptions {
                 error, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<?> jwtExpired(ExpiredJwtException ex){
+    @ExceptionHandler(JwtExpiredException.class)
+    public ResponseEntity<?> jwtExpired(JwtExpiredException ex){
         Error error = ErrorUtils.createError("Token expired, you can refresh with refreshtoken in /auth/refreshtoken",
-                ex.getLocalizedMessage(), HttpStatus.FORBIDDEN.value());
+                ex.getMessage(), HttpStatus.FORBIDDEN.value());
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    @ResponseBody
-    public ResponseEntity<?> handleAuthenticationException(Exception ex) {
-
-        Error re = ErrorUtils.createError("Authentication failed at controller advice",
-                ex.getLocalizedMessage(), HttpStatus.UNAUTHORIZED.value());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(re);
-    }
 }
 
