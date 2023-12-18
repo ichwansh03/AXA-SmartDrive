@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,38 +65,46 @@ class PartnerContactControllerTest {
 
     Partner partner;
 
-    @BeforeEach
-    void setUp() {
-       partnerContactRepository.findAll().stream().forEach(partnerContact -> {
-            userRepository.deleteById(partnerContact.getId().getUserId());
-       });
-       partnerRepository.findAll().stream().forEach(partner1 -> {
-           userRepository.deleteById(partner1.getPartEntityid());
-       });
-       partnerRepository.deleteAll();
-       
+    @AfterEach
+    void tearDown() {
+        partnerContactRepository.findByPartner(partner).stream()
+                .forEach(partnerContact -> userRepository.delete(partnerContact.getUser()));
+        userRepository.deleteById(partner.getPartEntityid());
+        partnerRepository.delete(partner);
+
+    }
+
+    Partner createPartner(){
         PartnerRequest request = new PartnerRequest();
-        request.setPartName("1234567890");
+        request.setPartName("PARTNER TEST");
         request.setCityId(1L);
-        request.setPartNpwp("1234567890");
+        request.setPartNpwp("405");
         request.setPartAddress("JL BENGKEL");
         request.setPartAccountNo("123");
 
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        return partnerService.save(request);
+    }
 
-        partner = partnerService.save(request);
+    PartnerContactRequest createPartnerContactRequest(boolean grantUser){
+        PartnerContactRequest partnerContactRequest = new PartnerContactRequest();
+        partnerContactRequest.setPartnerId(partner.getPartEntityid());
+        partnerContactRequest.setName("PC TEST");
+        partnerContactRequest.setPhone("404");
+        partnerContactRequest.setGrantUserAccess(grantUser);
+
+        return partnerContactRequest;
+    }
+
+    @BeforeEach
+    void setUp() {
+        partner = createPartner();
     }
 
     @Test
     void whenDeletePartnerContact_thenSuccess() throws Exception {
+        PartnerContactRequest request = createPartnerContactRequest(true);
 
-        PartnerContactRequest partnerContactRequest = new PartnerContactRequest();
-        partnerContactRequest.setPartnerId(partner.getPartEntityid());
-        partnerContactRequest.setName("TEST");
-        partnerContactRequest.setPhone("089999999998");
-        partnerContactRequest.setGrantUserAccess(true);
-
-        PartnerContact partnerContact = partnerContactService.create(partnerContactRequest);
+        PartnerContact partnerContact = partnerContactService.create(request);
 
         mockMvc.perform(
                 delete("/partner-contacts/"+partnerContact.getId().getUserId())
@@ -108,11 +117,7 @@ class PartnerContactControllerTest {
     @Test
     void whenCreatePartnerContactWithGrantUserAccessTrue_thenSuccess() throws Exception {
 
-        PartnerContactRequest partnerContactRequest = new PartnerContactRequest();
-        partnerContactRequest.setPartnerId(partner.getPartEntityid());
-        partnerContactRequest.setName("TEST");
-        partnerContactRequest.setPhone("089999999998");
-        partnerContactRequest.setGrantUserAccess(true);
+        PartnerContactRequest partnerContactRequest = createPartnerContactRequest(true);
 
         mockMvc.perform(
                 post("/partner-contacts")
@@ -134,11 +139,7 @@ class PartnerContactControllerTest {
     @Test
     void whenCreatePartnerContactWithGrantUserAccessFalse_thenSuccess() throws Exception {
 
-        PartnerContactRequest partnerContactRequest = new PartnerContactRequest();
-        partnerContactRequest.setPartnerId(partner.getPartEntityid());
-        partnerContactRequest.setName("TEST");
-        partnerContactRequest.setPhone("089999999998");
-        partnerContactRequest.setGrantUserAccess(false);
+        PartnerContactRequest partnerContactRequest = createPartnerContactRequest(false);
 
         mockMvc.perform(
                 post("/partner-contacts")
@@ -160,22 +161,16 @@ class PartnerContactControllerTest {
     @Test
     void whenEditPartnerContact_thenSuccess() throws Exception {
 
-        PartnerContactRequest partnerContactRequest = new PartnerContactRequest();
-        partnerContactRequest.setPartnerId(partner.getPartEntityid());
-        partnerContactRequest.setName("TEST");
-        partnerContactRequest.setPhone("888888888888");
-        partnerContactRequest.setGrantUserAccess(false);
+        PartnerContactRequest partnerContactRequest = createPartnerContactRequest(false);
 
         PartnerContact partnerContact = partnerContactService.create(partnerContactRequest);
         log.info("Name contact " + partnerContact.getUser().getUserFullName());
         log.info("Contact " + partnerContact.getUser().getUserPhone().get(0).getUserPhoneId().getUsphPhoneNumber());
 
 
-        PartnerContactRequest partnerContactRequest2 = new PartnerContactRequest();
-        partnerContactRequest2.setPartnerId(partner.getPartEntityid());
-        partnerContactRequest2.setName("TEST UPDATE");
-        partnerContactRequest2.setPhone("999999999999");
-        partnerContactRequest2.setGrantUserAccess(true);
+        PartnerContactRequest partnerContactRequest2 = createPartnerContactRequest(false);
+        partnerContactRequest2.setName("UPDATE");
+        partnerContactRequest2.setPhone("1111111111");
 
         mockMvc.perform(
                 put("/partner-contacts/"+partnerContact.getId().getUserId())

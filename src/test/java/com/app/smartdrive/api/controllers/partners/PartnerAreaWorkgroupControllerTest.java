@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.partners;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.partner.PartnerAreaWorkgroupDto;
 import com.app.smartdrive.api.dto.partner.request.PartnerAreaWorkgroupRequest;
 import com.app.smartdrive.api.dto.partner.request.PartnerContactRequest;
@@ -12,11 +13,15 @@ import com.app.smartdrive.api.repositories.partner.PartnerAreaWorkGroupRepositor
 import com.app.smartdrive.api.repositories.partner.PartnerContactRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
+import com.app.smartdrive.api.services.partner.PartnerAreaWorkgroupService;
 import com.app.smartdrive.api.services.partner.PartnerContactService;
 import com.app.smartdrive.api.services.partner.PartnerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +30,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,10 +54,7 @@ class PartnerAreaWorkgroupControllerTest {
     MockMvc mockMvc;
 
     @Autowired
-    ArwgRepository areaWorkGroupRepository;
-
-    @Autowired
-    PartnerAreaWorkGroupRepository partnerAreaWorkGroupRepository;
+    PartnerAreaWorkgroupService partnerAreaWorkgroupService;
 
     @Autowired
     PartnerService partnerService;
@@ -71,23 +74,30 @@ class PartnerAreaWorkgroupControllerTest {
     @Autowired
     PartnerRepository partnerRepository;
 
+    @Autowired
+    PartnerAreaWorkGroupRepository partnerAreaWorkGroupRepository;
+
+    @AfterEach
+    void tearDown() {
+
+        partnerContactRepository.findByPartner(partner).stream().forEach(partnerContact1 -> {
+            userRepository.delete(partnerContact1.getUser());
+        });
+        userRepository.deleteById(partner.getPartEntityid());
+
+        partnerRepository.delete(partner);
+
+    }
+
     @BeforeEach
     void setUp() {
-        partnerContactRepository.findAll().stream().forEach(partnerContact -> {
-            userRepository.deleteById(partnerContact.getId().getUserId());
-        });
-        partnerRepository.findAll().stream().forEach(partner1 -> {
-            userRepository.deleteById(partner1.getPartEntityid());
-        });
-        partnerRepository.deleteAll();
-
 
         PartnerRequest request = new PartnerRequest();
         request.setPartName("GALLEY LA COMPANY");
         request.setCityId(1L);
-        request.setPartNpwp("1234567890");
+        request.setPartNpwp("5555555555");
         request.setPartAddress("WATER SEVEN");
-        request.setPartAccountNo("123");
+        request.setPartAccountNo("5555555");
 
         partner = partnerService.save(request);
 
@@ -119,6 +129,49 @@ class PartnerAreaWorkgroupControllerTest {
             PartnerAreaWorkgroupDto partnerAreaWorkgroupDto = objectMapper.readValue(result.getResponse().getContentAsString(), PartnerAreaWorkgroupDto.class);
             log.info("result "+objectMapper.enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(partnerAreaWorkgroupDto));
         });
+    }
 
+    @Test
+    void whenGetAllPartnerAreaWorkGroup_thenSuccess() throws Exception {
+        PartnerAreaWorkgroupRequest request = new PartnerAreaWorkgroupRequest();
+        request.setCityId(1L);
+        request.setPartnerContactId(partnerContact.getId());
+
+        arwgRepository.findAll().stream().forEach(areaWorkGroup -> {
+            request.setAreaWorkgroupId(areaWorkGroup.getArwgCode());
+            partnerAreaWorkgroupService.create(request);
+        });
+
+        mockMvc.perform(
+                get("/partner-area-workgroups")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            List<PartnerAreaWorkgroupDto> partnerAreaWorkgroupDto = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<PartnerAreaWorkgroupDto>>() {});
+            assertEquals(partnerAreaWorkgroupDto.size(), arwgRepository.findAll().size());
+            log.info("result "+objectMapper.enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(partnerAreaWorkgroupDto));
+        });
+    }
+
+    @Test
+    void whenDeleteById_thenSuccess() throws Exception {
+
+        PartnerAreaWorkgroupRequest request = new PartnerAreaWorkgroupRequest();
+        request.setCityId(1L);
+        request.setPartnerContactId(partnerContact.getId());
+        request.setAreaWorkgroupId(arwgRepository.findAll().get(0).getArwgCode());
+        PartnerAreaWorkgroup partnerAreaWorkgroup = partnerAreaWorkgroupService.create(request);
+
+        assertNotNull(partnerAreaWorkgroupService.getById(partnerAreaWorkgroup.getId()));
+        mockMvc.perform(
+                delete("/partner-area-workgroups")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(partnerAreaWorkgroup.getId()))
+        ).andExpectAll(
+                status().isNoContent()
+        ).andDo(print());
+
+        assertThrows(EntityNotFoundException.class, ()-> partnerAreaWorkgroupService.getById(partnerAreaWorkgroup.getId()));
     }
 }

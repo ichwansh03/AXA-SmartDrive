@@ -53,8 +53,7 @@ class BatchPartnerInvoiceControllerTest {
     }
     @Test
     void whenGetInvoiceNotPaid_thenSuccess() throws Exception {
-
-
+        
         mockMvc.perform(
                 get("/partner-invoice")
         ).andExpectAll(
