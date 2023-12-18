@@ -2,6 +2,9 @@ package com.app.smartdrive.api.controllers.HR;
 
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,9 +69,19 @@ public class EmployeesController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmployeesResponseDto>> getAll(){
-        List<Employees> employees = employeesService.getAll();
-        return ResponseEntity.ok(employees.stream().map(emp -> TransactionMapper.mapEntityToDto(emp, EmployeesResponseDto.class)).toList());
+    public ResponseEntity<Page<EmployeesResponseDto>> getAll(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Employees> employeesPage = employeesService.getAll(pageable);
+
+        List<EmployeesResponseDto> employeesResponseList = employeesPage.getContent().stream()
+                .map(emp -> TransactionMapper.mapEntityToDto(emp, EmployeesResponseDto.class))
+                .toList();
+
+        return ResponseEntity.ok(new PageImpl<>(employeesResponseList, pageable, employeesPage.getTotalElements()));
     }
-    
+
+
 }

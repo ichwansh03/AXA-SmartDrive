@@ -71,7 +71,8 @@ public class EmployeesServiceImpl implements EmployeesService {
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
 
         Employees employee = new Employees();
-        JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).get();
+        JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).orElseThrow(() ->
+                new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
         
         employee.setEmpName(employeesDto.getEmpName());
         employee.setEmpJoinDate(empJoinDate);
@@ -210,27 +211,28 @@ public class EmployeesServiceImpl implements EmployeesService {
         userAddressService.updateUserAddress(user.getUserEntityId(), userAddress.getUsdrId(), userAddressRequestDto);
     }
 
-    
+
 
     @Override
     public Page<Employees> searchEmployees(String value, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        EnumClassHR.emp_graduate empGraduate = valueEmpGraduate(value);
 
-        if (empGraduate != null) {
+        try {
+            EnumClassHR.emp_graduate empGraduate = EnumClassHR.emp_graduate.valueOf(value.toUpperCase());
             return employeesRepository.findByEmpGraduate(empGraduate, pageable);
-        } else {
+        } catch (IllegalArgumentException e) {
             return employeesRepository.findByEmpNameContaining(value, pageable);
         }
     }
 
-    private EnumClassHR.emp_graduate valueEmpGraduate(String value) {
-        try {
-            return EnumClassHR.emp_graduate.valueOf(value.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
+
+//    private EnumClassHR.emp_graduate valueEmpGraduate(String value) {
+//        try {
+//            return EnumClassHR.emp_graduate.valueOf(value.toUpperCase());
+//        } catch (IllegalArgumentException e) {
+//            return null;
+//        }
+//    }
     
 
 
@@ -243,20 +245,6 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
   }
 
-    
-
-    @Override
-    public List<EmployeesRequestDto> getAllEmployeesDto() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllEmployeesDto'");
-    }
-
-    @Override
-    public List<EmployeesResponseDto> getAllDto() {
-      List<Employees> employees = employeesRepository.findAll();
-      List<EmployeesResponseDto> empDto = TransactionMapper.mapEntityListToDtoList(employees, EmployeesResponseDto.class);
-      return empDto;
-    }
 
     @Override
     public Employees getById(Long id) {
@@ -269,9 +257,18 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
 
     @Override
-    public List<Employees> getAll() {
-        return employeesRepository.findAll();
+    @Transactional
+    public Page<Employees> getAll(Pageable pageable) {
+        return employeesRepository.findAll(pageable);
     }
+
+    @Override
+    public List<Employees> getAll() {
+        return null;
+    }
+
+
+
 
     @Override
     public Employees save(Employees entity) {

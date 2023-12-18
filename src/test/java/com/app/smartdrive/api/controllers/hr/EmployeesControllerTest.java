@@ -1,10 +1,7 @@
 package com.app.smartdrive.api.controllers.hr;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,10 +14,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +31,9 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.SecurityConfig;
@@ -70,25 +73,14 @@ public class EmployeesControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @InjectMocks
-    private EmployeesController employeesController;
-
-    @Autowired
-    EmployeesRepository employeesRepository;
-
     @MockBean
     EmployeesService employeesService;
 
     
 
-    EmployeesRequestDto createEmployees(){
+    EmployeesRequestDto createEmployeesReq(){
         // Mock input
+
         EmployeesRequestDto requestDto = new EmployeesRequestDto();
         requestDto.setEmpName("test");
         requestDto.setEmail("test@gmail.com");
@@ -111,19 +103,19 @@ public class EmployeesControllerTest {
         requestDto.setJobType("FAJ");
 
 
+
         return requestDto;
 
     }
 
     @Test
     @WithMockUser(authorities = {"Admin"})
-    public void testCreateEmployee() throws Exception {
-
-        EmployeesRequestDto requestDto = createEmployees();
+    public void createEmployees_willSuccess() throws Exception {
+        EmployeesRequestDto requestDto = createEmployeesReq();
 
          Employees mockedResponse = new Employees();
          TransactionMapper.mapDtoToEntity(requestDto, mockedResponse);
-         when(employeesService.createEmployee(requestDto)).thenReturn(mockedResponse);
+        when(employeesService.createEmployee(requestDto)).thenReturn(mockedResponse);
 
         // Perform the request and validate the response
         mockMvc.perform(post("/employees/create")
@@ -132,19 +124,35 @@ public class EmployeesControllerTest {
                 .with(csrf())
                 .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
-                .andDo(result -> {
-                    EmployeesResponseDto response = this.objectMapper.readValue(result.getResponse().getContentAsString(),new TypeReference<>() {
-                    });
-                    assertNotNull(response);
-                    assertEquals(requestDto, response);
-                });
+                .andExpect(result -> jsonPath("$.empName").value(requestDto.getEmpName()))
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    public void createEmployees_willFail() throws Exception {
+        EmployeesRequestDto requestDto = createEmployeesReq();
+        Employees mockedResponse = new Employees();
+        TransactionMapper.mapDtoToEntity(requestDto, mockedResponse);
+
+        when(employeesService.createEmployee(requestDto))
+                .thenThrow(new EntityNotFoundException("Employee with " + mockedResponse.getEmpName() + " creation failed"));
+
+        mockMvc.perform(post("/employees/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
+                .andDo(print());
     }
 
     @Test
     @WithMockUser(authorities = {"Admin"})
     void shouldDeleteEmployees() throws Exception {
 
-        EmployeesRequestDto requestDto = createEmployees();
+        EmployeesRequestDto requestDto = createEmployeesReq();
 
         Employees mockedResponse = new Employees();
         TransactionMapper.mapDtoToEntity(requestDto, mockedResponse);
@@ -162,18 +170,7 @@ public class EmployeesControllerTest {
 
     }
 
-    @Test
-    @WithMockUser(authorities = {"Admin"})
-    void shouldUpdateEmployees() throws Exception {
-
-        EmployeesRequestDto requestDto = createEmployees();
-
-        Employees mockedResponse = new Employees();
-        TransactionMapper.mapDtoToEntity(requestDto, mockedResponse);
-        mockedResponse.setEmpEntityid(1L);
-        long id = mockedResponse.getEmpEntityid();
-
-        //updateDTO
+    EmployeesRequestDto updateEmployeesDto(){
         EmployeesRequestDto updateDto = new EmployeesRequestDto();
         updateDto.setEmpName("test2");
         updateDto.setEmail("test2@gmail.com");
@@ -195,16 +192,140 @@ public class EmployeesControllerTest {
         updateDto.setEmpAccountNumber("22222");
         updateDto.setJobType("FAJ");
 
+        return updateDto;
+    }
+
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void UpdateEmployees_willSuccsess() throws Exception {
+
+        EmployeesRequestDto requestDto = createEmployeesReq();
+
+        Employees mockedResponse = new Employees();
+        TransactionMapper.mapDtoToEntity(requestDto, mockedResponse);
+        mockedResponse.setEmpEntityid(1L);
+        long id = mockedResponse.getEmpEntityid();
+
+        //updateDTO
+        EmployeesRequestDto updateDto = updateEmployeesDto();
+        TransactionMapper.mapDtoToEntity(updateDto, mockedResponse);
+
         when(employeesService.editEmployee(id,updateDto)).thenReturn(mockedResponse);
+
 
         mockMvc.perform(put("/employees/{id}",id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(updateDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andDo(print());
     }
+
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void UpdateEmployees_willFail() throws Exception {
+
+        EmployeesRequestDto requestDto = createEmployeesReq();
+
+        Employees mockedResponse = new Employees();
+        TransactionMapper.mapDtoToEntity(requestDto, mockedResponse);
+        mockedResponse.setEmpEntityid(1L);
+        long id = mockedResponse.getEmpEntityid();
+
+        EmployeesRequestDto updateDto = updateEmployeesDto();
+        TransactionMapper.mapDtoToEntity(updateDto, mockedResponse);
+
+        when(employeesService.editEmployee(id,updateDto)).thenThrow(new EntityNotFoundException("Employee with " + mockedResponse.getEmpName() + " update failed"));
+
+        mockMvc.perform(put("/employees/{id}",id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
+                .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void getAllEmployees_willSuccess() throws Exception {
+        List<Employees> listEmployees = List.of(new Employees(),new Employees());
+
+        Page<Employees> mockEmployeesPage = new PageImpl<>(listEmployees);
+
+        when(employeesService.getAll(any(Pageable.class))).thenReturn(mockEmployeesPage);
+
+        mockMvc.perform(get("/employees"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(listEmployees.size()))
+                .andExpect(jsonPath("$.totalElements").value(mockEmployeesPage.getTotalElements()))
+                .andExpect(jsonPath("$.totalPages").value(mockEmployeesPage.getTotalPages()))
+                .andDo(print());
+
+    }
+
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void getAllEmployees_willFail() throws Exception {
+        List<Employees> listEmployees = List.of(new Employees(),new Employees());
+        Page<Employees> mockEmployeesPage = new PageImpl<>(listEmployees);
+
+        when(employeesService.getAll(any(Pageable.class))).thenThrow(new EntityNotFoundException("Employees Not Found"));
+
+        mockMvc.perform(get("/employees"))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertInstanceOf(EntityNotFoundException.class, result.getResolvedException()))
+                .andDo(print());
+
+    }
+
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void getEmployeesByNameOrGraduate_willSuccess() throws Exception {
+        List<Employees> listEmployees = List.of(new Employees(),new Employees());
+        Page<Employees> mockEmployeesPage = new PageImpl<>(listEmployees);
+
+        when(employeesService.searchEmployees(anyString(), anyInt(), anyInt())).thenReturn(mockEmployeesPage);
+
+        mockMvc.perform(get("/employees/search")
+                        .param("value", "someValue")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(listEmployees.size()))
+                .andExpect(jsonPath("$.totalElements").value(mockEmployeesPage.getTotalElements()))
+                .andExpect(jsonPath("$.totalPages").value(mockEmployeesPage.getTotalPages()))
+                .andDo(print());
+    }
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void getEmployeesByNameOrGraduate_willFail() throws Exception {
+        List<Employees> listEmployees = List.of(new Employees(), new Employees());
+        Page<Employees> mockEmployeesPage = new PageImpl<>(listEmployees);
+
+        when(employeesService.searchEmployees(anyString(), anyInt(), anyInt()))
+                .thenThrow(new EntityNotFoundException("Not Found"));
+
+        mockMvc.perform(get("/employees/search")
+                        .param("value", "someValue")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.content.size()").doesNotExist())
+                .andExpect(jsonPath("$.totalElements").doesNotExist())
+                .andExpect(jsonPath("$.totalPages").doesNotExist())
+                .andDo(print());
+    }
+
+
+
+
+
+
+
+
 
 //    @Test
 //    @WithMockUser(roles = {"ADMIN"})

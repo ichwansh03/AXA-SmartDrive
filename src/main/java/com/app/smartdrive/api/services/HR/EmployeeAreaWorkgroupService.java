@@ -11,6 +11,7 @@ import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 
 import com.app.smartdrive.api.services.BaseService;
+import org.springframework.data.domain.Pageable;
 
 public interface EmployeeAreaWorkgroupService extends BaseService<EmployeeAreaWorkgroup, Long> {
     public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size);
@@ -19,7 +20,7 @@ public interface EmployeeAreaWorkgroupService extends BaseService<EmployeeAreaWo
 
      public EmployeeAreaWorkgroup updateEawg(Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
 
-     public List<EmployeesAreaWorkgroupResponseDto> getAllDto();
+    public Page<EmployeeAreaWorkgroup> getAll(Pageable pageable);
 
 
 
