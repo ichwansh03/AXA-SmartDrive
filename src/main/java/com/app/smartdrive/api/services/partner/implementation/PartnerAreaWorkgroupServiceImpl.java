@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.partner.implementation;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.partner.request.PartnerAreaWorkgroupRequest;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.partner.PartnerAreaWorkGroupId;
@@ -27,23 +28,23 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
 
 
     @Override
-    public PartnerAreaWorkgroup getById(Long aLong) {
-        return null;
+    public PartnerAreaWorkgroup getById(PartnerAreaWorkGroupId id) {
+        return partnerAreaWorkGroupRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Partner Area WorkGroup Not Found"));
     }
 
     @Override
     public List<PartnerAreaWorkgroup> getAll() {
+        return partnerAreaWorkGroupRepository.findAll();
+    }
+
+    @Override
+    public PartnerAreaWorkgroup save(PartnerAreaWorkgroup pawo) {
         return null;
     }
 
     @Override
-    public PartnerAreaWorkgroup save(PartnerAreaWorkgroup entity) {
-        return null;
-    }
-
-    @Override
-    public void deleteById(Long aLong) {
-
+    public void deleteById(PartnerAreaWorkGroupId id) {
+        partnerAreaWorkGroupRepository.deleteById(id);
     }
 
     @Override
