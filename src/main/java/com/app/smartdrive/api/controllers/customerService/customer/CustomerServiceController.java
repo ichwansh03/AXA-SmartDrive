@@ -84,6 +84,7 @@ public class CustomerServiceController {
     }
 
     @GetMapping("/request/agen")
+    @PreAuthorize("hasAuthority('Employee')")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllUAgenCustomersRequest(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "3") int size,
@@ -109,6 +110,7 @@ public class CustomerServiceController {
 
 
     @GetMapping("request/search")
+    @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<CustomerResponseDTO> getById(
             @RequestParam("creqEntityId") Long creqEntityId
     ){
@@ -119,6 +121,7 @@ public class CustomerServiceController {
     }
 
     @PostMapping("/request")
+    @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee') or hasAuthority('Potential Customer')")
     public ResponseEntity<CustomerResponseDTO> create(
             @RequestParam("client") String client,
             @RequestParam("file") MultipartFile[] files
@@ -133,6 +136,7 @@ public class CustomerServiceController {
     }
 
     @PostMapping("/request/agen")
+    @PreAuthorize("hasAuthority('Employee')")
     public ResponseEntity<CustomerResponseDTO> createByAgen(
             @RequestParam("client") String client,
             @RequestParam("file") MultipartFile[] files
@@ -147,6 +151,7 @@ public class CustomerServiceController {
     }
 
     @PutMapping("/request")
+    @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<CustomerResponseDTO> update(
             @Valid @RequestParam("client") String client,
             @RequestParam("file") MultipartFile[] files
@@ -161,6 +166,7 @@ public class CustomerServiceController {
 
 
     @PutMapping("/request/claim")
+    @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
             @RequestBody ClaimRequestDTO claimRequestDTO
     ){
@@ -169,6 +175,7 @@ public class CustomerServiceController {
     }
 
     @GetMapping("/request/claim")
+    @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
             @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
     ){
@@ -178,6 +185,7 @@ public class CustomerServiceController {
     }
 
     @PutMapping("/request/close")
+    @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
         CustomerResponseDTO customerResponseDTO = this.customerClaimService.closePolis(closeRequestDTO);
 
