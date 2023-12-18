@@ -1,9 +1,15 @@
 package com.app.smartdrive.api.config;
 
+import com.app.smartdrive.api.Exceptions.Error;
+import com.app.smartdrive.api.Exceptions.JwtExpiredException;
 import com.app.smartdrive.api.dto.auth.response.ApiResponse;
 import com.app.smartdrive.api.services.jwt.JwtService;
+import com.app.smartdrive.api.services.jwt.JwtUtils;
 import com.app.smartdrive.api.services.users.UserService;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,59 +32,81 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtServiceImpl;
   private final UserService userService;
+  private final ObjectMapper objectMapper;
   @Value("${jwt.refresh.cookie}")
   private String jwtRefreshCookie;
 
   @Value("${jwt.cookie.name}")
   private String jwtCookie;
 //  private final UserDetailsService userDetailsService;
+
+  Gson gson(){
+    return new Gson();
+  }
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request,
                                   @NonNull HttpServletResponse response,
                                   @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-    final String jwt = jwtServiceImpl.getJwtFromCookies(request, jwtCookie);
-    if(!StringUtils.hasLength(jwt)){
-      filterChain.doFilter(request, response);
+    final Optional<String> jwt = JwtUtils.getJwtFromCookies(request, jwtCookie);
+    if(jwt.isEmpty()){
+      String path = request.getRequestURI();
+      if(path.startsWith("/api/auth/signin") || path.startsWith("/api/auth/signup")){
+        filterChain.doFilter(request, response);
+        return;
+      }
+      ApiResponse res = new ApiResponse(401, "Unauthorized");
+      String resJson = gson().toJson(res);
+      PrintWriter out = response.getWriter();
+      response.setContentType("application/json");
+      response.setStatus(401);
+      response.setCharacterEncoding("UTF-8");
+      out.print(resJson);
+      out.flush();
       return;
     }
 
-    if(request.getRequestURI().startsWith("/api/auth/refresh")){
-      filterChain.doFilter(request,response);
-      return;
-    }
-    try {
-      if(jwtServiceImpl.validateJwtToken(jwt)
-      && SecurityContextHolder.getContext().getAuthentication() == null){
-        String userName = jwtServiceImpl.extractUserName(jwt);
-        UserDetails user = userService.userDetailsService().loadUserByUsername(userName);
-        if(jwtServiceImpl.isTokenValid(jwt, user)){
-          SecurityContext context = SecurityContextHolder.createEmptyContext();
-          UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                  user, null, user.getAuthorities());
-          authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-          context.setAuthentication(authenticationToken);
-          SecurityContextHolder.setContext(context);
-        }
+    Optional<DecodedJWT> decodedJWT = JwtUtils.getValidatedToken(jwt.get());
+    if(decodedJWT.isEmpty()){
+      String path = request.getRequestURI();
+      if(path.startsWith("/api/auth/refresh") || path.startsWith("/api/auth/signout")){
+        filterChain.doFilter(request, response);
+        return;
       }
-    } catch (Exception e) {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
-      response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-      ApiResponse res = new ApiResponse(401, "Unauthorised");
-      res.setMessage("Unauthorised");
-      OutputStream out = response.getOutputStream();
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.writeValue(out, res);
+      Error errorResponse = new Error();
+      errorResponse.setStatus(HttpStatus.FORBIDDEN.value());
+      errorResponse.setMessage("JWT Expired! please refresh the token!");
+      errorResponse.setUrl(request.getRequestURI());
+      errorResponse.setTimestamp(LocalDateTime.now());
+      PrintWriter out = response.getWriter();
+      response.setContentType("application/json");
+      response.setCharacterEncoding("UTF-8");
+      response.setStatus(HttpStatus.FORBIDDEN.value());
+      out.print(objectMapper.writeValueAsString(errorResponse));
       out.flush();
-      filterChain.doFilter(request,response);
       return;
     }
+
+    if(SecurityContextHolder.getContext().getAuthentication() == null){
+      String userName = JwtUtils.extractUserName(jwt.get());
+      UserDetails user = userService.userDetailsService().loadUserByUsername(userName);
+      SecurityContext context = SecurityContextHolder.createEmptyContext();
+      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+              user, null, user.getAuthorities());
+      authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+      context.setAuthentication(authenticationToken);
+      SecurityContextHolder.setContext(context);
+    }
+
     filterChain.doFilter(request,response);
   }
 }

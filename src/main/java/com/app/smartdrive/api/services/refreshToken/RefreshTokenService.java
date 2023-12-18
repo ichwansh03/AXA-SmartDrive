@@ -6,6 +6,7 @@ import com.app.smartdrive.api.entities.auth.RefreshToken;
 import com.app.smartdrive.api.repositories.auth.RefreshTokenRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.jwt.JwtService;
+import com.app.smartdrive.api.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -29,7 +30,6 @@ public class RefreshTokenService {
 
   @Autowired
   private RefreshTokenRepository refreshTokenRepository;
-  private JwtService jwtService;
 
   public Optional<RefreshToken> findByToken(String token){
     return refreshTokenRepository.findByRetoToken(token);
@@ -50,7 +50,7 @@ public class RefreshTokenService {
   public RefreshToken verifyExpiration(RefreshToken token){
     if(token.getRetoExpiryDate().compareTo(Instant.now()) < 0){
       refreshTokenRepository.delete(token);
-      throw new TokenRefreshException(token.getRetoToken(), "Refresh token was expired. Please make a new signin request");
+      throw new TokenRefreshException("Refresh token was expired. Please make a new signin request");
     }
     return token;
   }
@@ -60,11 +60,10 @@ public class RefreshTokenService {
             .map(this::verifyExpiration)
             .map(RefreshToken::getUser)
             .map(user -> {
-              String jwt = jwtService.generateToken(user);
+              String jwt = JwtUtils.generateToken(user);
               return jwt;
             })
-            .orElseThrow(() -> new TokenRefreshException(token,
-                    "Refresh token is not in database"));
+            .orElseThrow(() -> new TokenRefreshException("Refresh token is not in database"));
   }
 
   @Transactional

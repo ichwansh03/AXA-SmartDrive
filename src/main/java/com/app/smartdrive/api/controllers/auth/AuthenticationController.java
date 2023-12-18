@@ -11,6 +11,7 @@ import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.jwt.JwtService;
+import com.app.smartdrive.api.services.jwt.JwtUtils;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.users.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,12 +28,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthenticationController {
   private final AuthenticationService authenticationService;
-  private final JwtService jwtService;
   private final RefreshTokenService refreshTokenService;
   private final UserService userService;
   @Value("${jwt.refresh.cookie}")
@@ -45,21 +47,22 @@ public class AuthenticationController {
   public ResponseEntity<?> loginCustomer(@Valid @RequestBody SignInRequest login){
     User user = authenticationService.signinCustomer(login);
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserEntityId());
-    ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
-    ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getRetoToken());
+    ResponseCookie jwtCookie = JwtUtils.generateJwtCookie(user);
+    ResponseCookie jwtRefreshCookie = JwtUtils.generateRefreshJwtCookie(refreshToken.getRetoToken());
 
     ProfileDto userResponse = TransactionMapper.mapEntityToDto(user, ProfileDto.class);
 
-    String jwt = jwtService.generateToken(user);
+//    String jwt = JwtUtils.generateToken(user);
 
     userResponse.setRoles(user.getAuthorities());
-    userResponse.setAccessToken(jwt);
+//    userResponse.setAccessToken(jwt);
     userResponse.setTokenType("Bearer");
 
-    return ResponseEntity.status(HttpStatus.OK)
+    ResponseEntity<?> body = ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
             .body(userResponse);
+    return body;
   }
 
   @PostMapping("/signup")
@@ -78,8 +81,8 @@ public class AuthenticationController {
 
   @PostMapping("/signout")
   public ResponseEntity<?> logout(){
-    ResponseCookie cookie = jwtService.getCleanJwtCookie(jwtCookie, "/api");
-    ResponseCookie refreshCookie = jwtService.getCleanJwtCookie(jwtRefreshCookie, "/api/auth/refreshtoken");
+    ResponseCookie cookie = JwtUtils.getCleanCookie(jwtCookie, "/api");
+    ResponseCookie refreshCookie = JwtUtils.getCleanCookie(jwtRefreshCookie, "/api/auth/refreshtoken");
     return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, cookie.toString())
             .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
@@ -88,19 +91,18 @@ public class AuthenticationController {
 
   @PostMapping("/refreshtoken")
   public ResponseEntity<?> refreshToken(HttpServletRequest request){
-    String refreshToken = jwtService.getJwtFromCookies(request, jwtRefreshCookie);
-    if(StringUtils.hasLength(refreshToken)){
-      return refreshTokenService.findByToken(refreshToken)
+    Optional<String> refreshToken = JwtUtils.getJwtFromCookies(request, jwtRefreshCookie);
+    if(refreshToken.isPresent()){
+      return refreshTokenService.findByToken(refreshToken.get())
               .map(token -> refreshTokenService.verifyExpiration(token))
               .map(users -> users.getUser())
               .map(user -> {
-                ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
+                ResponseCookie jwtCookie = JwtUtils.generateJwtCookie(user);
                 return ResponseEntity.ok()
                         .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                         .body(new MessageResponse("Token is refreshed successfully!"));
               })
-              .orElseThrow(() -> new TokenRefreshException(refreshToken,
-                      "Refresh token is not in database"));
+              .orElseThrow(() -> new TokenRefreshException("Refresh token is not in database"));
     }
 
     return ResponseEntity.badRequest().body(new MessageResponse("Refresh token is empty!"));
