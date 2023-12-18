@@ -71,8 +71,10 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     @Transactional
     @Override
     public boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId) {
-        ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId)).get();
-        ServicePremi premi = semiRepository.findById(secrServId).get();
+        ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId))
+                .orElseThrow(() -> new EntityNotFoundException("updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId)::ID is not found"));
+        ServicePremi premi = semiRepository.findById(secrServId)
+                .orElseThrow(() -> new EntityNotFoundException("findById(secrServId)::secrServId is not found"));
 
         List<ServicePremiCredit> allCredits = secrRepository.findAll();
         BigDecimal countPremiMonthly = allCredits.stream()

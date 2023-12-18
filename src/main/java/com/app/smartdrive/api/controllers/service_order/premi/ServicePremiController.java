@@ -2,7 +2,6 @@ package com.app.smartdrive.api.controllers.service_order.premi;
 
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
-import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
