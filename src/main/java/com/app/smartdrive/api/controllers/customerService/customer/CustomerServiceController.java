@@ -85,7 +85,7 @@ public class CustomerServiceController {
 
     @GetMapping("/request/agen")
     @PreAuthorize("hasAuthority('Employee')")
-    public ResponseEntity<Page<CustomerResponseDTO>> getAllUAgenCustomersRequest(
+    public ResponseEntity<Page<CustomerResponseDTO>> getAllAgenCustomersRequest(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "3") int size,
             @RequestParam(value = "type", defaultValue = "ALL") String type,
