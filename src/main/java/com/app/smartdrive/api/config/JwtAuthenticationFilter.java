@@ -1,12 +1,10 @@
 package com.app.smartdrive.api.config;
 
 import com.app.smartdrive.api.Exceptions.Error;
-import com.app.smartdrive.api.dto.auth.response.ApiResponse;
-import com.app.smartdrive.api.services.jwt.JwtUtils;
+import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.users.UserService;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +23,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -33,51 +30,55 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final UserService userService;
   private final ObjectMapper objectMapper;
-  @Value("${jwt.refresh.cookie}")
-  private String jwtRefreshCookie;
+  private final JwtService jwtService;
+
 
   @Value("${jwt.cookie.name}")
   private String jwtCookie;
-//  private final UserDetailsService userDetailsService;
 
-  Gson gson(){
-    return new Gson();
-  }
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request,
                                   @NonNull HttpServletResponse response,
                                   @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-    final Optional<String> jwt = JwtUtils.getJwtFromCookies(request, jwtCookie);
+    final Optional<String> jwt = jwtService.getJwtFromCookies(request, jwtCookie);
     if(jwt.isEmpty()){
       String path = request.getRequestURI();
-      if(path.startsWith("/api/auth/signin") || path.startsWith("/api/auth/signup")){
+      if(path.startsWith("/api/auth/signin") || path.startsWith("/api/auth/signup")
+              || path.startsWith("/api/auth/createAdmin")){
         filterChain.doFilter(request, response);
         return;
       }
-      ApiResponse res = new ApiResponse(401, "Unauthorized");
-      String resJson = gson().toJson(res);
+      Error errorResponse = Error.builder()
+              .errorCode("Unauthorized")
+              .message("Unauthorized")
+              .reqMethod(request.getMethod())
+              .url(request.getRequestURI())
+              .status(HttpStatus.UNAUTHORIZED.value())
+              .build();
       PrintWriter out = response.getWriter();
       response.setContentType("application/json");
       response.setStatus(401);
       response.setCharacterEncoding("UTF-8");
-      out.print(resJson);
+      out.print(objectMapper.writeValueAsString(errorResponse));
       out.flush();
       return;
     }
 
-    Optional<DecodedJWT> decodedJWT = JwtUtils.getValidatedToken(jwt.get());
+    Optional<DecodedJWT> decodedJWT = jwtService.getValidatedToken(jwt.get());
     if(decodedJWT.isEmpty()){
       String path = request.getRequestURI();
       if(path.startsWith("/api/auth/refresh") || path.startsWith("/api/auth/signout")){
         filterChain.doFilter(request, response);
         return;
       }
-      Error errorResponse = new Error();
-      errorResponse.setStatus(HttpStatus.FORBIDDEN.value());
-      errorResponse.setMessage("JWT Expired! please refresh the token!");
-      errorResponse.setUrl(request.getRequestURI());
-      errorResponse.setTimestamp(LocalDateTime.now());
+      Error errorResponse = Error.builder()
+              .errorCode("Jwt Expired")
+              .message("JWT Expired! please refresh the token!")
+              .reqMethod(request.getMethod())
+              .url(request.getRequestURI())
+              .status(HttpStatus.FORBIDDEN.value())
+              .build();
       PrintWriter out = response.getWriter();
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
@@ -88,7 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     if(SecurityContextHolder.getContext().getAuthentication() == null){
-      String userName = JwtUtils.extractUserName(jwt.get());
+      String userName = jwtService.extractUserName(jwt.get());
       UserDetails user = userService.userDetailsService().loadUserByUsername(userName);
       SecurityContext context = SecurityContextHolder.createEmptyContext();
       UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

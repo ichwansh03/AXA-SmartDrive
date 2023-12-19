@@ -1,15 +1,8 @@
 package com.app.smartdrive.api.services.users.implementation;
 
-import java.util.List;
-import java.util.Optional;
-
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.UserUserAccountDto;
-import com.app.smartdrive.api.entities.payment.Banks;
-import com.app.smartdrive.api.entities.payment.Fintech;
-import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.payment.BanksRepository;
@@ -17,10 +10,13 @@ import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.UserUserAccountService;
-import com.app.smartdrive.api.utils.NullUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
