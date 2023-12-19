@@ -11,13 +11,9 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.service_orders.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
-import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
-import com.app.smartdrive.api.services.service_order.servorder.ServService;
+import com.app.smartdrive.api.services.service_order.servorder.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,33 +41,36 @@ public class ServImpl implements ServService {
 
     private final CustomerRequestRepository customerRequestRepository;
     private final CustomerRequestService customerRequestService;
-
-    SoAdapter soAdapter = new SoAdapter();
+    private final GenerateService generateService;
 
     @Transactional
     @Override
     public Services addService(Long creqId) throws Exception {
 
-        CustomerRequest cr = customerRequestRepository.findById(creqId)
-                .orElseThrow(() -> new EntityNotFoundException("addService(Long creqId)::creqId "+creqId+" is not found"));
+        CustomerRequest cr = customerRequestRepository.findById(creqId).get();
+
         Services serv;
 
         switch (cr.getCreqType().toString()){
-            case "FEASIBLITY" -> serv = generateFeasiblityType(cr);
-            case "POLIS" -> serv = handleServiceUpdate(cr,
-                    LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
-            case "CLAIM" -> serv = handleServiceUpdate(cr,
+            case "FEASIBLITY" -> serv = generateService.generateFeasiblityType(cr);
+            case "POLIS" -> {
+                serv = generateService.handleServiceUpdate(cr,
+                        LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
+                log.info("ServImpl::addService save services to db polis {} ",serv);
+            }
+            case "CLAIM" -> serv = generateService.handleServiceUpdate(cr,
                     LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
-            default -> serv = handleServiceUpdate(cr,
-                    null, EnumModuleServiceOrders.ServStatus.INACTIVE);
+            default -> serv = generateService.handleServiceUpdate(cr,
+                    LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
         }
 
         if(Objects.equals(cr.getCreqType().toString(), "CLOSE")){
             cr.setCreqStatus(EnumCustomer.CreqStatus.CLOSED);
         }
 
+        log.info("ServImpl::addService save services to db {} ",serv);
         Services saved = soRepository.save(serv);
-        log.info("ServOrderServiceImpl::addService save services to db");
+        log.info("ServImpl::addService service saved {} ",saved);
 
         servOrderService.addServiceOrders(saved.getServId());
 
@@ -120,55 +119,6 @@ public class ServImpl implements ServService {
         serviceRespDto.setSemiDto(semiDto);
 
         return serviceRespDto;
-    }
-
-    private Services generateFeasiblityType(CustomerRequest cr){
-        return Services.builder()
-                .servType(cr.getCreqType())
-                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servCreatedOn(cr.getCreqCreateDate())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusDays(7))
-                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
-                .users(cr.getCustomer())
-                .customer(cr)
-                .build();
-    }
-
-    private Services handleServiceUpdate(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus) {
-        Services existingService = soRepository.findById(cr.getServices().getServId())
-                .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
-
-        existingService = Services.builder()
-                .servId(existingService.getServId())
-                .servType(cr.getCreqType())
-                .servCreatedOn(cr.getCreqCreateDate())
-                .servInsuranceNo(soAdapter.generatePolis(cr))
-                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(endDate)
-                .servStatus(servStatus)
-                .users(cr.getCustomer())
-                .customer(cr)
-                .build();
-
-        switch (existingService.getServType()) {
-            case POLIS -> generateServPremi(existingService);
-            case CLOSE -> servPremiService.updateSemiStatus(
-                    EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), existingService.getServId());
-        }
-
-        return existingService;
-    }
-
-    private void generateServPremi(Services services){
-        ServicePremi servicePremi = ServicePremi.builder()
-                .semiServId(services.getServId())
-                .semiPremiDebet(services.getCustomer().getCustomerInscAssets().getCiasTotalPremi())
-                .semiPaidType(services.getCustomer().getCustomerInscAssets().getCiasPaidType().toString())
-                .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
-
-        servPremiService.addSemi(servicePremi, services.getServId());
     }
 
 }
