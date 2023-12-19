@@ -2,10 +2,8 @@ package com.app.smartdrive.api.services.HR.implementation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
@@ -67,11 +65,9 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
             salaryDetail.setEmsaEmpEntityid(employees.getEmpEntityid());
             salaryDetail.setEmsaCreateDate(LocalDate.now());
             salaryDetail.setEmsaName(templateSalary.getTesalName());
-
             
             BigDecimal rateMin = templateSalary.getTesalRateMin();
 
-            
             BigDecimal calculatedSubtotal ;
             if(Objects.isNull(rateMin)){
                 calculatedSubtotal = servicePremi;
@@ -79,23 +75,17 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
              calculatedSubtotal = servicePremi.multiply(rateMin);
             }
 
-
             salaryDetail.setEmsaSubtotal(calculatedSubtotal);
             salaryDetail.setEmployees(employees);
             salaryDetail = employeeSalaryDetailRepository.save(salaryDetail);
             salaryDetails.add(salaryDetail);
 
         }
-
-        
         return salaryDetails;
     }
-    
-    
     @Override
-    public EmployeeSalaryDetail getById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+    public EmployeeSalaryDetail getById(Long aLong) {
+        return null;
     }
 
     @Override
