@@ -31,6 +31,5 @@ public class TransactionsDtoRequests {
     @Enumerated(EnumType.STRING)
     private EnumClassPayment.EnumPayment enumPayment;
     
-    @NotBlank(message = "Tidak boleh kosong")
-    private String patr_invoice_no;
+    
 }

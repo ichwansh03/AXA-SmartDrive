@@ -53,15 +53,15 @@ public class ServOrderController {
         return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
     }
 
-    @GetMapping("/partner")
-    public ResponseEntity<?> getAllPartnerBySeroId(@RequestParam("seroId") String seroId){
+    // @GetMapping("/partner")
+    // public ResponseEntity<?> getAllPartnerBySeroId(@RequestParam("seroId") String seroId){
 
-        List<Partner> allPartner = servOrderService.findAllPartner(seroId);
+    //     List<Partner> allPartner = servOrderService.findAllPartner(seroId);
 
-        //List<PartnerDto> partnerDtos = TransactionMapper.mapEntityListToDtoList(allPartner, PartnerDto.class);
+    //     //List<PartnerDto> partnerDtos = TransactionMapper.mapEntityListToDtoList(allPartner, PartnerDto.class);
 
-        return new ResponseEntity<>(allPartner, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(allPartner, HttpStatus.OK);
+    // }
 
     private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders) {
         Services servicesById = servService.findServicesById(serviceOrders.getServices().getServId());

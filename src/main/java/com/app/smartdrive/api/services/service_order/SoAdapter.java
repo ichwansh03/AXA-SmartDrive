@@ -96,14 +96,14 @@ public class SoAdapter {
         List<ServiceOrders> serviceOrders = servOrderService.findAllSeroByServId(services.getServId());
         List<ServiceOrderRespDto> serviceOrderRespDtoClass = TransactionMapper.mapListDtoToListEntity(serviceOrders, ServiceOrderRespDto.class);
 
-        List<ServicePremi> servicePremis = servPremiService.findByServId(services.getServId());
-        List<SemiDto> semiDtos = TransactionMapper.mapListDtoToListEntity(servicePremis, SemiDto.class);
+        // List<ServicePremi> servicePremis = servPremiService.findByServId(services.getServId());
+        // List<SemiDto> semiDtos = TransactionMapper.mapListDtoToListEntity(servicePremis, SemiDto.class);
 
         ServiceRespDto serviceDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
         serviceDto.setUserDto(userDto);
         serviceDto.setCustomerResponseDTO(creqDto);
         serviceDto.setServiceOrdersList(serviceOrderRespDtoClass);
-        serviceDto.setSemiDtoList(semiDtos);
+        // serviceDto.setSemiDtoList(semiDtos);
 
         return serviceDto;
     }

@@ -15,13 +15,15 @@ import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransferT
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TypeTransactionsResponse;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
-
+import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
 import com.app.smartdrive.api.services.BaseService;
 
 public interface PaymentTransactionsService extends BaseService<PaymentTransactions, String>{
     List<PaymentTransactions> findAllPaymentTransactions();
     TransaksiResponse transaksiByUser(TransactionsDtoRequests request);
     GenerateTransferResponse generateTransaksi(GenerateTransactionsRequests requests);
+    // void createTransactionsFrom(String noRekening, EnumClassPayment.EnumPayment EnumPayment, String notes, String toRekening, String invoice, Double debet);
+    // void createTransactionsTo(String noRekening, EnumClassPayment.EnumPayment EnumPayment, String notes, String toRekening, String invoice, Double debet);
     // Boolean topupFintech(Long usac_id, Payment)
     // TransferTransactionsResponse transfer(Long usac_id, TransferTransactionsRequest request);
     // TopupFintechResponse topupFintech(TopupFintechRequests requests );

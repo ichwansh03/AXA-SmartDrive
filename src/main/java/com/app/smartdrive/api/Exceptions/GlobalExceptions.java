@@ -149,6 +149,12 @@ public class GlobalExceptions {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NoRekNotFoundException.class)
+    public ResponseEntity<?> noRekNotFoundException(NoRekNotFoundException ex){
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(UsernameExistException.class)
     public ResponseEntity<?> userNameExist(UsernameExistException ex){
         Error error = ErrorUtils.createError(

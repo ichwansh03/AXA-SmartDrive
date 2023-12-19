@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.smartdrive.api.dto.payment.Request.UserAccounts.UserAccountsDtoRequests;
+import com.app.smartdrive.api.dto.payment.Request.UserAccounts.UserAccountsDtoRequestsFirst;
 import com.app.smartdrive.api.dto.payment.Response.UserAccounts.UserAccountsDtoResponse;
+import com.app.smartdrive.api.dto.payment.Response.UserAccounts.UserAccountsListDtoResponse;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.services.payment.UserAccountsService;
@@ -34,39 +37,30 @@ public class UserAccountsController {
 
     @GetMapping("/userAccounts/all")
     public ResponseEntity<?> userAccountsAll(){
-        List<UserAccountsDtoResponse> listDto = service.listDtoResponses();
+        List<UserAccountsListDtoResponse> listDto = service.listDtoResponses();
         return new ResponseEntity<>(listDto, HttpStatus.OK);
     }
 
     @GetMapping("/userAccounts/{usac_id}")
     public ResponseEntity<?> userAccountsById(@Valid @PathVariable("usac_id") Long usac_id){
-        UserAccountsDtoResponse userAccountsDtos = service.getIdUser(usac_id);
+        UserAccountsListDtoResponse userAccountsDtos = service.getIdUser(usac_id);
         return new ResponseEntity<>(userAccountsDtos, HttpStatus.OK);
     }
 
-    @PostMapping("/userAccounts/{usac_id}/add")
-    public ResponseEntity<?> addDebitCredit(@Valid @PathVariable("usac_id") Long usac_id,
-    @ModelAttribute UserAccountsDtoRequests userAccountsDtoRequests){
+    @PostMapping("/userAccounts/add")
+    public ResponseEntity<?> addDebit(@Valid @RequestBody UserAccountsDtoRequests requests){
         
-        Boolean addDebitCredit = service.addDebitCredit(usac_id, userAccountsDtoRequests);
+        UserAccountsDtoResponse addDebit = service.addDebit(requests);
        
-        return new ResponseEntity<>(addDebitCredit, HttpStatus.OK);
+        return new ResponseEntity<>(addDebit, HttpStatus.OK);
        
          
     }
 
-
-    @PutMapping("/userAccounts/{usac_id}/update")
-    public ResponseEntity<?> updateDebitCredit(@Valid @PathVariable("usac_id") Long usac_id,
-    @ModelAttribute UserAccountsDtoRequests userAccountsDto){
-        Boolean updateDebitCredits = service.updateDebitCredit(usac_id,userAccountsDto);
     
-        return new ResponseEntity<>(updateDebitCredits, HttpStatus.OK);
-    }
-    
-    @DeleteMapping("/userAccounts/{usac_id}/delete")
-    public ResponseEntity<?> deleteUserAccounts(@Valid @PathVariable("usac_id") Long usac_id){
-        Boolean deleteUser = service.deleteUAById(usac_id);
+    @DeleteMapping("/userAccounts/delete")
+    public ResponseEntity<?> deleteUserAccounts(@Valid @RequestBody UserAccountsDtoRequestsFirst request){
+        Boolean deleteUser = service.deleteUserAccountsByNoRek(request);
         return new ResponseEntity<>(deleteUser, HttpStatus.OK);
     }
     

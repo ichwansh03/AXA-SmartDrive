@@ -42,7 +42,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     private final PartnerRepository partnerRepository;
 
     private final EmailService emailService;
-    private final BatchPartnerInvoiceService bpinService;
+    // private final BatchPartnerInvoiceService bpinService;
 
     @Transactional
     @Override
@@ -138,7 +138,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                     }
                 }
                 //task calculate sparepart call createOne(String seroId) => BPIN Service
-                case "CALCULATE SPARE PART" -> bpinService.createOne(serviceOrders.getSeroId());
+                // case "CALCULATE SPARE PART" -> bpinService.createOne(serviceOrders.getSeroId());
                 case "NOTIFY AGENT CLAIM" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
