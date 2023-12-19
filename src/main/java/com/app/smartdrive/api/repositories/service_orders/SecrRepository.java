@@ -23,7 +23,4 @@ public interface SecrRepository extends JpaRepository<ServicePremiCredit, Servic
 
     ServicePremiCredit findBySecrDuedateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    @Modifying(clearAutomatically = true)
-    @Transactional
-    int updateWithPatrNo(@Param("patrTrxno") String patrTrxno, @Param("secrId") Long secrId);
 }

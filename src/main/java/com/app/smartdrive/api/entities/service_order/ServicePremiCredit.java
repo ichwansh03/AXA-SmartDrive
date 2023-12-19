@@ -19,9 +19,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(ServicePremiCreditId.class)
-@NamedQuery(
-        name = "ServicePremiCredit.updateWithPatrNo",
-        query = "UPDATE ServicePremiCredit secr SET secr.paymentTransactions.patrTrxno = :patrTrxno WHERE secr.secrId = :secrId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 @Entity
 @Table(name = "service_premi_credit", schema = "so")
 @DynamicInsert
