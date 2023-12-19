@@ -124,19 +124,27 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                     serviceOrders, null));
 
             switch (templateServiceTasks.get(i).getTestaName()){
-                case "NOTIFY PARTNER TO REPAIR" -> {
+                case "CLAIM DOCUMENT APPROVED" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
                                 "Repair Sparepart from Customer",
-                                "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
+                                "Repair from "+serviceOrders.getServices().getUsers().getUserFullName());
                     }
                 }
 
-                case "NOTIFY AGENT CLAIM" -> {
+                case "CALCULATE SPARE PART" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
-                                "New CLAIM Request",
-                                "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
+                                "Your car is finish to repair",
+                                "Car Repaired is finish");
+                    }
+                }
+
+                case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> {
+                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
+                        notifyTask(emailReq, serviceOrders,
+                                "Claim for "+serviceOrders.getServices().getUsers().getUserFullName(),
+                                "Repaired is finish, pay claim to user");
                     }
                 }
             }
