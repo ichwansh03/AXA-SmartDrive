@@ -19,8 +19,7 @@ import java.util.Optional;
 @Service
 public class JwtService {
 
-  @Value("${jwt.token.signing-key}")
-  private String jwtSigningKey;
+  private final String jwtSigningKey = "F54D1DC2E823404A9D4CD0B6613839E1DB997175F26A66EB747A9573A4F72AD9";
   private String COOKIE_NAME = "jwtcookie";
   private String REFRESH_COOKIE = "refreshjwt";
 
@@ -31,7 +30,6 @@ public class JwtService {
 
   @Value("${jwt.refreshExpired}")
   private int MAX_AGE_REFRESH;
-
   public Optional<DecodedJWT> getValidatedToken(String token){
     try{
       return Optional.of(JWT_VERIFIER.verify(token));
