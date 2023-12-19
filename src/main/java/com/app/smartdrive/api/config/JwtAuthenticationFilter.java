@@ -44,6 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final Optional<String> jwt = jwtService.getJwtFromCookies(request, jwtCookie);
     if(jwt.isEmpty()){
       String path = request.getRequestURI();
+
       if(path.startsWith("/api/auth/signin") || path.startsWith("/api/auth/signup")
               || path.startsWith("/api/auth/createAdmin")){
         filterChain.doFilter(request, response);

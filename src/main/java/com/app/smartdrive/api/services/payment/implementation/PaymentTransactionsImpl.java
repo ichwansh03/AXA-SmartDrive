@@ -109,8 +109,8 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
     }
 
     private int getIdFromNo(){
-        int c = repository.countTrxno();
-        return c+=1;
+        int c = getIdFromSequence();
+        return c-=1;
     }
     private String uuidInvoice(){
         UUID uuid = UUID.randomUUID();
@@ -127,26 +127,25 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         PaymentTransactions transactions2 = new PaymentTransactions();
         List<PaymentTransactions> listPayment = repository.findAll();
         PaymentTransactions reversal = repository.findByPatrTrxno(transactions.getPatrTrxno());
-        PaymentTransactions reversalRev = repository.findByPatrTrxnoRev(transactions.getPatrTrxnoRev());
-        
 
-        
-            int newD = getIdFromSequence()-1;
+       
+
+        if (listPayment.isEmpty()) {
             transactions.setPatrTrxno(generateTrxNo(timeNow()));
-            transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newD);
-        
-            
-               
-                    // int newB = getIdFromSequence() - 1;
-                    // transactions.setPatrTrxno(generateTrxNo(timeNow()));
-                    // transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newB);
-               
-                    // int newC = getIdFromSequence() - 1;
-                    // transactions.setPatrTrxno(generateTrxNo(timeNow()));
-                    // transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newC);
-                
-            
-        
+            transactions.setPatrTrxnoRev(null);
+        } else {
+            for (PaymentTransactions py : listPayment) {
+                if (py.getPatrTrxnoRev() == null) {
+                    int newB = getIdFromSequence() - 1;
+                    transactions.setPatrTrxno(generateTrxNo(timeNow()));
+                    transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newB);
+                } else if (reversal != null && py.getPatrTrxnoRev() != null) {
+                    int newC = getIdFromSequence() - 1;
+                    transactions.setPatrTrxno(generateTrxNo(timeNow()));
+                    transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newC);
+                }
+            }
+        }
         transactions.setPatr_created_on(timeNow());
         transactions.setPatr_usac_accountNo_from(noRekening);
         transactions.setPatr_usac_accountNo_to("-");
@@ -154,26 +153,21 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         transactions.setPatr_type(enumPayment);
         transactions.setPatr_invoice_no(invoice);
         transactions.setPatr_notes(notes);
-        
-
-        PaymentTransactions newPayment = repository.save(transactions);
-
-        transactions.setPatrTrxno(generateTrxNo(timeNow()));
-        transactions.setPatrTrxnoRev(newPayment.getPatrTrxno());
         repository.save(transactions);
+       
+        transactions2.setPatrTrxno(generateTrxNo(timeNow()));
         transactions2.setPatr_created_on(timeNow());
         transactions2.setPatr_usac_accountNo_from("-");
         transactions2.setPatr_usac_accountNo_to(toRekening);
-        transactions2.setPatr_credit(newPayment.getPatr_debet());
-        transactions2.setPatr_type(newPayment.getPatr_type());
-        transactions2.setPatr_notes(newPayment.getPatr_notes());
-        transactions2.setPatr_invoice_no(newPayment.getPatr_invoice_no());
-        transactions2.setPatrTrxnoRev(newPayment.getPatrTrxno());
-        repository.save(transactions2);
-        repository.flush();
+        transactions2.setPatr_credit(nominall);
+        transactions2.setPatr_type(enumPayment);
+        transactions2.setPatr_notes(notes);
+        transactions2.setPatr_invoice_no(invoice);
+        transactions2.setPatrTrxnoRev(transactions.getPatrTrxno());
+
+        repository.saveAndFlush(transactions2);
 
     }
-
     private void checkSaldoHandle(Double saldoSender, Double nominal, EnumPayment enumPayment) {
         if (saldoSender == null || saldoSender == 0.0) {
             throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp." + saldoSender
