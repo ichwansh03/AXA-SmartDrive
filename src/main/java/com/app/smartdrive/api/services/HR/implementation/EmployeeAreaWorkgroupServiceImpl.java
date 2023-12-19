@@ -57,6 +57,10 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         
         Employees employees = employeesService.getById(employeeAreaWorkgroupDto.getEmpEntityid());
 
+        if (employeeAreaWorkgroupRepository.existsByEmployeesAndAreaWorkGroup(employees, areaWorkGroup)) {
+            throw new IllegalStateException("Employee is already associated with the selected area workgroup");
+        }
+
         employeeAreaWorkgroup.setEmployees(employees);
         employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
         employeeAreaWorkgroup.setEawgArwgCode(areaWorkGroup.getArwgCode());
@@ -73,11 +77,17 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
         EmployeeAreaWorkgroup existingEawg = employeeAreaWorkgroupRepository.findByEawgId(eawgId).orElseThrow(() -> new EntityNotFoundException("EmployeeAreaWorkgroup not found with id: " + eawgId));
 
+
+
         if (existingEawg.getEawgArwgCode() != null) {
             AreaWorkGroup areaWorkGroup = arwgService.getById(employeeAreaWorkgroupDto.getArwgCode());
+            if (employeeAreaWorkgroupRepository.existsByEmployeesAndAreaWorkGroup(existingEawg.getEmployees(), areaWorkGroup)) {
+                throw new IllegalStateException("Employee is already associated with the selected area workgroup");
+            }
             existingEawg.setAreaWorkGroup(areaWorkGroup);
             existingEawg.setEawgArwgCode(areaWorkGroup.getArwgCode());
         }
+
         if (existingEawg.getEawgEntityid() != null) {
             employeeAreaWorkgroupRepository.setEawgEntityid(employeeAreaWorkgroupDto.getEmpEntityid(), existingEawg.getEawgEntityid());
         }

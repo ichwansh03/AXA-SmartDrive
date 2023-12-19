@@ -226,23 +226,9 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
 
 
-//    private EnumClassHR.emp_graduate valueEmpGraduate(String value) {
-//        try {
-//            return EnumClassHR.emp_graduate.valueOf(value.toUpperCase());
-//        } catch (IllegalArgumentException e) {
-//            return null;
-//        }
-//    }
-    
-
-
-
     @Override
   public void deleteEmployeesById(Long empEntitiyid) {
-    Optional<Employees> emp = employeesRepository.findById(empEntitiyid);
-    if(emp.isPresent()){
-      employeesRepository.delete(emp.get());
-    }
+    employeesRepository.deleteById(empEntitiyid);
   }
 
 
