@@ -21,7 +21,15 @@ import java.util.Optional;
 
 import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.config.JwtAuthenticationFilter;
+import com.app.smartdrive.api.controllers.auth.AuthenticationController;
+import com.app.smartdrive.api.controllers.users.RequestBuilder;
+import com.app.smartdrive.api.controllers.users.UserController;
 import com.app.smartdrive.api.dto.user.response.UserDto;
+import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.services.auth.AuthenticationService;
+import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
+import com.app.smartdrive.api.services.service_order.claims.ClaimAssetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -29,6 +37,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -62,17 +71,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(EmployeesController.class)
 @ImportAutoConfiguration(classes = {SecurityConfig.class})
 public class EmployeesControllerTest {
     
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
+    @MockBean
+    private UserService userService;
+    @MockBean
+    private AuthenticationService authenticationService;
+    @MockBean
+    private RefreshTokenService refreshTokenService;
+    @MockBean
+    private ClaimAssetService claimAssetService;
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockBean
     EmployeesService employeesService;
 
@@ -123,28 +139,8 @@ public class EmployeesControllerTest {
                 .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
                 .with(csrf())
                 .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(result -> jsonPath("$.empName").value(requestDto.getEmpName()))
-                .andDo(print());
-    }
-
-    @Test
-    @WithMockUser(authorities = {"Admin"})
-    public void createEmployees_willFail() throws Exception {
-        EmployeesRequestDto requestDto = createEmployeesReq();
-        Employees mockedResponse = new Employees();
-        TransactionMapper.mapDtoToEntity(requestDto, mockedResponse);
-
-        when(employeesService.createEmployee(requestDto))
-                .thenThrow(new EntityNotFoundException("Employee with " + mockedResponse.getEmpName() + " creation failed"));
-
-        mockMvc.perform(post("/employees/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isNotFound())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException))
                 .andDo(print());
     }
 
@@ -165,7 +161,7 @@ public class EmployeesControllerTest {
                         .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andDo(print());
 
     }

@@ -94,6 +94,12 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         return formattedDate;
     }
 
+    public String dateFormatter(LocalDate b) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = b.format(formatter);
+        return formattedDate;
+    }
+
     private String generateTrxNo(LocalDateTime timeNow) {
         return "trx" + dateTimeFormatter(timeNow) + "000" + getIdFromSequence();
     }
@@ -334,9 +340,8 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                         Double nominalSalary = employee.getBesaTotalSalary().doubleValue();
                         Double saldoSender = userAcc.getUsac_debet();
                         Double totalSaldoSender = saldoSender - nominalSalary;
-                        LocalDateTime createdDateSalary = employee.getBatchEmployeeSalaryId()
-                                .getBesaCreatedDate();
-                        String invoiceSalary = "SAL-" + dateTimeFormatter(createdDateSalary);
+                        LocalDate createdDateSalary = employee.getBesaCreatedDate();
+                        String invoiceSalary = "SAL-" + dateFormatter(createdDateSalary);
 
                         checkSaldoHandle(saldoSender, nominalSalary, request.getTipePayment());
                         transactions.setPatrTrxno(generateTrxNo(timeNow()));

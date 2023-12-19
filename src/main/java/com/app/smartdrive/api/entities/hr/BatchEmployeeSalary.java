@@ -1,22 +1,12 @@
 package com.app.smartdrive.api.entities.hr;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,11 +18,24 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Entity
+@IdClass(BatchEmployeeSalaryId.class)
 @Table(name="batch_employee_salary",schema="hr")
 public class BatchEmployeeSalary {
- 
-    @EmbeddedId
-    private BatchEmployeeSalaryId batchEmployeeSalaryId;
+
+    @Id
+    @Column(name = "besa_emp_entity_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE,
+            generator = "besaEmpEntityid-generator")
+    @SequenceGenerator(
+            name = "besaEmpEntityid-generator",
+            sequenceName = "besa_emp_entity_id",
+            allocationSize = 1, schema = "hr"
+    )
+    private Long besaEmpEntityid;
+
+    @Id
+    @Column(name = "besa_created_date",nullable = false)
+    private LocalDate besaCreatedDate;
 
     @Column(name="ems_trasfer_Date")
     private LocalDateTime emsTrasferDate;
