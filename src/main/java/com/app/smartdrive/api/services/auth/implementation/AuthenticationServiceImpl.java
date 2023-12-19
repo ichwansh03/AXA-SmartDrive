@@ -70,7 +70,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
     if(passwordEncoder.matches(passwordRequestDto.getCurrentPassword(), user.getPassword())){
       if(passwordRequestDto.getNewPassword().equals(passwordRequestDto.getConfirmPassword())){
-        user.setUserPassword("true");
+        user.setUserPassword(passwordEncoder.encode(passwordRequestDto.getNewPassword()));
         userRepository.save(user);
         return "password has been changed";
       }
