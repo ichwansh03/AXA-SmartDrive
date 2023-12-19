@@ -34,11 +34,14 @@ public class ServOrderController {
         return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
     }
 
+
+
     @PutMapping("/partner/{seroId}")
     public ResponseEntity<?> updateToAddPartner(@Valid @RequestBody Partner partner, @PathVariable("seroId") String seroId){
         servOrderService.selectPartner(partner, seroId);
         return new ResponseEntity<>(partner, HttpStatus.OK);
     }
+
 
     @PutMapping("/close/{seroId}")
     public ResponseEntity<?> updateToCloseOrder(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId){

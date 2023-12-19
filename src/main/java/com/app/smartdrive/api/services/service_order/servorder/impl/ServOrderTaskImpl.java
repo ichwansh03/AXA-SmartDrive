@@ -50,6 +50,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     private final ServOrderWorkorderService servOrderWorkorderService;
     private final EmailService emailService;
 
+
     @Transactional
     @Override
     public List<ServiceOrderTasks> addFeasiblityList(ServiceOrders serviceOrders) {
@@ -130,6 +131,11 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                                 "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
                     }
                 }
+<<<<<<< HEAD
+                //task calculate sparepart call createOne(String seroId) => BPIN Service
+                // case "CALCULATE SPARE PART" -> bpinService.createOne(serviceOrders.getSeroId());
+=======
+>>>>>>> 8fdddeccc505d2a6efc1fdbfefb3f82b09d5dec9
                 case "NOTIFY AGENT CLAIM" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
 
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment;
@@ -27,7 +28,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -49,9 +49,14 @@ public class PaymentTransactions {
     //     sequenceName = "payment.payment_transactions_seq",
     //     allocationSize = 1
     // )
+    // @SequenceGenerator(name = "patr_trxno", allocationSize = 1)
+    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patr_trxno")
+   
     @Id
     @Column(name="patr_trxno", length = 55,nullable = false)
     private String patrTrxno;
+
+
 
     @CreatedDate
     @Column(name = "patr_created_on")
@@ -96,7 +101,7 @@ public class PaymentTransactions {
     @JsonIgnore
     PaymentTransactions referencedTransaction;
 
-    @OneToMany(mappedBy = "referencedTransaction", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "referencedTransaction", cascade = CascadeType.PERSIST)
     @JsonIgnore
     private List<PaymentTransactions> referencingTransactions;
 

@@ -33,35 +33,47 @@ import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPayment;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
+import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TransaksiMapper;
 import com.app.smartdrive.api.mapper.payment.PaymentTransactions.BatchPartnerInvoiceMapper;
+import com.app.smartdrive.api.mapper.payment.PaymentTransactions.PartnerDtoMapper;
 import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TopupFintechMapper;
 import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TransferTransactionsMapper;
 import com.app.smartdrive.api.repositories.HR.BatchEmployeeSalaryRepository;
 import com.app.smartdrive.api.repositories.partner.BatchPartnerInvoiceRepository;
 import com.app.smartdrive.api.repositories.payment.PaymentTransactionsRepository;
 import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
+import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
+import com.app.smartdrive.api.services.HR.BatchEmployeeSalaryService;
 import com.app.smartdrive.api.services.partner.BatchPartnerInvoiceService;
 import com.app.smartdrive.api.services.payment.PaymentTransactionsService;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;  
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PaymentTransactionsImpl implements PaymentTransactionsService{
+@Slf4j
+public class PaymentTransactionsImpl implements PaymentTransactionsService {
     private final EntityManager entityManager;
+
     private final PaymentTransactionsRepository repository;
     private final UserAccountsRepository userAccountsRepository;
     private final BatchEmployeeSalaryRepository employeeSalaryRepository;
     private final BatchPartnerInvoiceRepository partnerInvoiceRepository;
     private final BatchPartnerInvoiceService serviceInvoicePartner;
+    private final BatchEmployeeSalaryService serviceEmployeSalary;
+    private final SecrRepository secrRepository;
 
-    public PaymentTransactions addaPY(PaymentTransactions paymentTransactions){
+    public PaymentTransactions addaPY(PaymentTransactions paymentTransactions) {
         entityManager.persist(paymentTransactions);
         return paymentTransactions;
     }
@@ -71,243 +83,303 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
         return repository.findAll();
     }
 
-    public String dateTimeFormatter(){
-        LocalDateTime now = LocalDateTime.now();
+    private LocalDateTime timeNow(){
+        LocalDateTime time = LocalDateTime.now();
+        return time;
+    }
+
+    public String dateTimeFormatter(LocalDateTime b) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = now.format(formatter);
+        String formattedDate = b.format(formatter);
         return formattedDate;
     }
-    
-    public void automationPaymentTransactionsId(){
-        List<PaymentTransactions> listPayment = repository.findAll();
-        PaymentTransactions payment = new PaymentTransactions();
-        int countFirst = 1;
-        if(listPayment.isEmpty()){
-            payment.setPatrTrxno("trx" + dateTimeFormatter() + countFirst );
-        }else{
-            for (PaymentTransactions paymentData : listPayment) {
-                if(paymentData.getPatrTrxnoRev()==null){
-                    countFirst++;
-                    payment.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countFirst);
-                }else{
-                    countFirst++;
-                    payment.setPatrTrxno("trx" + dateTimeFormatter() +  "000" + countFirst);
-                    payment.setPatrTrxnoRev(payment.getPatrTrxno());
-                }
-            }
-        }
-        addaPY(payment);
+
+    private String generateTrxNo(LocalDateTime timeNow) {
+        return "trx" + dateTimeFormatter(timeNow) + "000" + getIdFromSequence();
     }
 
-    
+    private String generateTrxNoRe(LocalDateTime timeNow) {
+        return "trx" + dateTimeFormatter(timeNow) + "000" + getIdFromNo();
+    }
 
+    private synchronized int getIdFromSequence() {
+        int b = repository.countTrxno();
+        int trxSequence = b += 1;
+        return trxSequence;
+    }
+
+    private int getIdFromNo(){
+        int c = repository.countTrxno();
+        return c+=1;
+    }
+    private String uuidInvoice(){
+        UUID uuid = UUID.randomUUID();
+        Long uuidd = uuid.getMostSignificantBits();
+        String idUnique = uuidd.toString();
+        String invoiceAutomate = "INV-" + idUnique; 
+        return invoiceAutomate;
+    }
+
+    private void automateIdAndCreateEntities(Double nominall, String noRekening, String toRekening, String notes,
+        EnumPayment enumPayment, String invoice) {
+
+        PaymentTransactions transactions = new PaymentTransactions();
+        PaymentTransactions transactions2 = new PaymentTransactions();
+        List<PaymentTransactions> listPayment = repository.findAll();
+        PaymentTransactions reversal = repository.findByPatrTrxno(transactions.getPatrTrxno());
+        PaymentTransactions reversalRev = repository.findByPatrTrxnoRev(transactions.getPatrTrxnoRev());
+        
+
+        
+            int newD = getIdFromSequence()-1;
+            transactions.setPatrTrxno(generateTrxNo(timeNow()));
+            transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newD);
+        
+            
+               
+                    // int newB = getIdFromSequence() - 1;
+                    // transactions.setPatrTrxno(generateTrxNo(timeNow()));
+                    // transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newB);
+               
+                    // int newC = getIdFromSequence() - 1;
+                    // transactions.setPatrTrxno(generateTrxNo(timeNow()));
+                    // transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newC);
+                
+            
+        
+        transactions.setPatr_created_on(timeNow());
+        transactions.setPatr_usac_accountNo_from(noRekening);
+        transactions.setPatr_usac_accountNo_to("-");
+        transactions.setPatr_debet(nominall);
+        transactions.setPatr_type(enumPayment);
+        transactions.setPatr_invoice_no(invoice);
+        transactions.setPatr_notes(notes);
+        
+
+        PaymentTransactions newPayment = repository.save(transactions);
+
+        transactions.setPatrTrxno(generateTrxNo(timeNow()));
+        transactions.setPatrTrxnoRev(newPayment.getPatrTrxno());
+        repository.save(transactions);
+        transactions2.setPatr_created_on(timeNow());
+        transactions2.setPatr_usac_accountNo_from("-");
+        transactions2.setPatr_usac_accountNo_to(toRekening);
+        transactions2.setPatr_credit(newPayment.getPatr_debet());
+        transactions2.setPatr_type(newPayment.getPatr_type());
+        transactions2.setPatr_notes(newPayment.getPatr_notes());
+        transactions2.setPatr_invoice_no(newPayment.getPatr_invoice_no());
+        transactions2.setPatrTrxnoRev(newPayment.getPatrTrxno());
+        repository.save(transactions2);
+        repository.flush();
+
+    }
+
+    private void checkSaldoHandle(Double saldoSender, Double nominal, EnumPayment enumPayment) {
+        if (saldoSender == null || saldoSender == 0.0) {
+            throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp." + saldoSender
+                    + ", Failed: " + enumPayment + ", Harap melakukan pengisian saldo!");
+        } else if (saldoSender < nominal) {
+            throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp." + saldoSender
+                    + ", Failed: " + enumPayment + ", Saldo anda kurangg!");
+        }
+    }
+
+  
     @Override
     public TransaksiResponse transaksiByUser(TransactionsDtoRequests request) {
         List<UserAccounts> listAcc = userAccountsRepository.findAll();
-        List<PaymentTransactions> listPayment = repository.findAll();
-        List<BatchEmployeeSalary> listEmployeSalary = employeeSalaryRepository.findAll();
-        List<BatchPartnerInvoice> listPartnerInvoice = serviceInvoicePartner.getAllInvoiceNotPaid();
         TransaksiResponse dto = new TransaksiResponse();
-        PaymentTransactions transactions = new PaymentTransactions();
-        PaymentTransactions transactions2 = new PaymentTransactions();
-        
-        int countt = repository.countTrxno();
-        if(request.getEnumPayment() == EnumPayment.TOPUP_BANK || 
-        request.getEnumPayment() == EnumPayment.TRANSFER || 
-        request.getEnumPayment() == EnumPayment.TOPUP_FINTECH )
-        {
-           
-            if(listPayment.isEmpty()){
-                countt+=1;
-                transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt );
-                addaPY(transactions);
-            }
-                for (UserAccounts userAccounts : listAcc) {
-                    if(request.getUsac_accountno().equals(userAccounts.getUsac_accountno())){
-                        for (PaymentTransactions py : listPayment) {
-                            if(py.getPatrTrxnoRev()==null){
-                                countt++;
-                                transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt ); 
-                            }else{
-                                int newC = countt;
-                                newC--;
-                                transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt );
-                                transactions.setPatrTrxnoRev("trx" + dateTimeFormatter() + "000" + newC );
+    
+        automateIdAndCreateEntities(request.getNominall(), request.getUsac_accountno(),
+                request.getPatr_usac_accountNo_to(), request.getPatr_notes(), request.getEnumPayment(), uuidInvoice());
+
+        if (request.getEnumPayment() == EnumPayment.TOPUP_BANK ||
+                request.getEnumPayment() == EnumPayment.TRANSFER ||
+                request.getEnumPayment() == EnumPayment.TOPUP_FINTECH) {
+
+            for (UserAccounts userAccounts : listAcc) {
+                if (request.getUsac_accountno().equals(userAccounts.getUsac_accountno())) {
+
+                    Double saldoSender = userAccounts.getUsac_debet();
+                    EnumPayment typeTransaksi = request.getEnumPayment();
+                    Double saldoNominal = request.getNominall();
+                    checkSaldoHandle(saldoSender, saldoNominal, typeTransaksi);
+                    Double totalSaldoSender = saldoSender - saldoNominal;
+                    userAccounts.setUsac_debet(totalSaldoSender);
+                    for (UserAccounts user : listAcc) {
+                        if (request.getPatr_usac_accountNo_to().equals(user.getUsac_accountno())) {
+                            Double saldoRecipient = user.getUsac_debet();
+                            if (saldoRecipient == null) {
+                                user.setUsac_debet(request.getNominall());
+                            } else {
+                                Double totalSaldoRecipient = request.getNominall() + saldoRecipient;
+                                user.setUsac_debet(totalSaldoRecipient);
                             }
                         }
-                        countt++;
-
-                        transactions.setPatr_created_on(LocalDateTime.now());
-                        transactions.setPatr_debet(request.getNominall());
-                        transactions.setPatr_credit(null);
-                        transactions.setPatr_usac_accountNo_to(null);
-                        transactions.setPatr_usac_accountNo_from(request.getUsac_accountno());
-                        
-                        Double saldoSender = userAccounts.getUsac_debet();
-                        EnumPayment typeTransaksi = request.getEnumPayment();
-                        if(saldoSender == null || saldoSender == 0.0){
-                            throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp."+ saldoSender + ", Failed: "+ typeTransaksi + ", Harap melakukan pengisian saldo!");
-                        }else if(saldoSender < request.getNominall()){
-                            throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp."+ saldoSender + ", Failed: "+ typeTransaksi + ", Saldo anda kurangg!");
-                        }else{
-                            Double totalSaldoSender = saldoSender - request.getNominall();
-                            userAccounts.setUsac_debet(totalSaldoSender);
-                            for (UserAccounts user : listAcc) {
-                                if(request.getPatr_usac_accountNo_to().equals(user.getUsac_accountno())){   
-                                    Double saldoRecipient = user.getUsac_debet();
-                                    if(saldoRecipient==null){
-                                        user.setUsac_debet(request.getNominall());
-                                    }else{
-                                        Double totalSaldoRecipient = request.getNominall() + saldoRecipient;
-                                        user.setUsac_debet(totalSaldoRecipient);
-                                    }
-                                
-                                }        
-                            }      
-                        }
-                    
-                        transactions.setPatr_type(request.getEnumPayment());
-                        transactions.setPatr_invoice_no(request.getPatr_invoice_no());
-                        transactions.setPatr_notes(request.getPatr_notes());
-                        addaPY(transactions);
-
-                        transactions2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt);
-                        transactions2.setPatr_created_on(LocalDateTime.now());
-                        transactions2.setPatr_debet(null);
-                        transactions2.setPatr_credit(request.getNominall());
-                        transactions2.setPatr_usac_accountNo_from(null);
-                        transactions2.setPatr_usac_accountNo_to(request.getPatr_usac_accountNo_to());
-                        transactions2.setPatr_type(request.getEnumPayment());
-                        transactions2.setPatr_invoice_no(request.getPatr_invoice_no());
-                        transactions2.setPatr_notes(request.getPatr_notes());
-                        transactions2.setPatrTrxnoRev(transactions.getPatrTrxno());
-                        repository.saveAndFlush(transactions2);
-                        
-                        userAccountsRepository.save(userAccounts);
-                    
                     }
+                    userAccountsRepository.save(userAccounts);
                 }
-        }else{
+            }
+        }
+        
+        else {
             throw new EntityNotFoundException("Failed Transaksi, Harap Pilih Tipe Transaksi yang Benar");
         }
-        dto = TransaksiMapper.mapperTransactionsDto(request);
+        dto = TransaksiMapper.mapperTransactionsDto(uuidInvoice(),request);
         return dto;
     }
 
-    
-    
-    
     @Override
     public GenerateTransferResponse generateTransaksi(GenerateTransactionsRequests request) {
-        List<UserAccounts> listAcc = userAccountsRepository.findAll();
-        List<PaymentTransactions> listPayment = repository.findAll();
-        List<BatchEmployeeSalary> listEmployeSalary = employeeSalaryRepository.findAll();
-        List<BatchPartnerInvoice> listPartnerInvoice = serviceInvoicePartner.getAllInvoiceNotPaid();
-        TransaksiResponse dto = new TransaksiResponse();
+        
         GenerateTransferResponse dtoGenerate = new GenerateTransferResponse();
+        dtoGenerate = handlePaymentTypeGenerateTransactions(request);
+
+        return dtoGenerate;
+    }
+
+    private GenerateTransferResponse handlePaymentTypeGenerateTransactions( GenerateTransactionsRequests request) {
+        UserAccounts userAcc = userAccountsRepository.findByAccounts(request.getNoRekening());
         PaymentTransactions transactions = new PaymentTransactions();
         PaymentTransactions transactions2 = new PaymentTransactions();
-        int countt = repository.countTrxno();
+        List<UserAccounts> listAcc = userAccountsRepository.findAll();
+        List<BatchEmployeeSalary> listEmployeSalary = serviceEmployeSalary.getAllTransNull();
+        List<BatchPartnerInvoice> listPartnerInvoice = serviceInvoicePartner.getAllInvoiceNotPaid();
+        ServicePremiCredit premiCredit = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(),
+                LocalDateTime.now().plusMonths(1));
+        GenerateTransferResponse dtoGenerate = new GenerateTransferResponse();
 
-        if(request.getTipePayment() == EnumPayment.CLAIM_EVENT || request.getTipePayment() == EnumPayment.PAID_PARTNER || 
-        request.getTipePayment() == EnumPayment.PREMI ||request.getTipePayment() == EnumPayment.SALARY )
-        {
-            if(listPayment.isEmpty()){
-                countt+=1;
-                transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt );
-                addaPY(transactions);
-            }
+        switch (request.getTipePayment()) {
+            case PAID_PARTNER:
+                for (BatchPartnerInvoice partner : listPartnerInvoice) {
+                    if (request.getToRekening().equals(partner.getAccountNo())) {
+                        Double nominalWithTax = partner.getSubTotal() - partner.getTax();
+                        Double saldoSenderPartner = userAcc.getUsac_debet();
+                        Double totalSaldoSenderPartner = saldoSenderPartner - nominalWithTax;
+                        LocalDateTime time = LocalDateTime.now();
+                        BatchPartnerInvoice partnerr = new BatchPartnerInvoice();
 
-            for (UserAccounts userAccounts : listAcc) {
-                    if(request.getNoRekening().equals(userAccounts.getUsac_accountno())){
-                        for (PaymentTransactions py : listPayment) {
-                            if(py.getPatrTrxnoRev()==null){
-                                countt++;
-                                transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt ); 
-                            }else{
-                                int newC = countt;
-                                newC--;
-                                transactions.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt );
-                                transactions.setPatrTrxnoRev("trx" + dateTimeFormatter() + "000" + newC );
-                            }
-                        }
-                        countt++;
+                        checkSaldoHandle(saldoSenderPartner, nominalWithTax, request.getTipePayment());
+                        transactions.setPatrTrxno(generateTrxNo(timeNow()));
+                        transactions2.setPatrTrxno(transactions.getPatrTrxno());
+                        partnerr.setNo(partner.getNo());
+                        partnerr.setServiceOrders(partner.getServiceOrders());
+                        partnerr.setPaidDate(time);
+                        partnerr.setStatus(BpinStatus.PAID);
+                        partnerr.setPaymentTransactions(transactions2);
+                        partnerr.setCreatedOn(time);
+                        userAcc.setUsac_debet(totalSaldoSenderPartner);
+                        transactions.setPatr_debet(nominalWithTax);
+                        transactions2.setPatr_invoice_no(partner.getNo());
+                        transactions2.setPatr_credit(nominalWithTax);
+                        automateIdAndCreateEntities(nominalWithTax, request.getNoRekening(),
+                request.getToRekening(), request.getNotes(), request.getTipePayment(), partner.getNo());
 
-                        transactions.setPatr_created_on(LocalDateTime.now());
-                        transactions.setPatr_credit(null);
-                        transactions.setPatr_usac_accountNo_to(null);
-                        transactions.setPatr_usac_accountNo_from(request.getNoRekening());
-                        transactions.setPatr_type(request.getTipePayment());
-                        transactions.setPatr_invoice_no(null);//
-                        transactions.setPatr_notes(request.getNotes());
-                        repository.saveAndFlush(transactions);
-                        
-                        transactions2.setPatrTrxno("trx" + dateTimeFormatter() + "000" + countt);
-                        transactions2.setPatr_created_on(LocalDateTime.now());
-                        transactions2.setPatr_debet(null);
-                        transactions2.setPatr_usac_accountNo_from(null);
-                        transactions2.setPatr_usac_accountNo_to(request.getToRekening());
-                        transactions2.setPatr_type(request.getTipePayment());
-                        transactions2.setPatr_notes(request.getNotes());
-                        transactions2.setPatrTrxnoRev(transactions.getPatrTrxno());
-                        repository.saveAndFlush(transactions2);
-                        
-                        if(request.getTipePayment()== EnumPayment.SALARY){
-                            for (BatchEmployeeSalary salary : listEmployeSalary) {
-                                if(request.getToRekening().equals(salary.getBesaAccountNumber())){
-                                    salary.setEmsTrasferDate(LocalDateTime.now());
-                                    salary.setBesaPatrTrxno(transactions2.getPatrTrxnoRev());
-                                    salary.setBesaPaidDate(LocalDateTime.now());
-                                    salary.setBesaModifiedDate(LocalDateTime.now());
-                                    employeeSalaryRepository.save(salary);
-                                    
+                        for (UserAccounts acc : listAcc) {
+                            if (partner.getAccountNo().equals(acc.getUsac_accountno())) {
+                                if (acc.getUsac_debet() == null || acc.getUsac_debet() == 0.0) {
+                                    acc.setUsac_debet(nominalWithTax);
+                                } else {
+                                    Double total = acc.getUsac_debet() + nominalWithTax;
+                                    acc.setUsac_debet(total);
                                 }
+                                userAccountsRepository.save(acc);
                             }
-                        }else if(request.getTipePayment().equals(EnumPayment.PAID_PARTNER)){ 
-                            for (BatchPartnerInvoice partner : listPartnerInvoice) {
-                                if(request.getToRekening().equals(partner.getAccountNo())){
-                                    Double nominalWithTax = partner.getSubTotal() - partner.getTax();
-                                    
-                                    transactions.setPatr_debet(nominalWithTax);
-                                    partner.setPaidDate(LocalDateTime.now());
-                                    partner.setStatus(BpinStatus.PAID);
-                                    partner.setPaymentTransactions(transactions2);
-                                    partner.setCreatedOn(LocalDateTime.now());
-                                    transactions2.setPatr_invoice_no(partner.getNo());
-                                    transactions2.setPatr_credit(nominalWithTax);
-                                    repository.save(transactions);
-                                    repository.save(transactions2);
-                                    for (UserAccounts acc : listAcc) {
-                                        if(partner.getAccountNo().equals(acc.getUsac_accountno())){
-                                            if(acc.getUsac_debet() == null || acc.getUsac_debet() == 0.0){
-                                                acc.setUsac_debet(nominalWithTax);
-                                            }else{
-                                                Double total = acc.getUsac_debet() + nominalWithTax;
-                                                acc.setUsac_debet(total);
-                                            }
-                                           
-                                            userAccountsRepository.save(acc);
-                                        }
-                                        
-                                    }
-                                    partnerInvoiceRepository.saveAndFlush(partner);
-                                    dtoGenerate.setAccountNo(partner.getAccountNo());
-                                    dtoGenerate.setInvoiceNo(partner.getNo());
-                                    dtoGenerate.setPaidDate(partner.getPaidDate());
-                                    dtoGenerate.setNominal(nominalWithTax);
-                                    dtoGenerate.setStatus(partner.getStatus());
-                                    dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
-                                }   
-                            }
-                        }else{
-                            throw new TypeTransaksiNotFoundException("Harap memilih tipe transaksi yang benar!");
                         }
-                        userAccountsRepository.save(userAccounts);
+                        partnerInvoiceRepository.saveAndFlush(partnerr);
+                        dtoGenerate.setAccountNo(partner.getAccountNo());
+                        dtoGenerate.setInvoiceNo(partner.getNo());
+                        dtoGenerate.setPaidDate(partner.getPaidDate());
+                        dtoGenerate.setNominal(nominalWithTax);
+                        dtoGenerate.setStatus(partner.getStatus());
+                        dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
+
+                    } else {
+                        throw new EntityNotFoundException("Nomor rekening tujuan yang anda masukan salah");
                     }
                 }
+                break;
+            case PREMI:
+                Double nominalPremi = premiCredit.getSecrPremiDebet().doubleValue();
+                Double saldoSenderPremi = userAcc.getUsac_debet();
+                Double totalSaldoSenderPremi = saldoSenderPremi - nominalPremi;
+                String invoiceNo = "SERV-" + premiCredit.getSecrId();
 
+                checkSaldoHandle(saldoSenderPremi, nominalPremi, request.getTipePayment());
+                transactions.setPatrTrxno(generateTrxNo(timeNow()));
+                transactions2.setPatrTrxno(transactions.getPatrTrxno());
+                transactions.setPatr_debet(nominalPremi);
+                transactions2.setPatr_invoice_no(invoiceNo);
+                transactions2.setPatr_credit(nominalPremi);
+                automateIdAndCreateEntities(nominalPremi, request.getNoRekening(),
+                request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceNo);
+                premiCredit.setPaymentTransactions(transactions2);
+                userAcc.setUsac_debet(totalSaldoSenderPremi);
+                for (UserAccounts user : listAcc) {
+                    if (request.getToRekening().equals(user.getUsac_accountno())) {
+                        if (user.getUsac_debet() == null || user.getUsac_debet() == 0) {
+                            user.setUsac_debet(nominalPremi);
+                        } else {
+                            Double total = user.getUsac_debet() + nominalPremi;
+                            user.setUsac_debet(total);
+                        }
+                        userAccountsRepository.save(user);
+                    }
+                    dtoGenerate.setAccountNo(request.getNoRekening());
+                    dtoGenerate.setInvoiceNo(invoiceNo);
+                    dtoGenerate.setNominal(nominalPremi);
+                    dtoGenerate.setStatus(EnumModuleServiceOrders.SemiStatus.PAID);
+                    dtoGenerate.setPaidDate(LocalDateTime.now());
+                    dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
+                }
+                break;
+            case SALARY:
+          
+                for (BatchEmployeeSalary employee : listEmployeSalary) {
+                    if (request.getToRekening().equals(employee.getBesaAccountNumber())) {
+                        Double nominalSalary = employee.getBesaTotalSalary().doubleValue();
+                        Double saldoSender = userAcc.getUsac_debet();
+                        Double totalSaldoSender = saldoSender - nominalSalary;
+                        LocalDateTime createdDateSalary = employee.getBatchEmployeeSalaryId()
+                                .getBesaCreatedDate();
+                        String invoiceSalary = "SAL-" + dateTimeFormatter(createdDateSalary);
+
+                        checkSaldoHandle(saldoSender, nominalSalary, request.getTipePayment());
+                        transactions.setPatrTrxno(generateTrxNo(timeNow()));
+                        transactions2.setPatrTrxno(transactions.getPatrTrxno());
+                        employee.setEmsTrasferDate(LocalDateTime.now());
+                        employee.setBesaPatrTrxno(transactions2.getPatrTrxno());
+                        employee.setBesaPaidDate(LocalDateTime.now());
+                        employee.setBesaModifiedDate(LocalDateTime.now());
+                        userAcc.setUsac_debet(totalSaldoSender);
+                        automateIdAndCreateEntities(nominalSalary, request.getNoRekening(),
+                request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceSalary);
+                        
+                        for (UserAccounts acc : listAcc) {
+                            if (employee.getBesaAccountNumber().equals(acc.getUsac_accountno())) {
+                                Double saldoRecipient = acc.getUsac_debet();
+                                Double totalRecipient = saldoRecipient + nominalSalary;
+                                if (acc.getUsac_debet() == null || acc.getUsac_debet() == 0.0) {
+                                    acc.setUsac_debet(nominalSalary);
+                                } else {
+                                    acc.setUsac_debet(totalRecipient);
+                                    userAccountsRepository.save(acc);
+                                }
+                            }
+                        }
+                        employeeSalaryRepository.saveAndFlush(employee);
+                        dtoGenerate.setAccountNo(employee.getBesaAccountNumber());
+                        dtoGenerate.setInvoiceNo("SAL-" + createdDateSalary);
+                        dtoGenerate.setNominal(nominalSalary);
+                        dtoGenerate.setPaidDate(employee.getBesaPaidDate());
+                        dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
+                    }
+                }
+                break;
+            default:
+                throw new TypeTransaksiNotFoundException("Harap memilih tipe transaksi yang benar!");
         }
-        return dtoGenerate;
+       return dtoGenerate;
     }
 
     @Override
@@ -327,10 +399,5 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService{
         // TODO Auto-generated method stub
         return null;
     }
-
-    
-
-   
-     
 
 }

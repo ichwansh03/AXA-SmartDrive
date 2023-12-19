@@ -19,5 +19,13 @@ public interface PaymentTransactionsRepository extends JpaRepository<PaymentTran
     @Query(value = "SELECT COUNT(patr_trxno) FROM payment.payment_transactions", nativeQuery = true)
     int countTrxno();
 
+    // @Query(value = "SELECT patr_trxno FROM payment.payment_transactions WHERE patr_trxno IS NULL")
+    // int checkTableEmpty();
+    
+
+    PaymentTransactions findByPatrTrxno(String patrTrxno);
+    PaymentTransactions findByPatrTrxnoRev(String patrTrxnoRev);
+    
+
     
 } 

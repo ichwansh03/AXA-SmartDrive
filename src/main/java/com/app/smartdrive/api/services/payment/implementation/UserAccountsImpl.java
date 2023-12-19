@@ -9,10 +9,16 @@ import javax.swing.text.html.Option;
 import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.stereotype.Service;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.NoRekNotFoundException;
 import com.app.smartdrive.api.dto.payment.Request.UserAccounts.UserAccountsDtoRequests;
+import com.app.smartdrive.api.dto.payment.Request.UserAccounts.UserAccountsDtoRequestsFirst;
 import com.app.smartdrive.api.dto.payment.Response.UserAccounts.UserAccountsDtoResponse;
+import com.app.smartdrive.api.dto.payment.Response.UserAccounts.UserAccountsListDtoResponse;
+import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.User;
+import com.app.smartdrive.api.mapper.payment.UserAccounts.UserAccountsListAllMapperResponse;
 import com.app.smartdrive.api.mapper.payment.UserAccounts.UserAccountsMapperResponse;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
@@ -26,89 +32,64 @@ public class UserAccountsImpl implements UserAccountsService {
     private final UserAccountsRepository repositoryUA;
 
     @Override
-    public Boolean addDebitCredit(Long usac_id,UserAccountsDtoRequests userAccountsDtoRequests) {
-        Optional<UserAccounts> idData = repositoryUA.findById(usac_id);
-        List<UserAccounts> listData = repositoryUA.findAll();
-        UserAccounts userAcc = idData.get();
-        if(idData.isPresent()){
-            for (UserAccounts user : listData) {
-                if(usac_id.equals(user.getUsac_id())){
-                    userAcc.setUsac_debet(userAccountsDtoRequests.getUsac_debet());
-                    userAcc.setUsac_credit(userAccountsDtoRequests.getUsac_credit());
-                    repositoryUA.save(userAcc);
-                    return true;
+    public UserAccountsDtoResponse addDebit(UserAccountsDtoRequests requests) {
+        List<UserAccounts> listAcc = repositoryUA.findAll();
+        UserAccounts user = new UserAccounts();
+        UserAccountsDtoResponse dto = new UserAccountsDtoResponse();
+        user.setUsac_debet(requests.getNominall());
+        
+        UserAccounts userAcc = repositoryUA.findByNorek(requests.getNoRekening()).orElse(null);
+        String noAccount = requests.getNoRekening();
+        
+        dto = UserAccountsMapperResponse.convertEnityToDto(requests);
+        if(userAcc!=null){
+            for (UserAccounts userAccount : listAcc) {
+                if(noAccount.equals(userAccount.getUsac_accountno())){
+                    userAccount.setUsac_debet(requests.getNominall());
+                    repositoryUA.save(userAccount);
                 }
             }
+            return dto;
+        }else{
+            throw new NoRekNotFoundException(noAccount + " Nomor rekening yang anda masukan belum terdaftar");
         }
-        return false;
-    }
-
     
-    @Override
-    public Boolean updateDebitCredit(Long usac_id, UserAccountsDtoRequests userAccountsDto) {
-        Optional<UserAccounts> idUA = repositoryUA.findById(usac_id);
-        List<UserAccounts> listUserAccounts = repositoryUA.findAll();
-        UserAccounts userAccData = idUA.get();
-        if(idUA.isPresent()){
-            for (UserAccounts user : listUserAccounts) {
-                if(usac_id.equals(user.getUsac_id())){
-                    if(userAccountsDto.getUsac_debet()!=null && userAccountsDto.getUsac_credit()!=null){
-                        userAccData.setUsac_debet(userAccountsDto.getUsac_debet());
-                        userAccData.setUsac_credit(userAccountsDto.getUsac_credit());
-                        repositoryUA.save(userAccData);
-                    }else if(userAccountsDto.getUsac_debet()!=null){
-                        userAccData.setUsac_debet(userAccountsDto.getUsac_debet());
-                        repositoryUA.save(userAccData);
-                    }else if(userAccountsDto.getUsac_credit()!=null){
-                        userAccData.setUsac_credit(userAccountsDto.getUsac_credit());
-                        repositoryUA.save(userAccData);
-                    }
-                    return true;
-                    
-                }
-            }
-        }
-        return false;
     }
 
     @Override
-    public Boolean deleteUAById(Long usac_id) {
-        int deleteId = repositoryUA.deleteUserAccountById(usac_id);
+    public Boolean deleteUserAccountsByNoRek(UserAccountsDtoRequestsFirst request) {
+        int deleteId = repositoryUA.deleteUserAccountByNoRek(request.getNoRekening());
         if(deleteId != 1){
             return false;
         }
         return true;
     }
 
-
-
     @Override
-    public List<UserAccountsDtoResponse> listDtoResponses() {
+    public List<UserAccountsListDtoResponse> listDtoResponses() {
         List<UserAccounts> listUA = repositoryUA.findAll();
-        List<UserAccountsDtoResponse> listDto = new ArrayList<>();
-        for (UserAccounts user : listUA) {
-            UserAccountsDtoResponse userDto = UserAccountsMapperResponse.convertEnityToDto(user);
-            listDto.add(userDto);
+        List<UserAccountsListDtoResponse> listDto = new ArrayList<>();
+
+        if(listUA.isEmpty()){
+            throw new EntityNotFoundException("Data masih belum terisi");
+        }else{
+            for (UserAccounts user : listUA) {
+                UserAccountsListDtoResponse userDto = UserAccountsListAllMapperResponse.convertEntityToDto(user);
+                listDto.add(userDto);
+            }
         }
+       
         return listDto;
     }
-
-    
-
+       
     @Override
-    public UserAccountsDtoResponse getIdUser(Long usac_id) {
-        Optional<UserAccounts> listUA = repositoryUA.findById(usac_id);
-        UserAccounts uA = listUA.get();
-        UserAccountsDtoResponse userR = new UserAccountsDtoResponse();
-        userR.setUsac_accountno(uA.getUsac_accountno());
-        userR.setUsac_debet(uA.getUsac_debet());
-        userR.setUsac_credit(uA.getUsac_credit());
-        userR.setEnumPaymentType(uA.getEnumPaymentType());
-        
-        return userR;
+    public UserAccountsListDtoResponse getIdUser(Long usac_id) {
+        UserAccounts user = repositoryUA.findById(usac_id).orElseThrow(() 
+        -> new NoRekNotFoundException("No Rekening belum terdaftar"));
+        UserAccountsListDtoResponse dto = new UserAccountsListDtoResponse();
+        dto = UserAccountsListAllMapperResponse.convertEntityToDto(user);   
+        return dto;
     }
-
-
 
     @Override
     public List<UserAccounts> getAll() {
@@ -125,11 +106,4 @@ public class UserAccountsImpl implements UserAccountsService {
     public UserAccounts save(UserAccounts entity) {
         return repositoryUA.save(entity);
     }
-
-
-    
-    
-    
-    
-    
 }

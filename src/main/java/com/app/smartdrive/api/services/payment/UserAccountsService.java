@@ -6,16 +6,17 @@ import java.util.Optional;
 import org.hibernate.validator.internal.engine.validationcontext.BaseBeanValidationContext;
 
 import com.app.smartdrive.api.dto.payment.Request.UserAccounts.UserAccountsDtoRequests;
+import com.app.smartdrive.api.dto.payment.Request.UserAccounts.UserAccountsDtoRequestsFirst;
 import com.app.smartdrive.api.dto.payment.Response.UserAccounts.UserAccountsDtoResponse;
+import com.app.smartdrive.api.dto.payment.Response.UserAccounts.UserAccountsListDtoResponse;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.services.BaseService;
 
 public interface UserAccountsService extends BaseService<UserAccounts, Long>{
-    List<UserAccountsDtoResponse> listDtoResponses();
-    UserAccountsDtoResponse getIdUser(Long usac_id);
-    Boolean addDebitCredit(Long usac_id, UserAccountsDtoRequests userAccountsDtoRequests);
-    Boolean updateDebitCredit(Long usac_id, UserAccountsDtoRequests userAccountsDto);
-    Boolean deleteUAById(Long usac_id);
+    List<UserAccountsListDtoResponse> listDtoResponses();
+    UserAccountsListDtoResponse getIdUser(Long usac_id);
+    UserAccountsDtoResponse addDebit(UserAccountsDtoRequests userAccountsDtoRequests);
+    Boolean deleteUserAccountsByNoRek(UserAccountsDtoRequestsFirst request);
 } 
    
 
