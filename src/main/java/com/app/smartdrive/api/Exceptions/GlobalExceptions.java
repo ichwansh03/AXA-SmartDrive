@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.Exceptions;
 
 
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 
 
