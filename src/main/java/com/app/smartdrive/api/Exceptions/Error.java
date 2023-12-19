@@ -1,8 +1,15 @@
 package com.app.smartdrive.api.Exceptions;
 
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Error {
   @Override
   public String toString() {

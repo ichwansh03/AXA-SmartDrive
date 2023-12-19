@@ -9,7 +9,7 @@ import com.app.smartdrive.api.entities.auth.RefreshToken;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
-import com.app.smartdrive.api.services.jwt.JwtUtils;
+import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.users.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +34,7 @@ public class AuthenticationController {
   private final AuthenticationService authenticationService;
   private final RefreshTokenService refreshTokenService;
   private final UserService userService;
+  private final JwtService jwtService;
   @Value("${jwt.refresh.cookie}")
   private String jwtRefreshCookie;
 
@@ -44,15 +45,13 @@ public class AuthenticationController {
   public ResponseEntity<?> loginCustomer(@Valid @RequestBody SignInRequest login){
     User user = authenticationService.signinCustomer(login);
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserEntityId());
-    ResponseCookie jwtCookie = JwtUtils.generateJwtCookie(user);
-    ResponseCookie jwtRefreshCookie = JwtUtils.generateRefreshJwtCookie(refreshToken.getRetoToken());
+    ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
+    ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getRetoToken());
 
     ProfileDto userResponse = TransactionMapper.mapEntityToDto(user, ProfileDto.class);
 
-//    String jwt = JwtUtils.generateToken(user);
-
     userResponse.setRoles(user.getAuthorities());
-//    userResponse.setAccessToken(jwt);
+    userResponse.setAccessToken(jwtCookie.getValue());
     userResponse.setTokenType("Bearer");
 
     ResponseEntity<?> body = ResponseEntity.status(HttpStatus.OK)
@@ -78,8 +77,8 @@ public class AuthenticationController {
 
   @PostMapping("/signout")
   public ResponseEntity<?> logout(){
-    ResponseCookie cookie = JwtUtils.getCleanCookie(jwtCookie, "/api");
-    ResponseCookie refreshCookie = JwtUtils.getCleanCookie(jwtRefreshCookie, "/api/auth/refreshtoken");
+    ResponseCookie cookie = jwtService.getCleanCookie(jwtCookie, "/api");
+    ResponseCookie refreshCookie = jwtService.getCleanCookie(jwtRefreshCookie, "/api/auth/refreshtoken");
     return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, cookie.toString())
             .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
@@ -88,13 +87,13 @@ public class AuthenticationController {
 
   @PostMapping("/refreshtoken")
   public ResponseEntity<?> refreshToken(HttpServletRequest request){
-    Optional<String> refreshToken = JwtUtils.getJwtFromCookies(request, jwtRefreshCookie);
+    Optional<String> refreshToken = jwtService.getJwtFromCookies(request, jwtRefreshCookie);
     if(refreshToken.isPresent()){
       return refreshTokenService.findByToken(refreshToken.get())
               .map(token -> refreshTokenService.verifyExpiration(token))
               .map(users -> users.getUser())
               .map(user -> {
-                ResponseCookie jwtCookie = JwtUtils.generateJwtCookie(user);
+                ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
                 return ResponseEntity.ok()
                         .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                         .body(new MessageResponse("Token is refreshed successfully!"));
