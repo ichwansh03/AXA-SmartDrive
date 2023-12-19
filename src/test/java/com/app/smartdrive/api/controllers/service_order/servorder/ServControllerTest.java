@@ -44,7 +44,7 @@ public class ServControllerTest {
     @ParameterizedTest
     @DisplayName("get service by id")
     @CsvSource({
-            "1, 200",
+            "900, 200",
             "999, 200"
     })
     void itShouldPrintServiceById(Long servId, Integer statusCode) throws Exception {

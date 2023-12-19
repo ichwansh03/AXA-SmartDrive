@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
+import com.app.smartdrive.api.dto.service_order.request.PagingServiceOrder;
 import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -28,46 +30,43 @@ public class ServOrderController {
     private final ServOrderService servOrderService;
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId) {
         ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(seroId);
         ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
         return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
     }
 
-
-
     @PutMapping("/partner/{seroId}")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToAddPartner(@Valid @RequestBody Partner partner, @PathVariable("seroId") String seroId){
         servOrderService.selectPartner(partner, seroId);
         return new ResponseEntity<>(partner, HttpStatus.OK);
     }
 
-
     @PutMapping("/close/{seroId}")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToCloseOrder(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId){
         int requested = servOrderService.requestClosePolis(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
         return new ResponseEntity<>(requested, HttpStatus.OK);
     }
 
     @GetMapping("/request")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getPageServiceOrders(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "3") int size,
-            @RequestParam(value = "type", defaultValue = "ALL") String type,
-            @RequestParam(value = "status", defaultValue = "OPEN") String status,
-            @RequestParam(value = "sortBy", defaultValue = "seroId") String sortBy,
-            @RequestParam(value = "sort", defaultValue = "ascending") String sort
-
+            @Valid @RequestBody PagingServiceOrder pagingServiceOrder,
+            @RequestParam("userId") Long userId
     ){
+
         Pageable paging;
 
-        if(Objects.equals(sort, "descending")){
-            paging = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        if(Objects.equals(pagingServiceOrder.getSort(), "descending")){
+            paging = PageRequest.of(pagingServiceOrder.getPage(), pagingServiceOrder.getSize(), Sort.by(pagingServiceOrder.getSortBy()).descending());
         }else {
-            paging = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+            paging = PageRequest.of(pagingServiceOrder.getPage(), pagingServiceOrder.getSize(), Sort.by(pagingServiceOrder.getSortBy()).ascending());
         }
 
-        Page<ServiceOrderRespDto> orderRespDtoPage = servOrderService.pageServiceOrderByUserId(paging, type, status);
+        Page<ServiceOrderRespDto> orderRespDtoPage = servOrderService.pageServiceOrderByUserId(paging, pagingServiceOrder.getType(), pagingServiceOrder.getStatus());
 
         return new ResponseEntity<>(orderRespDtoPage, HttpStatus.OK);
     }

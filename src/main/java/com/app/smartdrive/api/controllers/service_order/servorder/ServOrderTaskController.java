@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class ServOrderTaskController {
     }
 
     @PutMapping("/update/{seotId}")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SoTasksDto soTasksDto, @PathVariable("seotId") Long seotId) {
         int updated = servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
 
@@ -36,6 +38,7 @@ public class ServOrderTaskController {
     }
 
     @PutMapping("/update/claim/{seotId}")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SeotPartnerDto soTasksDto, @PathVariable("seotId") Long seotId) {
 
         SeotPartnerDto seotPartnerDto = new SeotPartnerDto();

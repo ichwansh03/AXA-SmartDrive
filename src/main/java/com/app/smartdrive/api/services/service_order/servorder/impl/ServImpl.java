@@ -63,7 +63,7 @@ public class ServImpl implements ServService {
             case "CLAIM" -> serv = handleServiceUpdate(cr,
                     LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
             default -> serv = handleServiceUpdate(cr,
-                    LocalDateTime.now(), EnumModuleServiceOrders.ServStatus.INACTIVE);
+                    null, EnumModuleServiceOrders.ServStatus.INACTIVE);
         }
 
         if(Objects.equals(cr.getCreqType().toString(), "CLOSE")){
