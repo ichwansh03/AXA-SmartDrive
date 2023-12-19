@@ -9,7 +9,6 @@ import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
-import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetService;
 import com.app.smartdrive.api.services.users.UserService;
@@ -60,8 +59,6 @@ class UserControllerTest {
   private AuthenticationService authenticationService;
   @MockBean
   private RefreshTokenService refreshTokenService;
-  @MockBean
-  private JwtService jwtService;
   private User user;
   @MockBean
   private ClaimAssetService claimAssetService;
