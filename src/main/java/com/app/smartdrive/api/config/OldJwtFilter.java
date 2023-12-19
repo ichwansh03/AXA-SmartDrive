@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.config;
 
 import com.app.smartdrive.api.dto.auth.response.ApiResponse;
-import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.users.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -20,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import com.app.smartdrive.api.services.jwt.JwtServiceImpl;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -30,7 +30,7 @@ import java.io.OutputStream;
 @RequiredArgsConstructor
 public class OldJwtFilter extends OncePerRequestFilter {
   @Autowired
-  private  JwtService jwtServiceImpl;
+  private JwtServiceImpl jwtServiceImpl;
   private final UserService userService;
   @Value("${jwt.refresh.cookie}")
   private String jwtRefreshCookie;

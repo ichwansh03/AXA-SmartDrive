@@ -28,6 +28,8 @@ import com.app.smartdrive.api.controllers.users.UserController;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
+import com.app.smartdrive.api.services.jwt.JwtService;
+import com.app.smartdrive.api.services.jwt.JwtServiceImpl;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetService;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,7 +90,9 @@ public class EmployeesControllerTest {
     @MockBean
     private ClaimAssetService claimAssetService;
     @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    JwtServiceImpl jwtServiceImpl;
+    @MockBean
+    JwtService jwtService;
     @MockBean
     EmployeesService employeesService;
 

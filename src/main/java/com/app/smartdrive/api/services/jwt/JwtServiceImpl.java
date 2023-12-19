@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.services.jwt.implementation;
+package com.app.smartdrive.api.services.jwt;
 
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.services.jwt.JwtService;
@@ -66,7 +66,7 @@ public class JwtServiceImpl {
             .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
   }
 
-  @Override
+
   public boolean isTokenExpired(String token){
     return extractExpiration(token).before(new Date());
   }
@@ -85,7 +85,7 @@ public class JwtServiceImpl {
     return Keys.hmacShaKeyFor(keyBytes);
   }
 
-  @Override
+
   public String getJwtFromCookies(HttpServletRequest request, String cookieName){
     Cookie cookie = WebUtils.getCookie(request, cookieName);
     if (cookie != null) {
@@ -95,14 +95,14 @@ public class JwtServiceImpl {
     }
   }
 
-  @Override
+
   public ResponseCookie generateJwtCookie(User userPrincipal){
     String jwt = generateToken(userPrincipal);
     ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24*60*60).httpOnly(true).build();
     return cookie;
   }
 
-  @Override
+
   public ResponseCookie getCleanJwtCookie(String cookieName, String path){
     ResponseCookie cookie = ResponseCookie.from(cookieName, null).path(path).httpOnly(true)
             .maxAge(0)
@@ -110,13 +110,13 @@ public class JwtServiceImpl {
     return cookie;
   }
 
-  @Override
+
   public ResponseCookie generateCookie(String name, String value, String path){
     ResponseCookie cookie = ResponseCookie.from(name, value).path(path).maxAge(24*60*60).httpOnly(true).build();
     return cookie;
   }
 
-  @Override
+
   public boolean validateJwtToken(String authToken) {
     try {
       Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parse(authToken);
