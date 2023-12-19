@@ -123,8 +123,8 @@ public class ServOrderImpl implements ServOrderService {
         EnumModuleServiceOrders.SeroStatus status = EnumModuleServiceOrders.SeroStatus.valueOf(seroStatus);
         Page<ServiceOrders> serviceOrdersPage;
 
-        if (Objects.equals(seroStatus, "ALL")) {
-            serviceOrdersPage = soOrderRepository.findBySeroStatus(pageable, status);
+        if (Objects.equals(seroOrdtType, "ALL")) {
+            serviceOrdersPage = soOrderRepository.findAll(pageable);
         } else {
             EnumModuleServiceOrders.SeroOrdtType type = EnumModuleServiceOrders.SeroOrdtType.valueOf(seroOrdtType);
             serviceOrdersPage = soOrderRepository.findBySeroOrdtTypeAndSeroStatus(pageable, type, status);
