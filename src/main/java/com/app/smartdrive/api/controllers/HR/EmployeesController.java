@@ -36,9 +36,9 @@ public class EmployeesController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<?> deleteEmployeesById (@PathVariable("id") Long emp_entityid) {
-        employeesService.deleteById(emp_entityid);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    public ResponseEntity<?> deleteEmployeesById (@PathVariable("id") Long id) {
+        employeesService.deleteEmployeesById(id);
+        return new ResponseEntity<>("Employees deleted successfully", HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

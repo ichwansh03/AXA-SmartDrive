@@ -1,13 +1,5 @@
 package com.app.smartdrive.api.services.users.implementation;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-
-import lombok.extern.slf4j.Slf4j;
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserPhoneDto;
 import com.app.smartdrive.api.entities.users.User;
@@ -20,6 +12,12 @@ import com.app.smartdrive.api.services.users.UserPhoneService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service

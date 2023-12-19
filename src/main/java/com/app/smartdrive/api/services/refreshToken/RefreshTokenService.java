@@ -4,8 +4,8 @@ import com.app.smartdrive.api.Exceptions.TokenRefreshException;
 import com.app.smartdrive.api.entities.auth.RefreshToken;
 import com.app.smartdrive.api.repositories.auth.RefreshTokenRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
-import com.app.smartdrive.api.services.jwt.JwtUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.app.smartdrive.api.services.jwt.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +15,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class RefreshTokenService {
 
   @Value("${jwt.refreshExpired}")
   private Long refreshTokenDurationMs;
 
-  @Autowired
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
 
-  @Autowired
-  private RefreshTokenRepository refreshTokenRepository;
+  private final RefreshTokenRepository refreshTokenRepository;
+
+  private final JwtService jwtService;
 
   public Optional<RefreshToken> findByToken(String token){
     return refreshTokenRepository.findByRetoToken(token);
@@ -34,7 +35,7 @@ public class RefreshTokenService {
     RefreshToken refreshToken = new RefreshToken();
 
     refreshToken.setUser(userRepository.findById(userId).get());
-    refreshToken.setRetoExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+    refreshToken.setRetoExpiryDate(Instant.now().plusSeconds(refreshTokenDurationMs));
     refreshToken.setRetoToken(UUID.randomUUID().toString());
 
     refreshToken = refreshTokenRepository.save(refreshToken);
@@ -54,10 +55,7 @@ public class RefreshTokenService {
     return findByToken(token)
             .map(this::verifyExpiration)
             .map(RefreshToken::getUser)
-            .map(user -> {
-              String jwt = JwtUtils.generateToken(user);
-              return jwt;
-            })
+            .map(user -> jwtService.generateToken(user))
             .orElseThrow(() -> new TokenRefreshException("Refresh token is not in database"));
   }
 

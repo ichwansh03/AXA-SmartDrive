@@ -19,14 +19,9 @@ import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import jakarta.transaction.Transactional;
 @Repository
 public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeAreaWorkgroup, EmployeeAreaWorkgroupId> {
-    @Query(value = "SELECT TOP(1) * FROM HR.EMPLOYEE_ARE_WORKGROUP ORDER BY eawg_id DESC", nativeQuery = true)
-    Optional<EmployeeAreaWorkgroup> findLastOptional();
 
     @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_id=?1", nativeQuery=true)
     Optional<EmployeeAreaWorkgroup> findByEawgId(Long eawgId);
-
-    @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_entityid=?1", nativeQuery=true)
-    EmployeeAreaWorkgroup findByEawgEntityid(Long eawgEntityid);
 
     Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
 
@@ -34,13 +29,6 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     @Modifying(clearAutomatically = true)
     @Query(value = "delete from hr.employee_are_workgroup where eawg_id=:eawg_id", nativeQuery = true)
     void deleteEawgById(Long eawg_id);
-    
-    EmployeeAreaWorkgroup findByEawgArwgCode(String eawgArwgCode);
-    EmployeeAreaWorkgroup findByAreaWorkGroup(AreaWorkGroup areaWorkGroup);
-
-    @Transactional
-    @Query(value = "SELECT * FROM hr.employee_are_workgroup WHERE eawg_entityid =:eawgEntityid AND eawg_arwg_code =:arwgCode", nativeQuery=true)
-    public EmployeeAreaWorkgroup findByAgenAndArwgCode(Long eawgEntityid, String arwgCode);
 
     @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE HR.EMPLOYEE_ARE_WORKGROUP SET EAWG_ENTITYID =?1 WHERE EAWG_ENTITYID =?2", nativeQuery = true) 
@@ -48,4 +36,5 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
 
     Optional<EmployeeAreaWorkgroup> findByAreaWorkGroupAndEmployees(AreaWorkGroup areaWorkGroup, Employees employees);
 
+    boolean existsByEmployeesAndAreaWorkGroup(Employees employees, AreaWorkGroup areaWorkGroup);
 }

@@ -45,10 +45,7 @@ public class WebSecurityConfig {
         return http.build();
 
     }
-//    @Bean
-//    public UserDetailsService userDetailsService(){
-//        return new UserDetailServiceImpl();
-//    };
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
