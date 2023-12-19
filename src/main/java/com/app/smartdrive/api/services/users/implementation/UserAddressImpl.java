@@ -1,11 +1,5 @@
 package com.app.smartdrive.api.services.users.implementation;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserAddressDto;
 import com.app.smartdrive.api.entities.master.Cities;
@@ -16,10 +10,14 @@ import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.users.UserAddressRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.UserAddressService;
-import com.app.smartdrive.api.utils.NullUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

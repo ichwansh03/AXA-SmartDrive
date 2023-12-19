@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 public class AuthenticationServiceImpl implements AuthenticationService {
   private final UserRepository userRepository;
   private final UserService userService;
-  private final UserRolesService userRolesService;
   private final AuthenticationManager authenticationManager;
   private final PasswordEncoder passwordEncoder;
   private final UserPhoneRepository userPhoneRepository;
@@ -54,7 +53,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     User user = userService.createUserCustomer(request);
     user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
     userRepository.save(user);
-    log.info("Save atau ngga");
   }
 
   @Override
