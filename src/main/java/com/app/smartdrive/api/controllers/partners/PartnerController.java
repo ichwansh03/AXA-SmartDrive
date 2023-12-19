@@ -10,12 +10,14 @@ import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.partner.PartnerAreaWorkgroup;
 import com.app.smartdrive.api.entities.partner.PartnerContact;
 import com.app.smartdrive.api.entities.partner.PartnerContactEntityId;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.partner.implementation.PartnerContactServiceImpl;
 import com.app.smartdrive.api.services.partner.implementation.PartnerServiceImpl;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +35,7 @@ import java.util.List;
 public class PartnerController {
 
     private final PartnerServiceImpl partnerService;
-    private final PartnerContactServiceImpl partnerContactService;
-    private final SoOrderRepository soOrderRepository;
+    private final ServOrderWorkorderService servOrderWorkorderService;
 
     @PostMapping
     public ResponseEntity<PartnerDto> createPartner(@Valid @RequestBody PartnerRequest request){
@@ -74,8 +75,8 @@ public class PartnerController {
         return ResponseEntity.ok(TransactionMapper.mapEntityToDto(partnerService.getById(id), PartnerDto.class));
     }
     @GetMapping("/workorder")
-    public ResponseEntity<?> getAllService(HttpServletRequest request){
-        Partner partner = partnerService.getById(Long.valueOf(request.getHeader("PARTNER-ID")));
-        return ResponseEntity.status(200).body(TransactionMapper.mapEntityListToDtoList(soOrderRepository.findByPartner(partner), ServiceOrderRespDto.class));
+    public ResponseEntity<?> getAllServiceWorkOrder(@RequestParam Long entityid, @RequestParam String arwgcode){
+        List<ServiceOrderWorkorder> serviceOrderWorkorderList = servOrderWorkorderService.findAllByPartnerAndArwgCode(entityid,arwgcode);
+        return ResponseEntity.status(200).body(null);
     }
 }

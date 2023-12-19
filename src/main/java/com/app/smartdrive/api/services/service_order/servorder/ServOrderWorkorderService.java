@@ -14,4 +14,6 @@ public interface ServOrderWorkorderService {
     int updateSowoStatus(Boolean sowoStatus, Long sowoId);
 
     boolean checkAllWorkComplete(List<ServiceOrderWorkorder> sowoList);
+
+    List<ServiceOrderWorkorder> findAllByPartnerAndArwgCode(Long partnerId, String arwgCode);
 }
