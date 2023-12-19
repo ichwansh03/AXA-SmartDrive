@@ -15,7 +15,7 @@ import com.app.smartdrive.api.Exceptions.AreaWorkGroupNotFoundException;
 import com.app.smartdrive.api.Exceptions.EmployeeAreaWorkgroupNotFoundException;
 import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
+import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.Employees;
@@ -50,7 +50,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
     @Override
     @Transactional
-    public EmployeeAreaWorkgroup createEawg(EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto){
+    public EmployeeAreaWorkgroup createEawg(EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto){
         EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
 
         AreaWorkGroup areaWorkGroup = arwgService.getById(employeeAreaWorkgroupDto.getArwgCode());
@@ -69,7 +69,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
     @Override
     @Transactional
-    public EmployeeAreaWorkgroup updateEawg(Long eawgId, EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto) {
+    public EmployeeAreaWorkgroup updateEawg(Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto) {
 
         EmployeeAreaWorkgroup existingEawg = employeeAreaWorkgroupRepository.findByEawgId(eawgId).orElseThrow(() -> new EntityNotFoundException("EmployeeAreaWorkgroup not found with id: " + eawgId));
 
@@ -100,25 +100,23 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
         return new PageImpl<>(dtos, pageable, resultPage.getTotalElements());
     }
-
-   
-
-    @Override
-    public List<EmployeesAreaWorkgroupResponseDto> getAllDto() {
-      List<EmployeeAreaWorkgroup> employeeAreaWorkgroups = employeeAreaWorkgroupRepository.findAll();
-      List<EmployeesAreaWorkgroupResponseDto> empDto = TransactionMapper.mapEntityListToDtoList(employeeAreaWorkgroups, EmployeesAreaWorkgroupResponseDto.class);
-      return empDto;
-    }
     
     @Override
     public EmployeeAreaWorkgroup getById(Long id) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.employeeAreaWorkgroupRepository.findByEawgId(id).orElseThrow(
+                () -> new EntityNotFoundException("EmployeeAreaWorkgroup is not found")
+        );
+    }
+
+    @Override
+    @Transactional
+    public Page<EmployeeAreaWorkgroup> getAll(Pageable pageable) {
+        return employeeAreaWorkgroupRepository.findAll(pageable);
     }
 
     @Override
     public List<EmployeeAreaWorkgroup> getAll() {
-        return employeeAreaWorkgroupRepository.findAll();
+        return null;
     }
 
     @Override
@@ -129,7 +127,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
     @Override
     public void deleteById(Long eawg_id) {
-        // TODO Auto-generated method stub
          employeeAreaWorkgroupRepository.deleteEawgById(eawg_id);
     }
 

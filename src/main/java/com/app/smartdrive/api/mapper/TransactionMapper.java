@@ -3,10 +3,12 @@ package com.app.smartdrive.api.mapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class TransactionMapper {
     private static final ModelMapper modelMapper;
 

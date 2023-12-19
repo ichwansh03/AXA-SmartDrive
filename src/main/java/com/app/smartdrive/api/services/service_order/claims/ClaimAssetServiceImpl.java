@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.claims;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.request.ClaimAssetRequest;
 import com.app.smartdrive.api.dto.service_order.request.ClaimAssetRequestDto;
 import com.app.smartdrive.api.dto.service_order.request.ClaimAssetRequestSparePart;
@@ -10,6 +11,7 @@ import com.app.smartdrive.api.entities.service_order.ClaimAssetSparepart;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.repositories.service_orders.CaevRepository;
 import com.app.smartdrive.api.repositories.service_orders.CaspRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +41,7 @@ public class ClaimAssetServiceImpl implements ClaimAssetService {
 
     private final PartnerService partnerService;
 
-    private final ServOrderService servOrderService;
+    private final SoOrderRepository soOrderRepository;
     private final Path caevImageRoot = Paths.get("src/main/resources/images/caev");
 
     public void init(){
@@ -65,7 +67,8 @@ public class ClaimAssetServiceImpl implements ClaimAssetService {
         StringBuilder fileName = new StringBuilder("CAEV-" + claimAssetRequestDto.getServiceOrderId());
 
         Partner partner = partnerService.getById(claimAssetRequestDto.getPartnerId());
-        ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(claimAssetRequestDto.getServiceOrderId());
+        ServiceOrders serviceOrders = soOrderRepository.findById(claimAssetRequestDto.getServiceOrderId())
+                .orElseThrow(()-> new EntityNotFoundException("Service Order not found"));
         List<ClaimAssetRequest> claimAssetRequestList = claimAssetRequestDto.getClaimAssets();
 
         List<ClaimAssetEvidence> claimAssetEvidenceList = new ArrayList<>();
@@ -79,14 +82,15 @@ public class ClaimAssetServiceImpl implements ClaimAssetService {
             claimAssetEvidenceList.add(claimAssetEvidence);
         }
 
+
         return caevRepository.saveAll(claimAssetEvidenceList);
     }
 
     @Override
     public List<ClaimAssetSparepart> create(ClaimAssetRequestSparePartDto claimAssetRequestDto) throws IOException {
         Partner partner = partnerService.getById(claimAssetRequestDto.getPartnerId());
-        ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(claimAssetRequestDto.getServiceOrderId());
-
+        ServiceOrders serviceOrders = soOrderRepository.findById(claimAssetRequestDto.getServiceOrderId())
+                .orElseThrow(()-> new EntityNotFoundException("Service Order not found"));
         List<ClaimAssetSparepart> caspList = new ArrayList<>();
 
         for(ClaimAssetRequestSparePart caspRequest : claimAssetRequestDto.getClaimAssets()){

@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
+import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 
@@ -29,11 +34,9 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/master/eawo")
+@RequestMapping("/eawg")
 public class EmployeeAreaWorkgroupController {
         private final EmployeeAreaWorkgroupService employeeAreaWorkgroupService;
-    
-
     
 
     @DeleteMapping("/{id}")
@@ -54,16 +57,25 @@ public class EmployeeAreaWorkgroupController {
         return employeeAreaWorkgroupService.searchEawg(value, page, size);
     }
 
-    @GetMapping("/all")
-    @PreAuthorize("hasAuthority('Admin')")
-    public List<EmployeesAreaWorkgroupResponseDto> getAllEmployees() {
-      return employeeAreaWorkgroupService.getAllDto();
+    @GetMapping
+    public ResponseEntity<Page<EmployeesAreaWorkgroupResponseDto>> getAll(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<EmployeeAreaWorkgroup> eawgPage = employeeAreaWorkgroupService.getAll(pageable);
+
+        List<EmployeesAreaWorkgroupResponseDto> listResponse = eawgPage.getContent().stream()
+                .map(eawg -> TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class))
+                .toList();
+
+        return ResponseEntity.ok(new PageImpl<>(listResponse, pageable, eawgPage.getTotalElements()));
     }
+
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<EmployeesAreaWorkgroupResponseDto> addPartnerAreaWorkGroup(@Valid @RequestBody EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto){
-
+    public ResponseEntity<EmployeesAreaWorkgroupResponseDto> addEawg(@Valid @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto){
         EmployeeAreaWorkgroup eawg = employeeAreaWorkgroupService.createEawg(employeeAreaWorkgroupDto);
         return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class));
     }
@@ -71,7 +83,7 @@ public class EmployeeAreaWorkgroupController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<EmployeesAreaWorkgroupResponseDto> updateEawg(
-        @RequestBody EmployeeAreaWorkgroupDto employeeAreaWorkgroupDto, @PathVariable("id") Long id){
+        @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto, @PathVariable("id") Long id){
         EmployeeAreaWorkgroup employeeAreaWorkgroup = employeeAreaWorkgroupService.updateEawg(id, employeeAreaWorkgroupDto);
         return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class));
         

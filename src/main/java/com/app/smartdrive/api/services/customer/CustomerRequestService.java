@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CustomerRequestService {
@@ -24,8 +25,6 @@ public interface CustomerRequestService {
 
     public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
-    public CustomerResponseDTO convert(CustomerRequest customerRequest);
-
     public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status);
 
     public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable pageable, String type, String status);
@@ -35,6 +34,8 @@ public interface CustomerRequestService {
     public void delete(Long creqEntityId);
 
     public CustomerRequest createCustomerRequest(BusinessEntity newEntity, User customer, Long entityId);
+
+    public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive);
 
     public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO);
 

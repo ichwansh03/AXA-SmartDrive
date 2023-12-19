@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.HR.implementation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         List<TemplateSalary> templateSalaries = templateSalaryRepository.findAll();
         List<EmployeeSalaryDetail> salaryDetails = new ArrayList<>();
 
-        Double totalPremi = 1000000.0;
+        // Double totalPremi = 1000000.0;
 
         // List<ServiceOrders> listServiceOrders = soOrderRepository.findByServices_Users_UserEntityId(entityId);
         
@@ -57,7 +58,7 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         Long services = pl.getServices().getServId();
         Optional<ServicePremi> semiID = semiRepository.findById(services);
         
-        Double servicePremi = semiID.get().getSemiPremiDebet();
+        BigDecimal servicePremi = semiID.get().getSemiPremiDebet();
 
         Employees employees = employeesRepository.findById(entityId).get();
 
@@ -68,16 +69,14 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
             salaryDetail.setEmsaName(templateSalary.getTesalName());
 
             
-            Double rateMin = templateSalary.getTesalRateMin();
-            // Double rateMax = templateSalary.getTesalRateMax();
-            // Double nominal = templateSalary.getTesalNominal();
+            BigDecimal rateMin = templateSalary.getTesalRateMin();
 
             
-            Double calculatedSubtotal ;
+            BigDecimal calculatedSubtotal ;
             if(Objects.isNull(rateMin)){
                 calculatedSubtotal = servicePremi;
             }else{
-             calculatedSubtotal = servicePremi*(rateMin);
+             calculatedSubtotal = servicePremi.multiply(rateMin);
             }
 
 

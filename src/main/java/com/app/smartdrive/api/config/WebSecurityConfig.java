@@ -2,6 +2,7 @@ package com.app.smartdrive.api.config;
 
 import com.app.smartdrive.api.services.users.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,10 +21,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 @EnableMethodSecurity
-public class SecurityConfig {
+@EnableWebSecurity
+public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthEntryPointJwt authEntryPointJwt;
     private final AccessDeniedHandler accessDeniedHandler;
@@ -40,7 +41,8 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authEntryPointJwt)
                         .accessDeniedHandler(accessDeniedHandler))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
     }
@@ -53,6 +55,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
+    @Autowired
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userService.userDetailsService());

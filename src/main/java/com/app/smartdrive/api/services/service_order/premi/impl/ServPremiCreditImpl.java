@@ -4,8 +4,6 @@ import com.app.smartdrive.api.Exceptions.CheckPaymentException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
-import com.app.smartdrive.api.entities.customer.EnumCustomer;
-import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCreditId;
@@ -23,6 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +36,10 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     private final SoRepository soRepository;
     private final EmailService emailService;
 
-    private static final long PEROIOD_IN_MILLIS = 24 * 60 * 60 * 1000;
+    private static final long PERIOD_IN_MILLIS = 24 * 60 * 60 * 1000;
 
+
+    @Transactional(readOnly = true)
     @Override
     public List<ServicePremiCredit> findByServId(Long servId) {
         return secrRepository.findByServices_ServId(servId);
@@ -67,11 +68,18 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         return servicePremiCredits;
     }
 
+    @Transactional
     @Override
     public boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId) {
-        ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId)).get();
-        ServicePremi premi = semiRepository.findById(secrServId).get();
-        Double premiMonthly = secrRepository.totalPremiMonthly();
+        ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId))
+                .orElseThrow(() -> new EntityNotFoundException("updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId)::ID is not found"));
+        ServicePremi premi = semiRepository.findById(secrServId)
+                .orElseThrow(() -> new EntityNotFoundException("findById(secrServId)::secrServId is not found"));
+
+        List<ServicePremiCredit> allCredits = secrRepository.findAll();
+        BigDecimal countPremiMonthly = allCredits.stream()
+                .map(ServicePremiCredit::getSecrPremiDebet)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         ServicePremiCredit newSecr = ServicePremiCredit.builder()
                 .secrId(existSecr.getSecrId())
@@ -87,7 +95,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
             throw new CheckPaymentException("your payment has passed deadline");
         }
 
-        if (premi.getSemiPremiDebet() <= premiMonthly){
+        if (premi.getSemiPremiDebet().compareTo(countPremiMonthly) >= 0){
             semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.PAID.toString(), existSecr.getSecrServId());
             throw new CheckPaymentException("your payment has been paid");
         }
@@ -103,18 +111,20 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
                 && LocalDateTime.now().isAfter(servicePremiCredit.getSecrDuedate());
     }
 
-//    @Async
-//    @Scheduled(fixedRate = PEROIOD_IN_MILLIS)
-//    public void sendNotify(){
-//        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
-//        Services services = soRepository.findById(existSecr.getSecrServId())
-//                .orElseThrow(() -> new EntityNotFoundException("Service not found"));
-//        if (existSecr.getSecrDuedate().minusDays(2).isBefore(LocalDateTime.now())){
-//            EmailReq emailReq = new EmailReq();
-//            emailReq.setTo(services.getUsers().getUserEmail());
-//            emailReq.setSubject("Due Date Premi Payment");
-//            emailReq.setBody("Pay your bill immediately before it closes");
-//            emailService.sendMail(emailReq);
-//        }
-//    }
+    @Async
+    @Scheduled(fixedRate = PERIOD_IN_MILLIS)
+    public void sendNotify(){
+        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+        if (existSecr != null){
+            Services services = soRepository.findById(existSecr.getSecrServId())
+                    .orElseThrow(() -> new EntityNotFoundException("Service not found"));
+            if (existSecr.getSecrDuedate().minusDays(2).isBefore(LocalDateTime.now())){
+                EmailReq emailReq = new EmailReq();
+                emailReq.setTo(services.getUsers().getUserEmail());
+                emailReq.setSubject("Due Date Premi Payment");
+                emailReq.setBody("Pay your bill immediately before it closes");
+                emailService.sendMail(emailReq);
+            }
+        }
+    }
 }

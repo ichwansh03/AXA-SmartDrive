@@ -2,7 +2,6 @@ package com.app.smartdrive.api.controllers.service_order.premi;
 
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
-import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,13 +14,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ServicePremiController {
 
-    private final ServPremiService servPremiService;
     private final ServPremiCreditService servPremiCreditService;
 
-    // @GetMapping("/credit")
-    // public ResponseEntity<?> getServicePremiCredit(){
-    //     return new ResponseEntity<>(servPremiCreditService.findByDueDate(), HttpStatus.OK);
-    // }
+
 
     @PutMapping("/credit/update/{secrServId}/{secrId}")
     public ResponseEntity<?> updatePremiByDuedate(@Valid @RequestBody SecrReqDto secrReqDto,

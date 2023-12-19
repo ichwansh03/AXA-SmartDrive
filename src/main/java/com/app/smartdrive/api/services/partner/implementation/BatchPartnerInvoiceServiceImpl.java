@@ -40,7 +40,7 @@ public class BatchPartnerInvoiceServiceImpl implements BatchPartnerInvoiceServic
 
     @Override
     public void deleteById(String s) {
-        BatchPartnerInvoiceService.super.deleteById(s);
+        bpinRepository.deleteById(s);
     }
 
     @Override

@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -33,10 +34,10 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
     public CustomerClaim createNewClaim(CustomerRequest customerRequest) {
 
         CustomerClaim newCustomerClaim = CustomerClaim.builder()
-                .cuclEventPrice(0.0)
-                .cuclSubtotal(0.0)
+                .cuclEventPrice(new BigDecimal(0))
+                .cuclSubtotal(new BigDecimal(0))
                 .cuclEvents(0)
-                .cuclCreqEntityid(customerRequest.getCreqEntityId())
+                .cuclCreqEntityId(customerRequest.getCreqEntityId())
                 .customerRequest(customerRequest)
                 .build();
 
@@ -53,13 +54,8 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         );
 
 
-        ClaimResponseDTO claimResponseDTO = ClaimResponseDTO.builder()
-                .cuclCreqEntityId(existCustomerClaim.getCuclCreqEntityid())
-                .cuclCreateDate(existCustomerClaim.getCuclCreateDate())
-                .cuclReason(existCustomerClaim.getCuclReason())
-                .cuclEventPrice(existCustomerClaim.getCuclEventPrice())
-                .cuclSubtotal(existCustomerClaim.getCuclSubtotal())
-                .build();
+        ClaimResponseDTO claimResponseDTO = TransactionMapper.mapEntityToDto(existCustomerClaim, ClaimResponseDTO.class);
+
 
         log.info("CustomerClaimImpl::getCustomerClaimById, find customer claim with id: {}", cuclCreqEntityId);
         return claimResponseDTO;
@@ -90,18 +86,13 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
 
         CustomerClaim existCustomerClaim = existCustomerRequest.getCustomerClaim();
 
-        LocalDateTime cuclCreateDate = existCustomerClaim.getCuclCreateDate();
+        existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
 
-        if(Objects.isNull(cuclCreateDate)){
-            existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
-        }
+        BigDecimal cuclEventPrice = existCustomerClaim.getCuclEventPrice();
+        cuclEventPrice = cuclEventPrice.add(claimRequestDTO.getCuclEventPrice());
 
-
-        Double cuclEventPrice = existCustomerClaim.getCuclEventPrice();
-        cuclEventPrice += claimRequestDTO.getCuclEventPrice();
-
-        Double cuclSubtotal = existCustomerClaim.getCuclSubtotal();
-        cuclSubtotal += claimRequestDTO.getCuclSubtotal();
+        BigDecimal cuclSubtotal = existCustomerClaim.getCuclSubtotal();
+        cuclSubtotal = cuclSubtotal.add(claimRequestDTO.getCuclSubtotal());
 
         int cuclEvents = existCustomerClaim.getCuclEvents();
         cuclEvents += 1;
@@ -123,6 +114,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         );
 
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
+        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
         CustomerClaim customerClaim = existCustomerRequest.getCustomerClaim();
         customerClaim.setCuclReason(closeRequestDTO.getCuclReason());

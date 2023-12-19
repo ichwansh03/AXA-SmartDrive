@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.entities.hr;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import java.util.List;
@@ -61,7 +62,7 @@ public class Employees {
     private EnumClassHR.emp_graduate empGraduate;
 
     @Column(name="emp_net_salary")
-    private Double empNetSalary;
+    private BigDecimal empNetSalary;
 
     @Column(name="emp_account_number", length = 35)
     private String empAccountNumber;

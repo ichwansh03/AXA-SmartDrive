@@ -18,7 +18,7 @@ public class EmployeeSalaryDetailController {
     
     private final EmployeeSalaryDetailService employeeSalaryDetailService;
 
-    @PostMapping("/generate/{entityId}")
+    @PostMapping("/{entityId}")
     public ResponseEntity<List<EmployeeSalaryDetail>> generateSalaryDetails(@PathVariable("entityId") Long entityId) {
         List<EmployeeSalaryDetail> salaryDetails = employeeSalaryDetailService.generateSalaryDetails(entityId);
         return new ResponseEntity<>(salaryDetails, HttpStatus.OK);

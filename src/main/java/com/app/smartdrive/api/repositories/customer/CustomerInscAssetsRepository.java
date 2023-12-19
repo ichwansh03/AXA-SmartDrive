@@ -5,7 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 
+import java.util.Optional;
+
 @Repository
 public interface CustomerInscAssetsRepository extends JpaRepository<CustomerInscAssets, Long>{
-    
+    Optional<CustomerInscAssets> findByCiasPoliceNumber(String ciasPoliceNumber);
 }

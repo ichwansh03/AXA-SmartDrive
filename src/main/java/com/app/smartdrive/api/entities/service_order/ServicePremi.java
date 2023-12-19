@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -29,10 +30,10 @@ public class ServicePremi {
     private Long semiServId;
 
     @Column(name = "semi_premi_debet")
-    private Double semiPremiDebet;
+    private BigDecimal semiPremiDebet;
 
     @Column(name = "semi_premi_credit")
-    private Double semiPremiCredit;
+    private BigDecimal semiPremiCredit;
 
     @Column(name = "semi_paid_type")
     private String semiPaidType;
@@ -44,8 +45,8 @@ public class ServicePremi {
     private LocalDateTime semiModifiedDate;
 
     @JsonIgnore
-    @OneToOne
-    @JoinColumn(name = "semi_serv_id", insertable = false, updatable = false)
+    @ManyToOne
+    @JoinColumn(name = "semi_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services services;
 
 }

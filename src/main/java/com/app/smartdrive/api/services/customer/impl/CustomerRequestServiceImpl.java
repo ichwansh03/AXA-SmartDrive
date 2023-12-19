@@ -1,50 +1,47 @@
 package com.app.smartdrive.api.services.customer.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
-import com.app.smartdrive.api.dto.master.response.ArwgRes;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.*;
-import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.*;
+import com.app.smartdrive.api.entities.users.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
-import com.app.smartdrive.api.repositories.customer.CustomerClaimRepository;
-import com.app.smartdrive.api.repositories.customer.CustomerInscDocRepository;
-import com.app.smartdrive.api.repositories.customer.CustomerInscExtendRepository;
-import com.app.smartdrive.api.repositories.master.*;
+import com.app.smartdrive.api.repositories.users.RolesRepository;
+import com.app.smartdrive.api.repositories.users.UserRepository;
+import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
 import com.app.smartdrive.api.services.master.*;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
+import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
-import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import com.app.smartdrive.api.entities.users.BusinessEntity;
-import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
-import com.app.smartdrive.api.repositories.users.BusinessEntityRepository;
-import com.app.smartdrive.api.repositories.users.UserRepository;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +75,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final ArwgService arwgService;
 
     private final EmployeesService employeesService;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final UserRolesService userRolesService;
+
+    private final UserRoleRepository userRoleRepository;
+
+    private final UserRepository userRepository;
 
 
     @Transactional(readOnly = true)
@@ -121,10 +126,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
 
+        if(this.customerInscAssetsService.isCiasAlreadyExist(ciasDTO.getCiasPoliceNumber())){
+            throw new Exception("CustomerRequest with police number " + ciasDTO.getCiasPoliceNumber() + " is already exist");
+        }
+
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
 
-        User entityUser = this.userService.getUserById(customerRequestDTO.getCustomerId()).orElseThrow(
+        User customer = this.userService.getUserById(customerRequestDTO.getCustomerId()).orElseThrow(
                 () -> new EntityNotFoundException("User with id " + customerRequestDTO.getCustomerId() + " is not found")
         );
 
@@ -140,7 +149,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 );
 
 
-        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, entityUser, entityId);
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, customer, entityId);
         newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
@@ -152,11 +161,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, cias.getCiasCurrentPrice());
 
 
-        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
+        BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
                 ciasDTO.getCurrentPrice(),
+                customer.getUserBirthDate().getYear(),
                 ciasCuexs
         );
 
@@ -182,14 +192,15 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
         Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
+
+        if(this.customerInscAssetsService.isCiasAlreadyExist(ciasDTO.getCiasPoliceNumber())){
+            throw new Exception("CustomerRequest with police number " + ciasDTO.getCiasPoliceNumber() + " is already exist");
+        }
 
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
-        userPost.getProfile().setUserBirthDate(birthDate);
-        User newCustomer = this.userService.createUserCustomer(userPost);
 
 
         CarSeries existCarSeries = this.carsService.getById(ciasDTO.getCiasCarsId());
@@ -204,7 +215,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 );
 
 
-        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, newCustomer, entityId);
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, null, entityId);
         newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
@@ -216,11 +227,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasDTO.getCurrentPrice());
 
 
-        Double premiPrice = this.customerInscAssetsService.getPremiPrice(
+        BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
                 ciasDTO.getCurrentPrice(),
+                birthDate.getYear(),
                 ciasCuexs
         );
 
@@ -229,201 +241,17 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
 
+
+        User newCustomer = this.createNewUserByAgen(userPost, birthDate, customerRequestDTO.getAccessGrantUser());
+
         // set and save
         newCustomerRequest.setCustomerClaim(newClaim);
         newCustomerRequest.setCustomerInscAssets(cias);
+        newCustomerRequest.setCustomer(newCustomer);
 
         CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
         return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
-    }
-
-
-    @Override
-    public CustomerResponseDTO convert(CustomerRequest customerRequest){
-        CustomerInscAssets cias = customerRequest.getCustomerInscAssets();
-        List<CustomerInscExtend> cuexList = cias.getCustomerInscExtend();
-        List<CustomerInscDoc> cadocList = cias.getCustomerInscDoc();
-        User customer = customerRequest.getCustomer();
-        InsuranceType insuranceType = cias.getInsuranceType();
-        CarSeries carSeries = cias.getCarSeries();
-        EmployeeAreaWorkgroup eawag = customerRequest.getEmployeeAreaWorkgroup();
-
-
-//        Employees employee = eawag.getEmployees();
-
-        BussinessEntityResponseDTO bussinessEntityResponseDTO = BussinessEntityResponseDTO.builder()
-                .entityId(customerRequest.getBusinessEntity().getEntityId())
-                .entityModifiedDate(customerRequest.getBusinessEntity().getEntityModifiedDate())
-                .build();
-
-
-        List<CuexResponseDTO> cuexResponseDTOList = cuexList.stream().map(cuex -> new CuexResponseDTO(
-                cuex.getCuexId(),
-                cuex.getCuexCreqEntityid(),
-                cuex.getCuexName(),
-                cuex.getCuexTotalItem(),
-                cuex.getCuexNominal()
-        )).toList();
-
-        List<CadocResponseDTO> cadocResponseDTOList = cadocList.stream().map(cadoc -> new CadocResponseDTO(
-                cadoc.getCadocId(),
-                cadoc.getCadocCreqEntityid(),
-                cadoc.getCadocFilename(),
-                cadoc.getCadocFiletype(),
-                cadoc.getCadocFilesize(),
-                cadoc.getCadocCategory(),
-                cadoc.getCadocModifiedDate()
-        )).toList();
-
-        CitiesResponseDTO citiesResponseDTO = CitiesResponseDTO.builder()
-                .cityId(cias.getCity().getCityId())
-                .cityName(cias.getCity().getCityName())
-                .provName(cias.getCity().getProvinsi().getProvName())
-                .build();
-
-        IntyResponseDTO intyResponseDTO = IntyResponseDTO.builder()
-                .intyName(insuranceType.getIntyName())
-                .intyDesc(insuranceType.getIntyDesc())
-                .build();
-
-        CarSeriesResponseDTO carSeriesResponseDTO = CarSeriesResponseDTO.builder()
-                .carsId(carSeries.getCarsId())
-                .carsPassenger(carSeries.getCarsPassenger())
-                .carsName(carSeries.getCarsName())
-                .build();
-
-//        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
-//                .ciasCreqEntityid(cias.getCiasCreqEntityid())
-//                .ciasEnddate(cias.getCiasEnddate())
-//                .ciasStartdate(cias.getCiasStartdate())
-//                .ciasYear(cias.getCiasYear())
-//                .ciasCurrentPrice(cias.getCiasCurrentPrice())
-//                .ciasInsurancePrice(cias.getCiasInsurancePrice())
-//                .ciasTotalPremi(cias.getCiasTotalPremi())
-//                .ciasIsNewChar(cias.getCiasIsNewChar())
-//                .ciasPaidType(cias.getCiasPaidType())
-//                .ciasPoliceNumber(cias.getCiasPoliceNumber())
-//                .customerInscDoc(cadocResponseDTOList)
-//                .customerInscExtend(cuexResponseDTOList)
-//                .city(citiesResponseDTO)
-//                .carSeriesResponseDTO(carSeriesResponseDTO)
-//                .intyResponseDTO(intyResponseDTO)
-//                .build();
-
-
-        List<UserPhoneResponseDTO> userPhoneResponseDTOList = customer.getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
-                phone.getUserPhoneId().getUsphEntityId(),
-                phone.getUserPhoneId().getUsphPhoneNumber(),
-                phone.getUsphMime(),
-                phone.getUsphPhoneType(),
-                phone.getUsphStatus(),
-                phone.getUsphModifiedDate()
-        )).toList();
-
-        // Address and Phone User
-        List<UserAddressResponseDTO> addressUserResponseDTOList = customer.getUserAddress().stream().map(address -> new UserAddressResponseDTO(
-                address.getUsdrId(),
-                address.getUsdrEntityId(),
-                address.getUsdrAddress1(),
-                address.getUsdrAddress2(),
-                address.getUsdrCityId(),
-                address.getUsdrModifiedDate()
-        )).toList();
-
-        CustomerUserResponseDTO customerUserResponseDTO = CustomerUserResponseDTO.builder()
-                .userEntityId(customer.getUserEntityId())
-                .userName(customer.getUsername())
-                .userFullName(customer.getUserFullName())
-                .userBirthPlace(customer.getUserBirthPlace())
-                .userNationalId(customer.getUserNationalId())
-                .userNPWP(customer.getUserNPWP())
-                .userBirthDate(customer.getUserBirthDate())
-                .userModifiedDate(customer.getUserModifiedDate())
-                .userEmail(customer.getUserEmail())
-                .userPhoto(customer.getUserPhoto())
-                .userAddresses(addressUserResponseDTOList)
-                .userPhone(userPhoneResponseDTOList)
-                .build();
-
-//        //  Address and Phone Agen
-//        List<UserPhoneResponseDTO> agenPhoneResponseDTOList = employee.getUser().getUserPhone().stream().map(phone -> new UserPhoneResponseDTO(
-//                phone.getUserPhoneId().getUsphEntityId(),
-//                phone.getUserPhoneId().getUsphPhoneNumber(),
-//                phone.getUsphMime(),
-//                phone.getUsphPhoneType(),
-//                phone.getUsphStatus(),
-//                phone.getUsphModifiedDate()
-//        )).toList();
-//
-//        List<UserAddressResponseDTO> addressAgenResponseDTOList = employee.getUser().getUserAddress().stream().map(address -> new UserAddressResponseDTO(
-//                address.getUsdrId(),
-//                address.getUsdrEntityId(),
-//                address.getUsdrAddress1(),
-//                address.getUsdrAddress2(),
-//                address.getUsdrCityId(),
-//                address.getUsdrModifiedDate()
-//        )).toList();
-//
-//        CustomerUserResponseDTO agenUserResponseDTO = CustomerUserResponseDTO.builder()
-//                .userEntityId(employee.getUser().getUserEntityId())
-//                .userName(employee.getUser().getUserName())
-//                .userFullName(employee.getUser().getUserFullName())
-//                .userBirthPlace(employee.getUser().getUserBirthPlace())
-//                .userNationalId(employee.getUser().getUserNationalId())
-//                .userNPWP(employee.getUser().getUserNPWP())
-//                .userBirthDate(employee.getUser().getUserBirthDate())
-//                .userModifiedDate(employee.getUser().getUserModifiedDate())
-//                .userEmail(employee.getUser().getUserEmail())
-//                .userPhoto(employee.getUser().getUserPhoto())
-//                .userAddresses(addressAgenResponseDTOList)
-//                .userPhone(agenPhoneResponseDTOList)
-//                .build();
-//
-//        // EAWAG
-
-        ArwgRes arwgRes = ArwgRes.builder()
-                .arwgCode(eawag.getAreaWorkGroup().getArwgCode())
-                .arwgDesc(eawag.getAreaWorkGroup().getArwgDesc())
-                .build();
-
-        EmployeesAreaWorkgroupResponseDto eawg = EmployeesAreaWorkgroupResponseDto.builder()
-                .areaWorkGroup(arwgRes)
-                .build();
-
-
-
-        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
-                .creqEntityId(customerRequest.getCreqEntityId())
-                .creqModifiedDate(customerRequest.getCreqModifiedDate())
-                .creqCreateDate(customerRequest.getCreqCreateDate())
-                .creqStatus(customerRequest.getCreqStatus())
-                .creqType(customerRequest.getCreqType())
-                .employeeAreaWorkgroup(eawg)
-                .build();
-
-//                .bussinessEntity(bussinessEntityResponseDTO)
-//                .customer(customerUserResponseDTO)
-//                .customerInscAssets(ciasResponseDTO)
-
-            CustomerClaim customerClaim = customerRequest.getCustomerClaim();
-
-            ClaimResponseDTO claimResponseDTO = ClaimResponseDTO.builder()
-                    .cuclCreqEntityId(customerClaim.getCuclCreqEntityid())
-                    .cuclCreateDate(customerClaim.getCuclCreateDate())
-                    .cuclEvents(customerClaim.getCuclEvents())
-                    .cuclEventPrice(customerClaim.getCuclEventPrice())
-                    .cuclReason(customerClaim.getCuclReason())
-                    .cuclSubtotal(customerClaim.getCuclSubtotal())
-                    .build();
-
-//            customerResponseDTO.setClaimResponseDTO(claimResponseDTO);
-
-
-//                .employee(agenUserResponseDTO)
-//                .employeeAreaWorkgroup(employeeAreaWorkgroupDto)
-//        return new CustomerResponseDTO();
-        return customerResponseDTO;
     }
 
 
@@ -482,6 +310,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
 
+    @Transactional(readOnly = true)
     @Override
     public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable paging, String type, String status) {
         AreaWorkGroup existAreaWorkgroup = this.arwgService.getById(arwgCode);
@@ -522,23 +351,26 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                         () -> new EntityNotFoundException("Customer Request with id " + updateCustomerRequestDTO.getCreqEntityId() + " is not found")
                 );
 
+
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
         CustomerInscAssets cias = existCustomerRequest.getCustomerInscAssets();
 
         CiasDTO ciasUpdateDTO = updateCustomerRequestDTO.getCiasDTO();
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
-//        existCustomerRequest.setEmployeeAreaWorkgroup(null);
 
-//        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
-//                .orElseThrow(
-//                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
-//                );
+        User customer = this.userService.getUserById(updateCustomerRequestDTO.getCustomerId()).orElseThrow(
+                () -> new EntityNotFoundException("User with id " + updateCustomerRequestDTO.getCustomerId() + " is not found")
+        );
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findByEawgId(updateCustomerRequestDTO.getAgenId()).get();
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
+                );
+
 
         existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
-//        existCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+        existCustomerRequest.setCustomer(customer);
 
 
         CarSeries carSeries = this.carsService.getById(ciasUpdateDTO.getCiasCarsId());
@@ -562,8 +394,19 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         List<CustomerInscDoc> newCiasDocs = this.customerInscDocService.fileCheck(files, entityId);
         cias.setCustomerInscDoc(newCiasDocs);
 
-        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
+        BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
+                existInty.getIntyName(),
+                carSeries.getCarModel().getCarBrand().getCabrName(),
+                existCity.getProvinsi().getZones().getZonesId(),
+                ciasUpdateDTO.getCurrentPrice(),
+                existCustomerRequest.getCustomer().getUserBirthDate().getYear(),
+                updatedCustomerInscExtend
+        );
+
+        cias.setCiasTotalPremi(premiPrice);
+
+        existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
@@ -592,9 +435,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             Long entityId
     ){
 
+        User updatedCustomer = this.userRolesService.updateRoleFromPcToCu(customer);
+
+
         CustomerRequest customerRequest = CustomerRequest.builder()
                 .businessEntity(newEntity)
-                .customer(customer)
+                .customer(updatedCustomer)
                 .creqCreateDate(LocalDateTime.now())
                 .creqStatus(EnumCustomer.CreqStatus.OPEN)
                 .creqType(EnumCustomer.CreqType.FEASIBLITY)
@@ -604,6 +450,18 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         log.info("CustomerRequestServiceImpl:createCustomerRequest, create new customerRequest");
         return customerRequest;
     }
+
+    @Override
+    public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive){
+        ProfileRequestDto profileRequestDto = userPost.getProfile();
+
+        profileRequestDto.setUserName(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
+        profileRequestDto.setUserPassword(this.passwordEncoder.encode(userPost.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber()));
+        userPost.getProfile().setUserBirthDate(birthDate);
+        User newCustomer = this.userService.createUserCustomerByAgen(userPost, isActive);
+        return newCustomer;
+    }
+
 
     @Transactional
     @Override

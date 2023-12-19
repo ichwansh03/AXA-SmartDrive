@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.HR.implementation;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
         BatchEmployeeSalaryId batchEmployeeSalaryId = new BatchEmployeeSalaryId();
         batchEmployeeSalaryId.setBesaEmpEntityid(id);
         batchEmployeeSalaryId.setBesaCreatedDate(LocalDateTime.now());
-        Double salary = calculateTotalCommission(employees.getEmployeeSalaryDetails())+employees.getEmpNetSalary();
+        BigDecimal salary = calculateTotalCommission(employees.getEmployeeSalaryDetails()).add(employees.getEmpNetSalary());
         BatchEmployeeSalary batchEmployeeSalary = BatchEmployeeSalary.builder()
         .batchEmployeeSalaryId(batchEmployeeSalaryId)
         .employees(employees)
@@ -50,11 +51,11 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
     }
 
 
-    public Double calculateTotalCommission(List<EmployeeSalaryDetail> salaryDetails) {
-        return salaryDetails.stream()
+    public BigDecimal calculateTotalCommission(List<EmployeeSalaryDetail> salaryDetails) {
+        return BigDecimal.valueOf(salaryDetails.stream()
                 .filter(detail -> detail.getEmsaName().startsWith("komisi"))
-                .mapToDouble(EmployeeSalaryDetail::getEmsaSubtotal)
-                .sum();
+                .mapToDouble(detail -> detail.getEmsaSubtotal().doubleValue())
+                .sum());
     }
 
 

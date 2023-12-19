@@ -6,6 +6,7 @@ import com.app.smartdrive.api.dto.partner.request.PartnerContactRequest;
 import com.app.smartdrive.api.entities.partner.PartnerContact;
 import com.app.smartdrive.api.entities.partner.PartnerContactEntityId;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.partner.PartnerContactService;
 import com.app.smartdrive.api.services.partner.implementation.PartnerContactServiceImpl;
 import jakarta.validation.Valid;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class PartnerContactController {
 
     private final PartnerContactService partnerContactService;
-    private final UserController userController;
+    private final UserRepository userRepository;
 
 
     @PostMapping
@@ -36,7 +37,7 @@ public class PartnerContactController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> deletePartnerContact(@PathVariable("userId") Long userId){
-        userController.deleteUser(userId);
+        userRepository.deleteById(userId);
         return ResponseEntity.status(204).build();
     }
 }

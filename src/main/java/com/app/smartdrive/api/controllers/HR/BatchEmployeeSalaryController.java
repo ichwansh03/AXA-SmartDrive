@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/bes")
+@RequestMapping("/besa")
 public class BatchEmployeeSalaryController {
 
     private final BatchEmployeeSalaryService batchEmployeeSalaryService;

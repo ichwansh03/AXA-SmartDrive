@@ -7,4 +7,8 @@ import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 
 public interface UserRolesService {
   List<UserRoles> createUserRole(RoleName roleName, User user);
+
+  public List<UserRoles> createUserRoleByAgen(RoleName roleName, User user, Boolean isActive);
+
+  public User updateRoleFromPcToCu(User customer);
 }

@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
+import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
@@ -32,5 +33,19 @@ public class ServOrderTaskController {
         int updated = servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
 
         return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @PutMapping("/update/claim/{seotId}")
+    public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SeotPartnerDto soTasksDto, @PathVariable("seotId") Long seotId) {
+
+        SeotPartnerDto seotPartnerDto = new SeotPartnerDto();
+        seotPartnerDto.setPartnerId(soTasksDto.getPartnerId());
+        seotPartnerDto.setRepair(soTasksDto.getRepair());
+        seotPartnerDto.setSparepart(soTasksDto.getSparepart());
+        servOrderTaskService.updateSeotPartner(seotPartnerDto, seotId);
+
+        servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
+
+        return new ResponseEntity<>(seotPartnerDto, HttpStatus.OK);
     }
 }

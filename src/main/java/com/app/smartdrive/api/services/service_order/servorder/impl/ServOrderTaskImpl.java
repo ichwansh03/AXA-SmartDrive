@@ -1,11 +1,16 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.EmailReq;
+import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
+import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -16,15 +21,16 @@ import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
-import com.app.smartdrive.api.services.partner.BatchPartnerInvoiceService;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,8 +47,9 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     private final TewoRepository tewoRepository;
     private final PartnerRepository partnerRepository;
 
+    private final ServOrderWorkorderService servOrderWorkorderService;
     private final EmailService emailService;
-    // private final BatchPartnerInvoiceService bpinService;
+
 
     @Transactional
     @Override
@@ -63,10 +70,8 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
         List<ServiceOrderTasks> serviceOrderTasks = soTasksRepository.saveAll(mapperTaskList);
 
-        ServOrderWorkorderImpl servOrderWorkorder = new ServOrderWorkorderImpl(soWorkorderRepository, tewoRepository);
-        servOrderWorkorder.addSowoList(serviceOrderTasks);
+        servOrderWorkorderService.addSowoList(serviceOrderTasks);
 
-        log.info("ServOrderTaskImpl::addFeasiblityList successfully saved {} ",serviceOrderTasks);
         return serviceOrderTasks;
     }
 
@@ -93,7 +98,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                 case "NOTIFY TO CUSTOMER" -> notifyTask(emailReq, serviceOrders,
                         "POLIS has been created",
                         "Your request POLIS has been created, check your dashboard page");
-                default -> log.info("ServOrderTaskImpl::addPolisList all notify in POLIS has been created");
 
             }
         }
@@ -120,16 +124,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                     serviceOrders, null));
 
             switch (templateServiceTasks.get(i).getTestaName()){
-                //pilih partner berdasarkan area workgroup
-                //wo1-pilih partner
-                //wo2-call method add partner(so, partner)
-                //wo3-notify to repair or ganti suku cadang or keduanya
-                case "CLAIM DOCUMENT APPROVED" -> {
-                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED){
-                        List<Partner> allPartner = findAllPartner(serviceOrders.getSeroId());
-                        soOrderRepository.selectPartner(allPartner.get(0), serviceOrders.getSeroId());
-                    }
-                }
                 case "NOTIFY PARTNER TO REPAIR" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
@@ -137,8 +131,11 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                                 "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
                     }
                 }
+<<<<<<< HEAD
                 //task calculate sparepart call createOne(String seroId) => BPIN Service
                 // case "CALCULATE SPARE PART" -> bpinService.createOne(serviceOrders.getSeroId());
+=======
+>>>>>>> 8fdddeccc505d2a6efc1fdbfefb3f82b09d5dec9
                 case "NOTIFY AGENT CLAIM" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
                         notifyTask(emailReq, serviceOrders,
@@ -146,7 +143,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
                                 "New claim request from "+serviceOrders.getServices().getUsers().getUserFullName());
                     }
                 }
-                default -> log.info("ServOrderTaskImpl::addClaimList all notify in CLAIM has been created");
             }
         }
 
@@ -158,17 +154,55 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderTasks> findSeotBySeroId(String seroId) {
-        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
-        log.info("SoOrderServiceImpl::findSeotById in ID start from {} ", seotBySeroId.get(0));
-        return seotBySeroId;
+        List<ServiceOrderTasks> orderTasks = soTasksRepository.findByServiceOrders_SeroId(seroId);
+
+        if (orderTasks.isEmpty()) {
+            throw new EntityNotFoundException("ID "+seroId+" is not found");
+        }
+
+        log.info("SoOrderServiceImpl::findSeotBySeroId in ID {} ",seroId);
+
+        return orderTasks;
     }
 
     @Transactional
     @Override
     public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
         int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, seotId);
+
+        if (updateSeot == 0) {
+            throw new ValidasiRequestException("Failed to update data",400);
+        }
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
         return updateSeot;
+    }
+
+    @Transactional
+    @Override
+    public SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId) {
+        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("::updateSeotPartner() ID "+seotId+" is not found"));
+        SeotPartnerDto seotPartner = SeotPartnerDto.builder()
+                .partnerId(seotPartnerDto.getPartnerId())
+                .repair(seotPartnerDto.getRepair())
+                .sparepart(seotPartnerDto.getSparepart())
+                .seotStatus(seotPartnerDto.getSeotStatus()).build();
+
+        if (seotPartnerDto.getRepair()) {
+            createWorkorderTask("REPAIR", seotId);
+            log.info("SoOrderServiceImpl::updateSeotPartner add REPAIR to workorder");
+        }
+
+        if (seotPartnerDto.getSparepart()) {
+            createWorkorderTask("GANTI SUKU CADANG", seotId);
+            log.info("SoOrderServiceImpl::updateSeotPartner add GANTI SUKU CADANG to workorder");
+        }
+
+        Partner partner = partnerRepository.findById(seotPartner.getPartnerId())
+                .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID "+seotPartner.getPartnerId()+" is not found"));
+        soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
+
+        return seotPartner;
     }
 
     private void notifyTask(EmailReq emailReq, ServiceOrders serviceOrders, String subject, String message){
@@ -179,10 +213,23 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         emailService.sendMail(emailReq);
     }
 
-    @Override
-    public List<Partner> findAllPartner(String seroId) {
-        ServiceOrders orders = soOrderRepository.findById(seroId).get();
-        String eawgArwgCode = orders.getEmployees().getEawgArwgCode();
-        return partnerRepository.findPartnerByArwgCode(eawgArwgCode);
+    @Transactional
+    private void createWorkorderTask(String sowoName, Long seotId){
+        TemplateTaskWorkOrder workOrder = new TemplateTaskWorkOrder();
+        workOrder.setTewoTestaId(seotId);
+        workOrder.setTewoName(sowoName);
+        tewoRepository.save(workOrder);
+
+        ServiceOrderTasks tasks = soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("::createWorkorderTask ID is not found"));
+
+        ServiceOrderWorkorder soWorkorder = new ServiceOrderWorkorder();
+        soWorkorder.setSowoName(workOrder.getTewoName());
+        soWorkorder.setServiceOrderTasks(tasks);
+        soWorkorder.setSowoStatus(false);
+        soWorkorder.setSowoModDate(LocalDateTime.now());
+
+        soWorkorderRepository.save(soWorkorder);
     }
+
 }

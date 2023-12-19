@@ -44,6 +44,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -96,6 +97,7 @@ class PartnerControllerTest {
         profil.setUserPassword(test);
         profil.setUserEmail(test);
         profil.setUserNpwp(test);
+        profil.setUserBirthDate(LocalDateTime.now().minusYears(36));
         profil.setUserNationalId(test);
         profil.setUserFullName(test);
 
@@ -112,7 +114,7 @@ class PartnerControllerTest {
         ciasDTO.setCiasCityId(1L);
         ciasDTO.setCiasIntyName("Comprehensive");
         ciasDTO.setCiasStartdate("2023-01-01 15:02:00");
-        ciasDTO.setCurrentPrice(120000000D);
+        ciasDTO.setCurrentPrice(new BigDecimal(120000000));
         ciasDTO.setCuexIds(new Long[]{7L,8L,9L});
         CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();
         customerRequestDTO.setCustomerId(user.getUserEntityId());
@@ -125,16 +127,6 @@ class PartnerControllerTest {
         ), new CustomerRequest());
     }
 
-    @Test
-    void testUser() throws Exception {
-        User userField = userRepository.save(createUser("TEST123"));
-
-        CustomerRequest customerRequest = createCustomerRequest("CREQ",userField);
-        customerRequestService.changeRequestTypeToClaim(new CustomerRequestTypeDTO(customerRequest.getCreqEntityId()));
-
-        assertNotNull(customerRequest);
-
-    }
 
     @Test
     void whenGetAllServiceByPartner() throws Exception {

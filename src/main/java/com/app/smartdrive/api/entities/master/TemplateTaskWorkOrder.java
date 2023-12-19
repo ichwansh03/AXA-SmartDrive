@@ -20,8 +20,11 @@ public class TemplateTaskWorkOrder {
     @Column(name = "tewo_name")
     private String tewoName;
 
-    @Column(name = "tewo_testa_id", insertable = false, nullable = false)
+    @Column(name = "tewo_testa_id")
     private Long tewoTestaId;
+
+    @Column(name = "tewo_value")
+    private String tewoValue;
 
     @JsonIgnore
     @ManyToOne

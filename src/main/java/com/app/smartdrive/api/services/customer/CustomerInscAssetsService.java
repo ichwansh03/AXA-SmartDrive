@@ -11,6 +11,7 @@ import com.app.smartdrive.api.entities.master.InsuranceType;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CustomerInscAssetsService {
@@ -31,11 +32,14 @@ public interface CustomerInscAssetsService {
             InsuranceType existInty
     );
 
-    public Double getPremiPrice(
+    public BigDecimal getPremiPrice(
             String insuraceType,
             String carBrand,
             Long zonesId,
-            Double currentPrice,
+            BigDecimal currentPrice,
+            int age,
             List<CustomerInscExtend> cuexs
     );
+
+    public boolean isCiasAlreadyExist(String ciasPoliceNumber);
 }

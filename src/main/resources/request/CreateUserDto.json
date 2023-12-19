@@ -1,0 +1,39 @@
+{
+  "profile"       :   {
+    "userName"      :   "test",
+    "userPassword"  :   "asd123",
+    "userFullName"  :   "izhasmayranda",
+    "userEmail"     :   "test@gmail.com",
+    "userBirthPlace":   "ketapang",
+    "userBirthDate" :   "2023-01-01T00:00:00",
+    "userNationalId":   "sdss",
+    "userNpwp"      :   "223123"
+  },
+  "cityId"        :   1,
+  "bankId"        :   1,
+  "fintechId"     :   null,
+  "userPhone"     :   [
+    {
+      "userPhoneId": {
+        "usphPhoneNumber": "123345"
+      },
+      "usphPhoneType": "HP"
+    }
+  ],
+  "userAddress"   :   [
+    {
+      "usdrAddress1": "jalan danau limboto12",
+      "usdrAddress2": "jalan saunan12"
+    },
+    {
+      "usdrAddress1": "jalan mantap",
+      "usdrAddress2": "jalan bagus"
+    }
+  ],
+  "userAccounts"  :   [
+    {
+      "enumPaymentType": "BANK",
+      "usac_accountno": "1234522"
+    }
+  ]
+}

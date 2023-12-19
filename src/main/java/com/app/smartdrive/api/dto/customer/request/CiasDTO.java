@@ -2,12 +2,16 @@ package com.app.smartdrive.api.dto.customer.request;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CiasDTO {
 
     @Size(max = 15, message = "test dari dto")
@@ -28,7 +32,7 @@ public class CiasDTO {
 
     private String ciasIntyName;
 
-    private Double currentPrice;
+    private BigDecimal currentPrice;
 
     private Long[] cuexIds;
 }

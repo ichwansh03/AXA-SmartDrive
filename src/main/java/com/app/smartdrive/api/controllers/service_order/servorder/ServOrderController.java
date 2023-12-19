@@ -1,27 +1,23 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
-import com.app.smartdrive.api.dto.partner.PartnerDto;
+import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
-import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
-import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.entities.partner.Partner;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
-import com.app.smartdrive.api.services.service_order.servorder.ServService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/sero")
@@ -30,50 +26,50 @@ import java.util.List;
 public class ServOrderController {
 
     private final ServOrderService servOrderService;
-    private final ServService servService;
-    private final ServOrderTaskService servOrderTaskService;
-
-    @GetMapping
-    public ResponseEntity<?> getServiceOrderById(@RequestParam("seroid") String seroId) {
-
-        ServiceOrders seroById = servOrderService.findServiceOrdersById(seroId);
-
-        ServiceOrderRespDto serviceOrderRespDto = responseServiceOrders(seroById);
-
-        log.info("ServiceOrdersController::getServiceOrderById successfully viewed");
-        return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
-    }
 
     @GetMapping("/search")
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId) {
         ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(seroId);
-
-        ServiceOrderRespDto serviceOrderRespDto = responseServiceOrders(serviceOrders);
-
+        ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
         return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
     }
 
-    // @GetMapping("/partner")
-    // public ResponseEntity<?> getAllPartnerBySeroId(@RequestParam("seroId") String seroId){
 
-    //     List<Partner> allPartner = servOrderService.findAllPartner(seroId);
 
-    //     //List<PartnerDto> partnerDtos = TransactionMapper.mapEntityListToDtoList(allPartner, PartnerDto.class);
-
-    //     return new ResponseEntity<>(allPartner, HttpStatus.OK);
-    // }
-
-    private ServiceOrderRespDto responseServiceOrders(ServiceOrders serviceOrders) {
-        Services servicesById = servService.findServicesById(serviceOrders.getServices().getServId());
-        ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(servicesById, ServiceRespDto.class);
-
-        List<ServiceOrderTasks> serviceOrderTasks = servOrderTaskService.findSeotBySeroId(serviceOrders.getSeroId());
-        List<SoTasksDto> soTasksDtos = TransactionMapper.mapListDtoToListEntity(serviceOrderTasks, SoTasksDto.class);
-
-        ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
-        serviceOrderRespDto.setServices(serviceRespDto);
-        serviceOrderRespDto.setSoTasksDtoList(soTasksDtos);
-
-        return serviceOrderRespDto;
+    @PutMapping("/partner/{seroId}")
+    public ResponseEntity<?> updateToAddPartner(@Valid @RequestBody Partner partner, @PathVariable("seroId") String seroId){
+        servOrderService.selectPartner(partner, seroId);
+        return new ResponseEntity<>(partner, HttpStatus.OK);
     }
+
+
+    @PutMapping("/close/{seroId}")
+    public ResponseEntity<?> updateToCloseOrder(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId){
+        int requested = servOrderService.requestClosePolis(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
+        return new ResponseEntity<>(requested, HttpStatus.OK);
+    }
+
+    @GetMapping("/request")
+    public ResponseEntity<?> getPageServiceOrders(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "3") int size,
+            @RequestParam(value = "type", defaultValue = "ALL") String type,
+            @RequestParam(value = "status", defaultValue = "OPEN") String status,
+            @RequestParam(value = "sortBy", defaultValue = "seroId") String sortBy,
+            @RequestParam(value = "sort", defaultValue = "ascending") String sort
+
+    ){
+        Pageable paging;
+
+        if(Objects.equals(sort, "descending")){
+            paging = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }else {
+            paging = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        }
+
+        Page<ServiceOrderRespDto> orderRespDtoPage = servOrderService.pageServiceOrderByUserId(paging, type, status);
+
+        return new ResponseEntity<>(orderRespDtoPage, HttpStatus.OK);
+    }
+
 }

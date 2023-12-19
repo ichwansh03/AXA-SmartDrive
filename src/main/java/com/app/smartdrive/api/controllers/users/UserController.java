@@ -7,6 +7,7 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.users.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
   private final UserService userService;
 
@@ -36,7 +38,7 @@ public class UserController {
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
-  public ResponseEntity<?> updateUser(@Valid @ModelAttribute UpdateUserRequestDto userPost,
+  public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequestDto userPost,
       @PathVariable("id") Long id) {
     UpdateUserRequestDto userUpdated = userService.updateUser(userPost, id);
     return ResponseEntity.status(HttpStatus.OK).body(userUpdated);

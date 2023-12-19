@@ -5,6 +5,7 @@ import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.entities.users.UserPhone;
 import com.app.smartdrive.api.entities.users.UserRoles;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
+  private Long userEntityId;
   private String userPhoto;
   private String userFullName;
   private List<UserRoleDto> userRoles;

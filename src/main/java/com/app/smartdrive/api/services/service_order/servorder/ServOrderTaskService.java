@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder;
 
+import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
@@ -19,5 +20,6 @@ public interface ServOrderTaskService {
 
     int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId);
 
-    List<Partner> findAllPartner(String seroId);
+    SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId);
+
 }

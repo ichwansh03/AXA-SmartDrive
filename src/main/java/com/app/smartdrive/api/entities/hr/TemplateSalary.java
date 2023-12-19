@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.entities.hr;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +30,7 @@ public class TemplateSalary {
     private Double tesalNominal;
 
     @Column(name="tesal_rate_min")
-    private Double tesalRateMin;
+    private BigDecimal tesalRateMin;
 
     @Column(name="tesal_rate_max")
     private Double tesalRateMax;
