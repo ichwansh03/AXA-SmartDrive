@@ -1,12 +1,17 @@
 package com.app.smartdrive.api.controllers.HR;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import com.app.smartdrive.api.dto.HR.response.EmployeeSalaryDetailResponseDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
+import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.app.smartdrive.api.entities.hr.BatchEmployeeSalary;
 import com.app.smartdrive.api.services.HR.BatchEmployeeSalaryService;
 import lombok.RequiredArgsConstructor;
@@ -28,4 +33,19 @@ public class BatchEmployeeSalaryController {
     public ResponseEntity<List<BatchEmployeeSalary>> getAllTransNull(){
         return ResponseEntity.ok(batchEmployeeSalaryService.getAllTransNull());
     }
+
+    @GetMapping("/commission")
+    public ResponseEntity<List<EmployeeSalaryDetailResponseDto>> getAllCommission(
+            @RequestParam Long besaEmpEntityId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate besaCreateDate
+    ) {
+        List<EmployeeSalaryDetail> commissionDetails =
+                batchEmployeeSalaryService.getAllCommission(besaEmpEntityId, besaCreateDate);
+
+        List<EmployeeSalaryDetailResponseDto> commissionResponseDtoList =
+                TransactionMapper.mapEntityListToDtoList(commissionDetails, EmployeeSalaryDetailResponseDto.class);
+
+        return ResponseEntity.status(HttpStatus.OK).body(commissionResponseDtoList);
+    }
+
 }

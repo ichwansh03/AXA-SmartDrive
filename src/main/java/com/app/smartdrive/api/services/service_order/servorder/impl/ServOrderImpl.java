@@ -10,8 +10,8 @@ import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServic
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.*;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
+import com.app.smartdrive.api.services.service_order.servorder.GenerateServiceTasks;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class ServOrderImpl implements ServOrderService {
     private final SoTasksRepository soTasksRepository;
     private final SoWorkorderRepository soWorkorderRepository;
 
-    private final ServOrderTaskService servOrderTaskService;
+    private final GenerateServiceTasks generateServiceTasks;
     private final ServOrderWorkorderService servOrderWorkorderService;
 
     SoAdapter soAdapter = new SoAdapter();
@@ -50,7 +50,7 @@ public class ServOrderImpl implements ServOrderService {
         switch (services.getServType().toString()){
             case "FEASIBLITY" -> {
                 orders = generateSeroFeasiblity(services);
-                servOrderTaskService.addFeasiblityList(orders);
+                generateServiceTasks.addFeasiblityList(orders);
                 log.info("ServOrderImpl::addServiceOrders create FEASIBLITY tasks");
             }
             case "POLIS" -> {
@@ -59,7 +59,7 @@ public class ServOrderImpl implements ServOrderService {
                 //close previous service order
                 closeExistingSero(fs);
                 orders = handlePolisAndClaim(services, null, null, "FS%");
-                servOrderTaskService.addPolisList(orders);
+                generateServiceTasks.addPolisList(orders);
                 log.info("ServOrderImpl::addServiceOrders create POLIS tasks");
             }
             case "CLAIM" -> {
@@ -72,7 +72,7 @@ public class ServOrderImpl implements ServOrderService {
                 }
                 //first time to request claim
                 orders = handlePolisAndClaim(services, LocalDateTime.now(), LocalDateTime.now().plusDays(10), "PL%");
-                servOrderTaskService.addClaimList(orders);
+                generateServiceTasks.addClaimList(orders);
                 log.info("ServOrderImpl::addServiceOrders create CLAIM tasks");
             }
             default -> requestClosePolis(services);
@@ -123,8 +123,8 @@ public class ServOrderImpl implements ServOrderService {
         EnumModuleServiceOrders.SeroStatus status = EnumModuleServiceOrders.SeroStatus.valueOf(seroStatus);
         Page<ServiceOrders> serviceOrdersPage;
 
-        if (Objects.equals(seroStatus, "ALL")) {
-            serviceOrdersPage = soOrderRepository.findBySeroStatus(pageable, status);
+        if (Objects.equals(seroOrdtType, "ALL")) {
+            serviceOrdersPage = soOrderRepository.findAll(pageable);
         } else {
             EnumModuleServiceOrders.SeroOrdtType type = EnumModuleServiceOrders.SeroOrdtType.valueOf(seroOrdtType);
             serviceOrdersPage = soOrderRepository.findBySeroOrdtTypeAndSeroStatus(pageable, type, status);
