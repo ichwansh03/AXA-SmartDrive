@@ -66,7 +66,7 @@ public class Services {
     private User users;
 
     @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "serv_creq_entityid")
     private CustomerRequest customer;
 
@@ -74,8 +74,6 @@ public class Services {
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrdersSet;
 
-    //@PrimaryKeyJoinColumn
-    //@JsonIgnore
     @OneToOne(mappedBy = "services", cascade = CascadeType.ALL)
     private ServicePremi servicePremi;
 
