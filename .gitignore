@@ -34,3 +34,5 @@ build/
 .vscode/
 
 image
+src/main/java/com/app/smartdrive/api/config/OldJwtFilter.java
+src/main/java/com/app/smartdrive/api/services/jwt/JwtServiceImpl.java

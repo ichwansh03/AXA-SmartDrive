@@ -5,6 +5,7 @@ import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import com.app.smartdrive.api.dto.user.ProfileDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
+import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.entities.auth.RefreshToken;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -20,10 +21,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -35,6 +34,7 @@ public class AuthenticationController {
   private final RefreshTokenService refreshTokenService;
   private final UserService userService;
   private final JwtService jwtService;
+
   @Value("${jwt.refresh.cookie}")
   private String jwtRefreshCookie;
 
@@ -85,7 +85,17 @@ public class AuthenticationController {
             .body(new MessageResponse("You've been sign out!"));
   }
 
+  @PostMapping("/{id}/changePassword")
+  @PreAuthorize("principal.getUserEntityId() == #id && isAuthenticated()")
+  public ResponseEntity<?> changePassword(@RequestBody PasswordRequestDto passwordRequestDto
+          , @PathVariable("id") Long id){
+    String message = authenticationService.changePassword(id, passwordRequestDto);
+    MessageResponse messageResponse = new MessageResponse(message);
+    return ResponseEntity.status(HttpStatus.CREATED.value()).body(messageResponse);
+  }
+
   @PostMapping("/refreshtoken")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<?> refreshToken(HttpServletRequest request){
     Optional<String> refreshToken = jwtService.getJwtFromCookies(request, jwtRefreshCookie);
     if(refreshToken.isPresent()){

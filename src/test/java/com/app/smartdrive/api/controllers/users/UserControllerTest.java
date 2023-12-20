@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.controllers.auth.AuthenticationController;
 import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
@@ -9,6 +10,7 @@ import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
+import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetService;
 import com.app.smartdrive.api.services.users.UserService;
@@ -53,6 +55,8 @@ class UserControllerTest {
   ObjectMapper objectMapper;
   @Autowired
   private MockMvc mockMvc;
+  @MockBean
+  JwtService jwtService;
   @MockBean
   private UserService userService;
   @MockBean
@@ -101,6 +105,18 @@ class UserControllerTest {
     public void shouldReturnUnauthorize() throws Exception{
         requestBuilder.getUserByIdMock(1L)
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser("users")
+    public void shouldReturnNotFound() throws Exception{
+        Long id = 1L;
+      when(userService.getById(2L)).thenThrow(new EntityNotFoundException("tidak nemu"));
+      mockMvc.perform(get("/user/{id}", id)
+                      .with(user("users").
+                              authorities(List.of(new SimpleGrantedAuthority("Admin")))))
+              .andExpect(status().isNotFound())
+              .andDo(print());
     }
   }
 

@@ -94,13 +94,17 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         return formattedDate;
     }
 
+    public String dateFormatter(LocalDate b) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = b.format(formatter);
+        return formattedDate;
+    }
+
     private String generateTrxNo(LocalDateTime timeNow) {
         return "trx" + dateTimeFormatter(timeNow) + "000" + getIdFromSequence();
     }
 
-    private String generateTrxNoRe(LocalDateTime timeNow) {
-        return "trx" + dateTimeFormatter(timeNow) + "000" + getIdFromNo();
-    }
+   
 
     private synchronized int getIdFromSequence() {
         int b = repository.countTrxno();
@@ -108,10 +112,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         return trxSequence;
     }
 
-    private int getIdFromNo(){
-        int c = getIdFromSequence();
-        return c-=1;
-    }
+   
     private String uuidInvoice(){
         UUID uuid = UUID.randomUUID();
         Long uuidd = uuid.getMostSignificantBits();
@@ -200,19 +201,13 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                     checkSaldoHandle(saldoSender, saldoNominal, typeTransaksi);
                     Double totalSaldoSender = saldoSender - saldoNominal;
                     userAccounts.setUsac_debet(totalSaldoSender);
-                    for (UserAccounts user : listAcc) {
-                        if (request.getPatr_usac_accountNo_to().equals(user.getUsac_accountno())) {
-                            Double saldoRecipient = user.getUsac_debet();
-                            if (saldoRecipient == null) {
-                                user.setUsac_debet(request.getNominall());
-                            } else {
-                                Double totalSaldoRecipient = request.getNominall() + saldoRecipient;
-                                user.setUsac_debet(totalSaldoRecipient);
-                            }
+                            listAcc.stream()
+                    .filter(user -> request.getPatr_usac_accountNo_to().equals(user.getUsac_accountno()))
+                    .forEach(user -> user.setUsac_debet(
+                        Optional.ofNullable(user.getUsac_debet()).orElse(0.0) + saldoNominal));
+                userAccountsRepository.saveAll(listAcc);
+
                         }
-                    }
-                    userAccountsRepository.save(userAccounts);
-                }
             }
         }
         
@@ -230,6 +225,16 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         dtoGenerate = handlePaymentTypeGenerateTransactions(request);
 
         return dtoGenerate;
+    }
+
+
+    private void handleUpdateDebetTransactionsUserAccount(List<UserAccounts> listAcc, 
+    GenerateTransactionsRequests request, Double nominal ){
+        listAcc.stream()
+            .filter(user -> request.getToRekening().equals(user.getUsac_accountno()))
+            .forEach(user -> user.setUsac_debet(
+                Optional.ofNullable(user.getUsac_debet()).orElse(0.0) + nominal));
+        userAccountsRepository.saveAll(listAcc);
     }
 
     private GenerateTransferResponse handlePaymentTypeGenerateTransactions( GenerateTransactionsRequests request) {
@@ -254,6 +259,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                         BatchPartnerInvoice partnerr = new BatchPartnerInvoice();
 
                         checkSaldoHandle(saldoSenderPartner, nominalWithTax, request.getTipePayment());
+
                         transactions.setPatrTrxno(generateTrxNo(timeNow()));
                         transactions2.setPatrTrxno(transactions.getPatrTrxno());
                         partnerr.setNo(partner.getNo());
@@ -266,30 +272,20 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                         transactions.setPatr_debet(nominalWithTax);
                         transactions2.setPatr_invoice_no(partner.getNo());
                         transactions2.setPatr_credit(nominalWithTax);
+
                         automateIdAndCreateEntities(nominalWithTax, request.getNoRekening(),
-                request.getToRekening(), request.getNotes(), request.getTipePayment(), partner.getNo());
+                        request.getToRekening(), request.getNotes(), request.getTipePayment(), partner.getNo());
 
-                        for (UserAccounts acc : listAcc) {
-                            if (partner.getAccountNo().equals(acc.getUsac_accountno())) {
-                                if (acc.getUsac_debet() == null || acc.getUsac_debet() == 0.0) {
-                                    acc.setUsac_debet(nominalWithTax);
-                                } else {
-                                    Double total = acc.getUsac_debet() + nominalWithTax;
-                                    acc.setUsac_debet(total);
-                                }
-                                userAccountsRepository.save(acc);
-                            }
-                        }
+                        handleUpdateDebetTransactionsUserAccount(listAcc, request, nominalWithTax);
+                        
                         partnerInvoiceRepository.saveAndFlush(partnerr);
-                        dtoGenerate.setAccountNo(partner.getAccountNo());
-                        dtoGenerate.setInvoiceNo(partner.getNo());
-                        dtoGenerate.setPaidDate(partner.getPaidDate());
-                        dtoGenerate.setNominal(nominalWithTax);
-                        dtoGenerate.setStatus(partner.getStatus());
-                        dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
+                            dtoGenerate.setAccountNo(partner.getAccountNo());
+                            dtoGenerate.setInvoiceNo(partner.getNo());
+                            dtoGenerate.setPaidDate(partner.getPaidDate());
+                            dtoGenerate.setNominal(nominalWithTax);
+                            dtoGenerate.setStatus(partner.getStatus());
+                            dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
 
-                    } else {
-                        throw new EntityNotFoundException("Nomor rekening tujuan yang anda masukan salah");
                     }
                 }
                 break;
@@ -309,23 +305,16 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                 request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceNo);
                 premiCredit.setPaymentTransactions(transactions2);
                 userAcc.setUsac_debet(totalSaldoSenderPremi);
-                for (UserAccounts user : listAcc) {
-                    if (request.getToRekening().equals(user.getUsac_accountno())) {
-                        if (user.getUsac_debet() == null || user.getUsac_debet() == 0) {
-                            user.setUsac_debet(nominalPremi);
-                        } else {
-                            Double total = user.getUsac_debet() + nominalPremi;
-                            user.setUsac_debet(total);
-                        }
-                        userAccountsRepository.save(user);
-                    }
+
+               handleUpdateDebetTransactionsUserAccount(listAcc, request, nominalPremi);
+               
                     dtoGenerate.setAccountNo(request.getNoRekening());
                     dtoGenerate.setInvoiceNo(invoiceNo);
                     dtoGenerate.setNominal(nominalPremi);
                     dtoGenerate.setStatus(EnumModuleServiceOrders.SemiStatus.PAID);
                     dtoGenerate.setPaidDate(LocalDateTime.now());
                     dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
-                }
+                
                 break;
             case SALARY:
           
@@ -334,11 +323,11 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                         Double nominalSalary = employee.getBesaTotalSalary().doubleValue();
                         Double saldoSender = userAcc.getUsac_debet();
                         Double totalSaldoSender = saldoSender - nominalSalary;
-                        LocalDateTime createdDateSalary = employee.getBatchEmployeeSalaryId()
-                                .getBesaCreatedDate();
-                        String invoiceSalary = "SAL-" + dateTimeFormatter(createdDateSalary);
+                        LocalDate createdDateSalary = employee.getBesaCreatedDate();
+                        String invoiceSalary = "SAL-" + dateFormatter(createdDateSalary);
 
                         checkSaldoHandle(saldoSender, nominalSalary, request.getTipePayment());
+                       
                         transactions.setPatrTrxno(generateTrxNo(timeNow()));
                         transactions2.setPatrTrxno(transactions.getPatrTrxno());
                         employee.setEmsTrasferDate(LocalDateTime.now());
@@ -346,21 +335,12 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                         employee.setBesaPaidDate(LocalDateTime.now());
                         employee.setBesaModifiedDate(LocalDateTime.now());
                         userAcc.setUsac_debet(totalSaldoSender);
+
                         automateIdAndCreateEntities(nominalSalary, request.getNoRekening(),
                 request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceSalary);
-                        
-                        for (UserAccounts acc : listAcc) {
-                            if (employee.getBesaAccountNumber().equals(acc.getUsac_accountno())) {
-                                Double saldoRecipient = acc.getUsac_debet();
-                                Double totalRecipient = saldoRecipient + nominalSalary;
-                                if (acc.getUsac_debet() == null || acc.getUsac_debet() == 0.0) {
-                                    acc.setUsac_debet(nominalSalary);
-                                } else {
-                                    acc.setUsac_debet(totalRecipient);
-                                    userAccountsRepository.save(acc);
-                                }
-                            }
-                        }
+
+                        handleUpdateDebetTransactionsUserAccount(listAcc, request, nominalSalary);
+
                         employeeSalaryRepository.saveAndFlush(employee);
                         dtoGenerate.setAccountNo(employee.getBesaAccountNumber());
                         dtoGenerate.setInvoiceNo("SAL-" + createdDateSalary);

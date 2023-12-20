@@ -43,26 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     final Optional<String> jwt = jwtService.getJwtFromCookies(request, jwtCookie);
     if(jwt.isEmpty()){
-      String path = request.getRequestURI();
-
-      if(path.startsWith("/api/auth/signin") || path.startsWith("/api/auth/signup")
-              || path.startsWith("/api/auth/createAdmin")){
-        filterChain.doFilter(request, response);
-        return;
-      }
-      Error errorResponse = Error.builder()
-              .errorCode("Unauthorized")
-              .message("Unauthorized")
-              .reqMethod(request.getMethod())
-              .url(request.getRequestURI())
-              .status(HttpStatus.UNAUTHORIZED.value())
-              .build();
-      PrintWriter out = response.getWriter();
-      response.setContentType("application/json");
-      response.setStatus(401);
-      response.setCharacterEncoding("UTF-8");
-      out.print(objectMapper.writeValueAsString(errorResponse));
-      out.flush();
+      filterChain.doFilter(request,response);
       return;
     }
 

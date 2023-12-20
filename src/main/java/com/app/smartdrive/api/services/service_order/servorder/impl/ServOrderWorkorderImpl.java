@@ -12,7 +12,11 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
+<<<<<<< HEAD
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
+=======
+import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
+>>>>>>> development
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import jakarta.persistence.criteria.*;
@@ -33,6 +37,7 @@ import java.util.Optional;
 @Slf4j
 public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
 
+    private final SoTasksRepository soTasksRepository;
     private final SoWorkorderRepository soWorkorderRepository;
     private final TewoRepository tewoRepository;
     private final PartnerRepository partnerRepository;
@@ -108,4 +113,25 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
 
         return soWorkorderRepository.findAll(specification);
     }
+
+    @Transactional
+    @Override
+    public void createWorkorderTask(String sowoName, Long seotId){
+        TemplateTaskWorkOrder workOrder = new TemplateTaskWorkOrder();
+        workOrder.setTewoTestaId(seotId);
+        workOrder.setTewoName(sowoName);
+        tewoRepository.save(workOrder);
+
+        ServiceOrderTasks tasks = soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("::createWorkorderTask ID is not found"));
+
+        ServiceOrderWorkorder soWorkorder = new ServiceOrderWorkorder();
+        soWorkorder.setSowoName(workOrder.getTewoName());
+        soWorkorder.setServiceOrderTasks(tasks);
+        soWorkorder.setSowoStatus(false);
+        soWorkorder.setSowoModDate(LocalDateTime.now());
+
+        soWorkorderRepository.save(soWorkorder);
+    }
+
 }

@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,6 +66,7 @@ public class BanksController {
         
     }
     @GetMapping("/banks/{bank_entityid}")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> getBanksById(@Valid @PathVariable("bank_entityid") Long bank_entityid){
        BanksDtoResponse resultDto = service.getById(bank_entityid);
        return new ResponseEntity<>(resultDto,HttpStatus.OK);

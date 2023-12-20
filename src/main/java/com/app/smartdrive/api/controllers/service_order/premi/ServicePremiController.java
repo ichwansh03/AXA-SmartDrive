@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -16,13 +17,14 @@ public class ServicePremiController {
 
     private final ServPremiCreditService servPremiCreditService;
 
-
-
     @PutMapping("/credit/update/{secrServId}/{secrId}")
+    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updatePremiByDuedate(@Valid @RequestBody SecrReqDto secrReqDto,
                                                   @PathVariable("secrId") Long secrId,
                                                   @PathVariable("secrServId") Long secrServId){
 
-        return new ResponseEntity<>(servPremiCreditService.updateSecr(secrReqDto, secrId, secrServId), HttpStatus.OK);
+        servPremiCreditService.updateSecr(secrReqDto, secrId, secrServId);
+
+        return new ResponseEntity<>(secrReqDto, HttpStatus.OK);
     }
 }
