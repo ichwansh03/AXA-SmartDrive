@@ -18,3 +18,7 @@ spring:
           uri: http://localhost:8081
           predicates:
             - Path=/partners/**,/partner-**
+        - id: service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/service/**,/sero/**,/seot/**,/sowo/**,/premi/**,/claim-asset/**
