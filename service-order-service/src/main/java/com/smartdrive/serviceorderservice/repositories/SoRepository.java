@@ -14,5 +14,4 @@ public interface SoRepository extends JpaRepository<Services, Long> {
     @Override
     Services save(Services services);
 
-    Services findByCustomer_CreqEntityId(Long creqId);
 }

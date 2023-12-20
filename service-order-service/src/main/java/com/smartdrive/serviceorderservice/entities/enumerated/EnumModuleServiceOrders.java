@@ -17,6 +17,7 @@ public class EnumModuleServiceOrders {
     }
 
     public enum SeroOrdtType {
+        ALL,
         CREATE,
         MODIFY,
         CLOSE

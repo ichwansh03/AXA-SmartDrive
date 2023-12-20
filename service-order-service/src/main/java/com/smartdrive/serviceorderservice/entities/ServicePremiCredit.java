@@ -18,9 +18,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(ServicePremiCreditId.class)
-@NamedQuery(
-        name = "ServicePremiCredit.updateWithPatrNo",
-        query = "UPDATE ServicePremiCredit secr SET secr.paymentTransactions = :paymentTransactions WHERE secr.secrId = :secrId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 @Entity
 @Table(name = "service_premi_credit", schema = "so")
 @DynamicInsert
@@ -57,5 +54,10 @@ public class ServicePremiCredit {
     @ManyToOne
     @JoinColumn(name = "secr_serv_id", insertable = false, updatable = false)
     private Services services;
+
+//    @JsonIgnore
+//    @ManyToOne
+//    @JoinColumn(name = "secr_patr_trxno")
+//    PaymentTransactions paymentTransactions;
 
 }

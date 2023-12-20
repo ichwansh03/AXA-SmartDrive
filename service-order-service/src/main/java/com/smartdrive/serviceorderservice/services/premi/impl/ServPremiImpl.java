@@ -1,11 +1,13 @@
 package com.smartdrive.serviceorderservice.services.premi.impl;
 
-import com.app.smartdrive.api.entities.service_order.ServicePremi;
-import com.app.smartdrive.api.entities.service_order.Services;
-import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoRepository;
-import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
-import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
+import com.smartdrive.serviceorderservice.Exceptions.ValidasiRequestException;
+import com.smartdrive.serviceorderservice.entities.ServicePremi;
+import com.smartdrive.serviceorderservice.entities.Services;
+import com.smartdrive.serviceorderservice.repositories.SemiRepository;
+import com.smartdrive.serviceorderservice.repositories.SoRepository;
+import com.smartdrive.serviceorderservice.services.premi.ServPremiCreditService;
+import com.smartdrive.serviceorderservice.services.premi.ServPremiService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,13 +27,15 @@ public class ServPremiImpl implements ServPremiService {
 
     @Override
     public ServicePremi findByServId(Long servId) {
-        return semiRepository.findById(servId).get();
+        return semiRepository.findById(servId)
+                .orElseThrow(() -> new EntityNotFoundException("findByServId(Long servId)::servId premi is not found"));
     }
 
     @Transactional
     @Override
     public ServicePremi addSemi(ServicePremi servicePremi, Long servId) {
-        Services services = soRepository.findById(servId).get();
+        Services services = soRepository.findById(servId)
+                .orElseThrow(() -> new EntityNotFoundException("addSemi(ServicePremi servicePremi, Long servId)::servId is not found"));
 
         ServicePremi premi = ServicePremi.builder()
                 .semiServId(services.getServId())
@@ -53,6 +57,11 @@ public class ServPremiImpl implements ServPremiService {
     @Override
     public int updateSemiStatus(String semiStatus, Long semiServId) {
         int updated = semiRepository.updateSemiStatus(semiStatus, semiServId);
+
+        if (updated == 0) {
+            throw new ValidasiRequestException("Failed to update data",400);
+        }
+
         log.info("ServPremiImpl::updateSemiStatus successfully updated {} ", updated);
         return updated;
     }

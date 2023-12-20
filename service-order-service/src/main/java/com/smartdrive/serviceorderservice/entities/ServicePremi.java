@@ -45,7 +45,7 @@ public class ServicePremi {
     private LocalDateTime semiModifiedDate;
 
     @JsonIgnore
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "semi_serv_id", referencedColumnName = "serv_id", insertable = false, updatable = false)
     Services services;
 
