@@ -14,7 +14,11 @@ spring:
           uri: http://localhost:8080
           predicates:
             - Path=/master/**
-        - id: partner
+        - id: users
           uri: http://localhost:8081
+          predicates:
+            - Path=/user/**
+        - id: partner
+          uri: http://localhost:8085
           predicates:
             - Path=/partners/**,/partner-**
