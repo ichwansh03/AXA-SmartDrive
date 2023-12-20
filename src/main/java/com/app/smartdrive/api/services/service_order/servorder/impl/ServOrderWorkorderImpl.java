@@ -4,6 +4,7 @@ import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.service_order.request.ServiceWorkorderReqDto;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
@@ -11,6 +12,7 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
+import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
@@ -38,7 +40,7 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     private final SoWorkorderRepository soWorkorderRepository;
     private final TewoRepository tewoRepository;
     private final PartnerRepository partnerRepository;
-    private final EmployeeAreaWorkgroupRepository eawgRepository;
+    private final ArwgRepository arwgRepository;
 
     @Transactional
     @Override
@@ -88,26 +90,31 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     public List<ServiceOrderWorkorder> findAllByPartnerAndArwgCode(Long partnerId, String arwgCode) {
         Partner partner = partnerRepository.findById(partnerId).orElseThrow(()->new EntityNotFoundException("Partner Not Found"));
         Specification<ServiceOrderWorkorder> specification = (root, query, criteriaBuilder) -> {
+
             List<Predicate> predicates = new ArrayList<>();
-            Join<ServiceOrderWorkorder, ServiceOrderTasks> serviceOrderTasksJoin = root.join("serviceOrderTasks", JoinType.INNER);
-            Join<ServiceOrderTasks, ServiceOrders> serviceOrdersJoin = root.join("serviceOrders", JoinType.INNER);
+            Fetch<ServiceOrderWorkorder, ServiceOrderTasks> serviceOrderTasksFetch = root.fetch("serviceOrderTasks", JoinType.INNER);
+            Join<ServiceOrderWorkorder, ServiceOrderTasks> serviceOrderTasksJoin = (Join<ServiceOrderWorkorder, ServiceOrderTasks>) serviceOrderTasksFetch;
+            Fetch<ServiceOrderTasks, ServiceOrders> serviceOrdersFetch = serviceOrderTasksFetch.fetch("serviceOrders", JoinType.INNER);
+            Join<ServiceOrderTasks, ServiceOrders> serviceOrdersJoin = (Join<ServiceOrderTasks, ServiceOrders>) serviceOrdersFetch;
 
             predicates.add(
                     criteriaBuilder.and(
-                            criteriaBuilder.equal(serviceOrderTasksJoin.get("seotId"), 17L),
+                            criteriaBuilder.equal(serviceOrderTasksJoin.get("seotName"), "NOTIFY PARTNER TO REPAIR"),
                             criteriaBuilder.equal(serviceOrdersJoin.get("partner"), partner)
                     )
             );
 
-            if (Objects.nonNull(arwgCode)){
-               Optional<EmployeeAreaWorkgroup> employeeAreaWorkgroup = eawgRepository.findByEawgArwgCode(arwgCode);
-                employeeAreaWorkgroup.ifPresent(areaWorkgroup -> predicates.add(
-                        criteriaBuilder.equal(serviceOrdersJoin.get("employees"), areaWorkgroup)
-                ));
+            if (Objects.nonNull(arwgCode)) {
+
+                AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode(arwgCode);
+                if (areaWorkGroup != null) {
+                    predicates.add(
+                            criteriaBuilder.equal(serviceOrderTasksJoin.get("areaWorkGroup"), areaWorkGroup)
+                    );
+                }
             }
             return query.where(predicates.toArray(Predicate[]::new)).getRestriction();
         };
-
         return soWorkorderRepository.findAll(specification);
     }
 
@@ -130,5 +137,4 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
 
         soWorkorderRepository.save(soWorkorder);
     }
-
 }

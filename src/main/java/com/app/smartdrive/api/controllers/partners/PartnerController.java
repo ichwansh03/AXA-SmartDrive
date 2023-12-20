@@ -75,8 +75,8 @@ public class PartnerController {
         return ResponseEntity.ok(TransactionMapper.mapEntityToDto(partnerService.getById(id), PartnerDto.class));
     }
     @GetMapping("/workorder")
-    public ResponseEntity<?> getAllServiceWorkOrder(@RequestParam Long entityid, @RequestParam String arwgcode){
+    public ResponseEntity<?> getAllServiceWorkOrder(@RequestParam Long entityid, @RequestParam(required = false) String arwgcode){
         List<ServiceOrderWorkorder> serviceOrderWorkorderList = servOrderWorkorderService.findAllByPartnerAndArwgCode(entityid,arwgcode);
-        return ResponseEntity.status(200).body(null);
+        return ResponseEntity.status(200).body(serviceOrderWorkorderList);
     }
 }
