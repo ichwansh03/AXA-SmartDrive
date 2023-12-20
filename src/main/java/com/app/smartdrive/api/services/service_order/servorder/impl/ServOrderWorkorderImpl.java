@@ -12,11 +12,8 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
-<<<<<<< HEAD
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
-=======
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
->>>>>>> development
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import jakarta.persistence.criteria.*;
