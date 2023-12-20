@@ -29,7 +29,7 @@ public class ServPremiImpl implements ServPremiService {
     @Override
     public ServicePremi findByServId(Long servId) {
         return semiRepository.findById(servId)
-                .orElseThrow(() -> new EntityNotFoundException("findByServId(Long servId)::servId is not found"));
+                .orElseThrow(() -> new EntityNotFoundException("findByServId(Long servId)::servId premi is not found"));
     }
 
     @Transactional

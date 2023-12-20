@@ -24,7 +24,7 @@ public class ServController {
     private final ServService servService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getServiceById(@RequestParam("servid") Long servId) {
 
         ServiceRespDto servicesById = servService.findServicesById(servId);
@@ -34,7 +34,7 @@ public class ServController {
     }
 
     @GetMapping("/addserv")
-    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> generateService(@RequestParam("creqId") Long creqId) throws Exception {
         Services services = servService.addService(creqId);
 

@@ -18,4 +18,6 @@ public interface ServOrderTaskService {
     SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId);
 
     void notifyTask(EmailReq emailReq, ServiceOrders serviceOrders, String subject, String message);
+
+    boolean checkAllTaskComplete(String seroId);
 }

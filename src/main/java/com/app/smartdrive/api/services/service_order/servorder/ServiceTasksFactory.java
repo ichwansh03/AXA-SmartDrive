@@ -5,7 +5,7 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 
 import java.util.List;
 
-public interface GenerateServiceTasks {
+public interface ServiceTasksFactory {
 
     List<ServiceOrderTasks> addFeasiblityList(ServiceOrders serviceOrders);
 
