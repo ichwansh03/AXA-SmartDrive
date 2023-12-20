@@ -11,7 +11,7 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TestaRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
-import com.app.smartdrive.api.services.service_order.servorder.GenerateServiceTasks;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GenerateServiceTasksImpl implements GenerateServiceTasks {
+public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
 
     private final SoTasksRepository soTasksRepository;
     private final TestaRepository testaRepository;

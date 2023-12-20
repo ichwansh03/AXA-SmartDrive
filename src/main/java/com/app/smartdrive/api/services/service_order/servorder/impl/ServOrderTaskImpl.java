@@ -6,11 +6,13 @@ import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
@@ -28,6 +30,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
     private final SoOrderRepository soOrderRepository;
     private final SoTasksRepository soTasksRepository;
+    private final SoWorkorderRepository soWorkorderRepository;
     private final PartnerRepository partnerRepository;
 
     private final EmailService emailService;
@@ -96,4 +99,22 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
         emailService.sendMail(emailReq);
     }
 
+    @Override
+    public boolean checkAllTaskComplete(String seroId) {
+
+        List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
+
+        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
+        boolean allWorkComplete = servOrderWorkorderService.checkAllWorkComplete(sowoBySeotId);
+
+        boolean checkedAll = false;
+        for (ServiceOrderTasks item : seotBySeroId) {
+            if (item.getSeotStatus().toString().equals("COMPLETED") && allWorkComplete){
+                checkedAll = true;
+            }
+        }
+
+        log.info("ServOrderTaskImpl::checkAllTaskComplete the results is {}",checkedAll);
+        return checkedAll;
+    }
 }
