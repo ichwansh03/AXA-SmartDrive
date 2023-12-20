@@ -14,4 +14,5 @@ import java.time.LocalDate;
 public class EmployeeSalaryDetailResponseDto {
     private String emsaName;
     private BigDecimal emsaSubtotal;
+    private EmployeesResponseDto employees;
 }

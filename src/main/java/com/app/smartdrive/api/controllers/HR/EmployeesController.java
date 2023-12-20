@@ -47,7 +47,7 @@ public class EmployeesController {
             @PathVariable("id") Long id,
             @RequestBody EmployeesRequestDto updatedEmployeeDto) {
         Employees employees = employeesService.editEmployee(id, updatedEmployeeDto);
-        return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(employees, EmployeesResponseDto.class));
+        return ResponseEntity.status(200).body(TransactionMapper.mapEntityToDto(employees, EmployeesResponseDto.class));
     }
 
     @PostMapping("/create")
