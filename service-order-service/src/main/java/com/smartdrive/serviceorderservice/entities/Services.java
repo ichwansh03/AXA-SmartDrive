@@ -58,12 +58,19 @@ public class Services {
     @OneToMany(mappedBy = "parentServices")
     private List<Services> servicesList;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "serv_cust_entityid")
+//    private User users;
+//
+//    @JsonBackReference
+//    @OneToOne
+//    @JoinColumn(name = "serv_creq_entityid")
+//    private CustomerRequest customer;
+
     @JsonIgnore
     @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
     private List<ServiceOrders> serviceOrdersSet;
 
-    //@PrimaryKeyJoinColumn
-    //@JsonIgnore
     @OneToOne(mappedBy = "services", cascade = CascadeType.ALL)
     private ServicePremi servicePremi;
 

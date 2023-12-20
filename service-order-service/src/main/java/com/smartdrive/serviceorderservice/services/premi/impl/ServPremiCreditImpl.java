@@ -1,5 +1,6 @@
 package com.smartdrive.serviceorderservice.services.premi.impl;
 
+import com.smartdrive.serviceorderservice.Exceptions.CheckPaymentException;
 import com.smartdrive.serviceorderservice.dto.request.SecrReqDto;
 import com.smartdrive.serviceorderservice.entities.ServicePremi;
 import com.smartdrive.serviceorderservice.entities.ServicePremiCredit;
@@ -22,6 +23,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -68,31 +71,39 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     @Transactional
     @Override
     public boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId) {
-        ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId)).get();
-        ServicePremi premi = semiRepository.findById(secrServId).get();
-        BigDecimal premiMonthly = secrRepository.totalPremiMonthly();
+        ServicePremiCredit existSecr = secrRepository.findById(new ServicePremiCreditId(secrId, secrServId))
+                .orElseThrow(() -> new EntityNotFoundException("updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId)::ID is not found"));
+        ServicePremi premi = semiRepository.findById(secrServId)
+                .orElseThrow(() -> new EntityNotFoundException("findById(secrServId)::secrServId is not found"));
 
         ServicePremiCredit newSecr = ServicePremiCredit.builder()
                 .secrId(existSecr.getSecrId())
                 .secrServId(existSecr.getSecrServId())
                 .secrYear(existSecr.getSecrYear())
                 .secrPremiCredit(secrReqDto.getSecrPremiCredit())
-                .secrPremiDebet(secrReqDto.getSecrPremiDebet())
+                .secrPremiDebet(Optional.ofNullable(secrReqDto.getSecrPremiDebet()).orElse(BigDecimal.ZERO))
                 .secrTrxDate(LocalDateTime.now())
-                .secrDuedate(existSecr.getSecrDuedate()).build();
+                .secrDuedate(existSecr.getSecrDuedate())
+                .services(premi.getServices()).build();
+
+        secrRepository.save(newSecr);
+
+        List<ServicePremiCredit> allCredits = secrRepository.findAll();
+        BigDecimal countPremiMonthly = allCredits.stream()
+                .map(ServicePremiCredit::getSecrPremiDebet)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (checkDueDatePayment(newSecr)){
             semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), existSecr.getSecrServId());
-      //      throw new CheckPaymentException("your payment has passed deadline");
+            throw new CheckPaymentException("your payment has passed deadline");
         }
 
-        if (premi.getSemiPremiDebet().compareTo(premiMonthly) >= 0){
+        if (premi.getSemiPremiDebet().compareTo(countPremiMonthly) >= 0){
             semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.PAID.toString(), existSecr.getSecrServId());
-        //    throw new CheckPaymentException("your payment has been paid");
         }
 
         log.info("ServPremiImpl::updateSecr successfully updated");
-        secrRepository.save(newSecr);
         return true;
     }
 
@@ -102,10 +113,10 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
                 && LocalDateTime.now().isAfter(servicePremiCredit.getSecrDuedate());
     }
 
-    @Async
-    @Scheduled(fixedRate = PERIOD_IN_MILLIS)
-    public void sendNotify(){
-        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+//    @Async
+//    @Scheduled(fixedRate = PERIOD_IN_MILLIS)
+//    public void sendNotify(){
+//        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
 //        if (existSecr != null){
 //            Services services = soRepository.findById(existSecr.getSecrServId())
 //                    .orElseThrow(() -> new EntityNotFoundException("Service not found"));
@@ -117,5 +128,5 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
 //                emailService.sendMail(emailReq);
 //            }
 //        }
-    }
+//    }
 }

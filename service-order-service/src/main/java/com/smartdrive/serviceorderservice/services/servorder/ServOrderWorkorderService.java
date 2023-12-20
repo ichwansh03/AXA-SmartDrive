@@ -15,4 +15,6 @@ public interface ServOrderWorkorderService {
     int updateSowoStatus(Boolean sowoStatus, Long sowoId);
 
     boolean checkAllWorkComplete(List<ServiceOrderWorkorder> sowoList);
+
+    void createWorkorderTask(String sowoName, Long seotId);
 }

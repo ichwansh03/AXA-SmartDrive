@@ -47,6 +47,11 @@ public class ServiceOrderTasks {
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeotStatus seotStatus;
 
+//    @JsonIgnore
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "seot_arwg_code")
+//    private AreaWorkGroup areaWorkGroup;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seot_sero_id")

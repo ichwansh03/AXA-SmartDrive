@@ -20,10 +20,4 @@ public interface SecrRepository extends JpaRepository<ServicePremiCredit, Servic
 
     ServicePremiCredit findBySecrDuedateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    @Query(value = "SELECT SUM(so.service_premi_credit.secr_premi_debet) FROM so.service_premi_credit", nativeQuery = true)
-    BigDecimal totalPremiMonthly();
-
-//    @Modifying(clearAutomatically = true)
-//    @Transactional
-//    int updateWithPatrNo(@Param("paymentTransactions") PaymentTransactions paymentTransactions, @Param("secrId") Long secrId);
 }

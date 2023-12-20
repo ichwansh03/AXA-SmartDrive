@@ -10,16 +10,13 @@ import java.util.List;
 
 public interface ServOrderTaskService {
 
-    List<ServiceOrderTasks> addFeasiblityList(ServiceOrders serviceOrders);
-
-    List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) throws Exception;
-
-    List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders);
-
     List<ServiceOrderTasks> findSeotBySeroId(String seroId);
 
     int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId);
 
     SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId);
 
+    //void notifyTask(EmailReq emailReq, ServiceOrders serviceOrders, String subject, String message);
+
+    boolean checkAllTaskComplete(String seroId);
 }

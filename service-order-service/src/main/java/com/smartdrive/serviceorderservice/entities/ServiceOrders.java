@@ -17,9 +17,14 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_orders", schema = "so")
-@NamedQuery(
-        name = "ServiceOrders.selectPartner",
-        query = "UPDATE ServiceOrders sero SET sero.partner = :partner WHERE sero.seroId = :seroId", lockMode = LockModeType.PESSIMISTIC_WRITE)
+@NamedQueries({
+        @NamedQuery(
+                name = "ServiceOrders.selectPartner",
+                query = "UPDATE ServiceOrders sero SET sero.partner = :partner WHERE sero.seroId = :seroId", lockMode = LockModeType.PESSIMISTIC_WRITE),
+        @NamedQuery(
+                name = "ServiceOrders.requestClosePolis",
+                query = "UPDATE ServiceOrders sero SET sero.seroStatus = :seroStatus, sero.seroReason = :seroReason WHERE sero.seroId = :seroId", lockMode = LockModeType.PESSIMISTIC_WRITE),
+})
 @DynamicInsert
 @DynamicUpdate
 public class ServiceOrders {
@@ -51,6 +56,12 @@ public class ServiceOrders {
     @Column(name = "sero_agent_entityid")
     private Long seroAgentEntityid;
 
+    //should be to partner area workgroup
+//    @JsonIgnore
+//    @ManyToOne
+//    @JoinColumn(name = "sero_part_id")
+//    private Partner partner;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "sero_sero_id")
@@ -63,6 +74,11 @@ public class ServiceOrders {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sero_serv_id")
     private Services services;
+
+//    @JsonIgnore
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "sero_agent_entityid", referencedColumnName = "eawg_id", insertable = false, updatable = false)
+//    private EmployeeAreaWorkgroup employees;
 
     @OneToMany(mappedBy = "serviceOrders", cascade = CascadeType.ALL)
     private List<ServiceOrderTasks> serviceOrderTasks;
