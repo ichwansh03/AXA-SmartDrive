@@ -25,17 +25,8 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
     @Transactional
     @Override
     public ServiceOrders generateSeroFeasiblity(Services services){
-        String formatSeroId = soAdapter.formatServiceOrderId(services);
 
-        ServiceOrders serviceOrders = new ServiceOrders();
-        serviceOrders = ServiceOrders.builder()
-                .seroId(formatSeroId)
-                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
-                .seroStatus(serviceOrders.getSeroStatus())
-                .seroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId())
-                .employees(services.getCustomer().getEmployeeAreaWorkgroup())
-                .services(services).build();
-
+        ServiceOrders serviceOrders = buildCommonSeroData(services, null, null, null);
         ServiceOrders saved = soOrderRepository.save(serviceOrders);
 
         log.info("ServOrderTaskImpl::generateSeroFeasiblity successfully added in ID {} ", saved.getSeroId());
@@ -46,20 +37,9 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
     @Transactional
     @Override
     public ServiceOrders handlePolisAndClaim(Services services, LocalDateTime startDate, LocalDateTime endDate, String prefixSeroId){
-        String formatSeroId = soAdapter.formatServiceOrderId(services);
+
         ServiceOrders existingSero = soOrderRepository.findBySeroIdLikeAndServices_ServId(prefixSeroId, services.getServId());
-        ServiceOrders serviceOrders = new ServiceOrders();
-        serviceOrders = ServiceOrders.builder()
-                .seroId(formatSeroId)
-                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
-                .seroStatus(serviceOrders.getSeroStatus())
-                .servClaimNo(services.getServInsuranceNo())
-                .servClaimStartdate(startDate)
-                .servClaimEnddate(endDate)
-                .parentServiceOrders(existingSero)
-                .seroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId())
-                .employees(services.getCustomer().getEmployeeAreaWorkgroup())
-                .services(services).build();
+        ServiceOrders serviceOrders = buildCommonSeroData(services, existingSero, startDate, endDate);
 
         ServiceOrders saved = soOrderRepository.save(serviceOrders);
         log.info("ServOrderTaskImpl::generateSeroClaim successfully added {} ", saved.getSeroId());
@@ -67,4 +47,20 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
         return saved;
     }
 
+    private ServiceOrders buildCommonSeroData(Services services, ServiceOrders parentSero, LocalDateTime startDate, LocalDateTime endDate){
+        String formatSeroId = soAdapter.formatServiceOrderId(services);
+
+        return ServiceOrders.builder()
+                .seroId(formatSeroId)
+                .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
+                .seroStatus(EnumModuleServiceOrders.SeroStatus.OPEN)
+                .servClaimNo(services.getServInsuranceNo())
+                .servClaimStartdate(startDate)
+                .servClaimEnddate(endDate)
+                .parentServiceOrders(parentSero)
+                .seroAgentEntityid(services.getCustomer().getEmployeeAreaWorkgroup().getEawgId())
+                .employees(services.getCustomer().getEmployeeAreaWorkgroup())
+                .services(services).build();
+
+    }
 }
