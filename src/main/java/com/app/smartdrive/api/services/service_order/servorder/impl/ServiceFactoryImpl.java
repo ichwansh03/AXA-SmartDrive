@@ -8,7 +8,7 @@ import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServic
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
-import com.app.smartdrive.api.services.service_order.servorder.GenerateService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GenerateServiceImpl implements GenerateService {
+public class ServiceFactoryImpl implements ServiceFactory {
 
     private final SoRepository soRepository;
     private final ServPremiService servPremiService;

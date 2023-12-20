@@ -41,26 +41,27 @@ public class ServImpl implements ServService {
 
     private final CustomerRequestRepository customerRequestRepository;
     private final CustomerRequestService customerRequestService;
-    private final GenerateService generateService;
+    private final ServiceFactory serviceFactory;
 
     @Transactional
     @Override
     public Services addService(Long creqId) throws Exception {
 
-        CustomerRequest cr = customerRequestRepository.findById(creqId).get();
+        CustomerRequest cr = customerRequestRepository.findById(creqId)
+                .orElseThrow(() -> new EntityNotFoundException("creqId "+creqId+" is not found"));
 
         Services serv;
 
         switch (cr.getCreqType().toString()){
-            case "FEASIBLITY" -> serv = generateService.generateFeasiblityType(cr);
+            case "FEASIBLITY" -> serv = serviceFactory.generateFeasiblityType(cr);
             case "POLIS" -> {
-                serv = generateService.handleServiceUpdate(cr,
+                serv = serviceFactory.handleServiceUpdate(cr,
                         LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
                 log.info("ServImpl::addService save services to db polis {} ",serv);
             }
-            case "CLAIM" -> serv = generateService.handleServiceUpdate(cr,
+            case "CLAIM" -> serv = serviceFactory.handleServiceUpdate(cr,
                     LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
-            default -> serv = generateService.handleServiceUpdate(cr,
+            default -> serv = serviceFactory.handleServiceUpdate(cr,
                     LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
         }
 

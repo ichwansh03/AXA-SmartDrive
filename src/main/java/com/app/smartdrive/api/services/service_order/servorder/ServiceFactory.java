@@ -6,7 +6,7 @@ import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServic
 
 import java.time.LocalDateTime;
 
-public interface GenerateService {
+public interface ServiceFactory {
 
     Services generateFeasiblityType(CustomerRequest cr);
 

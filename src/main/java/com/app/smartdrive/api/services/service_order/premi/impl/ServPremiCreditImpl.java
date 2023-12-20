@@ -25,6 +25,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -76,19 +78,23 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         ServicePremi premi = semiRepository.findById(secrServId)
                 .orElseThrow(() -> new EntityNotFoundException("findById(secrServId)::secrServId is not found"));
 
-        List<ServicePremiCredit> allCredits = secrRepository.findAll();
-        BigDecimal countPremiMonthly = allCredits.stream()
-                .map(ServicePremiCredit::getSecrPremiDebet)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         ServicePremiCredit newSecr = ServicePremiCredit.builder()
                 .secrId(existSecr.getSecrId())
                 .secrServId(existSecr.getSecrServId())
                 .secrYear(existSecr.getSecrYear())
                 .secrPremiCredit(secrReqDto.getSecrPremiCredit())
-                .secrPremiDebet(secrReqDto.getSecrPremiDebet())
+                .secrPremiDebet(Optional.ofNullable(secrReqDto.getSecrPremiDebet()).orElse(BigDecimal.ZERO))
                 .secrTrxDate(LocalDateTime.now())
-                .secrDuedate(existSecr.getSecrDuedate()).build();
+                .secrDuedate(existSecr.getSecrDuedate())
+                .services(premi.getServices()).build();
+
+        secrRepository.save(newSecr);
+
+        List<ServicePremiCredit> allCredits = secrRepository.findAll();
+        BigDecimal countPremiMonthly = allCredits.stream()
+                .map(ServicePremiCredit::getSecrPremiDebet)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (checkDueDatePayment(newSecr)){
             semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), existSecr.getSecrServId());
@@ -97,11 +103,9 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
 
         if (premi.getSemiPremiDebet().compareTo(countPremiMonthly) >= 0){
             semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.PAID.toString(), existSecr.getSecrServId());
-            throw new CheckPaymentException("your payment has been paid");
         }
 
         log.info("ServPremiImpl::updateSecr successfully updated");
-        secrRepository.save(newSecr);
         return true;
     }
 
