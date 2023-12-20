@@ -24,20 +24,20 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping
-  @PreAuthorize("hasAuthority('Admin')")
+  @PreAuthorize("isAuthenticated() && hasAuthority('Admin')")
   public List<UserDto> getAllUsers() {
     return TransactionMapper.mapEntityListToDtoList(userService.getAll(), UserDto.class);
   }
 
   @GetMapping("/{id}")
-  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
+  @PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.getUserEntityId() == #id)")
   public UserDto getUser(@PathVariable("id") Long id) {
     User user = userService.getById(id);
     return TransactionMapper.mapEntityToDto(user, UserDto.class);
   }
 
   @PatchMapping("/{id}")
-  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
+  @PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.getUserEntityId() == #id)")
   public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequestDto userPost,
       @PathVariable("id") Long id) {
     UpdateUserRequestDto userUpdated = userService.updateUser(userPost, id);
@@ -45,7 +45,7 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasAuthority('Admin') or principal.getUserEntityId() == #id")
+  @PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.getUserEntityId() == #id)")
   public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
     Optional<User> user = userService.getUserById(id);
       if(user.isPresent()){

@@ -86,7 +86,7 @@ public class AuthenticationController {
   }
 
   @PostMapping("/{id}/changePassword")
-  @PreAuthorize("principal.getUserEntityId() == #id")
+  @PreAuthorize("principal.getUserEntityId() == #id && isAuthenticated()")
   public ResponseEntity<?> changePassword(@RequestBody PasswordRequestDto passwordRequestDto
           , @PathVariable("id") Long id){
     String message = authenticationService.changePassword(id, passwordRequestDto);
