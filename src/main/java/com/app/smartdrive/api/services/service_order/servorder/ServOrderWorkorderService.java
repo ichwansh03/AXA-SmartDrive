@@ -15,5 +15,9 @@ public interface ServOrderWorkorderService {
 
     boolean checkAllWorkComplete(List<ServiceOrderWorkorder> sowoList);
 
+
+    List<ServiceOrderWorkorder> findAllByPartnerAndArwgCode(Long partnerId, String arwgCode);
+
     void createWorkorderTask(String sowoName, Long seotId);
+
 }

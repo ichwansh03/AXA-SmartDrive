@@ -3,6 +3,7 @@ package com.app.smartdrive.api.repositories.service_orders;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface SoWorkorderRepository extends JpaRepository<ServiceOrderWorkorder, Long> {
+public interface SoWorkorderRepository extends JpaRepository<ServiceOrderWorkorder, Long>, JpaSpecificationExecutor<ServiceOrderWorkorder> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Override

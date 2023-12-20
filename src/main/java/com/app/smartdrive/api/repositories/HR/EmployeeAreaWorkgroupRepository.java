@@ -37,4 +37,6 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     Optional<EmployeeAreaWorkgroup> findByAreaWorkGroupAndEmployees(AreaWorkGroup areaWorkGroup, Employees employees);
 
     boolean existsByEmployeesAndAreaWorkGroup(Employees employees, AreaWorkGroup areaWorkGroup);
+
+    Optional<EmployeeAreaWorkgroup> findByEawgArwgCode(String arwgCode);
 }
