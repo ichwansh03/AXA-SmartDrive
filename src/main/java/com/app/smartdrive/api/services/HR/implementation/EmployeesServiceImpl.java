@@ -89,12 +89,11 @@ public class EmployeesServiceImpl implements EmployeesService {
         if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
-            userRolesService.createUserRoleEmployees(RoleName.EM,user,"ACTIVE");
-        }else{
-            userRolesService.createUserRoleEmployees(RoleName.EM,user,"INACTIVE");
+
+
         }
 
-
+        userRolesService.createUserRoleEmployees(RoleName.EM,user,employeesDto.getGrantAccessUser());
         createUserPhonefromDto(user, employeesDto.getEmpPhone());
         createUserAccountFromDto(user, employeesDto.getEmpAccountNumber());
         createUserAddressFromDto(user, employeesDto.getEmpAddress());    
@@ -121,8 +120,8 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         UserRoles userRoles = new UserRoles();
         userRoles.setUserRolesId(userRolesId);
-        userRoles.setUsroStatus(isActive ? "Active" : "Inactive");
-        userRolesService.createUserRole(roleName, user);
+        userRoles.setUsroStatus(isActive ? "ACTIVE" : "INACTIVE");
+        userRolesService.createUserRole(roleName, user, true);
     }
 
     private void createUserAccountFromDto(User user, String accountNo){

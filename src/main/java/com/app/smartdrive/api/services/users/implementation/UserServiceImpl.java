@@ -11,12 +11,12 @@ import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.users.*;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -53,10 +53,10 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User createUserCustomer(CreateUserDto userPost) {
+  public User createUserCustomer(CreateUserDto userPost, RoleName roleName) {
     User user = createUser(userPost.getProfile());
 
-    userRolesService.createUserRole(RoleName.PC, user);
+    userRolesService.createUserRole(roleName, user, true);
 
     userPhoneService.createUserPhone(user, userPost.getUserPhone());
 
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
   public User createUserCustomerByAgen(CreateUserDto userPost, Boolean grantAccessUser) {
     User user = createUser(userPost.getProfile());
 
-    userRolesService.createUserRoleByAgen(RoleName.CU, user, grantAccessUser);
+    userRolesService.createUserRole(RoleName.CU, user, grantAccessUser);
 
     userPhoneService.createUserPhone(user, userPost.getUserPhone());
 
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
   public User createAdmin(CreateUserDto userPost){
     User user = createUser(userPost.getProfile());
 
-    userRolesService.createUserRole(RoleName.AD, user);
+    userRolesService.createUserRole(RoleName.AD, user, true);
 
     userPhoneService.createUserPhone(user, userPost.getUserPhone());
 

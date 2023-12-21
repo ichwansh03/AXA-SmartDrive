@@ -50,7 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
     );
 
-    User user = userService.createUserCustomer(request);
+    User user = userService.createUserCustomer(request, EnumUsers.RoleName.PC);
     user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
     userRepository.save(user);
   }
