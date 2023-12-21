@@ -44,4 +44,6 @@ public interface CustomerRequestService {
     public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO);
 
     Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status);
+
+    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);
 }

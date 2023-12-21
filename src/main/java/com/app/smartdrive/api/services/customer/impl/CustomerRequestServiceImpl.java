@@ -359,9 +359,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
 
-        User customer = this.userService.getUserById(updateCustomerRequestDTO.getCustomerId()).orElseThrow(
-                () -> new EntityNotFoundException("User with id " + updateCustomerRequestDTO.getCustomerId() + " is not found")
-        );
+        User customer = this.getUpdatedUser(updateCustomerRequestDTO.getCustomerId(), updateCustomerRequestDTO.getAccessGrantUser());
 
         EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
                 .orElseThrow(
@@ -415,6 +413,21 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
 
         return customerResponseDTO;
+    }
+
+    @Override
+    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess) {
+        User customer = this.userService.getUserById(userEntityId).orElseThrow(
+                () -> new EntityNotFoundException("User with id " + userEntityId + " is not found")
+        );
+
+        if(grantUserAccess){
+            customer = this.userRolesService.updateRoleStatus(customer, "ACTIVE");
+        }else{
+            customer = this.userRolesService.updateRoleStatus(customer, "INACTIVE");
+        }
+
+        return customer;
     }
 
     @Transactional
