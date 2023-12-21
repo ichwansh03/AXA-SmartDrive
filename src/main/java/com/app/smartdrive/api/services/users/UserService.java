@@ -20,7 +20,7 @@ public interface UserService extends BaseService<User, Long> {
 
   User save(User user);
 
-  User createUserCustomer(CreateUserDto userPost);
+  User createUserCustomer(CreateUserDto userPost, RoleName roleName);
 
   User createUserCustomerByAgen(CreateUserDto userPost, Boolean grantAccessUser);
 

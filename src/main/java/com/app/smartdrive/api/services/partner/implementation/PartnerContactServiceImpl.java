@@ -102,7 +102,7 @@ public class PartnerContactServiceImpl implements PartnerContactService {
         Partner partner = partnerService.getById(request.getPartnerId());
         User user = createUser(request);
 
-        userRolesService.createUserRole(EnumUsers.RoleName.PR, user);
+        userRolesService.createUserRole(EnumUsers.RoleName.PR, user, true);
         createUserPhoneDtoList(request.getPhone(), user);
         user = userService.save(user);
 
