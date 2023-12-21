@@ -40,7 +40,7 @@ public class UserPhone {
   @Column(name = "usph_modified_date")
   private LocalDateTime usphModifiedDate;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "usph_entityid")
   @MapsId("usphEntityId")
   @JsonBackReference

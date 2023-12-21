@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -27,7 +28,7 @@ public class UserPhoneController {
   @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> updateUserPhone(@PathVariable("id") Long id,
                                            @PathVariable("phoneNumber") String phoneNumber,
-                                           @Valid @ModelAttribute UserPhoneRequestDto userPost) {
+                                           @RequestBody @Valid UserPhoneRequestDto userPost) {
     UserPhone updatedPhone = userPhoneService.updateUserPhone(id, phoneNumber, userPost);
     return ResponseEntity.status(HttpStatus.OK).body(updatedPhone);
   }
@@ -43,6 +44,6 @@ public class UserPhoneController {
   @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> deleteUserPhone(@PathVariable("id") Long id, @PathVariable("phoneNumber") String phoneNumber){
     userPhoneService.deleteUserPhone(id, phoneNumber);
-    return ResponseEntity.status(HttpStatus.OK).body("UserPhone has been deleted");
+    return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("UserPhone has been deleted"));
   }
 }

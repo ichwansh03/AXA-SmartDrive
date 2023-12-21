@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 @Slf4j
+@PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.getUserEntityId() == #id)")
 public class UserController {
   private final UserService userService;
 
@@ -30,14 +32,12 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
-  @PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.getUserEntityId() == #id)")
   public UserDto getUser(@PathVariable("id") Long id) {
     User user = userService.getById(id);
     return TransactionMapper.mapEntityToDto(user, UserDto.class);
   }
 
   @PatchMapping("/{id}")
-  @PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.getUserEntityId() == #id)")
   public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequestDto userPost,
       @PathVariable("id") Long id) {
     UpdateUserRequestDto userUpdated = userService.updateUser(userPost, id);
@@ -45,7 +45,6 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  @PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.getUserEntityId() == #id)")
   public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
     Optional<User> user = userService.getUserById(id);
       if(user.isPresent()){
@@ -53,5 +52,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body("User sudah dihapus");
       }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");
+  }
+
+  @PatchMapping("/{id}/changeEmail")
+  public ResponseEntity<?> changeEmail(@PathVariable("id") Long id, @RequestBody String email){
+    userService.changeEmail(id, email);
+    return ResponseEntity.ok(new MessageResponse("email has changed: " + email));
   }
 }
