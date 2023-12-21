@@ -29,19 +29,11 @@ public class UserAddressImpl implements UserAddressService {
 
   @Override
   public UserAddress updateUserAddress(User user, UserAddress address, UserAddressRequestDto userPost) {
-    // Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(idAddress);
-    // User user = userRepository.findById(id).get();
-
-    // if (userAddress.isPresent()
-    //     && userAddress.get().getUsdrEntityId().equals(id)) {
-      
-    // }
     TransactionMapper.mapDtoToEntity(userPost, address);
     Cities city = cityRepository.findById(userPost.getCityId()).orElseThrow(() -> new EntityNotFoundException("City not found"));
     address.setCity(city);
     address.setUsdrModifiedDate(LocalDateTime.now());
     address.setUser(user);
-      // return userAddressRepository.save(userAddress.get());
     return address;
   }
 
@@ -76,9 +68,7 @@ public class UserAddressImpl implements UserAddressService {
   @Transactional
   public void deleteAddressById(Long id, Long addressId){
     Optional<UserAddress> userAddress = userAddressRepository.findUserAddressOptional(addressId, id);
-    if(userAddress.isPresent()){
-      userAddressRepository.delete(userAddress.get());
-    }
+    userAddress.ifPresent(userAddressRepository::delete);
   }
 
   @Override

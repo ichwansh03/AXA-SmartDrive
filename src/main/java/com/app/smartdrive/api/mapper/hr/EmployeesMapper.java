@@ -11,7 +11,7 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 
 
 public class EmployeesMapper {
-    public static EmployeesResponseDto convertEntityToDtoEmp(Employees employees){
+    public static EmployeesResponseDto convertEntityToDto(Employees employees){
         EmployeesResponseDto employeesDto = EmployeesResponseDto.builder()
         .user(TransactionMapper.mapEntityToDto(employees.getUser(), UserDto.class))
         .empName(employees.getEmpName())

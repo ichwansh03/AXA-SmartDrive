@@ -42,6 +42,24 @@ public class UserRolesImpl implements UserRolesService{
   }
 
   @Override
+  public List<UserRoles> createUserRoleEmployees(RoleName roleName, User user, String isActive) {
+    UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
+
+    Roles roles = rolesRepository.findById(roleName).get();
+    UserRoles userRoles = new UserRoles();
+    userRoles.setRoles(roles);
+    userRoles.setUserRolesId(userRolesId);
+    userRoles.setUsroStatus(isActive);
+    userRoles.setUsroModifiedDate(LocalDateTime.now());
+    userRoles.setUser(user);
+
+    List<UserRoles> listRole = new ArrayList<>();
+    listRole.add(userRoles);
+    user.setUserRoles(listRole);
+    return listRole;
+  }
+
+  @Override
   @Transactional
   public List<UserRoles> createUserRoleByAgen(RoleName roleName, User user, Boolean isActive) {
     UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);

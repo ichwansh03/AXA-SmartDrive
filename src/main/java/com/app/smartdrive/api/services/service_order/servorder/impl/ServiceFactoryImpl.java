@@ -27,16 +27,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
 
     @Override
     public Services generateFeasiblityType(CustomerRequest cr){
-        return Services.builder()
-                .servType(cr.getCreqType())
-                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servCreatedOn(cr.getCreqCreateDate())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusDays(7))
-                .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE)
-                .users(cr.getCustomer())
-                .customer(cr)
-                .build();
+        return buildCommonServiceData(cr, LocalDateTime.now().plusDays(7), EnumModuleServiceOrders.ServStatus.ACTIVE);
     }
 
     @Override
@@ -44,27 +35,17 @@ public class ServiceFactoryImpl implements ServiceFactory {
         Services existingService = soRepository.findById(cr.getServices().getServId())
                 .orElseThrow(() -> new EntityNotFoundException("ID is not found"));
 
-        existingService = Services.builder()
-                .servId(existingService.getServId())
-                .servType(cr.getCreqType())
-                .servCreatedOn(cr.getCreqCreateDate())
-                .servInsuranceNo(soAdapter.generatePolis(cr))
-                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(endDate)
-                .servStatus(servStatus)
-                .users(cr.getCustomer())
-                .customer(cr)
-                .build();
+        Services services = buildCommonServiceData(cr, endDate, servStatus);
+        services.setServId(existingService.getServId());
 
-        switch (existingService.getServType()) {
-            case POLIS -> generateServPremi(existingService);
+        switch (services.getServType()) {
+            case POLIS -> generateServPremi(services);
             case CLOSE -> servPremiService.updateSemiStatus(
-                    EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), existingService.getServId());
+                    EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), services.getServId());
         }
-        log.info("service new existing {} ",existingService);
+        log.info("service new existing {} ",services);
 
-        return existingService;
+        return services;
     }
 
     @Override
@@ -78,4 +59,17 @@ public class ServiceFactoryImpl implements ServiceFactory {
         servPremiService.addSemi(servicePremi, services.getServId());
     }
 
+    private Services buildCommonServiceData(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus){
+        return Services.builder()
+                .servType(cr.getCreqType())
+                .servCreatedOn(cr.getCreqCreateDate())
+                .servInsuranceNo(soAdapter.generatePolis(cr))
+                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
+                .servStartDate(LocalDateTime.now())
+                .servEndDate(endDate)
+                .servStatus(servStatus)
+                .users(cr.getCustomer())
+                .customer(cr)
+                .build();
+    }
 }

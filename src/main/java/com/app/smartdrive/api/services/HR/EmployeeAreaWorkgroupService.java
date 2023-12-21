@@ -14,7 +14,7 @@ import com.app.smartdrive.api.services.BaseService;
 import org.springframework.data.domain.Pageable;
 
 public interface EmployeeAreaWorkgroupService extends BaseService<EmployeeAreaWorkgroup, Long> {
-    public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size);
+    public Page<EmployeeAreaWorkgroup> searchEawg(String value, int page, int size);
 
      public EmployeeAreaWorkgroup createEawg(EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
 

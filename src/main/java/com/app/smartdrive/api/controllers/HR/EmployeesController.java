@@ -60,12 +60,18 @@ public class EmployeesController {
 
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('Admin')")
-    public Page<Employees> searchEmployees(
+        public ResponseEntity<Page<EmployeesResponseDto>> searchEmployees(
             @RequestParam(value = "value") String value,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        return employeesService.searchEmployees(value, page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Employees> employeesPage = employeesService.searchEmployees(value, page, size);
+        List<EmployeesResponseDto> employeesResponseList = employeesPage.getContent().stream()
+                .map(emp -> TransactionMapper.mapEntityToDto(emp, EmployeesResponseDto.class))
+                .toList();
+
+        return ResponseEntity.ok(new PageImpl<>(employeesResponseList, pageable, employeesPage.getTotalElements()));
     }
 
     @GetMapping

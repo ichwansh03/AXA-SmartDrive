@@ -11,6 +11,7 @@ import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.partner.Partner;
+import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.User;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,12 +85,18 @@ class PartnerControllerTest {
     @Autowired
     CustomerRequestRepository customerRequestRepository;
 
+    Partner partner;
+
     @BeforeEach
     @Transactional
     public void setUp() {
-        partnerRepository.deleteAll();
         userRepository.deleteByUserName("TEST123");
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
+
+    @AfterEach
+    void tearDown() {
+        partnerRepository.delete(partner);
     }
 
     User createUser(String test){
@@ -130,25 +138,21 @@ class PartnerControllerTest {
 
     @Test
     void whenGetAllServiceByPartner() throws Exception {
-        User user = userRepository.save(createUser("TEST123"));
-        CustomerRequest customerRequest = createCustomerRequest("CREQ",user);
-        //customerRequestService.changeRequestTypeToClaim(new CustomerRequestTypeDTO(customerRequest.getCreqEntityId()));
-        Services services = service.addService(customerRequest.getCreqEntityId());
-        ServiceOrders serviceOrders = servOrderService.addServiceOrders(services.getServId());
-        Partner partner = create();
-        serviceOrders.setPartner(partner);
-        soOrderRepository.save(serviceOrders);
+        partner = create();
 
         mockMvc.perform(
                 get("/partners/workorder")
-                        .header("PARTNER-ID", partner.getPartEntityid())
+                        .param("entityid", "1060")
+                        .param("arwgcode", "BCY-0001")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
         ).andExpectAll(
                 status().isOk()
-        );
+        ).andDo(print());
     }
     @Test
     void whenDelete_thenSucces() throws Exception {
-        Partner partner = create();
+        partner = create();
 
         mockMvc.perform(
                 delete("/partners/"+partner.getPartEntityid())
@@ -166,18 +170,18 @@ class PartnerControllerTest {
 
     Partner create(){
         PartnerRequest request = new PartnerRequest();
-        request.setPartName("1234567890");
+        request.setPartName("PARTNER TEST");
         request.setCityId(1L);
-        request.setPartNpwp("1234567890");
-        request.setPartAddress("JL BENGKEL");
-        request.setPartAccountNo("123");
+        request.setPartNpwp("123123123");
+        request.setPartAddress("SENTUL");
+        request.setPartAccountNo("123123123");
 
         Partner partner = partnerService.save(request);
         return partnerService.save(partner);
     }
     @Test
     void whenUpdatePartner_thenSuccess() throws Exception {
-        Partner partner = create();
+        partner = create();
         PartnerRequest request = new PartnerRequest();
         request.setPartName("UPDATE");
         request.setCityId(1L);
@@ -221,7 +225,7 @@ class PartnerControllerTest {
     @Test
     void whenGetPartnerById_thenSuccess() throws Exception {
 
-        Partner partner = create();
+        partner = create();
         mockMvc.perform(
                 get("/partners/"+partner.getPartEntityid())
         ).andExpectAll(
