@@ -53,10 +53,10 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User createUserCustomer(CreateUserDto userPost) {
+  public User createUserCustomer(CreateUserDto userPost, RoleName roleName) {
     User user = createUser(userPost.getProfile());
 
-    userRolesService.createUserRole(RoleName.PC, user);
+    userRolesService.createUserRole(roleName, user);
 
     userPhoneService.createUserPhone(user, userPost.getUserPhone());
 
