@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.app.smartdrive.api.dto.HR.request.EmployeeSalaryDetailRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeeSalaryDetailResponseDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
@@ -36,9 +37,11 @@ public class BatchEmployeeSalaryController {
 
     @GetMapping("/commission")
     public ResponseEntity<List<EmployeeSalaryDetailResponseDto>> getAllCommission(
-            @RequestParam Long besaEmpEntityId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate besaCreateDate
+            @RequestBody EmployeeSalaryDetailRequestDto employeeSalaryDetailRequestDto
     ) {
+        Long besaEmpEntityId = employeeSalaryDetailRequestDto.getBesaEmpEntityId();
+        LocalDate besaCreateDate = employeeSalaryDetailRequestDto.getBesaCreateDate();
+
         List<EmployeeSalaryDetail> commissionDetails =
                 batchEmployeeSalaryService.getAllCommission(besaEmpEntityId, besaCreateDate);
 
