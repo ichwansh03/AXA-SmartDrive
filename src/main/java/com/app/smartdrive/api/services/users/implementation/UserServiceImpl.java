@@ -10,7 +10,7 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.users.*;
-import jakarta.persistence.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,8 +35,8 @@ public class UserServiceImpl implements UserService {
   @Override
   public User createUser(ProfileRequestDto userPost) {
     BusinessEntity businessEntity = businessEntityService.createBusinessEntity();
-    User newUser = new User();
-    User user = TransactionMapper.mapDtoToEntity(userPost, newUser);
+    User user = new User();
+    TransactionMapper.mapDtoToEntity(userPost, user);
     businessEntity.setUser(user);
     user.setUserBusinessEntity(businessEntity);
     user.setUserEntityId(businessEntity.getEntityId());
@@ -111,8 +111,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public User save(User user) {
-    User newUser = userRepo.save(user);
-    return newUser;
+    return userRepo.save(user);
   }
 
   @Override
@@ -150,5 +149,14 @@ public class UserServiceImpl implements UserService {
   public List<User> getAll() {
     List<User> users = userRepo.findAll();
     return users;
+  }
+
+  @Transactional
+  @Override
+  public void changeEmail(Long userId, String newEmail) {
+    User user = userRepo.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
+    user.setUserEmail(newEmail);
+    save(user);
   }
 }

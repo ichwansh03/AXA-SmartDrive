@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import com.app.smartdrive.api.dto.user.request.UserUserAccountDtoRequest;
 import com.app.smartdrive.api.dto.user.response.UserUserAccountResponseDto;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
@@ -36,6 +37,6 @@ public class UserUserAccountController {
   @DeleteMapping("/{ucId}")
   public ResponseEntity<?> deleteUC(@PathVariable("id")Long id, @PathVariable("ucId") Long accountId){
     userAccountService.deleteUserAccounts(id, accountId);
-    return ResponseEntity.status(HttpStatus.OK).body("UserAccount has been deleted");
+    return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("UserAccount has been deleted"));
   }
 }

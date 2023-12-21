@@ -85,7 +85,7 @@ public class AuthenticationController {
             .body(new MessageResponse("You've been sign out!"));
   }
 
-  @PostMapping("/{id}/changePassword")
+  @PatchMapping("/{id}/changePassword")
   @PreAuthorize("principal.getUserEntityId() == #id && isAuthenticated()")
   public ResponseEntity<?> changePassword(@RequestBody PasswordRequestDto passwordRequestDto
           , @PathVariable("id") Long id){
@@ -95,7 +95,6 @@ public class AuthenticationController {
   }
 
   @PostMapping("/refreshtoken")
-  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<?> refreshToken(HttpServletRequest request){
     Optional<String> refreshToken = jwtService.getJwtFromCookies(request, jwtRefreshCookie);
     if(refreshToken.isPresent()){
