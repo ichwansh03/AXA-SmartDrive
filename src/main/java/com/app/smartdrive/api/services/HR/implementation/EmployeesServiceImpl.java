@@ -183,11 +183,11 @@ public class EmployeesServiceImpl implements EmployeesService {
         if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
-            existingEmployee.setEmpStatus(EnumClassHR.status.ACTIVE);
+            userRolesService.updateUserRoleStatus(existingEmployee.getEmpEntityid(),RoleName.EM,"ACTIVE");
         }else{
             user.setUserName(null);
             user.setUserPassword(null);
-            existingEmployee.setEmpStatus(EnumClassHR.status.INACTIVE);
+            userRolesService.updateUserRoleStatus(existingEmployee.getEmpEntityid(),RoleName.EM,"INACTIVE");
         }
 
         updateAddressEmployees(user, employeesDto.getEmpAddress());

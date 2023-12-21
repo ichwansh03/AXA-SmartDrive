@@ -6,6 +6,7 @@ import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.services.master.ArwgService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,11 +26,13 @@ public class ArwgServiceImpl implements ArwgService {
     }
 
     @Override
+    @Transactional
     public AreaWorkGroup save(AreaWorkGroup entity) {
         return repository.save(entity);
     }
 
     @Override
+    @Transactional
     public void deleteById(String s) {
         repository.deleteById(s);
     }

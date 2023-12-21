@@ -6,6 +6,7 @@ import com.app.smartdrive.api.services.master.IntyService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class IntyServiceImpl implements IntyService {
     }
 
     @Override
+    @Transactional
     public InsuranceType save(InsuranceType entity) {
         return repository.save(entity);
     }

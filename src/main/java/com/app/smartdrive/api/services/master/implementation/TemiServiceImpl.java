@@ -6,6 +6,7 @@ import com.app.smartdrive.api.services.master.TemiService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public class TemiServiceImpl implements TemiService {
     }
 
     @Override
+    @Transactional
+
     public TemplateInsurancePremi save(TemplateInsurancePremi entity) {
         return repository.save(entity);
     }
