@@ -99,16 +99,17 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
    
 
     @Override
-    public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size) {
+    public Page<EmployeeAreaWorkgroup> searchEawg(String value, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<EmployeeAreaWorkgroup> resultPage = employeeAreaWorkgroupRepository.findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(value, value, value, pageable);
 
-        List<EmployeesAreaWorkgroupResponseDto> dtos = resultPage.getContent().stream()
-                .map(EmployeesAreaWorkgroupMapper::convertToDto)
-                .collect(Collectors.toList());
+//        List<EmployeesAreaWorkgroupResponseDto> dto = resultPage.getContent().stream()
+//                .map(EmployeesAreaWorkgroupMapper::convertToDto)
+//                .collect(Collectors.toList());
 
-        return new PageImpl<>(dtos, pageable, resultPage.getTotalElements());
+//        return new PageImpl<>(dto, pageable, resultPage.getTotalElements());
+        return resultPage;
     }
     
     @Override

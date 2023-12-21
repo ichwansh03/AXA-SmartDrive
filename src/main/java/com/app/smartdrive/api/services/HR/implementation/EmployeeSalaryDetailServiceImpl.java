@@ -42,7 +42,7 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         List<TemplateSalary> templateSalaries = templateSalaryRepository.findAll();
         List<EmployeeSalaryDetail> salaryDetails = new ArrayList<>();
 
-        // Double totalPremi = 1000000.0;
+//         BigDecimal totalPremi = new BigDecimal(100000);
 
         // List<ServiceOrders> listServiceOrders = soOrderRepository.findByServices_Users_UserEntityId(entityId);
         
@@ -67,12 +67,20 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
             salaryDetail.setEmsaName(templateSalary.getTesalName());
             
             BigDecimal rateMin = templateSalary.getTesalRateMin();
+            BigDecimal rateMax = templateSalary.getTesalRateMax();
 
             BigDecimal calculatedSubtotal ;
+
+
+
             if(Objects.isNull(rateMin)){
                 calculatedSubtotal = servicePremi;
-            }else{
-             calculatedSubtotal = servicePremi.multiply(rateMin);
+            }else {
+                if ("FAM".equals(employees.getEmpJobCode()) && Objects.nonNull(rateMax)) {
+                    calculatedSubtotal = servicePremi.multiply(rateMax);
+                } else {
+                    calculatedSubtotal = servicePremi.multiply(rateMin);
+                }
             }
 
             salaryDetail.setEmsaSubtotal(calculatedSubtotal);

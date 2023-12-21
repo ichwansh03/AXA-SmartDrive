@@ -33,7 +33,7 @@ public class TemplateSalary {
     private BigDecimal tesalRateMin;
 
     @Column(name="tesal_rate_max")
-    private Double tesalRateMax;
+    private BigDecimal tesalRateMax;
 
 
 
