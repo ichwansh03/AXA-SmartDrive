@@ -42,15 +42,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "payment_transactions", schema  = "payment")
 public class PaymentTransactions {
-    // @GeneratedValue(strategy = GenerationType.TABLE,
-    //  generator = "id_generator")
-    // @SequenceGenerator(
-    //     name = "id_generator",
-    //     sequenceName = "payment.payment_transactions_seq",
-    //     allocationSize = 1
-    // )
-    // @SequenceGenerator(name = "patr_trxno", allocationSize = 1)
-    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patr_trxno")
    
     @Id
     @Column(name="patr_trxno", length = 55,nullable = false)
@@ -89,21 +80,19 @@ public class PaymentTransactions {
     private String patrTrxnoRev;
 
  
-//     @ManyToOne
-//     @JoinColumn(name = "")
-//     ServicePremiCredit servicePremiCredits;
+
 
     @OneToMany(mappedBy = "paymentTransactions")
     private List<ServicePremiCredit> servicePremiCredits;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "patr_trxno_rev", referencedColumnName = "patr_trxno" ,insertable = false, updatable = false)
     @JsonIgnore
     PaymentTransactions referencedTransaction;
 
-    @OneToMany(mappedBy = "referencedTransaction", cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "referencedTransaction", cascade = CascadeType.PERSIST)
     @JsonIgnore
-    private List<PaymentTransactions> referencingTransactions;
+    private PaymentTransactions referencingTransaction;
 
     
     

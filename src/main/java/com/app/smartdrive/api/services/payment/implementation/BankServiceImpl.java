@@ -74,6 +74,14 @@ public class BankServiceImpl implements BankService {
     }
 
     @Override
+    public BanksDtoResponse getBankById(Long id) {
+        Banks banks = banksRepository.findById(id).orElseThrow(() 
+        -> new EntityNotFoundException(id + " Tidak terdaftar "));
+        BanksDtoResponse dto = BanksMapper.convertEntityToDto(banks);
+        return dto;
+    }
+
+    @Override
     public List<BanksDtoResponse> getAll() {
         List<Banks> banksList = banksRepository.findAll();
         List<BanksDtoResponse> banksDtos = new ArrayList<>();
