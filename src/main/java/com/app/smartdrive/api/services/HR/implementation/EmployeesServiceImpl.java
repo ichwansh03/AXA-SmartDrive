@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.user.response.UserRoleDto;
+import com.app.smartdrive.api.entities.users.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +30,6 @@ import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.hr.EnumClassHR.emp_type;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
-import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
@@ -86,13 +86,15 @@ public class EmployeesServiceImpl implements EmployeesService {
         employee.setEmpModifiedDate(LocalDateTime.now());
         
         User user = createUserFromDto(employeesDto);
-        if(employeesDto.getGrantAccessUser()==true){
+        if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
-            employee.setEmpStatus(EnumClassHR.status.ACTIVE);
+            userRolesService.createUserRoleEmployees(RoleName.EM,user,"ACTIVE");
+        }else{
+            userRolesService.createUserRoleEmployees(RoleName.EM,user,"INACTIVE");
         }
-        
-        userRolesService.createUserRole(RoleName.EM, user);
+
+
         createUserPhonefromDto(user, employeesDto.getEmpPhone());
         createUserAccountFromDto(user, employeesDto.getEmpAccountNumber());
         createUserAddressFromDto(user, employeesDto.getEmpAddress());    
@@ -102,7 +104,6 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         return employeesRepository.save(employee);
     }
-
 
     private User createUserFromDto(EmployeesRequestDto employeesDto) {
         ProfileRequestDto profileRequestDto = new ProfileRequestDto();
@@ -115,6 +116,14 @@ public class EmployeesServiceImpl implements EmployeesService {
         return user;
     }
 
+    private void createUserRolesAccountFromDto(User user, RoleName roleName, Boolean isActive){
+        UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
+
+        UserRoles userRoles = new UserRoles();
+        userRoles.setUserRolesId(userRolesId);
+        userRoles.setUsroStatus(isActive ? "Active" : "Inactive");
+        userRolesService.createUserRole(roleName, user);
+    }
 
     private void createUserAccountFromDto(User user, String accountNo){
         UserUserAccountDto userAccountDto = new UserUserAccountDto();    
@@ -163,7 +172,6 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         existingEmployee.setEmpName(employeesDto.getEmpName());
         existingEmployee.setEmpJoinDate(empJoinDate);
-        existingEmployee.setEmpType(emp_type.PERMANENT);
         existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         existingEmployee.setEmpGraduate(employeesDto.getEmpGraduate());
         existingEmployee.setEmpNetSalary(employeesDto.getEmpSalary());
@@ -173,7 +181,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         User user = existingEmployee.getUser();
         updateUserFromDto(user, employeesDto);
 
-        if(employeesDto.getGrantAccessUser()==true){
+        if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
             existingEmployee.setEmpStatus(EnumClassHR.status.ACTIVE);

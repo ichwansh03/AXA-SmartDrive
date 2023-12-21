@@ -46,15 +46,19 @@ public class EmployeeAreaWorkgroupController {
             return new ResponseEntity<>("EAWG deleted successfully", HttpStatus.OK);
     }
 
-    
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('Admin')")
-    public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(
+    public ResponseEntity<Page<EmployeesAreaWorkgroupResponseDto>> searchEawg(
             @RequestParam(name = "value") String value,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
 
-        return employeeAreaWorkgroupService.searchEawg(value, page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<EmployeeAreaWorkgroup> eawgPage = employeeAreaWorkgroupService.searchEawg(value, page, size);
+        List<EmployeesAreaWorkgroupResponseDto> listResponse = eawgPage.getContent().stream()
+                .map(eawg -> TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class))
+                .toList();
+        return ResponseEntity.ok(new PageImpl<>(listResponse, pageable, eawgPage.getTotalElements()));
     }
 
     @GetMapping

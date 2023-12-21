@@ -11,4 +11,5 @@ public interface UserRolesService {
   public List<UserRoles> createUserRoleByAgen(RoleName roleName, User user, Boolean isActive);
 
   public User updateRoleFromPcToCu(User customer);
+  public List<UserRoles> createUserRoleEmployees(RoleName roleName, User user, String isActive);
 }
