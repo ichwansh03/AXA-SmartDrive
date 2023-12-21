@@ -6,6 +6,7 @@ import com.app.smartdrive.api.services.master.TewoService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class TewoServiceImpl implements TewoService {
     }
 
     @Override
+    @Transactional
     public TemplateTaskWorkOrder save(TemplateTaskWorkOrder entity) {
         return repository.save(entity);
     }
