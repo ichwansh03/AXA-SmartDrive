@@ -16,22 +16,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 
 public interface UserService extends BaseService<User, Long> {
-  @Transactional
   User createAdmin(CreateUserDto userPost);
 
-  public User save(User user);
+  User save(User user);
 
-  public User createUserCustomer(CreateUserDto userPost);
+  User createUserCustomer(CreateUserDto userPost);
 
-  public User createUserCustomerByAgen(CreateUserDto userPost, Boolean grantAccessUser);
+  User createUserCustomerByAgen(CreateUserDto userPost, Boolean grantAccessUser);
 
-  public User createUser(ProfileRequestDto userPost);
+  User createUser(ProfileRequestDto userPost);
 
-  @Transactional
   UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id);
 
-  public Optional<User> getUserById(Long id);
+  Optional<User> getUserById(Long id);
 
-  public UserDetailsService userDetailsService();
+  UserDetailsService userDetailsService();
+
+  void changeEmail(Long id, String newEmail);
+
+
 
 }

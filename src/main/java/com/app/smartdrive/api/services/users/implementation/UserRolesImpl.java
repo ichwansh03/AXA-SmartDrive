@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.entities.users.*;
 import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,20 @@ public class UserRolesImpl implements UserRolesService{
   }
 
   @Override
+  @Transactional
+  public UserRoles updateUserRoleStatus(Long userEntityId, RoleName roleName, String newStatus) {
+    UserRolesId userRolesId = new UserRolesId(userEntityId, roleName);
+
+    UserRoles userRoles = userRoleRepository.findById(userRolesId)
+            .orElseThrow(() -> new EntityNotFoundException("UserRoles not found with id: " + userRolesId));
+
+    userRoles.setUsroStatus(newStatus);
+    userRoles.setUsroModifiedDate(LocalDateTime.now());
+
+    return userRoleRepository.save(userRoles);
+  }
+  @Override
+  @Transactional
   public List<UserRoles> createUserRoleEmployees(RoleName roleName, User user, String isActive) {
     UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
 
