@@ -31,6 +31,7 @@ import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserRolesId;
+import com.app.smartdrive.api.services.payment.BankService;
 import com.app.smartdrive.api.services.payment.implementation.BankServiceImpl;
 import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
@@ -44,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequestMapping("/payment")
 public class BanksController {
-    private final BankServiceImpl service;
+    private final BankService service;
     private final BusinessEntityImpl serviceBusiness;
 
     @GetMapping("/banks/all")
@@ -67,8 +68,8 @@ public class BanksController {
     }
     @GetMapping("/banks/{bank_entityid}")
     @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<?> getBanksById(@Valid @PathVariable("bank_entityid") Long bank_entityid){
-       BanksDtoResponse resultDto = service.getById(bank_entityid);
+    public ResponseEntity<?> getBanksById( @PathVariable("bank_entityid") Long bank_entityid){
+       BanksDtoResponse resultDto = service.getBankById(bank_entityid);
        return new ResponseEntity<>(resultDto,HttpStatus.OK);
     }
 
