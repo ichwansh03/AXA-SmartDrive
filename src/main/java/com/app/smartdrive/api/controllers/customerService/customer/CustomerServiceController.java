@@ -170,7 +170,7 @@ public class CustomerServiceController {
     public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
             @RequestBody ClaimRequestDTO claimRequestDTO
     ){
-        CustomerResponseDTO customerResponseDTO = this.customerClaimService.updateCustomerClaim(claimRequestDTO);
+        CustomerResponseDTO customerResponseDTO = this.customerClaimService.claimPolis(claimRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 

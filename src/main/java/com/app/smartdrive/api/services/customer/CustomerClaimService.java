@@ -21,7 +21,9 @@ public interface CustomerClaimService {
 
     public void deleteCustomerClaim(Long cuclCreqEntityId);
 
-    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO);
+    public CustomerResponseDTO claimPolis(ClaimRequestDTO claimRequestDTO);
 
     public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO);
+
+    public void calculateSubtotalAndEventPrice(CustomerRequest customerRequest, Double paid, Double tax);
 }
