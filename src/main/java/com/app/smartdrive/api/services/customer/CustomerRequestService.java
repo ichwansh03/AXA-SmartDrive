@@ -39,6 +39,8 @@ public interface CustomerRequestService {
 
     public void changeRequestType(CustomerRequest customerRequest, EnumCustomer.CreqType creqType);
 
+    public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus);
+
     Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status);
 
     public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);

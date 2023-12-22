@@ -4,11 +4,14 @@ import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.*;
+import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.service_order.servorder.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +35,8 @@ public class ServOrderImpl implements ServOrderService {
     private final ServiceOrderFactory serviceOrderFactory;
     private final ServiceTasksFactory serviceTasksFactory;
     private final ServOrderTaskService servOrderTaskService;
+
+    private final CustomerRequestService customerRequestService;
 
     @Transactional
     @Override
@@ -155,6 +160,11 @@ public class ServOrderImpl implements ServOrderService {
      */
     @Transactional
     private void requestCloseAllSero(Services services){
+        CustomerRequest customerRequest = services.getCustomer();
+        this.customerRequestService.changeRequestStatus(customerRequest, EnumCustomer.CreqStatus.CLOSED);
+
+        log.info("ServOrderImpl::requestCloseAllSero change customer request status to CLOSED");
+
         //get all service order by servId
         List<ServiceOrders> serviceOrders = soOrderRepository.findByServices_ServId(services.getServId());
         List<ServiceOrders> updateSero = serviceOrders.stream()

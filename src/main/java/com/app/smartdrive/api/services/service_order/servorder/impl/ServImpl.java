@@ -65,10 +65,6 @@ public class ServImpl implements ServService {
                     LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
         }
 
-        if(Objects.equals(cr.getCreqType().toString(), "CLOSE")){
-            cr.setCreqStatus(EnumCustomer.CreqStatus.CLOSED);
-        }
-
         log.info("ServImpl::addService save services to db {} ",serv);
         Services saved = soRepository.save(serv);
         log.info("ServImpl::addService service saved {} ",saved);

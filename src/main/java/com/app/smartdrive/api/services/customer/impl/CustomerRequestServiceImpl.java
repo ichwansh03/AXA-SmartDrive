@@ -485,6 +485,15 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.save(customerRequest);
         log.info("CustomerRequestServiceImpl:changeRequestType, successfully change creq type to " + creqType.toString());
     }
+
+    @Override
+    public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus) {
+        customerRequest.setCreqStatus(creqStatus);
+
+        this.customerRequestRepository.save(customerRequest);
+    }
+
+
 }
 
 
