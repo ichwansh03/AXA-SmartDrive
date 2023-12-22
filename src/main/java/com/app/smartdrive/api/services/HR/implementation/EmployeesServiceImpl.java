@@ -93,7 +93,7 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         }
 
-        userRolesService.createUserRoleEmployees(RoleName.EM,user,employeesDto.getGrantAccessUser());
+        userRolesService.createUserRole(RoleName.EM,user,employeesDto.getGrantAccessUser());
         createUserPhonefromDto(user, employeesDto.getEmpPhone());
         createUserAccountFromDto(user, employeesDto.getEmpAccountNumber());
         createUserAddressFromDto(user, employeesDto.getEmpAddress());    

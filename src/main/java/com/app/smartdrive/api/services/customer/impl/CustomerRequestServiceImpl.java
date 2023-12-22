@@ -435,8 +435,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             Long entityId
     ){
 
-        User updatedCustomer = this.userRolesService.updateRoleFromPcToCu(customer);
-
+        this.userRolesService.updateRoleFromPcToCu(customer.getUserEntityId());
+        User updatedCustomer = userService.getUserById(customer.getUserEntityId())
+                .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
 
         CustomerRequest customerRequest = CustomerRequest.builder()
                 .businessEntity(newEntity)
