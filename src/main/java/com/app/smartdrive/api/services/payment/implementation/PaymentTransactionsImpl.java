@@ -101,17 +101,42 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
     }
 
     private String generateTrxNo(LocalDateTime timeNow) {
-        return "trx" + dateTimeFormatter(timeNow) + "000" + getIdFromSequence();
+        return "trx" + dateTimeFormatter(timeNow) + "000" + setIdForTrxno();
     }
 
-   
+    private String generateTrxNoRev(LocalDateTime timeNow){
+        return "trx" + dateTimeFormatter(timeNow) + "000" + setIdForTrxnoRev();
+    }
 
-    private synchronized int getIdFromSequence() {
+    private String generateTrxNoRevAwal(LocalDateTime timeNow){
+        return "trx" + dateTimeFormatter(timeNow) + "000" + getIdFromSequencee();
+    }
+
+    private synchronized int getIdFromSequencee() {
         int b = repository.countTrxno();
-        int trxSequence = b += 1;
+        int trxSequence = b;
         return trxSequence;
     }
 
+     private synchronized int getIdFromSequence() {
+        int b = repository.countTrxno();
+        b+=1;
+        int trxSequence = b;
+        return trxSequence;
+    }
+
+    private String setIdForTrxno(){
+        int c = getIdFromSequence();
+        String str1 = Integer.toString(c);
+        return str1;
+    }
+
+    private String setIdForTrxnoRev(){
+        int c = getIdFromSequence();
+        c-=1;
+        String str1 = Integer.toString(c);
+        return str1;
+    }
    
     private String uuidInvoice(){
         UUID uuid = UUID.randomUUID();
@@ -130,23 +155,27 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         PaymentTransactions reversal = repository.findByPatrTrxno(transactions.getPatrTrxno());
 
        
-
-        if (listPayment.isEmpty()) {
-            transactions.setPatrTrxno(generateTrxNo(timeNow()));
-            transactions.setPatrTrxnoRev(null);
-        } else {
-            for (PaymentTransactions py : listPayment) {
-                if (py.getPatrTrxnoRev() == null) {
-                    int newB = getIdFromSequence() - 1;
-                    transactions.setPatrTrxno(generateTrxNo(timeNow()));
-                    transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newB);
-                } else if (reversal != null && py.getPatrTrxnoRev() != null) {
-                    int newC = getIdFromSequence() - 1;
-                    transactions.setPatrTrxno(generateTrxNo(timeNow()));
-                    transactions.setPatrTrxnoRev("trx" + dateTimeFormatter(timeNow()) + "000" + newC);
-                }
+       if(listPayment.isEmpty()){
+        transactions.setPatrTrxno(generateTrxNo(timeNow()));
+        transactions.setPatrTrxnoRev(null);
+        repository.save(transactions);
+       }     
+       for (PaymentTransactions py : listPayment) {
+            if(py.getPatrTrxnoRev() == null){
+                 transactions.setPatrTrxno(generateTrxNo(timeNow())); 
+                 transactions.setPatrTrxnoRev(generateTrxNoRev(timeNow()));
+                 
             }
-        }
+            else if(py.getPatrTrxnoRev()!=null){
+                transactions.setPatrTrxno(generateTrxNo(timeNow()));
+                transactions.setPatrTrxnoRev(generateTrxNoRev(timeNow()));
+                
+            }
+        }    
+        
+       
+          
+        
         transactions.setPatr_created_on(timeNow());
         transactions.setPatr_usac_accountNo_from(noRekening);
         transactions.setPatr_usac_accountNo_to("-");
@@ -154,8 +183,11 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         transactions.setPatr_type(enumPayment);
         transactions.setPatr_invoice_no(invoice);
         transactions.setPatr_notes(notes);
+        
         repository.save(transactions);
        
+        
+        String norev2 = transactions.getPatrTrxno();
         transactions2.setPatrTrxno(generateTrxNo(timeNow()));
         transactions2.setPatr_created_on(timeNow());
         transactions2.setPatr_usac_accountNo_from("-");
@@ -164,9 +196,9 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         transactions2.setPatr_type(enumPayment);
         transactions2.setPatr_notes(notes);
         transactions2.setPatr_invoice_no(invoice);
-        transactions2.setPatrTrxnoRev(transactions.getPatrTrxno());
+        transactions2.setPatrTrxnoRev(generateTrxNoRev(timeNow()));
 
-        repository.saveAndFlush(transactions2);
+        repository.save(transactions2);
 
     }
     private void checkSaldoHandle(Double saldoSender, Double nominal, EnumPayment enumPayment) {

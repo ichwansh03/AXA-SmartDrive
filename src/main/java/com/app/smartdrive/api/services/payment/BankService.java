@@ -19,4 +19,5 @@ public interface BankService extends BaseService<BanksDtoResponse, Long>{
     Boolean updateBanks(Long bank_entityid,BanksDtoResponse banksDto);
     Boolean deleteBanks(Long bank_entityid);
     BanksIdForUserDtoResponse getBanksUser(String bank_name);
+    public BanksDtoResponse getBankById(Long id);
 } 

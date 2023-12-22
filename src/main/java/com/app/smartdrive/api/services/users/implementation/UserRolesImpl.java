@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.entities.users.*;
 import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -22,61 +23,31 @@ public class UserRolesImpl implements UserRolesService{
   private final RolesRepository rolesRepository;
 
   private final UserRoleRepository userRoleRepository;
-  
-  @Override
-  public List<UserRoles> createUserRole(RoleName roleName, User user) {
-    UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
-
-    Roles roles = rolesRepository.findById(roleName).get();
-    UserRoles userRoles = new UserRoles();
-    userRoles.setRoles(roles);
-    userRoles.setUserRolesId(userRolesId);
-    userRoles.setUsroStatus("ACTIVE");
-    userRoles.setUsroModifiedDate(LocalDateTime.now());
-    userRoles.setUser(user);
-    
-    List<UserRoles> listRole = new ArrayList<>();
-    listRole.add(userRoles);
-    user.setUserRoles(listRole);
-    return listRole;
-  }
-
-  @Override
-  public List<UserRoles> createUserRoleEmployees(RoleName roleName, User user, String isActive) {
-    UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
-
-    Roles roles = rolesRepository.findById(roleName).get();
-    UserRoles userRoles = new UserRoles();
-    userRoles.setRoles(roles);
-    userRoles.setUserRolesId(userRolesId);
-    userRoles.setUsroStatus(isActive);
-    userRoles.setUsroModifiedDate(LocalDateTime.now());
-    userRoles.setUser(user);
-
-    List<UserRoles> listRole = new ArrayList<>();
-    listRole.add(userRoles);
-    user.setUserRoles(listRole);
-    return listRole;
-  }
 
   @Override
   @Transactional
-  public List<UserRoles> createUserRoleByAgen(RoleName roleName, User user, Boolean isActive) {
+  public UserRoles updateUserRoleStatus(Long userEntityId, RoleName roleName, String newStatus) {
+    UserRolesId userRolesId = new UserRolesId(userEntityId, roleName);
+
+    UserRoles userRoles = userRoleRepository.findById(userRolesId)
+            .orElseThrow(() -> new EntityNotFoundException("UserRoles not found with id: " + userRolesId));
+
+    userRoles.setUsroStatus(newStatus);
+    userRoles.setUsroModifiedDate(LocalDateTime.now());
+
+    return userRoleRepository.save(userRoles);
+  }
+  @Override
+  @Transactional
+  public List<UserRoles> createUserRole(RoleName roleName, User user, boolean isActive) {
     UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
 
-    String roleStatus;
-
-    if(isActive){
-      roleStatus = "ACTIVE";
-    }else{
-      roleStatus = "INACTIVE";
-    }
-
-    Roles roles = rolesRepository.findById(roleName).get();
+    Roles roles = rolesRepository.findById(roleName)
+            .orElseThrow(() -> new EntityNotFoundException("Role not found"));
     UserRoles userRoles = new UserRoles();
     userRoles.setRoles(roles);
     userRoles.setUserRolesId(userRolesId);
-    userRoles.setUsroStatus(roleStatus);
+    userRoles.setUsroStatus(isActive ? "ACTIVE" : "INACTIVE");
     userRoles.setUsroModifiedDate(LocalDateTime.now());
     userRoles.setUser(user);
 
@@ -85,6 +56,25 @@ public class UserRolesImpl implements UserRolesService{
     user.setUserRoles(listRole);
     return listRole;
   }
+  @Override
+  public List<UserRoles> createUserRoleEmployees(RoleName roleName, User user, boolean isActive) {
+    UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
+
+    Roles roles = rolesRepository.findById(roleName).get();
+    UserRoles userRoles = new UserRoles();
+    userRoles.setRoles(roles);
+    userRoles.setUserRolesId(userRolesId);
+    userRoles.setUsroStatus(isActive ? "ACTIVE" : "INACTIVE");
+    userRoles.setUsroModifiedDate(LocalDateTime.now());
+    userRoles.setUser(user);
+
+    List<UserRoles> listRole = new ArrayList<>();
+    listRole.add(userRoles);
+    user.setUserRoles(listRole);
+    return listRole;
+  }
+
+
 
   @Override
   public User updateRoleFromPcToCu(User customer) {

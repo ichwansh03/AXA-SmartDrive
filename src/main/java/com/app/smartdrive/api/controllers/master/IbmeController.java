@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -47,7 +46,6 @@ public class IbmeController implements BaseController<IbmeReq, Long> {
         return ResponseEntity.ok("OK");
     }
 
-    @Transactional
     @PostMapping
     public ResponseEntity<?> saveAndSendMail(@Valid @RequestBody NotificationReq request) {
         IbmeReq ibmeReq = new IbmeReq();
@@ -68,7 +66,6 @@ public class IbmeController implements BaseController<IbmeReq, Long> {
     }
 
     @Override
-    @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody IbmeReq request) {
         InboxMessaging result = getResponseEntity(request, service.getById(id));
@@ -85,7 +82,6 @@ public class IbmeController implements BaseController<IbmeReq, Long> {
     }
 
     @Override
-    @Transactional
     @DeleteMapping("/{id}")
     public ResponseEntity<?> destroyData(@PathVariable Long id) {
         service.deleteById(id);

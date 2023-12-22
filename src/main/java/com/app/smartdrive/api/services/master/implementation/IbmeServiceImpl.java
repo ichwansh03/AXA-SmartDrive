@@ -6,6 +6,7 @@ import com.app.smartdrive.api.services.master.IbmeService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,11 +26,13 @@ public class IbmeServiceImpl implements IbmeService {
     }
 
     @Override
+    @Transactional
     public InboxMessaging save(InboxMessaging entity) {
         return repository.save(entity);
     }
 
     @Override
+    @Transactional
     public void deleteById(Long aLong) {
         repository.deleteById(aLong);
     }

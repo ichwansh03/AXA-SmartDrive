@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,7 +33,6 @@ public class TetyController implements BaseController<TetyReq, Long> {
     }
 
     @Override
-    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody TetyReq request) {
         TemplateType result = new TemplateType();
@@ -44,7 +42,6 @@ public class TetyController implements BaseController<TetyReq, Long> {
     }
 
     @Override
-    @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TetyReq request) {
         TemplateType result = service.getById(id);
