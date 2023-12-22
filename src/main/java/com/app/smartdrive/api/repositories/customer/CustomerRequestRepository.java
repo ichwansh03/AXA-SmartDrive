@@ -6,6 +6,8 @@ import com.app.smartdrive.api.entities.users.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -28,4 +30,7 @@ public interface CustomerRequestRepository extends JpaRepository<CustomerRequest
 
     Page<CustomerRequest> findByCreqStatus(Pageable pageable, EnumCustomer.CreqStatus creqStatus);
 
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE CustomerRequest creq SET creq.creqType = ?1 WHERE creq.creqEntityId = ?2")
+    int updateCreqType(EnumCustomer.CreqType creqType, Long creqId);
 }

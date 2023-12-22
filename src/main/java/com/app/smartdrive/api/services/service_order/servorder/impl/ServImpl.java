@@ -53,7 +53,10 @@ public class ServImpl implements ServService {
         Services serv;
 
         switch (cr.getCreqType().toString()){
-            case "FEASIBLITY" -> serv = serviceFactory.generateFeasiblityType(cr);
+            case "FEASIBLITY" -> {
+                serv = serviceFactory.generateFeasiblityType(cr);
+                customerRequestRepository.updateCreqType(EnumCustomer.CreqType.POLIS, cr.getCreqEntityId());
+            }
             case "POLIS" -> {
                 serv = serviceFactory.handleServiceUpdate(cr,
                         LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
