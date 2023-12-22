@@ -65,7 +65,7 @@ public class Services {
     @JoinColumn(name = "serv_cust_entityid")
     private User users;
 
-    @JsonBackReference
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "serv_creq_entityid")
     private CustomerRequest customer;

@@ -10,4 +10,6 @@ public interface UserRolesService {
   public User updateRoleFromPcToCu(User customer);
   public List<UserRoles> createUserRoleEmployees(RoleName roleName, User user, boolean isActive);
   public UserRoles updateUserRoleStatus(Long userEntityId, RoleName roleName, String newStatus);
+
+  User updateRoleStatus(User customer, String active);
 }
