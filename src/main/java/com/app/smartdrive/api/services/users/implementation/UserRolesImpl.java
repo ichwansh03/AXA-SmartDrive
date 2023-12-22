@@ -96,4 +96,14 @@ public class UserRolesImpl implements UserRolesService{
     }
   }
 
+  @Transactional
+  public User updateRoleStatus(User customer, String status){
+    UserRoles existUserRole = this.userRoleRepository.checkUserRoleIsExist(customer.getUserEntityId(), RoleName.CU.toString())
+            .orElseThrow(() -> new EntityNotFoundException("User Role is not exist"));
+
+    existUserRole.setUsroStatus(status);
+
+    return customer;
+  }
+
 }

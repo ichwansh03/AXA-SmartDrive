@@ -359,9 +359,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
 
-        User customer = this.userService.getUserById(updateCustomerRequestDTO.getCustomerId()).orElseThrow(
-                () -> new EntityNotFoundException("User with id " + updateCustomerRequestDTO.getCustomerId() + " is not found")
-        );
+        User customer = this.getUpdatedUser(updateCustomerRequestDTO.getCustomerId(), updateCustomerRequestDTO.getAccessGrantUser());
 
         EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
                 .orElseThrow(
@@ -417,6 +415,21 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return customerResponseDTO;
     }
 
+    @Override
+    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess) {
+        User customer = this.userService.getUserById(userEntityId).orElseThrow(
+                () -> new EntityNotFoundException("User with id " + userEntityId + " is not found")
+        );
+
+        if(grantUserAccess){
+            customer = this.userRolesService.updateRoleStatus(customer, "ACTIVE");
+        }else{
+            customer = this.userRolesService.updateRoleStatus(customer, "INACTIVE");
+        }
+
+        return customer;
+    }
+
     @Transactional
     @Override
     public void delete(Long creqEntityId) {
@@ -465,43 +478,22 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request with id " + customerRequestTypeDTO.getCreqEntityId() + " is not found")
-        );
+    public void changeRequestType(CustomerRequest customerRequest, EnumCustomer.CreqType creqType) {
 
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.POLIS);
+        customerRequest.setCreqType(creqType);
 
-        this.customerRequestRepository.save(existCustomerRequest);
-        log.info("CustomerRequestServiceImpl:changeRequestTypeToPolis, successfully change creq type to polis");
+        this.customerRequestRepository.save(customerRequest);
+        log.info("CustomerRequestServiceImpl:changeRequestType, successfully change creq type to " + creqType.toString());
     }
 
-    @Transactional
     @Override
-    public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request with id " + customerRequestTypeDTO.getCreqEntityId() + " is not found")
-        );
+    public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus) {
+        customerRequest.setCreqStatus(creqStatus);
 
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
-
-        this.customerRequestRepository.save(existCustomerRequest);
-        log.info("CustomerRequestServiceImpl:changeRequestTypeToClaim, successfully change creq type to claim");
+        this.customerRequestRepository.save(customerRequest);
     }
 
 
-    @Transactional
-    @Override
-    public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(customerRequestTypeDTO.getCreqEntityId()).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request with id " + customerRequestTypeDTO.getCreqEntityId() + " is not found")
-        );
-
-        existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLOSE);
-
-        this.customerRequestRepository.save(existCustomerRequest);
-        log.info("CustomerRequestServiceImpl:changeRequestTypeToClose, successfully change creq type to close");
-    }
 }
 
 

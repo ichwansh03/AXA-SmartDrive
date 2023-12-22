@@ -19,5 +19,7 @@ public class UpdateCustomerRequestDTO {
 
     private Long employeeId;
 
+    private Boolean accessGrantUser = true;
+
     private CiasDTO ciasDTO;
 }
