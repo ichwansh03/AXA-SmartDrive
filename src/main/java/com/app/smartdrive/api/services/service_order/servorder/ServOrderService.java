@@ -23,5 +23,5 @@ public interface ServOrderService {
 
     int selectPartner(Partner partner, String seroId);
 
-    int requestClosePolis(EnumModuleServiceOrders.SeroStatus seroStatus, String seroReason, String seroId);
+    int updateStatusRequest(EnumModuleServiceOrders.SeroStatus seroStatus, String seroReason, String seroId);
 }

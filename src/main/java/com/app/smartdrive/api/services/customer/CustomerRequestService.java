@@ -37,11 +37,11 @@ public interface CustomerRequestService {
 
     public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive);
 
-    public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO);
+    public void changeRequestType(CustomerRequest customerRequest, EnumCustomer.CreqType creqType);
 
-    public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO);
-
-    public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO);
+    public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus);
 
     Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status);
+
+    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);
 }

@@ -53,7 +53,10 @@ public class ServImpl implements ServService {
         Services serv;
 
         switch (cr.getCreqType().toString()){
-            case "FEASIBLITY" -> serv = serviceFactory.generateFeasiblityType(cr);
+            case "FEASIBLITY" -> {
+                serv = serviceFactory.generateFeasiblityType(cr);
+                customerRequestRepository.updateCreqType(EnumCustomer.CreqType.POLIS, cr.getCreqEntityId());
+            }
             case "POLIS" -> {
                 serv = serviceFactory.handleServiceUpdate(cr,
                         LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
@@ -63,10 +66,6 @@ public class ServImpl implements ServService {
                     LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
             default -> serv = serviceFactory.handleServiceUpdate(cr,
                     LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
-        }
-
-        if(Objects.equals(cr.getCreqType().toString(), "CLOSE")){
-            cr.setCreqStatus(EnumCustomer.CreqStatus.CLOSED);
         }
 
         log.info("ServImpl::addService save services to db {} ",serv);

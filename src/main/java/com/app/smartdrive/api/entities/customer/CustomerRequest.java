@@ -73,7 +73,7 @@ public class CustomerRequest {
     )
     private EmployeeAreaWorkgroup employeeAreaWorkgroup;
 
-//
+    @JsonManagedReference
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
     private Services services;
 }

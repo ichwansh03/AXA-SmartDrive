@@ -23,4 +23,9 @@ public interface UserRoleRepository extends JpaRepository<UserRoles, UserRolesId
             "WHERE usro_entityid = ?1 \n" +
             "AND usro_role_name = 'PC'", nativeQuery = true)
     Optional<UserRoles> checkRolePcIsExist(Long usro_entityId);
+
+    @Query(value = "SELECT TOP(1) * FROM users.user_roles\n" +
+            "WHERE usro_entityid = ?1 \n" +
+            "AND usro_role_name = ?2", nativeQuery = true)
+    Optional<UserRoles> checkUserRoleIsExist(Long usro_entityId, String roleName);
 }
