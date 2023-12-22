@@ -158,8 +158,6 @@ public class CustomerServiceControllerTest {
     public ClaimRequestDTO getClaimRequestDTO(Long creqEntityId){
         return ClaimRequestDTO.builder()
                 .creqEntityId(creqEntityId)
-                .cuclEventPrice(BigDecimal.valueOf(100_000_000))
-                .cuclSubtotal(BigDecimal.valueOf(100_000_000))
                 .build();
     }
     public ClaimResponseDTO getClaimResponseDTO(Long creqEntity){
@@ -644,7 +642,7 @@ public class CustomerServiceControllerTest {
 
         CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(cuclCreqEntityId, type, status);
 
-        when(this.customerClaimService.updateCustomerClaim(claimRequestDTO))
+        when(this.customerClaimService.claimPolis(claimRequestDTO))
                 .thenReturn(customerResponseDTO);
 
         mockMvc.perform(put("/customer/service/request/claim")
@@ -674,7 +672,7 @@ public class CustomerServiceControllerTest {
         ClaimRequestDTO claimRequestDTO = getClaimRequestDTO(cuclCreqEntityId);
 
 
-        when(this.customerClaimService.updateCustomerClaim(claimRequestDTO))
+        when(this.customerClaimService.claimPolis(claimRequestDTO))
                 .thenThrow(new EntityNotFoundException("Customer Request with id " + claimRequestDTO.getCreqEntityId() + " is not found"));
 
         mockMvc.perform(put("/customer/service/request/claim")

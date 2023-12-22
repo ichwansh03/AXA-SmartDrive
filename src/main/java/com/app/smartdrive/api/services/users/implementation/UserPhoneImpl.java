@@ -78,6 +78,11 @@ public class UserPhoneImpl implements UserPhoneService {
   }
 
   @Override
+  public Optional<String> findByPhoneNumber(String phoneNumber) {
+    return this.userPhoneRepository.findPhoneNumber(phoneNumber);
+  }
+
+  @Override
   public List<UserPhone> createUserPhone(User user, List<UserPhoneDto> userPost) {
     List<UserPhone> userPhone = TransactionMapper.mapListDtoToListEntity(userPost, UserPhone.class);
     userPhone.forEach(phone -> {
