@@ -145,7 +145,7 @@ public class ServOrderImpl implements ServOrderService {
     }
 
     @Override
-    public int requestClosePolis(EnumModuleServiceOrders.SeroStatus seroStatus, String seroReason, String seroId) {
+    public int updateStatusRequest(EnumModuleServiceOrders.SeroStatus seroStatus, String seroReason, String seroId) {
         int requested = soOrderRepository.requestClosePolis(seroStatus, seroReason, seroId);
 
         if (requested == 0) {
