@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.UserPhoneExistException;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
@@ -24,12 +25,14 @@ import com.app.smartdrive.api.entities.users.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.users.RolesRepository;
+import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
 import com.app.smartdrive.api.services.master.*;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
+import com.app.smartdrive.api.services.users.UserPhoneService;
 import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -80,10 +83,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final UserRolesService userRolesService;
 
-    private final UserRoleRepository userRoleRepository;
-
-    private final UserRepository userRepository;
-
+    private final UserPhoneService userPhoneService;
 
     @Transactional(readOnly = true)
     @Override
@@ -199,6 +199,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             throw new Exception("CustomerRequest with police number " + ciasDTO.getCiasPoliceNumber() + " is already exist");
         }
 
+        userPost.getUserPhone().stream().forEach(
+                userPhoneDto -> {
+                    if(this.userPhoneService.findByPhoneNumber(userPhoneDto.getUserPhoneId().getUsphPhoneNumber()).isPresent()){
+                        throw new UserPhoneExistException("User with phone number " + userPhoneDto.getUserPhoneId().getUsphPhoneNumber() + " is already exist");
+                    }
+                }
+        );
+
         BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
         Long entityId = newEntity.getEntityId();
 
@@ -214,8 +222,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                         () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
                 );
 
+        User newCustomer = this.createNewUserByAgen(userPost, birthDate, customerRequestDTO.getAccessGrantUser());
 
-        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, null, entityId);
+
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, newCustomer, entityId);
         newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
@@ -241,8 +251,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
 
-
-        User newCustomer = this.createNewUserByAgen(userPost, birthDate, customerRequestDTO.getAccessGrantUser());
 
         // set and save
         newCustomerRequest.setCustomerClaim(newClaim);
