@@ -47,7 +47,7 @@ public class ServOrderController {
     @PutMapping("/close/{seroId}")
     //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToCloseOrder(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId){
-        int requested = servOrderService.requestClosePolis(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
+        int requested = servOrderService.updateStatusRequest(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
         return new ResponseEntity<>(requested, HttpStatus.OK);
     }
 

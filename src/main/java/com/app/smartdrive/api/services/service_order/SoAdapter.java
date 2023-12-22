@@ -46,11 +46,11 @@ public class SoAdapter {
     public String generatePolis(CustomerRequest cr){
         String servTypes = cr.getCreqType().toString();
         String createdDate = cr.getCreqCreateDate().format(formatter);
-        String formatPolisId = String.format("%04d", cr.getServices().getServId());
+        //String formatPolisId = String.format("%04d", getNextSequenceNumber());
 
         return switch (servTypes) {
-            case "POLIS", "CLAIM" -> formatPolisId+"-"+createdDate;
-            default -> "-";
+            case "POLIS", "CLAIM" -> getNextSequenceNumber()+"-"+createdDate;
+            default -> "0";
         };
 
     }
