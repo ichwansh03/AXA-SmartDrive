@@ -429,13 +429,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 () -> new EntityNotFoundException("User with id " + userEntityId + " is not found")
         );
 
-        if(grantUserAccess){
-            customer = this.userRolesService.updateRoleStatus(customer, "ACTIVE");
-        }else{
-            customer = this.userRolesService.updateRoleStatus(customer, "INACTIVE");
-        }
+        this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, grantUserAccess? "ACTIVE":"INACTIVE");
+//        if(grantUserAccess){
+//            this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, "ACTIVE");
+//        }else{
+//            this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, "INACTIVE");
+//        }
 
-        return customer;
+        return userService.getById(customer.getUserEntityId());
     }
 
     @Transactional

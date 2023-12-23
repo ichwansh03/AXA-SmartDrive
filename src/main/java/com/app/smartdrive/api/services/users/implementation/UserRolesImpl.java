@@ -31,7 +31,7 @@ public class UserRolesImpl implements UserRolesService{
 
   @Override
   @Transactional
-  public UserRoles updateUserRoleStatus(Long userEntityId, RoleName roleName, String newStatus) {
+  public void updateUserRoleStatus(Long userEntityId, RoleName roleName, String newStatus) {
     UserRolesId userRolesId = new UserRolesId(userEntityId, roleName);
 
     UserRoles userRoles = userRoleRepository.findById(userRolesId)
@@ -40,7 +40,8 @@ public class UserRolesImpl implements UserRolesService{
     userRoles.setUsroStatus(newStatus);
     userRoles.setUsroModifiedDate(LocalDateTime.now());
 
-    return userRoleRepository.save(userRoles);
+    userRoleRepository.save(userRoles);
+    entityManager.clear();
   }
   @Override
   @Transactional
