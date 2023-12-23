@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.auth.implementation;
 
+import com.app.smartdrive.api.Exceptions.AccountNonActiveException;
 import com.app.smartdrive.api.Exceptions.EmailExistException;
 import com.app.smartdrive.api.Exceptions.UserPhoneExistException;
 import com.app.smartdrive.api.Exceptions.UsernameExistException;
@@ -57,11 +58,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   @Override
   public User signinCustomer(SignInRequest request) {
-    authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
     User user = userRepository.findUserByIden(request.getUsername())
             .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-    return user;
+    if(user.getUserRoles().stream().anyMatch(usro -> usro.getUsroStatus().equals("ACTIVE"))){
+      authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+      return user;
+    }
+    throw new AccountNonActiveException();
   }
 
   @Override
