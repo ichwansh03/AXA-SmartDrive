@@ -208,5 +208,11 @@ public class GlobalExceptions {
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
+  @ExceptionHandler(AccountNonActiveException.class)
+  public ResponseEntity<?> inactiveAccount(AccountNonActiveException ex){
+    Error error = ErrorUtils.createError("Inactive account, please use another account",
+            ex.getMessage(), HttpStatus.FORBIDDEN.value());
+    return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+  }
 }
 

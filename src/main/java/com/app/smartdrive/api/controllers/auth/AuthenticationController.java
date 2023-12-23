@@ -54,11 +54,10 @@ public class AuthenticationController {
     userResponse.setAccessToken(jwtCookie.getValue());
     userResponse.setTokenType("Bearer");
 
-    ResponseEntity<?> body = ResponseEntity.status(HttpStatus.OK)
+    return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
             .body(userResponse);
-    return body;
   }
 
   @PostMapping("/signup")
