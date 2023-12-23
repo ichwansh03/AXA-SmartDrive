@@ -2,6 +2,7 @@ package com.app.smartdrive.api.services.service_order.premi.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,8 +49,11 @@ public class ServPremiImpl implements ServPremiService {
 
         ServicePremi save = semiRepository.save(premi);
 
-        servPremiCreditService.addSecr(premi);
-        log.info("ServPremiImpl::addSemi successfully added service premi");
+        if (services.getCustomer().getCustomerInscAssets().getCiasPaidType() == EnumCustomer.CreqPaidType.CREDIT) {
+            servPremiCreditService.addSecr(premi);
+            log.info("ServPremiImpl::addSemi successfully added service premi");
+        }
+
         return save;
     }
 
