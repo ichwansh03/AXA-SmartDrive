@@ -9,5 +9,5 @@ public interface UserRolesService {
   List<UserRoles> createUserRole(RoleName roleName, User user, boolean isActive);
   void updateRoleFromPcToCu(Long userId);
 
-  UserRoles updateUserRoleStatus(Long userEntityId, RoleName roleName, String newStatus);
+  void updateUserRoleStatus(Long userEntityId, RoleName roleName, String newStatus);
 }
