@@ -27,7 +27,8 @@ public class ServiceFactoryImpl implements ServiceFactory {
 
     @Override
     public Services generateFeasiblityType(CustomerRequest cr){
-        return buildCommonServiceData(cr, LocalDateTime.now().plusDays(7), EnumModuleServiceOrders.ServStatus.ACTIVE);
+        return buildCommonServiceData(cr, LocalDateTime.now().plusDays(7),
+                EnumModuleServiceOrders.ServStatus.ACTIVE);
     }
 
     @Override
@@ -60,6 +61,9 @@ public class ServiceFactoryImpl implements ServiceFactory {
     }
 
     private Services buildCommonServiceData(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus){
+        Services serviceParent = soRepository.getServiceParent(cr.getCustomer().getUserEntityId())
+                .orElse(null);
+
         return Services.builder()
                 .servType(cr.getCreqType())
                 .servCreatedOn(cr.getCreqCreateDate())
@@ -69,6 +73,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
                 .servEndDate(endDate)
                 .servStatus(servStatus)
                 .users(cr.getCustomer())
+                .parentServices(serviceParent)
                 .customer(cr)
                 .build();
     }
