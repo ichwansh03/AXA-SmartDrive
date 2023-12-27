@@ -24,7 +24,7 @@ import java.util.List;
         uniqueConstraints = @UniqueConstraint(columnNames = "serv_creq_entityid"))
 @NamedQuery(
         name = "Services.getServiceParent",
-        query = "SELECT a FROM Services a INNER JOIN Services b ON a.servId = b.serv.servId WHERE a.users.userEntityId = ?1")
+        query = "SELECT a FROM Services a INNER JOIN Services b ON a.servId = b.parentServices.servId WHERE a.users.userEntityId = ?1")
 @DynamicInsert
 @DynamicUpdate
 public class Services {
