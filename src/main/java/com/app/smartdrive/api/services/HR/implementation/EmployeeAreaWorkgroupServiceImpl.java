@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,8 +35,8 @@ import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.master.ArwgService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -113,6 +115,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     }
     
     @Override
+    @Transactional(readOnly = true)
     public EmployeeAreaWorkgroup getById(Long id) {
         return this.employeeAreaWorkgroupRepository.findByEawgId(id).orElseThrow(
                 () -> new EntityNotFoundException("EmployeeAreaWorkgroup is not found")
@@ -123,6 +126,14 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     @Transactional
     public Page<EmployeeAreaWorkgroup> getAll(Pageable pageable) {
         return employeeAreaWorkgroupRepository.findAll(pageable);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    @Override
+    public EmployeeAreaWorkgroup getById(Long eawgId, Long employeeId) {
+
+        return this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(eawgId, employeeId))
+                .orElseThrow(() -> new EntityNotFoundException("Employee Areaworkgroup with id " + eawgId + " is not found"));
     }
 
     @Override

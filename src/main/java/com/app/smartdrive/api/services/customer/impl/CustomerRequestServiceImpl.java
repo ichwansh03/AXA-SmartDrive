@@ -28,6 +28,7 @@ import com.app.smartdrive.api.repositories.users.RolesRepository;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.repositories.users.UserRoleRepository;
+import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
 import com.app.smartdrive.api.services.master.*;
@@ -56,6 +57,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
+
+    private final EmployeeAreaWorkgroupService employeeAreaWorkgroupService;
 
     private final BusinessEntityService businessEntityService;
 
@@ -151,10 +154,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()))
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
-                );
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId());
 
 
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, customer, entityId);
@@ -225,10 +225,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()))
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
-                );
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId());
 
         User newCustomer = this.createNewUserByAgen(userPost, birthDate, customerRequestDTO.getAccessGrantUser());
 
@@ -374,10 +371,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         User customer = this.getUpdatedUser(updateCustomerRequestDTO.getCustomerId(), updateCustomerRequestDTO.getAccessGrantUser());
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
-                );
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId());
 
 
         existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());

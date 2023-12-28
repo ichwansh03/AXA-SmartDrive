@@ -22,6 +22,7 @@ public interface EmployeeAreaWorkgroupService extends BaseService<EmployeeAreaWo
 
     public Page<EmployeeAreaWorkgroup> getAll(Pageable pageable);
 
+    public EmployeeAreaWorkgroup getById(Long eawgId, Long employeeId);
 
 
     
