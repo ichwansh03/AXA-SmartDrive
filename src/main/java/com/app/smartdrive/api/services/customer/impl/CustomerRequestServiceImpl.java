@@ -110,6 +110,16 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
+    public CustomerRequest getById(Long creqEntityId){
+
+        return this.customerRequestRepository.findById(creqEntityId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
+                );
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
                 .orElseThrow(() -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
