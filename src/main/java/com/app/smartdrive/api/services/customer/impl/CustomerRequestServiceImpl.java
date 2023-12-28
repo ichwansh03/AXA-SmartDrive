@@ -3,7 +3,7 @@ package com.app.smartdrive.api.services.customer.impl;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.UserPhoneExistException;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
-import com.app.smartdrive.api.dto.customer.request.CiasDTO;
+import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.CreateCustomerRequestByAgenDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
@@ -48,7 +48,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -187,64 +186,65 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerRequest create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
-        CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
-        Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = customerRequestDTO.getCustomerInscAssetsRequestDTO();
+        Long[] customerInscExtendIds = customerRequestDTO.getCustomerInscAssetsRequestDTO().getCuexIds();
 
-        if(this.customerInscAssetsService.isCiasAlreadyExist(ciasDTO.getCiasPoliceNumber())){
-            throw new Exception("CustomerRequest with police number " + ciasDTO.getCiasPoliceNumber() + " is already exist");
+        if(this.customerInscAssetsService.isCustomerInscAssetsPoliceNumberExist(customerInscAssetsRequestDTO.getCiasPoliceNumber())){
+            throw new Exception("CustomerRequest with police number " + customerInscAssetsRequestDTO.getCiasPoliceNumber() + " is already exist");
         }
 
-        BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
-        Long entityId = newEntity.getEntityId();
-
-        User customer = this.userService.getUserById(customerRequestDTO.getCustomerId()).orElseThrow(
-                () -> new EntityNotFoundException("User with id " + customerRequestDTO.getCustomerId() + " is not found")
+        User existCustomer = this.userService.getById(customerRequestDTO.getCustomerId());
+        CarSeries existCarSeries = this.carsService.getById(customerInscAssetsRequestDTO.getCiasCarsId());
+        Cities existCity = this.cityService.getById(customerInscAssetsRequestDTO.getCiasCityId());
+        InsuranceType existInsuranceType = this.intyService.getById(customerInscAssetsRequestDTO.getCiasIntyName());
+        EmployeeAreaWorkgroup existEmployeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(
+                customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()
         );
 
-        CarSeries existCarSeries = this.carsService.getById(ciasDTO.getCiasCarsId());
 
-        Cities existCity = this.cityService.getById(ciasDTO.getCiasCityId());
-
-        InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
-
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId());
+        BusinessEntity newBusinessEntity = this.businessEntityService.createBusinessEntity();
+        Long entityId = newBusinessEntity.getEntityId();
 
 
-        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, customer, entityId);
-        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
-        newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+        CustomerRequest newCustomerRequest = this.createCustomerRequest(newBusinessEntity, existCustomer, entityId);
+        newCustomerRequest.setCreqAgenEntityid(existEmployeeAreaWorkgroup.getEawgId());
+        newCustomerRequest.setEmployeeAreaWorkgroup(existEmployeeAreaWorkgroup);
 
-        CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, existCarSeries, existCity, existInty, newCustomerRequest);
+        CustomerClaim newCustomerClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
 
-        List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
-        cias.setCustomerInscDoc(ciasDocs);
-
-        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, cias.getCiasCurrentPrice());
+        CustomerInscAssets newCustomerInscAssets = this.customerInscAssetsService.createCustomerInscAssets(
+                entityId, customerInscAssetsRequestDTO, existCarSeries, existCity, existInsuranceType, newCustomerRequest
+        );
+        List<CustomerInscDoc> newCustomerInscDocList = this.customerInscDocService.fileCheck(files, entityId);
+        List<CustomerInscExtend> newCustomerInscExtendList = this.customerInscExtendService.getCustomerInscEtend(
+                customerInscExtendIds, newCustomerInscAssets, entityId, newCustomerInscAssets.getCiasCurrentPrice()
+        );
 
 
         BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
-                existInty.getIntyName(),
+                existInsuranceType.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
-                ciasDTO.getCurrentPrice(),
-                customer.getUserBirthDate().getYear(),
-                ciasCuexs
+                customerInscAssetsRequestDTO.getCurrentPrice(),
+                existCustomer.getUserBirthDate().getYear(),
+                newCustomerInscExtendList
         );
 
-        cias.setCiasTotalPremi(premiPrice);
-        cias.setCustomerInscExtend(ciasCuexs);
 
-        CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
+        // cias set
+        newCustomerInscAssets.setCiasTotalPremi(premiPrice);
+        newCustomerInscAssets.setCustomerInscExtend(newCustomerInscExtendList);
+        newCustomerInscAssets.setCustomerInscDoc(newCustomerInscDocList);
 
         // set and save
-        newCustomerRequest.setCustomerClaim(newClaim);
-        newCustomerRequest.setCustomerInscAssets(cias);
+        newCustomerRequest.setCustomerClaim(newCustomerClaim);
+        newCustomerRequest.setCustomerInscAssets(newCustomerInscAssets);
 
-        CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
-        log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
-        return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(newCustomerRequest);
+        log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCustomerRequest);
+        return savedCustomerRequest;
     }
 
     @Transactional
@@ -253,14 +253,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         // prep
         CreateUserDto userPost = customerRequestDTO.getUserDTO();
-        CiasDTO ciasDTO = customerRequestDTO.getCiasDTO();
-        Long[] cuexIds = customerRequestDTO.getCiasDTO().getCuexIds();
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = customerRequestDTO.getCustomerInscAssetsRequestDTO();
+        Long[] cuexIds = customerRequestDTO.getCustomerInscAssetsRequestDTO().getCuexIds();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
 
-        if(this.customerInscAssetsService.isCiasAlreadyExist(ciasDTO.getCiasPoliceNumber())){
-            throw new Exception("CustomerRequest with police number " + ciasDTO.getCiasPoliceNumber() + " is already exist");
+        if(this.customerInscAssetsService.isCustomerInscAssetsPoliceNumberExist(customerInscAssetsRequestDTO.getCiasPoliceNumber())){
+            throw new Exception("CustomerRequest with police number " + customerInscAssetsRequestDTO.getCiasPoliceNumber() + " is already exist");
         }
 
         userPost.getUserPhone().stream().forEach(
@@ -275,11 +275,11 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Long entityId = newEntity.getEntityId();
 
 
-        CarSeries existCarSeries = this.carsService.getById(ciasDTO.getCiasCarsId());
+        CarSeries existCarSeries = this.carsService.getById(customerInscAssetsRequestDTO.getCiasCarsId());
 
-        Cities existCity = this.cityService.getById(ciasDTO.getCiasCityId());
+        Cities existCity = this.cityService.getById(customerInscAssetsRequestDTO.getCiasCityId());
 
-        InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
+        InsuranceType existInty = this.intyService.getById(customerInscAssetsRequestDTO.getCiasIntyName());
 
         EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId());
 
@@ -290,19 +290,19 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
 
-        CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, existCarSeries, existCity, existInty, newCustomerRequest);
+        CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, customerInscAssetsRequestDTO, existCarSeries, existCity, existInty, newCustomerRequest);
 
         List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
         cias.setCustomerInscDoc(ciasDocs);
 
-        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasDTO.getCurrentPrice());
+        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, customerInscAssetsRequestDTO.getCurrentPrice());
 
 
         BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
                 existInty.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
-                ciasDTO.getCurrentPrice(),
+                customerInscAssetsRequestDTO.getCurrentPrice(),
                 birthDate.getYear(),
                 ciasCuexs
         );
@@ -332,7 +332,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
         CustomerInscAssets cias = existCustomerRequest.getCustomerInscAssets();
 
-        CiasDTO ciasUpdateDTO = updateCustomerRequestDTO.getCiasDTO();
+        CustomerInscAssetsRequestDTO ciasUpdateDTO = updateCustomerRequestDTO.getCustomerInscAssetsRequestDTO();
         Long[] cuexIds = ciasUpdateDTO.getCuexIds();
 
 

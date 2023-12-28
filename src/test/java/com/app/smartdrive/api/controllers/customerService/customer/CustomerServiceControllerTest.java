@@ -7,32 +7,16 @@ import com.app.smartdrive.api.dto.customer.response.CiasResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
-import com.app.smartdrive.api.dto.user.request.CreateUserDto;
-import com.app.smartdrive.api.dto.user.response.UserDto;
-import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
-import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
-import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
-import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
-import com.app.smartdrive.api.services.customer.impl.CustomerRequestServiceImpl;
-import com.app.smartdrive.api.services.master.CarsService;
-import com.app.smartdrive.api.services.master.CityService;
-import com.app.smartdrive.api.services.master.IntyService;
-import com.app.smartdrive.api.services.users.BusinessEntityService;
-import com.app.smartdrive.api.services.users.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
@@ -52,7 +36,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
@@ -81,7 +64,7 @@ public class CustomerServiceControllerTest {
     public CustomerRequestDTO getCustomerRequestDTO(){
         Long[] cuexIds = {7L,8L,9L};
 
-        CiasDTO ciasDTO = CiasDTO.builder()
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
                 .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
@@ -98,7 +81,7 @@ public class CustomerServiceControllerTest {
                 .customerId(2L)
                 .agenId(1L)
                 .employeeId(1L)
-                .ciasDTO(ciasDTO)
+                .customerInscAssetsRequestDTO(customerInscAssetsRequestDTO)
                 .build();
 
         return customerRequestDTO;
@@ -106,7 +89,7 @@ public class CustomerServiceControllerTest {
     public UpdateCustomerRequestDTO getUpdateCustomerRequestDTO(Long creqEntityId){
         Long[] cuexIds = {7L,8L,9L};
 
-        CiasDTO ciasDTO = CiasDTO.builder()
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
                 .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
@@ -124,7 +107,7 @@ public class CustomerServiceControllerTest {
                 .customerId(2L)
                 .agenId(1L)
                 .employeeId(1L)
-                .ciasDTO(ciasDTO)
+                .customerInscAssetsRequestDTO(customerInscAssetsRequestDTO)
                 .build();
 
         return customerRequestDTO;
@@ -132,7 +115,7 @@ public class CustomerServiceControllerTest {
     public CreateCustomerRequestByAgenDTO getCustomerRequestByAgenDTO(){
         Long[] cuexIds = {7L,8L,9L};
 
-        CiasDTO ciasDTO = CiasDTO.builder()
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
                 .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
@@ -149,7 +132,7 @@ public class CustomerServiceControllerTest {
                 .employeeId(2L)
                 .agenId(1L)
                 .employeeId(1L)
-                .ciasDTO(ciasDTO)
+                .customerInscAssetsRequestDTO(customerInscAssetsRequestDTO)
                 .build();
 
         return customerRequestDTO;
@@ -423,10 +406,10 @@ public class CustomerServiceControllerTest {
 
         CustomerRequestDTO customerRequestDTO = getCustomerRequestDTO();
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+        CustomerRequest customerRequest = new CustomerRequest();
 
         when(this.customerRequestService.create(customerRequestDTO, multipartFiles))
-                .thenReturn(customerResponseDTO);
+                .thenReturn(customerRequest);
 
         mockMvc.perform(multipart("/customer/service/request")
                 .file(file)
@@ -440,7 +423,7 @@ public class CustomerServiceControllerTest {
             assertEquals(creqEntityId, response.getCreqEntityId());
             assertEquals(type, response.getCreqType().toString());
             assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
     }
 
@@ -524,7 +507,7 @@ public class CustomerServiceControllerTest {
         CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = getCustomerRequestByAgenDTO();
 
         when(this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, multipartFiles))
-                .thenThrow(new Exception("CustomerRequest with police number " + createCustomerRequestByAgenDTO.getCiasDTO().getCiasPoliceNumber() + " is already exist"));
+                .thenThrow(new Exception("CustomerRequest with police number " + createCustomerRequestByAgenDTO.getCustomerInscAssetsRequestDTO().getCiasPoliceNumber() + " is already exist"));
 
         mockMvc.perform(multipart("/customer/service/request/agen")
                 .file(file)
@@ -532,7 +515,7 @@ public class CustomerServiceControllerTest {
         ).andExpect(status().isInternalServerError()
         ).andExpect(result -> assertTrue(result.getResolvedException() instanceof Exception)
         ).andExpect(result -> assertEquals(
-                "CustomerRequest with police number " + createCustomerRequestByAgenDTO.getCiasDTO().getCiasPoliceNumber() + " is already exist",
+                "CustomerRequest with police number " + createCustomerRequestByAgenDTO.getCustomerInscAssetsRequestDTO().getCiasPoliceNumber() + " is already exist",
                 result.getResolvedException().getMessage())
         ).andDo(print());
     }

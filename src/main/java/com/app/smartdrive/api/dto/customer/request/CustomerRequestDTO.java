@@ -21,5 +21,5 @@ public class CustomerRequestDTO {
 
     @Valid
     @NotBlank
-    private CiasDTO ciasDTO;
+    private CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO;
 }

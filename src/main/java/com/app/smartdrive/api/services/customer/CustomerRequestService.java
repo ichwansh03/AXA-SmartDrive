@@ -27,7 +27,7 @@ public interface CustomerRequestService {
 
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId);
 
-    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerRequest create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
     public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 

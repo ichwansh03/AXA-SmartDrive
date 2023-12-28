@@ -22,7 +22,7 @@ public class CreateCustomerRequestByAgenDTO {
 
     @Valid
     @NotBlank
-    private CiasDTO ciasDTO;
+    private CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO;
 
     @Valid
     @NotBlank

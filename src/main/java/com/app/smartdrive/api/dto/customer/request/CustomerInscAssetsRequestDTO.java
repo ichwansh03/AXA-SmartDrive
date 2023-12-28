@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CiasDTO {
+public class CustomerInscAssetsRequestDTO {
 
     @Size(max = 15, message = "test dari dto")
     private String ciasPoliceNumber;

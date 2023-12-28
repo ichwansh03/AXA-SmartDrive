@@ -21,5 +21,5 @@ public class UpdateCustomerRequestDTO {
 
     private Boolean accessGrantUser = true;
 
-    private CiasDTO ciasDTO;
+    private CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO;
 }
