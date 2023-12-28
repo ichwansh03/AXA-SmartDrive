@@ -339,68 +339,67 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerRequest updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
         CustomerRequest existCustomerRequest = this.getById(updateCustomerRequestDTO.getCreqEntityId());
-
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = updateCustomerRequestDTO.getCustomerInscAssetsRequestDTO();
+        Long[] customerInscExtendIds = customerInscAssetsRequestDTO.getCuexIds();
 
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
-        CustomerInscAssets cias = existCustomerRequest.getCustomerInscAssets();
-
-        CustomerInscAssetsRequestDTO ciasUpdateDTO = updateCustomerRequestDTO.getCustomerInscAssetsRequestDTO();
-        Long[] cuexIds = ciasUpdateDTO.getCuexIds();
+        CustomerInscAssets existCustomerInscAssets = existCustomerRequest.getCustomerInscAssets();
 
 
-        User customer = this.getUpdatedUser(updateCustomerRequestDTO.getCustomerId(), updateCustomerRequestDTO.getAccessGrantUser());
+        User existCustomer = this.getUpdatedUser(updateCustomerRequestDTO.getCustomerId(), updateCustomerRequestDTO.getAccessGrantUser());
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId());
+        EmployeeAreaWorkgroup existEmployeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(
+                updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()
+        );
+
+        CarSeries existCarSeries = this.carsService.getById(customerInscAssetsRequestDTO.getCiasCarsId());
+        Cities existCity = this.cityService.getById(customerInscAssetsRequestDTO.getCiasCityId());
+        InsuranceType existInsuranceType = this.intyService.getById(customerInscAssetsRequestDTO.getCiasIntyName());
 
 
-        existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
-        existCustomerRequest.setCustomer(customer);
-
-
-        CarSeries carSeries = this.carsService.getById(ciasUpdateDTO.getCiasCarsId());
-
-        Cities existCity = this.cityService.getById(ciasUpdateDTO.getCiasCityId());
-
-        InsuranceType existInty = this.intyService.getById(ciasUpdateDTO.getCiasIntyName());
-
-        this.customerInscAssetsService.updateCustomerInscAssets(cias, ciasUpdateDTO, existCity, carSeries, existInty);
 
         // update cuex
         this.customerInscExtendService.deleteAllCustomerInscExtendInCustomerRequest(entityId);
 
-        List<CustomerInscExtend> updatedCustomerInscExtend = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, ciasUpdateDTO.getCurrentPrice());
+        List<CustomerInscExtend> updatedCustomerInscExtend = this.customerInscExtendService.getCustomerInscEtend(
+                customerInscExtendIds, existCustomerInscAssets, entityId, customerInscAssetsRequestDTO.getCurrentPrice()
+        );
 
-        cias.setCustomerInscExtend(updatedCustomerInscExtend);
+        existCustomerInscAssets.setCustomerInscExtend(updatedCustomerInscExtend);
 
         // update cadoc
         this.customerInscDocService.deleteAllCustomerInscDocInCustomerRequest(entityId);
 
         List<CustomerInscDoc> newCiasDocs = this.customerInscDocService.fileCheck(files, entityId);
-        cias.setCustomerInscDoc(newCiasDocs);
+        existCustomerInscAssets.setCustomerInscDoc(newCiasDocs);
 
 
         BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
-                existInty.getIntyName(),
-                carSeries.getCarModel().getCarBrand().getCabrName(),
+                existInsuranceType.getIntyName(),
+                existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
-                ciasUpdateDTO.getCurrentPrice(),
+                customerInscAssetsRequestDTO.getCurrentPrice(),
                 existCustomerRequest.getCustomer().getUserBirthDate().getYear(),
                 updatedCustomerInscExtend
         );
 
-        cias.setCiasTotalPremi(premiPrice);
+        // update cias
+        this.customerInscAssetsService.updateCustomerInscAssets(existCustomerInscAssets, customerInscAssetsRequestDTO, existCity, existCarSeries, existInsuranceType);
+        existCustomerInscAssets.setCiasTotalPremi(premiPrice);
 
+        existCustomerRequest.setCreqAgenEntityid(existEmployeeAreaWorkgroup.getEawgId());
+        existCustomerRequest.setCustomer(existCustomer);
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
-        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(employeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
-        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
+//        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+//        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(existEmployeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
+//        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
 
-        return customerResponseDTO;
+        return savedCustomerRequest;
     }
 
     @Transactional

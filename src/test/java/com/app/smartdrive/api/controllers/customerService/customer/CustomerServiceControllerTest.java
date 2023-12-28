@@ -538,7 +538,7 @@ public class CustomerServiceControllerTest {
 
         UpdateCustomerRequestDTO customerRequestDTO = getUpdateCustomerRequestDTO(creqEntityId);
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+        CustomerRequest customerRequest = new CustomerRequest();
 
         // custom http method for multipart
         MockMultipartHttpServletRequestBuilder builder =
@@ -552,7 +552,7 @@ public class CustomerServiceControllerTest {
         });
 
         when(this.customerRequestService.updateCustomerRequest(customerRequestDTO, multipartFiles))
-                .thenReturn(customerResponseDTO);
+                .thenReturn(customerRequest);
 
         mockMvc.perform(builder
                 .file(file)
@@ -566,7 +566,7 @@ public class CustomerServiceControllerTest {
             assertEquals(creqEntityId, response.getCreqEntityId());
             assertEquals(type, response.getCreqType().toString());
             assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
     }
 

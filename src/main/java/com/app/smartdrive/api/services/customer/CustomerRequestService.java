@@ -37,7 +37,7 @@ public interface CustomerRequestService {
 
     public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive);
 
-    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerRequest updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
     public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);
 

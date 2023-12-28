@@ -78,6 +78,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
         LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
 
         if(!Objects.equals(cias.getCiasPoliceNumber(), ciasUpdateDTO.getCiasPoliceNumber())){
+            this.validatePoliceNumber(cias.getCiasPoliceNumber());
             cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
         }
 

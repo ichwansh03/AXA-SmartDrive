@@ -185,8 +185,9 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         UpdateCustomerRequestDTO updateCustomerRequestDTO = mapper.readValue(client, UpdateCustomerRequestDTO.class);
 
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, files);
+        CustomerRequest updatedCustomerRequest = this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, files);
 
+        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(updatedCustomerRequest, CustomerResponseDTO.class);
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
