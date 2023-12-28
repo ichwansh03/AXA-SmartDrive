@@ -115,15 +115,6 @@ public class EmployeesServiceImpl implements EmployeesService {
         return user;
     }
 
-    private void createUserRolesAccountFromDto(User user, RoleName roleName, Boolean isActive){
-        UserRolesId userRolesId = new UserRolesId(user.getUserEntityId(), roleName);
-
-        UserRoles userRoles = new UserRoles();
-        userRoles.setUserRolesId(userRolesId);
-        userRoles.setUsroStatus(isActive ? "ACTIVE" : "INACTIVE");
-        userRolesService.createUserRole(roleName, user, true);
-    }
-
     private void createUserAccountFromDto(User user, String accountNo){
         UserUserAccountDto userAccountDto = new UserUserAccountDto();    
         userAccountDto.setUsac_accountno(accountNo);
@@ -218,19 +209,12 @@ public class EmployeesServiceImpl implements EmployeesService {
         userAddressService.updateUserAddress(user.getUserEntityId(), userAddress.getUsdrId(), userAddressRequestDto);
     }
 
-
-
     @Override
     public Page<Employees> searchEmployees(String value, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        try {
-            EnumClassHR.emp_graduate empGraduate = EnumClassHR.emp_graduate.valueOf(value.toUpperCase());
-            return employeesRepository.findByEmpGraduate(empGraduate, pageable);
-        } catch (IllegalArgumentException e) {
-            return employeesRepository.findByEmpNameContaining(value, pageable);
-        }
+        return employeesRepository.findByEmpNameOrEmpGraduate(value, pageable);
     }
+
 
 
     @Override
