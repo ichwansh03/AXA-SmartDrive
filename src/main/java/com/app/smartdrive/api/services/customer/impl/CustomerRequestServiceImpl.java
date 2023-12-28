@@ -192,6 +192,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
 
+    @Transactional
     @Override
     public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
 
@@ -268,6 +269,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
 
+    @Transactional(readOnly = true)
     @Override
     public Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status) {
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
