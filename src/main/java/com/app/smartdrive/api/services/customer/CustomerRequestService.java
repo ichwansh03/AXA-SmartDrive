@@ -19,6 +19,8 @@ public interface CustomerRequestService {
 
     public Page<CustomerResponseDTO> getPaging(Pageable pageable);
 
+    public CustomerRequest getById(Long creqEntityId);
+
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId);
 
     public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
