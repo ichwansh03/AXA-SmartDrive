@@ -121,9 +121,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional(readOnly = true)
     @Override
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
-                );
+        CustomerRequest existCustomerRequest = this.getById(creqEntityId);
 
         log.info("CustomerRequestImpl::getCustomerRequestById in ID {} ", existCustomerRequest.getCreqEntityId());
         return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
@@ -364,10 +362,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional
     @Override
     public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(updateCustomerRequestDTO.getCreqEntityId())
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Customer Request with id " + updateCustomerRequestDTO.getCreqEntityId() + " is not found")
-                );
+        CustomerRequest existCustomerRequest = this.getById(updateCustomerRequestDTO.getCreqEntityId());
 
 
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
@@ -433,6 +428,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return customerResponseDTO;
     }
 
+    @Transactional
     @Override
     public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess) {
         User customer = this.userService.getUserById(userEntityId).orElseThrow(
@@ -440,11 +436,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         );
 
         this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, grantUserAccess? "ACTIVE":"INACTIVE");
-//        if(grantUserAccess){
-//            this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, "ACTIVE");
-//        }else{
-//            this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, "INACTIVE");
-//        }
 
         return userService.getById(customer.getUserEntityId());
     }
@@ -452,14 +443,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional
     @Override
     public void delete(Long creqEntityId) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
-        );
+        CustomerRequest existCustomerRequest = this.getById(creqEntityId);
 
         this.customerRequestRepository.delete(existCustomerRequest);
         log.info("CustomerRequestServiceImpl:delete, successfully delete customer request");
     }
 
+    @Transactional
     @Override
     public CustomerRequest createCustomerRequest(
             BusinessEntity newEntity,
@@ -484,6 +474,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return customerRequest;
     }
 
+    @Transactional
     @Override
     public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive){
         ProfileRequestDto profileRequestDto = userPost.getProfile();
@@ -506,6 +497,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         log.info("CustomerRequestServiceImpl:changeRequestType, successfully change creq type to " + creqType.toString());
     }
 
+    @Transactional
     @Override
     public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus) {
         customerRequest.setCreqStatus(creqStatus);
