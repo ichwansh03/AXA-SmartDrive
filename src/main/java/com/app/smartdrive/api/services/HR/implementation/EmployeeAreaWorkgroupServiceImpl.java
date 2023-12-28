@@ -128,7 +128,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         return employeeAreaWorkgroupRepository.findAll(pageable);
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     @Override
     public EmployeeAreaWorkgroup getById(Long eawgId, Long employeeId) {
 
