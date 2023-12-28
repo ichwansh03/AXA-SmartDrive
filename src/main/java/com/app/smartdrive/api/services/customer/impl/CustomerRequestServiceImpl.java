@@ -115,6 +115,76 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Page<CustomerRequest> getAllPaging(Pageable paging, String type, String status) {
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
+
+        Page<CustomerRequest> pageCustomerRequest;
+
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByCreqStatus(paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByCreqTypeAndCreqStatus(paging, creqType, creqStatus);
+        }
+
+        log.info("CustomerRequestServiceImpl::getAllPaging get paging all customer request");
+        return pageCustomerRequest;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<CustomerRequest> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status) {
+        User user = this.userService.getUserById(customerId).orElseThrow(
+                () -> new EntityNotFoundException("User with id " + customerId + " is not found")
+        );
+
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
+
+        Page<CustomerRequest> pageCustomerRequest;
+
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqStatus(user, paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqTypeAndCreqStatus(user, paging, creqType, creqStatus);
+        }
+
+
+        log.info("CustomerRequestServiceImpl::getPagingUserCustomerRequest," +
+                " successfully get all customer request who belong to user with ID: {}", user.getUserEntityId());
+
+        return pageCustomerRequest;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<CustomerRequest> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable paging, String type, String status) {
+        AreaWorkGroup existAreaWorkgroup = this.arwgService.getById(arwgCode);
+        Employees existEmployee = this.employeesService.getById(employeeId);
+        EmployeeAreaWorkgroup existEmployeeAreaworkgroup = this.employeeAreaWorkgroupRepository.findByAreaWorkGroupAndEmployees(existAreaWorkgroup, existEmployee).orElseThrow(
+                () -> new EntityNotFoundException("Agen with id : " + employeeId + " is not found")
+        );
+
+        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
+
+        Page<CustomerRequest> pageCustomerRequest;
+
+        if(Objects.equals(type, "ALL")){
+            pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqStatus(existEmployeeAreaworkgroup, paging, creqStatus);
+        }else{
+            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
+            pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqTypeAndCreqStatus(existEmployeeAreaworkgroup, paging, creqType, creqStatus);
+        }
+
+
+        log.info("CustomerRequestServiceImpl::getPagingAgenCustomerRequest," +
+                " successfully get all customer request who belong to agen with ID: {} and areaCode: {}", employeeId, arwgCode);
+
+        return pageCustomerRequest;
+    }
+
     @Transactional
     @Override
     public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
@@ -253,96 +323,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
 
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status) {
-        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
-
-        Page<CustomerRequest> pageCustomerRequest;
-
-        if(Objects.equals(type, "ALL")){
-            pageCustomerRequest = this.customerRequestRepository.findByCreqStatus(paging, creqStatus);
-        }else{
-            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
-            pageCustomerRequest = this.customerRequestRepository.findByCreqTypeAndCreqStatus(paging, creqType, creqStatus);
-        }
-
-        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
-
-        return pageCustomerResponseDTO;
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status) {
-        User user = this.userService.getUserById(custId).orElseThrow(
-                () -> new EntityNotFoundException("User with id " + custId + " is not found")
-        );
-
-        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
-
-        Page<CustomerRequest> pageCustomerRequest;
-
-        if(Objects.equals(type, "ALL")){
-            pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqStatus(user, paging, creqStatus);
-        }else{
-            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
-            pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqTypeAndCreqStatus(user, paging, creqType, creqStatus);
-        }
-
-        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
-
-        log.info("CustomerRequestServiceImpl::getPagingCustomerRequest," +
-                " successfully get all customer request who belong to user with ID: {}", user.getUserEntityId());
-
-        return pageCustomerResponseDTO;
-    }
-
-
-    @Transactional(readOnly = true)
-    @Override
-    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable paging, String type, String status) {
-        AreaWorkGroup existAreaWorkgroup = this.arwgService.getById(arwgCode);
-        Employees existEmployee = this.employeesService.getById(empId);
-        EmployeeAreaWorkgroup existEawg = this.employeeAreaWorkgroupRepository.findByAreaWorkGroupAndEmployees(existAreaWorkgroup, existEmployee).orElseThrow(
-                () -> new EntityNotFoundException("Agen with id : " + empId + " is not found")
-        );
-
-        EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
-
-        Page<CustomerRequest> pageCustomerRequest;
-
-        if(Objects.equals(type, "ALL")){
-            pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqStatus(existEawg, paging, creqStatus);
-        }else{
-            EnumCustomer.CreqType creqType = EnumCustomer.CreqType.valueOf(type);
-            pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqTypeAndCreqStatus(existEawg, paging, creqType, creqStatus);
-        }
-
-        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
-
-        log.info("CustomerRequestServiceImpl::getPagingCustomerRequest," +
-                " successfully get all customer request who belong to agen with ID: {} and areaCode: {}", empId, arwgCode);
-
-        return pageCustomerResponseDTO;
-    }
-
     @Transactional
     @Override
     public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
@@ -423,15 +403,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public void delete(Long creqEntityId) {
-        CustomerRequest existCustomerRequest = this.getById(creqEntityId);
-
-        this.customerRequestRepository.delete(existCustomerRequest);
-        log.info("CustomerRequestServiceImpl:delete, successfully delete customer request");
-    }
-
-    @Transactional
-    @Override
     public CustomerRequest createCustomerRequest(
             BusinessEntity newEntity,
             User customer,
@@ -486,7 +457,14 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerRequestRepository.save(customerRequest);
     }
 
+    @Transactional
+    @Override
+    public void delete(Long creqEntityId) {
+        CustomerRequest existCustomerRequest = this.getById(creqEntityId);
 
+        this.customerRequestRepository.delete(existCustomerRequest);
+        log.info("CustomerRequestServiceImpl:delete, successfully delete customer request");
+    }
 }
 
 

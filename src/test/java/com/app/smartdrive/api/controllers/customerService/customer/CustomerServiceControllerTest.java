@@ -201,7 +201,7 @@ public class CustomerServiceControllerTest {
                 getCustomerResponseDTO(2L, "CLAIM", "OPEN")
         );
 
-        Page<CustomerResponseDTO> pagedResponse = new PageImpl(creqDTOList);
+        Page<CustomerRequest> pagedResponse = new PageImpl(creqDTOList);
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
@@ -240,24 +240,24 @@ public class CustomerServiceControllerTest {
     @Test
     @WithMockUser(authorities = "Customer")
     void getAllUserCustomersRequest_willSuccess() throws Exception {
-        UserDto user = new UserDto();
+        User user = new User();
         user.setUserEntityId(1L);
 
-        List<CustomerResponseDTO> customerResponseDTOList = List.of(
-                getCustomerResponseDTO(1L, "POLIS", "OPEN"),
-                getCustomerResponseDTO(2L, "CLAIM", "OPEN")
+        List<CustomerRequest> customerResponseDTOList = List.of(
+                new CustomerRequest(),
+                new CustomerRequest()
         );
 
-        for (CustomerResponseDTO response : customerResponseDTOList) {
+        for (CustomerRequest response : customerResponseDTOList) {
             response.setCustomer(user);
         }
 
 
-        Page<CustomerResponseDTO> pagedResponse = new PageImpl(customerResponseDTOList);
+        Page<CustomerRequest> pagedResponse = new PageImpl(customerResponseDTOList);
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
-        when(this.customerRequestService.getPagingUserCustomerRequests(user.getUserEntityId(), paging, "ALL", "OPEN")).thenReturn(pagedResponse);
+        when(this.customerRequestService.getPagingUserCustomerRequest(user.getUserEntityId(), paging, "ALL", "OPEN")).thenReturn(pagedResponse);
 
         mockMvc.perform(
                 get("/customer/service/request/customer")
@@ -277,7 +277,7 @@ public class CustomerServiceControllerTest {
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
-        when(this.customerRequestService.getPagingUserCustomerRequests(customerId, paging, "ALL", "OPEN"))
+        when(this.customerRequestService.getPagingUserCustomerRequest(customerId, paging, "ALL", "OPEN"))
                 .thenThrow(new EntityNotFoundException("User with id "+ customerId + " is not found"));
 
         mockMvc.perform(
@@ -315,7 +315,7 @@ public class CustomerServiceControllerTest {
             arwgCodeList.add(response.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode());
         }
 
-        Page<CustomerResponseDTO> pagedResponse = new PageImpl(customerResponseDTOList);
+        Page<CustomerRequest> pagedResponse = new PageImpl(customerResponseDTOList);
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
