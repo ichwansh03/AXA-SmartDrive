@@ -1,41 +1,40 @@
 package com.app.smartdrive.api.services.customer.impl;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.UserPhoneExistException;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
-import com.app.smartdrive.api.dto.customer.request.*;
-import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.dto.customer.request.CiasDTO;
+import com.app.smartdrive.api.dto.customer.request.CreateCustomerRequestByAgenDTO;
+import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
-import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.entities.master.*;
-import com.app.smartdrive.api.entities.users.*;
+import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.entities.master.CarSeries;
+import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.master.InsuranceType;
+import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.entities.users.EnumUsers;
+import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
-import com.app.smartdrive.api.repositories.users.RolesRepository;
-import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
-import com.app.smartdrive.api.repositories.users.UserRepository;
-import com.app.smartdrive.api.repositories.users.UserRoleRepository;
+import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
-import com.app.smartdrive.api.services.master.*;
+import com.app.smartdrive.api.services.master.ArwgService;
+import com.app.smartdrive.api.services.master.CarsService;
+import com.app.smartdrive.api.services.master.CityService;
+import com.app.smartdrive.api.services.master.IntyService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserPhoneService;
 import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,11 +43,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-
-import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
