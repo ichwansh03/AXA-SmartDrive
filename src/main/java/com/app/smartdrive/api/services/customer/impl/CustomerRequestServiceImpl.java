@@ -98,21 +98,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerResponseDTO> getPaging(Pageable pageable){
-        Page<CustomerRequest> pageCustomerRequest = this.customerRequestRepository.findAll(pageable);
-        Page<CustomerResponseDTO> pageCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
-
-        log.info("CustomerRequestServiceImpl::getPaging, successfully get all customer request with paging");
-        return pageCustomerResponseDTO;
-    }
-
-    @Transactional(readOnly = true)
-    @Override
     public CustomerRequest getById(Long creqEntityId){
 
         return this.customerRequestRepository.findById(creqEntityId)

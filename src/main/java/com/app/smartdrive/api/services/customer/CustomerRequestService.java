@@ -17,8 +17,6 @@ import java.util.List;
 public interface CustomerRequestService {
     public List<CustomerResponseDTO> get();
 
-    public Page<CustomerResponseDTO> getPaging(Pageable pageable);
-
     public CustomerRequest getById(Long creqEntityId);
 
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId);
