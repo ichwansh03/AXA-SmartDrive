@@ -471,10 +471,10 @@ public class CustomerServiceControllerTest {
 
         CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = getCustomerRequestByAgenDTO();
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+        CustomerRequest customerRequest = new CustomerRequest();
 
         when(this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, multipartFiles))
-                .thenReturn(customerResponseDTO);
+                .thenReturn(customerRequest);
 
         mockMvc.perform(multipart("/customer/service/request/agen")
                 .file(file)
@@ -488,7 +488,7 @@ public class CustomerServiceControllerTest {
             assertEquals(creqEntityId, response.getCreqEntityId());
             assertEquals(type, response.getCreqType().toString());
             assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
     }
 

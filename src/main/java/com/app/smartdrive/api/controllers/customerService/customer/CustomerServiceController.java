@@ -170,8 +170,9 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = mapper.readValue(client, CreateCustomerRequestByAgenDTO.class);
 
-        CustomerResponseDTO customerResponseDTO = this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, files);
+        CustomerRequest newCustomerRequest = this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, files);
 
+        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(newCustomerRequest, CustomerResponseDTO.class);
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
     }
 

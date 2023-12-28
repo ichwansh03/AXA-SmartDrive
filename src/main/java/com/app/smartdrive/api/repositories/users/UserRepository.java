@@ -19,6 +19,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Boolean existsByUserEmail(String email);
 
+  Boolean existsByUserNPWP(String email);
+
+  Boolean existsByUserNationalId(String email);
+
+
+
   @Transactional
   @Modifying
   long deleteByUserName(String username);

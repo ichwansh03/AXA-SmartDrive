@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.customer.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityAlreadyExistException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
@@ -145,10 +146,13 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
     }
 
     @Override
-    public boolean isCustomerInscAssetsPoliceNumberExist(String ciasPoliceNumber) {
-        Optional<CustomerInscAssets> customerInscAssets = this.customerInscAssetsRepository.findByCiasPoliceNumber(ciasPoliceNumber);
-
-        return customerInscAssets.isPresent();
+    public void validatePoliceNumber(String policeNumber){
+        this.customerInscAssetsRepository.findByCiasPoliceNumber(policeNumber)
+                .ifPresent(
+                        customerInscAssets -> {
+                            throw new EntityAlreadyExistException("Customer Request with police number " + policeNumber + " is already exist");
+                        }
+                );
     }
 
 }

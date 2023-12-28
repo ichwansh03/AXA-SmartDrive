@@ -29,9 +29,11 @@ public interface CustomerRequestService {
 
     public CustomerRequest create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
-    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerRequest createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
     public CustomerRequest createCustomerRequest(BusinessEntity newEntity, User customer, Long entityId);
+
+    public CustomerRequest createCustomerRequestByAgen(BusinessEntity newEntity, User customer, Long entityId);
 
     public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive);
 

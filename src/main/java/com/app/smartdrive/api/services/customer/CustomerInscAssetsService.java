@@ -38,5 +38,5 @@ public interface CustomerInscAssetsService {
             List<CustomerInscExtend> cuexs
     );
 
-    public boolean isCustomerInscAssetsPoliceNumberExist(String ciasPoliceNumber);
+    public void validatePoliceNumber(String policeNumber);
 }

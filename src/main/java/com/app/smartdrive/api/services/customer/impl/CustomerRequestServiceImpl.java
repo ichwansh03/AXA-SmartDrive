@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.services.customer.impl;
 
-import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.Exceptions.UserPhoneExistException;
+import com.app.smartdrive.api.Exceptions.*;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.CreateCustomerRequestByAgenDTO;
@@ -23,6 +22,7 @@ import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
+import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
@@ -86,6 +86,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final UserRolesService userRolesService;
 
     private final UserPhoneService userPhoneService;
+
+    // sementara
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -191,9 +194,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = customerRequestDTO.getCustomerInscAssetsRequestDTO();
         Long[] customerInscExtendIds = customerRequestDTO.getCustomerInscAssetsRequestDTO().getCuexIds();
 
-        if(this.customerInscAssetsService.isCustomerInscAssetsPoliceNumberExist(customerInscAssetsRequestDTO.getCiasPoliceNumber())){
-            throw new Exception("CustomerRequest with police number " + customerInscAssetsRequestDTO.getCiasPoliceNumber() + " is already exist");
-        }
+        this.customerInscAssetsService.validatePoliceNumber(customerInscAssetsRequestDTO.getCiasPoliceNumber());
 
         User existCustomer = this.userService.getById(customerRequestDTO.getCustomerId());
         CarSeries existCarSeries = this.carsService.getById(customerInscAssetsRequestDTO.getCiasCarsId());
@@ -249,78 +250,91 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerRequest createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
 
         // prep
-        CreateUserDto userPost = customerRequestDTO.getUserDTO();
+        CreateUserDto createUserDto = customerRequestDTO.getUserDTO();
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = customerRequestDTO.getCustomerInscAssetsRequestDTO();
-        Long[] cuexIds = customerRequestDTO.getCustomerInscAssetsRequestDTO().getCuexIds();
+        Long[] customerInscExtendIds = customerRequestDTO.getCustomerInscAssetsRequestDTO().getCuexIds();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime birthDate = LocalDateTime.parse(userPost.getProfile().getUserByAgenBirthDate(), formatter);
+        LocalDateTime birthDate = LocalDateTime.parse(createUserDto.getProfile().getUserByAgenBirthDate(), formatter);
 
-        if(this.customerInscAssetsService.isCustomerInscAssetsPoliceNumberExist(customerInscAssetsRequestDTO.getCiasPoliceNumber())){
-            throw new Exception("CustomerRequest with police number " + customerInscAssetsRequestDTO.getCiasPoliceNumber() + " is already exist");
+        this.customerInscAssetsService.validatePoliceNumber(customerInscAssetsRequestDTO.getCiasPoliceNumber());
+
+        if(userRepository.existsByUserName((createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber()))){
+            throw new UsernameExistException();
         }
 
-        userPost.getUserPhone().stream().forEach(
-                userPhoneDto -> {
-                    if(this.userPhoneService.findByPhoneNumber(userPhoneDto.getUserPhoneId().getUsphPhoneNumber()).isPresent()){
-                        throw new UserPhoneExistException("User with phone number " + userPhoneDto.getUserPhoneId().getUsphPhoneNumber() + " is already exist");
-                    }
+        if(userRepository.existsByUserEmail(createUserDto.getProfile().getUserEmail())){
+            throw new EmailExistException();
+        };
+
+        if(userRepository.existsByUserNPWP(createUserDto.getProfile().getUserNpwp())){
+            throw new UserExistException("User with NPWP number " + createUserDto.getProfile().getUserNpwp() + " is already exist");
+        }
+
+        if(userRepository.existsByUserNationalId(createUserDto.getProfile().getUserNationalId())){
+            throw new UserExistException("User with national id " + createUserDto.getProfile().getUserNationalId() + " is already exist");
+        }
+
+        createUserDto.getUserPhone().forEach(
+                phone -> {
+                    if(userPhoneService.findByPhoneNumber(phone.getUserPhoneId().getUsphPhoneNumber()).isPresent())
+                        throw new UserPhoneExistException(phone.getUserPhoneId().getUsphPhoneNumber());
                 }
         );
 
-        BusinessEntity newEntity = this.businessEntityService.createBusinessEntity();
-        Long entityId = newEntity.getEntityId();
-
-
         CarSeries existCarSeries = this.carsService.getById(customerInscAssetsRequestDTO.getCiasCarsId());
-
         Cities existCity = this.cityService.getById(customerInscAssetsRequestDTO.getCiasCityId());
+        InsuranceType existInsuranceType = this.intyService.getById(customerInscAssetsRequestDTO.getCiasIntyName());
+        EmployeeAreaWorkgroup existEmployeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(
+                customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()
+        );
+        User newCustomer = this.createNewUserByAgen(createUserDto, birthDate, customerRequestDTO.getAccessGrantUser());
 
-        InsuranceType existInty = this.intyService.getById(customerInscAssetsRequestDTO.getCiasIntyName());
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId());
-
-        User newCustomer = this.createNewUserByAgen(userPost, birthDate, customerRequestDTO.getAccessGrantUser());
+        BusinessEntity newBusinessEntity = this.businessEntityService.createBusinessEntity();
+        Long entityId = newBusinessEntity.getEntityId();
 
 
-        CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, newCustomer, entityId);
-        newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
-        newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
+        CustomerRequest newCustomerRequest = this.createCustomerRequestByAgen(newBusinessEntity, newCustomer, entityId);
+        newCustomerRequest.setCreqAgenEntityid(existEmployeeAreaWorkgroup.getEawgId());
+        newCustomerRequest.setEmployeeAreaWorkgroup(existEmployeeAreaWorkgroup);
 
-        CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, customerInscAssetsRequestDTO, existCarSeries, existCity, existInty, newCustomerRequest);
-
-        List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
-        cias.setCustomerInscDoc(ciasDocs);
-
-        List<CustomerInscExtend> ciasCuexs = this.customerInscExtendService.getCustomerInscEtend(cuexIds, cias, entityId, customerInscAssetsRequestDTO.getCurrentPrice());
+        CustomerInscAssets newCustomerInscAssets = this.customerInscAssetsService.createCustomerInscAssets(
+                entityId, customerInscAssetsRequestDTO, existCarSeries, existCity, existInsuranceType, newCustomerRequest
+        );
+        List<CustomerInscExtend> newCustomerInscExtendList = this.customerInscExtendService.getCustomerInscEtend(
+                customerInscExtendIds, newCustomerInscAssets, entityId, customerInscAssetsRequestDTO.getCurrentPrice()
+        );
+        List<CustomerInscDoc> newCustomerInscDocList = this.customerInscDocService.fileCheck(files, entityId);
 
 
         BigDecimal premiPrice = this.customerInscAssetsService.getPremiPrice(
-                existInty.getIntyName(),
+                existInsuranceType.getIntyName(),
                 existCarSeries.getCarModel().getCarBrand().getCabrName(),
                 existCity.getProvinsi().getZones().getZonesId(),
                 customerInscAssetsRequestDTO.getCurrentPrice(),
                 birthDate.getYear(),
-                ciasCuexs
+                newCustomerInscExtendList
         );
 
-        cias.setCiasTotalPremi(premiPrice);
-        cias.setCustomerInscExtend(ciasCuexs);
+        newCustomerInscAssets.setCiasTotalPremi(premiPrice);
+        newCustomerInscAssets.setCustomerInscDoc(newCustomerInscDocList);
+        newCustomerInscAssets.setCustomerInscExtend(newCustomerInscExtendList);
 
-        CustomerClaim newClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
+        CustomerClaim newCustomerClaim = this.customerClaimService.createNewClaim(newCustomerRequest);
 
 
         // set and save
-        newCustomerRequest.setCustomerClaim(newClaim);
-        newCustomerRequest.setCustomerInscAssets(cias);
+        newCustomerRequest.setCustomerClaim(newCustomerClaim);
+        newCustomerRequest.setCustomerInscAssets(newCustomerInscAssets);
         newCustomerRequest.setCustomer(newCustomer);
 
-        CustomerRequest savedCreq = this.customerRequestRepository.save(newCustomerRequest);
-        log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCreq);
-        return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(newCustomerRequest);
+        log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCustomerRequest);
+        return savedCustomerRequest;
     }
 
     @Transactional
@@ -416,6 +430,27 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CustomerRequest customerRequest = CustomerRequest.builder()
                 .businessEntity(newEntity)
                 .customer(updatedCustomer)
+                .creqCreateDate(LocalDateTime.now())
+                .creqStatus(EnumCustomer.CreqStatus.OPEN)
+                .creqType(EnumCustomer.CreqType.FEASIBLITY)
+                .creqEntityId(entityId)
+                .build();
+
+        log.info("CustomerRequestServiceImpl:createCustomerRequest, create new customerRequest");
+        return customerRequest;
+    }
+
+    @Transactional
+    @Override
+    public CustomerRequest createCustomerRequestByAgen(
+            BusinessEntity newEntity,
+            User customer,
+            Long entityId
+    ){
+
+        CustomerRequest customerRequest = CustomerRequest.builder()
+                .businessEntity(newEntity)
+                .customer(customer)
                 .creqCreateDate(LocalDateTime.now())
                 .creqStatus(EnumCustomer.CreqStatus.OPEN)
                 .creqType(EnumCustomer.CreqType.FEASIBLITY)
