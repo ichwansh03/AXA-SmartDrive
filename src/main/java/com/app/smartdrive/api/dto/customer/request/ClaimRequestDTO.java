@@ -19,7 +19,4 @@ public class ClaimRequestDTO {
 
     private Long creqEntityId;
 
-    private BigDecimal cuclEventPrice;
-
-    private BigDecimal cuclSubtotal;
 }

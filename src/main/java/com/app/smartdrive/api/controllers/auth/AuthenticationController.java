@@ -54,11 +54,10 @@ public class AuthenticationController {
     userResponse.setAccessToken(jwtCookie.getValue());
     userResponse.setTokenType("Bearer");
 
-    ResponseEntity<?> body = ResponseEntity.status(HttpStatus.OK)
+    return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
             .body(userResponse);
-    return body;
   }
 
   @PostMapping("/signup")
@@ -85,7 +84,7 @@ public class AuthenticationController {
             .body(new MessageResponse("You've been sign out!"));
   }
 
-  @PostMapping("/{id}/changePassword")
+  @PatchMapping("/{id}/changePassword")
   @PreAuthorize("principal.getUserEntityId() == #id && isAuthenticated()")
   public ResponseEntity<?> changePassword(@RequestBody PasswordRequestDto passwordRequestDto
           , @PathVariable("id") Long id){
@@ -95,7 +94,6 @@ public class AuthenticationController {
   }
 
   @PostMapping("/refreshtoken")
-  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<?> refreshToken(HttpServletRequest request){
     Optional<String> refreshToken = jwtService.getJwtFromCookies(request, jwtRefreshCookie);
     if(refreshToken.isPresent()){

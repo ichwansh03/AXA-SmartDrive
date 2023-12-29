@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,6 @@ public class UserAddressController {
   @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> deleteAddress(@PathVariable("id") Long id, @PathVariable("addressId") Long addressId){
     userAddressService.deleteAddressById(id, addressId);
-    return ResponseEntity.status(HttpStatus.OK).body("Address has been deleted");
+    return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Address has been deleted"));
   }
 }

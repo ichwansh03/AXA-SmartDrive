@@ -23,6 +23,8 @@ import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetServiceImpl;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceOrderFactory;
 import com.app.smartdrive.api.services.users.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -66,6 +69,7 @@ class ClaimAssetControllerTest {
     ObjectMapper objectMapper;
     @Autowired
     MockMvc mockMvc;
+    @MockBean
     @Autowired
     ClaimAssetServiceImpl claimAssetService;
     @Autowired
@@ -75,11 +79,11 @@ class ClaimAssetControllerTest {
     @Autowired
     CustomerRequestService customerRequestService;
     @Autowired
-    ServService servService;
+    ServiceFactory servService;
     @Autowired
     SoOrderRepository soOrderRepository;
     @Autowired
-    ServOrderService servOrderService;
+    ServiceOrderFactory servOrderService;
     @Autowired
     CaspRepository caspRepository;
     @Autowired

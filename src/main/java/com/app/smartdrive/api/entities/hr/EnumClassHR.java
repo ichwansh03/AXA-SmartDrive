@@ -8,14 +8,26 @@ public class EnumClassHR {
     }
 
     public enum emp_graduate {
-        SMA,
-        SMK,
-        D1,
-        D2,
-        D3,
-        S1,
-        S2
+        SMA("SMA"),
+        SMK("SMK"),
+        D1("D1"),
+        D2("D2"),
+        D3("D3"),
+
+        S1("S1"),
+        S2("S2");
+
+        private final String value;
+        private emp_graduate(String value){
+            this.value = value;
+        }
+        public String getValue(){
+            return value;
+        }
+
     }
+
+
 
     public enum emp_type{
         CONTRACT,

@@ -1,5 +1,7 @@
 package com.app.smartdrive.api.services.partner.implementation;
 
+import com.app.smartdrive.api.entities.customer.CustomerClaim;
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.partner.BatchPartnerInvoice;
 import com.app.smartdrive.api.entities.partner.BpinStatus;
 import com.app.smartdrive.api.entities.service_order.ClaimAssetEvidence;
@@ -7,11 +9,13 @@ import com.app.smartdrive.api.entities.service_order.ClaimAssetSparepart;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.partner.BatchPartnerInvoiceRepository;
+import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import com.app.smartdrive.api.services.partner.BatchPartnerInvoiceService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,6 +26,8 @@ public class BatchPartnerInvoiceServiceImpl implements BatchPartnerInvoiceServic
 
     private final ServOrderService servOrderService;
     private final BatchPartnerInvoiceRepository bpinRepository;
+
+    private final CustomerClaimService customerClaimService;
 
     @Override
     public BatchPartnerInvoice getById(String s) {
@@ -61,6 +67,9 @@ public class BatchPartnerInvoiceServiceImpl implements BatchPartnerInvoiceServic
                 .no(generateInvoiceNo(seroId))
                 .build();
 
+
+        CustomerRequest customerRequest = serviceOrders.getServices().getCustomer();
+        this.customerClaimService.calculateSubtotalAndEventPrice(customerRequest, paid, batchPartnerInvoice.getTax());
 
         return bpinRepository.save(batchPartnerInvoice);
     }

@@ -74,9 +74,12 @@ public class UserPhoneImpl implements UserPhoneService {
   @Override
   public void deleteUserPhone(Long id, String number) {
     Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumberAndUserId(number, id);
-    if(userPhone.isPresent()){
-      userPhoneRepository.delete(userPhone.get());
-    }
+    userPhone.ifPresent(userPhoneRepository::delete);
+  }
+
+  @Override
+  public Optional<String> findByPhoneNumber(String phoneNumber) {
+    return this.userPhoneRepository.findPhoneNumber(phoneNumber);
   }
 
   @Override

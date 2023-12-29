@@ -1,40 +1,31 @@
 package com.app.smartdrive.api.services.HR.implementation;
 
 import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
+
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.app.smartdrive.api.Exceptions.AreaWorkGroupNotFoundException;
-import com.app.smartdrive.api.Exceptions.EmployeeAreaWorkgroupNotFoundException;
-import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
-import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
-import com.app.smartdrive.api.entities.master.Cities;
-import com.app.smartdrive.api.entities.master.Provinsi;
-import com.app.smartdrive.api.entities.master.Zones;
-import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.mapper.hr.EmployeesAreaWorkgroupMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
-import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
-import com.app.smartdrive.api.repositories.master.ArwgRepository;
-import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.master.ArwgService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -99,19 +90,21 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
    
 
     @Override
-    public Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size) {
+    public Page<EmployeeAreaWorkgroup> searchEawg(String value, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<EmployeeAreaWorkgroup> resultPage = employeeAreaWorkgroupRepository.findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(value, value, value, pageable);
+        Page<EmployeeAreaWorkgroup> resultPage = employeeAreaWorkgroupRepository.findeawg(value, value, value, pageable);
 
-        List<EmployeesAreaWorkgroupResponseDto> dtos = resultPage.getContent().stream()
-                .map(EmployeesAreaWorkgroupMapper::convertToDto)
-                .collect(Collectors.toList());
+//        List<EmployeesAreaWorkgroupResponseDto> dto = resultPage.getContent().stream()
+//                .map(EmployeesAreaWorkgroupMapper::convertToDto)
+//                .collect(Collectors.toList());
 
-        return new PageImpl<>(dtos, pageable, resultPage.getTotalElements());
+//        return new PageImpl<>(dto, pageable, resultPage.getTotalElements());
+        return resultPage;
     }
     
     @Override
+    @Transactional(readOnly = true)
     public EmployeeAreaWorkgroup getById(Long id) {
         return this.employeeAreaWorkgroupRepository.findByEawgId(id).orElseThrow(
                 () -> new EntityNotFoundException("EmployeeAreaWorkgroup is not found")
@@ -124,16 +117,15 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         return employeeAreaWorkgroupRepository.findAll(pageable);
     }
 
+    @Transactional
     @Override
-    public List<EmployeeAreaWorkgroup> getAll() {
-        return null;
+    public EmployeeAreaWorkgroup getById(Long eawgId, Long employeeId) {
+
+        return this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(eawgId, employeeId))
+                .orElseThrow(() -> new EntityNotFoundException("Employee Areaworkgroup with id " + eawgId + " is not found"));
     }
 
-    @Override
-    public EmployeeAreaWorkgroup save(EmployeeAreaWorkgroup entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
+
 
     @Override
     public void deleteById(Long eawg_id) {

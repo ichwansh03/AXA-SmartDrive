@@ -104,23 +104,5 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
     }
 
 
-    @Override
-    public BatchEmployeeSalary getById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
-    }
-
-    @Override
-    public List<BatchEmployeeSalary> getAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
-    }
-
-    @Override
-    public BatchEmployeeSalary save(BatchEmployeeSalary t) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
-
 
 }

@@ -7,6 +7,7 @@ import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceOrderFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import java.util.Objects;
 public class ServOrderController {
 
     private final ServOrderService servOrderService;
+    private final ServiceOrderFactory serviceOrderFactory;
 
     @GetMapping("/search")
     //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
@@ -47,7 +49,7 @@ public class ServOrderController {
     @PutMapping("/close/{seroId}")
     //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToCloseOrder(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId){
-        int requested = servOrderService.requestClosePolis(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
+        int requested = serviceOrderFactory.updateStatusRequest(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
         return new ResponseEntity<>(requested, HttpStatus.OK);
     }
 

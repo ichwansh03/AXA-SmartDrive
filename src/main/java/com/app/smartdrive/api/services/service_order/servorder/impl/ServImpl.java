@@ -3,12 +3,8 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.*;
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.*;
-import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.service_orders.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
@@ -19,9 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -39,47 +33,8 @@ public class ServImpl implements ServService {
     private final ServPremiService servPremiService;
     private final ServPremiCreditService servPremiCreditService;
 
-    private final CustomerRequestRepository customerRequestRepository;
     private final CustomerRequestService customerRequestService;
     private final ServiceFactory serviceFactory;
-
-    @Transactional
-    @Override
-    public Services addService(Long creqId) throws Exception {
-
-        CustomerRequest cr = customerRequestRepository.findById(creqId)
-                .orElseThrow(() -> new EntityNotFoundException("creqId "+creqId+" is not found"));
-
-        Services serv;
-
-        switch (cr.getCreqType().toString()){
-            case "FEASIBLITY" -> serv = serviceFactory.generateFeasiblityType(cr);
-            case "POLIS" -> {
-                serv = serviceFactory.handleServiceUpdate(cr,
-                        LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
-                log.info("ServImpl::addService save services to db polis {} ",serv);
-            }
-            case "CLAIM" -> serv = serviceFactory.handleServiceUpdate(cr,
-                    LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
-            default -> serv = serviceFactory.handleServiceUpdate(cr,
-                    LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
-        }
-
-        if(Objects.equals(cr.getCreqType().toString(), "CLOSE")){
-            cr.setCreqStatus(EnumCustomer.CreqStatus.CLOSED);
-        }
-
-        log.info("ServImpl::addService save services to db {} ",serv);
-        Services saved = soRepository.save(serv);
-        log.info("ServImpl::addService service saved {} ",saved);
-
-        servOrderService.addServiceOrders(saved.getServId());
-
-        soRepository.flush();
-        log.info("ServOrderServiceImpl::addService sync data to db");
-
-        return saved;
-    }
 
     @Transactional(readOnly = true)
     @Override

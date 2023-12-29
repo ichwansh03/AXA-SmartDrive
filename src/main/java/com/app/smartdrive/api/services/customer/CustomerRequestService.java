@@ -19,6 +19,8 @@ public interface CustomerRequestService {
 
     public Page<CustomerResponseDTO> getPaging(Pageable pageable);
 
+    public CustomerRequest getById(Long creqEntityId);
+
     public CustomerResponseDTO getCustomerRequestById(Long creqEntityId);
 
     public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
@@ -37,11 +39,11 @@ public interface CustomerRequestService {
 
     public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive);
 
-    public void changeRequestTypeToPolis(CustomerRequestTypeDTO customerRequestTypeDTO);
+    public void changeRequestType(CustomerRequest customerRequest, EnumCustomer.CreqType creqType);
 
-    public void changeRequestTypeToClaim(CustomerRequestTypeDTO customerRequestTypeDTO);
-
-    public void changeRequestTypeToClose(CustomerRequestTypeDTO customerRequestTypeDTO);
+    public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus);
 
     Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status);
+
+    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);
 }

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.user.response.UserRoleDto;
+import com.app.smartdrive.api.entities.users.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +30,6 @@ import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.hr.EnumClassHR.emp_type;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
-import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.entities.users.UserAddress;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
@@ -70,29 +70,43 @@ public class EmployeesServiceImpl implements EmployeesService {
     
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
 
-        Employees employee = new Employees();
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).orElseThrow(() ->
                 new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
+
+        Employees employee = Employees.builder()
+                .empName(employeesDto.getEmpName())
+                .empJoinDate(empJoinDate)
+                .empStatus(EnumClassHR.status.ACTIVE)
+                .empType(emp_type.PERMANENT)
+                .empGraduate(employeesDto.getEmpGraduate())
+                .empAccountNumber(employeesDto.getEmpAccountNumber())
+                .empNetSalary(employeesDto.getEmpSalary())
+                .jobType(jobType)
+                .empJobCode(employeesDto.getJobType())
+                .empModifiedDate(LocalDateTime.now())
+                .build();
+
         
-        employee.setEmpName(employeesDto.getEmpName());
-        employee.setEmpJoinDate(empJoinDate);
-        employee.setEmpStatus(EnumClassHR.status.INACTIVE);
-        employee.setEmpType(emp_type.PERMANENT);
-        employee.setEmpGraduate(employeesDto.getEmpGraduate());
-        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
-        employee.setEmpNetSalary(employeesDto.getEmpSalary());
-        employee.setJobType(jobType);
-        employee.setEmpJobCode(employeesDto.getJobType());
-        employee.setEmpModifiedDate(LocalDateTime.now());
+//        employee.setEmpName(employeesDto.getEmpName());
+//        employee.setEmpJoinDate(empJoinDate);
+//        employee.setEmpStatus(EnumClassHR.status.INACTIVE);
+//        employee.setEmpType(emp_type.PERMANENT);
+//        employee.setEmpGraduate(employeesDto.getEmpGraduate());
+//        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
+//        employee.setEmpNetSalary(employeesDto.getEmpSalary());
+//        employee.setJobType(jobType);
+//        employee.setEmpJobCode(employeesDto.getJobType());
+//        employee.setEmpModifiedDate(LocalDateTime.now());
         
         User user = createUserFromDto(employeesDto);
-        if(employeesDto.getGrantAccessUser()==true){
+        if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
-            employee.setEmpStatus(EnumClassHR.status.ACTIVE);
+
+
         }
-        
-        userRolesService.createUserRole(RoleName.EM, user);
+
+        userRolesService.createUserRole(RoleName.EM,user,employeesDto.getGrantAccessUser());
         createUserPhonefromDto(user, employeesDto.getEmpPhone());
         createUserAccountFromDto(user, employeesDto.getEmpAccountNumber());
         createUserAddressFromDto(user, employeesDto.getEmpAddress());    
@@ -102,7 +116,6 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         return employeesRepository.save(employee);
     }
-
 
     private User createUserFromDto(EmployeesRequestDto employeesDto) {
         ProfileRequestDto profileRequestDto = new ProfileRequestDto();
@@ -114,7 +127,6 @@ public class EmployeesServiceImpl implements EmployeesService {
     
         return user;
     }
-
 
     private void createUserAccountFromDto(User user, String accountNo){
         UserUserAccountDto userAccountDto = new UserUserAccountDto();    
@@ -163,7 +175,6 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         existingEmployee.setEmpName(employeesDto.getEmpName());
         existingEmployee.setEmpJoinDate(empJoinDate);
-        existingEmployee.setEmpType(emp_type.PERMANENT);
         existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         existingEmployee.setEmpGraduate(employeesDto.getEmpGraduate());
         existingEmployee.setEmpNetSalary(employeesDto.getEmpSalary());
@@ -173,14 +184,14 @@ public class EmployeesServiceImpl implements EmployeesService {
         User user = existingEmployee.getUser();
         updateUserFromDto(user, employeesDto);
 
-        if(employeesDto.getGrantAccessUser()==true){
+        if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
-            existingEmployee.setEmpStatus(EnumClassHR.status.ACTIVE);
+            userRolesService.updateUserRoleStatus(existingEmployee.getEmpEntityid(),RoleName.EM,"ACTIVE");
         }else{
             user.setUserName(null);
             user.setUserPassword(null);
-            existingEmployee.setEmpStatus(EnumClassHR.status.INACTIVE);
+            userRolesService.updateUserRoleStatus(existingEmployee.getEmpEntityid(),RoleName.EM,"INACTIVE");
         }
 
         updateAddressEmployees(user, employeesDto.getEmpAddress());
@@ -211,26 +222,16 @@ public class EmployeesServiceImpl implements EmployeesService {
         userAddressService.updateUserAddress(user.getUserEntityId(), userAddress.getUsdrId(), userAddressRequestDto);
     }
 
-
-
     @Override
     public Page<Employees> searchEmployees(String value, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        try {
-            EnumClassHR.emp_graduate empGraduate = EnumClassHR.emp_graduate.valueOf(value.toUpperCase());
-            return employeesRepository.findByEmpGraduate(empGraduate, pageable);
-        } catch (IllegalArgumentException e) {
-            return employeesRepository.findByEmpNameContaining(value, pageable);
-        }
+        return employeesRepository.findByEmpNameOrEmpGraduate(value, pageable);
     }
-
 
     @Override
   public void deleteEmployeesById(Long empEntitiyid) {
     employeesRepository.deleteById(empEntitiyid);
   }
-
 
     @Override
     public Employees getById(Long id) {
@@ -242,24 +243,12 @@ public class EmployeesServiceImpl implements EmployeesService {
         return existEmployees;
     }
 
+
+
     @Override
     @Transactional
     public Page<Employees> getAll(Pageable pageable) {
         return employeesRepository.findAll(pageable);
-    }
-
-    @Override
-    public List<Employees> getAll() {
-        return null;
-    }
-
-
-
-
-    @Override
-    public Employees save(Employees entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
 
     

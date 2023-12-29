@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.controllers.users;
 
+import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,8 +26,8 @@ public class UserPhotoController {
 
   @PostMapping
   @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
-  public ResponseEntity<?> addUserPhone(@RequestParam MultipartFile photo, @PathVariable("id") Long id) throws Exception{
-    String userphoto = userPhotoService.addPhoto(photo,id);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userphoto);
+  public ResponseEntity<?> savePhotoUser(@RequestParam MultipartFile photo, @PathVariable("id") Long id) throws Exception{
+    userPhotoService.savePhoto(photo, id);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Success save photo user"));
   }
 }

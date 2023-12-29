@@ -6,6 +6,7 @@ import com.app.smartdrive.api.services.master.TestaService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class TestaServiceImpl implements TestaService {
     }
 
     @Override
+    @Transactional
     public TemplateServiceTask save(TemplateServiceTask entity) {
         return repository.save(entity);
     }

@@ -4,7 +4,6 @@ import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.entities.users.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,7 +19,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "services", schema = "so", uniqueConstraints = @UniqueConstraint(columnNames = "serv_creq_entityid"))
+@Table(
+        name = "services", schema = "so",
+        uniqueConstraints = @UniqueConstraint(columnNames = "serv_creq_entityid"))
+@NamedQuery(
+        name = "Services.getServiceParent",
+        query = "SELECT a FROM Services a INNER JOIN Services b ON a.servId = b.parentServices.servId WHERE a.users.userEntityId = ?1")
 @DynamicInsert
 @DynamicUpdate
 public class Services {
@@ -65,7 +69,7 @@ public class Services {
     @JoinColumn(name = "serv_cust_entityid")
     private User users;
 
-    @JsonBackReference
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "serv_creq_entityid")
     private CustomerRequest customer;

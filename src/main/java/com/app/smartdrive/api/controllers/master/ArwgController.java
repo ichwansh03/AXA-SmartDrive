@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,14 +33,12 @@ public class ArwgController implements BaseController<ArwgReq, String> {
     }
 
     @Override
-    @Transactional
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody ArwgReq request) {
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new AreaWorkGroup())), HttpStatus.CREATED);
     }
 
     @Override
-    @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable String id,@Valid @RequestBody ArwgReq request) {
         return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);

@@ -4,6 +4,7 @@ import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ServOrderTaskController {
 
     private final ServOrderTaskService servOrderTaskService;
+    private final ServiceTasksFactory serviceTasksFactory;
 
     @GetMapping()
     public ResponseEntity<?> getServiceOrderTasksById(@RequestParam("seroId") String seroId) {
@@ -32,7 +34,7 @@ public class ServOrderTaskController {
     @PutMapping("/update/{seotId}")
     //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SoTasksDto soTasksDto, @PathVariable("seotId") Long seotId) {
-        int updated = servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
+        int updated = serviceTasksFactory.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
 
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
@@ -45,9 +47,9 @@ public class ServOrderTaskController {
         seotPartnerDto.setPartnerId(soTasksDto.getPartnerId());
         seotPartnerDto.setRepair(soTasksDto.getRepair());
         seotPartnerDto.setSparepart(soTasksDto.getSparepart());
-        servOrderTaskService.updateSeotPartner(seotPartnerDto, seotId);
+        serviceTasksFactory.updateSeotPartner(seotPartnerDto, seotId);
 
-        servOrderTaskService.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
+        serviceTasksFactory.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
 
         return new ResponseEntity<>(seotPartnerDto, HttpStatus.OK);
     }

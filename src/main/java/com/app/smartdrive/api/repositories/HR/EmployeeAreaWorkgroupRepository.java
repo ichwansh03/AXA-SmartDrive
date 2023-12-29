@@ -23,7 +23,7 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_id=?1", nativeQuery=true)
     Optional<EmployeeAreaWorkgroup> findByEawgId(Long eawgId);
 
-    Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
+//    Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
 
     @Transactional
     @Modifying(clearAutomatically = true)
@@ -37,4 +37,12 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     Optional<EmployeeAreaWorkgroup> findByAreaWorkGroupAndEmployees(AreaWorkGroup areaWorkGroup, Employees employees);
 
     boolean existsByEmployeesAndAreaWorkGroup(Employees employees, AreaWorkGroup areaWorkGroup);
+
+    @Query(value = "SELECT * FROM hr.employee_are_workgroup eawg " +
+            "LEFT JOIN hr.employees emp ON eawg.eawg_entityid = emp.emp_entityid " +
+            "LEFT JOIN mtr.area_workgroup awg ON eawg.eawg_arwg_code = awg.arwg_code " +
+            "LEFT JOIN mtr.cities c ON awg.arwg_city_id = c.city_id " +
+            "WHERE eawg.eawg_arwg_code = :arwgCode OR emp.emp_name LIKE %:empName% OR c.city_name LIKE %:cityName%",
+            nativeQuery = true)
+    Page<EmployeeAreaWorkgroup> findeawg(String arwgCode, String empName, String cityName, Pageable pageable);
 }

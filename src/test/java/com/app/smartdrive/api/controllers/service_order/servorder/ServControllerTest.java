@@ -1,11 +1,13 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
+import com.app.smartdrive.api.controllers.auth.AuthenticationController;
 import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -14,10 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.SecurityConfig;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -27,9 +31,11 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+//@SpringBootTest
+//@AutoConfigureMockMvc
 @Slf4j
+@WebMvcTest({ServController.class, AuthenticationController.class})
+@ImportAutoConfiguration(classes = {SecurityConfig.class})
 public class ServControllerTest {
 
     @Autowired
@@ -37,6 +43,9 @@ public class ServControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private ServiceFactory serviceFactory;
 
     @MockBean
     private ServService servService;
@@ -47,6 +56,7 @@ public class ServControllerTest {
             "900, 200",
             "999, 200"
     })
+    @WithMockUser(authorities = {"Employee","Admin"})
     void itShouldPrintServiceById(Long servId, Integer statusCode) throws Exception {
 
         ServiceRespDto services = ServiceRespDto.builder()
@@ -79,7 +89,7 @@ public class ServControllerTest {
         services.setServStatus(EnumModuleServiceOrders.ServStatus.ACTIVE);
         services.setServType(EnumCustomer.CreqType.POLIS);
 
-        when(servService.addService(creqId)).thenReturn(services);
+        when(serviceFactory.addService(creqId)).thenReturn(services);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/service/addserv?creqId={creqId}", creqId))
@@ -91,6 +101,6 @@ public class ServControllerTest {
                     Assertions.assertEquals(serviceReqDto.getServType(), EnumCustomer.CreqType.POLIS);
                 });
 
-        verify(servService, times(1)).addService(creqId);
+        verify(serviceFactory, times(1)).addService(creqId);
     }
 }

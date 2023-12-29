@@ -14,4 +14,10 @@ public interface AuthenticationService {
   String changePassword(Long id, PasswordRequestDto passwordRequestDto);
 
   User createAdmin(CreateUserDto profileRequestDto);
+
+  void validateUsername(String username);
+
+  void validateEmail(String email);
+
+  void validateUserPhone(String phoneNumber);
 }

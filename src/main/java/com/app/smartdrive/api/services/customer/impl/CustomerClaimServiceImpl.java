@@ -76,7 +76,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
 
     @Transactional
     @Override
-    public CustomerResponseDTO updateCustomerClaim(ClaimRequestDTO claimRequestDTO) {
+    public CustomerResponseDTO claimPolis(ClaimRequestDTO claimRequestDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
                 () -> new EntityNotFoundException("Customer Request with id " + claimRequestDTO.getCreqEntityId() + " is not found")
         );
@@ -84,24 +84,8 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         existCustomerRequest.setCreqType(EnumCustomer.CreqType.CLAIM);
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
 
-        CustomerClaim existCustomerClaim = existCustomerRequest.getCustomerClaim();
 
-        existCustomerClaim.setCuclCreateDate(LocalDateTime.now());
-
-        BigDecimal cuclEventPrice = existCustomerClaim.getCuclEventPrice();
-        cuclEventPrice = cuclEventPrice.add(claimRequestDTO.getCuclEventPrice());
-
-        BigDecimal cuclSubtotal = existCustomerClaim.getCuclSubtotal();
-        cuclSubtotal = cuclSubtotal.add(claimRequestDTO.getCuclSubtotal());
-
-        int cuclEvents = existCustomerClaim.getCuclEvents();
-        cuclEvents += 1;
-
-        existCustomerClaim.setCuclEventPrice(cuclEventPrice);
-        existCustomerClaim.setCuclSubtotal(cuclSubtotal);
-        existCustomerClaim.setCuclEvents(cuclEvents);
-
-        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerClaim.getCustomerRequest());
+        CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerClaimServiceImpl::updateCustomerClaim by ID {}", savedCustomerRequest.getCreqEntityId());
         return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
@@ -123,5 +107,24 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerClaimServiceImpl::closePolis successfully close polis");
         return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+    }
+
+    @Override
+    public void calculateSubtotalAndEventPrice(CustomerRequest customerRequest, Double paid, Double tax){
+        CustomerClaim customerClaim = customerRequest.getCustomerClaim();
+
+
+        BigDecimal eventPrice = BigDecimal.valueOf(paid);
+        eventPrice = eventPrice.add(BigDecimal.valueOf(tax));
+        BigDecimal currentPrice = customerClaim.getCuclEventPrice();
+
+        BigDecimal totalEventPrice = currentPrice.add(eventPrice);
+
+
+        customerClaim.setCuclEvents(customerClaim.getCuclEvents() + 1);
+        customerClaim.setCuclSubtotal(BigDecimal.valueOf(paid));
+        customerClaim.setCuclEventPrice(customerClaim.getCuclEventPrice().add(BigDecimal.valueOf(paid)));
+
+        this.customerRequestRepository.save(customerClaim.getCustomerRequest());
     }
 }
