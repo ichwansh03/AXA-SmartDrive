@@ -13,12 +13,14 @@ import com.app.smartdrive.api.entities.payment.UserAccounts;
 @Repository
 public interface PaymentTransactionsRepository extends JpaRepository<PaymentTransactions,String>{
 
-    @Query(value = "SELECT TOP(1) * FROM payment.payment_transactions ORDER BY patr_created_on DESC ", nativeQuery = true) 
+    @Query(value = "SELECT TOP(1) patr_trxno FROM payment.payment_transactions ORDER BY patr_created_on DESC ", nativeQuery = true) 
     String findLastOptional();
     
     @Query(value = "SELECT COUNT(patr_trxno) FROM payment.payment_transactions", nativeQuery = true)
     int countTrxno();
 
+    @Query(value = "SELECT * FROM payment.payment_transactions ORDER BY patr_created_on ASC", nativeQuery = true)
+    List<PaymentTransactions> getAllPaymentTransactions();
     // @Query(value = "SELECT patr_trxno FROM payment.payment_transactions WHERE patr_trxno IS NULL")
     // int checkTableEmpty();
     
