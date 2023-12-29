@@ -110,15 +110,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
-        CustomerRequest existCustomerRequest = this.getById(creqEntityId);
-
-        log.info("CustomerRequestImpl::getCustomerRequestById in ID {} ", existCustomerRequest.getCreqEntityId());
-        return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
     public Page<CustomerRequest> getAllPaging(Pageable paging, String type, String status) {
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
 

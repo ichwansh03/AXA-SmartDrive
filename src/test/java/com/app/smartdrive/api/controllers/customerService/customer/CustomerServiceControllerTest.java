@@ -339,54 +339,54 @@ public class CustomerServiceControllerTest {
 
     }
 
-    @Test
-    @WithMockUser(authorities = "Customer")
-    void getById_willSuccess() throws Exception {
-        Long creqEntityId = 1L;
-        String type = "POLIS";
-        String status = "OPEN";
-
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
-
-        when(this.customerRequestService.getCustomerRequestById(creqEntityId)).thenReturn(customerResponseDTO);
-
-        mockMvc.perform(
-                get("/customer/service/request/search")
-                        .param("creqEntityId", creqEntityId.toString())
-
-        ).andExpectAll(
-                status().isOk()
-        ).andDo(result -> {
-            CustomerResponseDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-            });
-
-            assertNotNull(response);
-            assertEquals(creqEntityId, response.getCreqEntityId());
-            assertEquals(type, response.getCreqType().toString());
-            assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
-        });
-    }
-
-    @Test
-    @WithMockUser(authorities = {"Customer", "Employee"})
-    void getById_willFailed() throws Exception {
-
-        Long creqEntityId = 2L;
-
-        when(this.customerRequestService.getCustomerRequestById(creqEntityId))
-                .thenThrow(new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found"));
-
-        mockMvc.perform(
-                get("/customer/service/request/search")
-                        .param("creqEntityId", creqEntityId.toString())
-
-        ).andExpect(
-                status().isNotFound()
-        ).andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException)
-        ).andExpect(result -> assertEquals("Customer Request with id " + creqEntityId + " is not found", result.getResolvedException().getMessage())
-        ).andDo(print());
-    }
+//    @Test
+//    @WithMockUser(authorities = "Customer")
+//    void getById_willSuccess() throws Exception {
+//        Long creqEntityId = 1L;
+//        String type = "POLIS";
+//        String status = "OPEN";
+//
+//        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+//
+//        when(this.customerRequestService.getCustomerRequestById(creqEntityId)).thenReturn(customerResponseDTO);
+//
+//        mockMvc.perform(
+//                get("/customer/service/request/search")
+//                        .param("creqEntityId", creqEntityId.toString())
+//
+//        ).andExpectAll(
+//                status().isOk()
+//        ).andDo(result -> {
+//            CustomerResponseDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+//            });
+//
+//            assertNotNull(response);
+//            assertEquals(creqEntityId, response.getCreqEntityId());
+//            assertEquals(type, response.getCreqType().toString());
+//            assertEquals(status, response.getCreqStatus().toString());
+//            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+//        });
+//    }
+//
+//    @Test
+//    @WithMockUser(authorities = {"Customer", "Employee"})
+//    void getById_willFailed() throws Exception {
+//
+//        Long creqEntityId = 2L;
+//
+//        when(this.customerRequestService.getCustomerRequestById(creqEntityId))
+//                .thenThrow(new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found"));
+//
+//        mockMvc.perform(
+//                get("/customer/service/request/search")
+//                        .param("creqEntityId", creqEntityId.toString())
+//
+//        ).andExpect(
+//                status().isNotFound()
+//        ).andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException)
+//        ).andExpect(result -> assertEquals("Customer Request with id " + creqEntityId + " is not found", result.getResolvedException().getMessage())
+//        ).andDo(print());
+//    }
 
     @Test
     @WithMockUser(authorities = "Potential Customer")
