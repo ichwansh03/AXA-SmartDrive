@@ -21,6 +21,7 @@ public interface EmployeeAreaWorkgroupService{
     public void deleteById(Long eawg_id);
     public Page<EmployeeAreaWorkgroup> getAll(Pageable pageable);
 
+    public EmployeeAreaWorkgroup getById(Long eawgId, Long employeeId);
 
 
     

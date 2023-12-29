@@ -1,10 +1,8 @@
 package com.app.smartdrive.api.repositories.service_orders;
 
-import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
 import com.app.smartdrive.api.entities.partner.Partner;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.Services;
 
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import jakarta.persistence.LockModeType;
@@ -43,8 +41,6 @@ public interface SoOrderRepository extends JpaRepository<ServiceOrders, String> 
 
     @Modifying(clearAutomatically = true)
     int requestClosePolis(@Param("seroStatus") EnumModuleServiceOrders.SeroStatus seroStatus, @Param("seroReason") String seroReason, @Param("seroId") String seroId);
-
-    Page<ServiceOrders> findBySeroStatus(Pageable pageable, EnumModuleServiceOrders.SeroStatus seroStatus);
 
     Page<ServiceOrders> findBySeroOrdtTypeAndSeroStatus(Pageable pageable, EnumModuleServiceOrders.SeroOrdtType seroOrdtType, EnumModuleServiceOrders.SeroStatus seroStatus);
 }

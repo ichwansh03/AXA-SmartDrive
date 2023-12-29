@@ -1,40 +1,40 @@
 package com.app.smartdrive.api.services.customer.impl;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.UserPhoneExistException;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
-import com.app.smartdrive.api.dto.customer.request.*;
-import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.dto.customer.request.CiasDTO;
+import com.app.smartdrive.api.dto.customer.request.CreateCustomerRequestByAgenDTO;
+import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
+import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.*;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
-import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.entities.master.*;
-import com.app.smartdrive.api.entities.users.*;
+import com.app.smartdrive.api.entities.master.AreaWorkGroup;
+import com.app.smartdrive.api.entities.master.CarSeries;
+import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.entities.master.InsuranceType;
+import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.entities.users.EnumUsers;
+import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
-import com.app.smartdrive.api.repositories.users.RolesRepository;
-import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
-import com.app.smartdrive.api.repositories.users.UserRepository;
-import com.app.smartdrive.api.repositories.users.UserRoleRepository;
+import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
+import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
 import com.app.smartdrive.api.services.customer.*;
-import com.app.smartdrive.api.services.master.*;
+import com.app.smartdrive.api.services.master.ArwgService;
+import com.app.smartdrive.api.services.master.CarsService;
+import com.app.smartdrive.api.services.master.CityService;
+import com.app.smartdrive.api.services.master.IntyService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserPhoneService;
 import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,11 +43,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-
-import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +57,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final CustomerRequestRepository customerRequestRepository;
 
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
+
+    private final EmployeeAreaWorkgroupService employeeAreaWorkgroupService;
 
     private final BusinessEntityService businessEntityService;
 
@@ -110,10 +113,18 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId)
-                .orElseThrow(() -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
+    public CustomerRequest getById(Long creqEntityId){
+
+        return this.customerRequestRepository.findById(creqEntityId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
                 );
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public CustomerResponseDTO getCustomerRequestById(Long creqEntityId){
+        CustomerRequest existCustomerRequest = this.getById(creqEntityId);
 
         log.info("CustomerRequestImpl::getCustomerRequestById in ID {} ", existCustomerRequest.getCreqEntityId());
         return TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
@@ -143,10 +154,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()))
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
-                );
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId());
 
 
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, customer, entityId);
@@ -184,6 +192,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return TransactionMapper.mapEntityToDto(savedCreq, CustomerResponseDTO.class);
     }
 
+    @Transactional
     @Override
     public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
 
@@ -217,10 +226,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         InsuranceType existInty = this.intyService.getById(ciasDTO.getCiasIntyName());
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()))
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + customerRequestDTO.getAgenId() + " is not found")
-                );
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId());
 
         User newCustomer = this.createNewUserByAgen(userPost, birthDate, customerRequestDTO.getAccessGrantUser());
 
@@ -263,6 +269,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     }
 
 
+    @Transactional(readOnly = true)
     @Override
     public Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status) {
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
@@ -354,10 +361,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional
     @Override
     public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(updateCustomerRequestDTO.getCreqEntityId())
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Customer Request with id " + updateCustomerRequestDTO.getCreqEntityId() + " is not found")
-                );
+        CustomerRequest existCustomerRequest = this.getById(updateCustomerRequestDTO.getCreqEntityId());
 
 
         Long entityId = existCustomerRequest.getBusinessEntity().getEntityId();
@@ -369,10 +373,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         User customer = this.getUpdatedUser(updateCustomerRequestDTO.getCustomerId(), updateCustomerRequestDTO.getAccessGrantUser());
 
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()))
-                .orElseThrow(
-                        () -> new EntityNotFoundException("Employee Areaworkgroup with id " + updateCustomerRequestDTO.getAgenId() + " is not found")
-                );
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId());
 
 
         existCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
@@ -423,6 +424,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return customerResponseDTO;
     }
 
+    @Transactional
     @Override
     public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess) {
         User customer = this.userService.getUserById(userEntityId).orElseThrow(
@@ -430,11 +432,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         );
 
         this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, grantUserAccess? "ACTIVE":"INACTIVE");
-//        if(grantUserAccess){
-//            this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, "ACTIVE");
-//        }else{
-//            this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, "INACTIVE");
-//        }
 
         return userService.getById(customer.getUserEntityId());
     }
@@ -442,14 +439,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional
     @Override
     public void delete(Long creqEntityId) {
-        CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(creqEntityId).orElseThrow(
-                () -> new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found")
-        );
+        CustomerRequest existCustomerRequest = this.getById(creqEntityId);
 
         this.customerRequestRepository.delete(existCustomerRequest);
         log.info("CustomerRequestServiceImpl:delete, successfully delete customer request");
     }
 
+    @Transactional
     @Override
     public CustomerRequest createCustomerRequest(
             BusinessEntity newEntity,
@@ -474,6 +470,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         return customerRequest;
     }
 
+    @Transactional
     @Override
     public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive){
         ProfileRequestDto profileRequestDto = userPost.getProfile();
@@ -496,6 +493,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         log.info("CustomerRequestServiceImpl:changeRequestType, successfully change creq type to " + creqType.toString());
     }
 
+    @Transactional
     @Override
     public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus) {
         customerRequest.setCreqStatus(creqStatus);
