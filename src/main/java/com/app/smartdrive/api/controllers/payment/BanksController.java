@@ -74,6 +74,7 @@ public class BanksController {
     }
 
     @PostMapping("/banks/add")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> addBanks(@Valid @RequestBody BanksDtoRequests requests){
        BanksDtoResponse resultDto = service.addBankss(requests);
        return new ResponseEntity<>(resultDto,HttpStatus.CREATED);

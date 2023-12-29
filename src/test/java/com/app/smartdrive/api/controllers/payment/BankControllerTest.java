@@ -35,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.MockMvcBuilder.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -85,11 +87,49 @@ public class BankControllerTest {
         mockMvc.perform(get("/payment/banks/{bank_entityid}", 1))
        .andExpect(status().isOk())
        .andDo(print());
+    }
 
- 
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void updateBanks() throws Exception{
+        BanksDtoResponse dto = new BanksDtoResponse();
+        BanksDtoRequests requests = createDtoBanks();
+        dto.setBank_name("BDA");
+        dto.setBank_desc("SWASTA");
+
+        TransactionMapper.mapDtoToEntity(requests, dto);
+        when(bankService.updateBanks(1L, dto)).thenReturn(true);
+
+        mockMvc.perform(put("/payment/banks/update/{bank_entityid}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
+                .with(csrf())
+                .content(objectmapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(result -> jsonPath("$.bank_name").value(dto.getBank_name()))
+                .andDo(print());
     }
 
     
-    
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void addBanks() throws Exception{
+        BanksDtoResponse dto = new BanksDtoResponse();
+        BanksDtoRequests requests = createDtoBanks();
+        requests.setBank_name("BTN");
+        requests.setBank_desc("SWASTA");
+
+        TransactionMapper.mapDtoToEntity(requests, dto);
+        when(bankService.addBankss(requests)).thenReturn(dto);
+
+        mockMvc.perform(post("/payment/banks/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user("users").authorities(List.of(new SimpleGrantedAuthority("Admin"))))
+                .with(csrf())
+                .content(objectmapper.writeValueAsString(requests)))
+                .andExpect(status().isCreated())
+                .andExpect(result -> jsonPath("$.bank_name").value(requests.getBank_name()))
+                .andDo(print());
+    }
     
 }

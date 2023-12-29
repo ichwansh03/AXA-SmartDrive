@@ -80,7 +80,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
 
     @Override
     public List<PaymentTransactions> findAllPaymentTransactions() {
-        return repository.findAll();
+        return repository.getAllPaymentTransactions();
     }
 
     private LocalDateTime timeNow(){
@@ -104,24 +104,10 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         return "trx" + dateTimeFormatter(timeNow) + "000" + setIdForTrxno();
     }
 
-    private String generateTrxNoRev(LocalDateTime timeNow){
-        return "trx" + dateTimeFormatter(timeNow) + "000" + setIdForTrxnoRev();
-    }
 
-    private String generateTrxNoRevAwal(LocalDateTime timeNow){
-        return "trx" + dateTimeFormatter(timeNow) + "000" + getIdFromSequencee();
-    }
-
-    private synchronized int getIdFromSequencee() {
-        int b = repository.countTrxno();
-        int trxSequence = b;
-        return trxSequence;
-    }
-
-     private synchronized int getIdFromSequence() {
-        int b = repository.countTrxno();
-        b+=1;
-        int trxSequence = b;
+    private synchronized int getIdFromSequence() {
+        int trxSequence = repository.countTrxno();
+        trxSequence++;
         return trxSequence;
     }
 
@@ -131,12 +117,6 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         return str1;
     }
 
-    private String setIdForTrxnoRev(){
-        int c = getIdFromSequence();
-        c-=1;
-        String str1 = Integer.toString(c);
-        return str1;
-    }
    
     private String uuidInvoice(){
         UUID uuid = UUID.randomUUID();
@@ -146,60 +126,50 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         return invoiceAutomate;
     }
 
+   
     private void automateIdAndCreateEntities(Double nominall, String noRekening, String toRekening, String notes,
         EnumPayment enumPayment, String invoice) {
-
         PaymentTransactions transactions = new PaymentTransactions();
         PaymentTransactions transactions2 = new PaymentTransactions();
+        
         List<PaymentTransactions> listPayment = repository.findAll();
         PaymentTransactions reversal = repository.findByPatrTrxno(transactions.getPatrTrxno());
+        String trxNo = generateTrxNo(timeNow());
+        String trxNoRev = repository.findLastOptional();
 
-       
        if(listPayment.isEmpty()){
-        transactions.setPatrTrxno(generateTrxNo(timeNow()));
-        transactions.setPatrTrxnoRev(null);
-        repository.save(transactions);
-       }     
-       for (PaymentTransactions py : listPayment) {
-            if(py.getPatrTrxnoRev() == null){
-                 transactions.setPatrTrxno(generateTrxNo(timeNow())); 
-                 transactions.setPatrTrxnoRev(generateTrxNoRev(timeNow()));
-                 
-            }
-            else if(py.getPatrTrxnoRev()!=null){
-                transactions.setPatrTrxno(generateTrxNo(timeNow()));
-                transactions.setPatrTrxnoRev(generateTrxNoRev(timeNow()));
-                
-            }
-        }    
-        
-       
-          
-        
+            transactions.setPatrTrxno(trxNo);
+            transactions.setPatrTrxnoRev(null);
+       }    
+        transactions.setPatrTrxno(trxNo);
+        transactions.setPatrTrxnoRev(trxNoRev);
+    
         transactions.setPatr_created_on(timeNow());
         transactions.setPatr_usac_accountNo_from(noRekening);
         transactions.setPatr_usac_accountNo_to("-");
         transactions.setPatr_debet(nominall);
+        transactions.setPatr_credit(0.0);
         transactions.setPatr_type(enumPayment);
         transactions.setPatr_invoice_no(invoice);
         transactions.setPatr_notes(notes);
-        
+
         repository.save(transactions);
-       
+
         
-        String norev2 = transactions.getPatrTrxno();
         transactions2.setPatrTrxno(generateTrxNo(timeNow()));
         transactions2.setPatr_created_on(timeNow());
         transactions2.setPatr_usac_accountNo_from("-");
         transactions2.setPatr_usac_accountNo_to(toRekening);
         transactions2.setPatr_credit(nominall);
+        transactions2.setPatr_debet(0.0);
         transactions2.setPatr_type(enumPayment);
         transactions2.setPatr_notes(notes);
         transactions2.setPatr_invoice_no(invoice);
-        transactions2.setPatrTrxnoRev(generateTrxNoRev(timeNow()));
+        transactions2.setPatrTrxnoRev(transactions.getPatrTrxno());
 
         repository.save(transactions2);
 
+       
     }
     private void checkSaldoHandle(Double saldoSender, Double nominal, EnumPayment enumPayment) {
         if (saldoSender == null || saldoSender == 0.0) {
@@ -223,6 +193,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         if (request.getEnumPayment() == EnumPayment.TOPUP_BANK ||
                 request.getEnumPayment() == EnumPayment.TRANSFER ||
                 request.getEnumPayment() == EnumPayment.TOPUP_FINTECH) {
+                    
 
             for (UserAccounts userAccounts : listAcc) {
                 if (request.getUsac_accountno().equals(userAccounts.getUsac_accountno())) {
@@ -233,16 +204,12 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                     checkSaldoHandle(saldoSender, saldoNominal, typeTransaksi);
                     Double totalSaldoSender = saldoSender - saldoNominal;
                     userAccounts.setUsac_debet(totalSaldoSender);
-                            listAcc.stream()
-                    .filter(user -> request.getPatr_usac_accountNo_to().equals(user.getUsac_accountno()))
-                    .forEach(user -> user.setUsac_debet(
-                        Optional.ofNullable(user.getUsac_debet()).orElse(0.0) + saldoNominal));
+                    
+                    handleUpdateDebetTransactionsUserAccount(listAcc, request.getPatr_usac_accountNo_to(), saldoNominal);
                 userAccountsRepository.saveAll(listAcc);
-
-                        }
+                }
             }
         }
-        
         else {
             throw new EntityNotFoundException("Failed Transaksi, Harap Pilih Tipe Transaksi yang Benar");
         }
@@ -261,9 +228,9 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
 
 
     private void handleUpdateDebetTransactionsUserAccount(List<UserAccounts> listAcc, 
-    GenerateTransactionsRequests request, Double nominal ){
+    String toRekening, Double nominal ){
         listAcc.stream()
-            .filter(user -> request.getToRekening().equals(user.getUsac_accountno()))
+            .filter(user -> toRekening.equals(user.getUsac_accountno()))
             .forEach(user -> user.setUsac_debet(
                 Optional.ofNullable(user.getUsac_debet()).orElse(0.0) + nominal));
         userAccountsRepository.saveAll(listAcc);
@@ -308,7 +275,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                         automateIdAndCreateEntities(nominalWithTax, request.getNoRekening(),
                         request.getToRekening(), request.getNotes(), request.getTipePayment(), partner.getNo());
 
-                        handleUpdateDebetTransactionsUserAccount(listAcc, request, nominalWithTax);
+                        handleUpdateDebetTransactionsUserAccount(listAcc, request.getToRekening(), nominalWithTax);
                         
                         partnerInvoiceRepository.saveAndFlush(partnerr);
                             dtoGenerate.setAccountNo(partner.getAccountNo());
@@ -333,12 +300,14 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                 transactions.setPatr_debet(nominalPremi);
                 transactions2.setPatr_invoice_no(invoiceNo);
                 transactions2.setPatr_credit(nominalPremi);
+
                 automateIdAndCreateEntities(nominalPremi, request.getNoRekening(),
                 request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceNo);
+                
                 premiCredit.setPaymentTransactions(transactions2);
                 userAcc.setUsac_debet(totalSaldoSenderPremi);
 
-               handleUpdateDebetTransactionsUserAccount(listAcc, request, nominalPremi);
+                handleUpdateDebetTransactionsUserAccount(listAcc, request.getToRekening(), nominalPremi);
                
                     dtoGenerate.setAccountNo(request.getNoRekening());
                     dtoGenerate.setInvoiceNo(invoiceNo);
@@ -371,7 +340,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
                         automateIdAndCreateEntities(nominalSalary, request.getNoRekening(),
                 request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceSalary);
 
-                        handleUpdateDebetTransactionsUserAccount(listAcc, request, nominalSalary);
+                        handleUpdateDebetTransactionsUserAccount(listAcc, request.getToRekening(), nominalSalary);
 
                         employeeSalaryRepository.saveAndFlush(employee);
                         dtoGenerate.setAccountNo(employee.getBesaAccountNumber());
@@ -390,8 +359,7 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
 
     @Override
     public List<PaymentTransactions> getAll() {
-        // TODO Auto-generated method stub
-        return null;
+        return repository.findAll();
     }
 
     @Override
