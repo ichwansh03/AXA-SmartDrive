@@ -214,5 +214,19 @@ public class GlobalExceptions {
             ex.getMessage(), HttpStatus.FORBIDDEN.value());
     return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
   }
+
+    @ExceptionHandler(EntityAlreadyExistException.class)
+    public ResponseEntity<?> handleEntityAlreadyExistException(
+            HttpServletRequest request, EntityAlreadyExistException ex) {
+
+        Error error = ErrorUtils.createError(
+                        ex.getMessage(),
+                        ex.getLocalizedMessage(),
+                        HttpStatus.CONFLICT.value())
+                .setUrl(request.getRequestURL().toString())
+                .setReqMethod(request.getMethod())
+                .setTimestamp(LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
 }
 

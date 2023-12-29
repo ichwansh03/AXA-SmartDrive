@@ -1,36 +1,24 @@
 package com.app.smartdrive.api.controllers.partners;
 
 import com.app.smartdrive.api.Exceptions.Error;
-import com.app.smartdrive.api.dto.customer.request.CiasDTO;
+import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
-import com.app.smartdrive.api.dto.customer.request.CustomerRequestTypeDTO;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
-import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.partner.Partner;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
-import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
-import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoRepository;
-import com.app.smartdrive.api.repositories.users.RolesRepository;
-import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
-import com.app.smartdrive.api.repositories.users.UserRoleRepository;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import com.app.smartdrive.api.services.users.UserService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
@@ -48,11 +36,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.MockMvcBuilder.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -113,22 +99,22 @@ class PartnerControllerTest {
     }
 
     CustomerRequest createCustomerRequest(String test, User user) throws Exception {
-        CiasDTO ciasDTO = new CiasDTO();
-        ciasDTO.setCiasPoliceNumber(test);
-        ciasDTO.setCiasYear("2010");
-        ciasDTO.setCiasIsNewChar('Y');
-        ciasDTO.setCiasPaidType("CASH");
-        ciasDTO.setCiasCarsId(1L);
-        ciasDTO.setCiasCityId(1L);
-        ciasDTO.setCiasIntyName("Comprehensive");
-        ciasDTO.setCiasStartdate("2023-01-01 15:02:00");
-        ciasDTO.setCurrentPrice(new BigDecimal(120000000));
-        ciasDTO.setCuexIds(new Long[]{7L,8L,9L});
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = new CustomerInscAssetsRequestDTO();
+        customerInscAssetsRequestDTO.setCiasPoliceNumber(test);
+        customerInscAssetsRequestDTO.setCiasYear("2010");
+        customerInscAssetsRequestDTO.setCiasIsNewChar('Y');
+        customerInscAssetsRequestDTO.setCiasPaidType("CASH");
+        customerInscAssetsRequestDTO.setCiasCarsId(1L);
+        customerInscAssetsRequestDTO.setCiasCityId(1L);
+        customerInscAssetsRequestDTO.setCiasIntyName("Comprehensive");
+        customerInscAssetsRequestDTO.setCiasStartdate("2023-01-01 15:02:00");
+        customerInscAssetsRequestDTO.setCurrentPrice(new BigDecimal(120000000));
+        customerInscAssetsRequestDTO.setCuexIds(new Long[]{7L,8L,9L});
         CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();
         customerRequestDTO.setCustomerId(user.getUserEntityId());
         customerRequestDTO.setAgenId(1L);
         customerRequestDTO.setEmployeeId(1L);
-        customerRequestDTO.setCiasDTO(ciasDTO);
+        customerRequestDTO.setCustomerInscAssetsRequestDTO(customerInscAssetsRequestDTO);
 
         return TransactionMapper.mapDtoToEntity(customerRequestService.create(customerRequestDTO,
                 new MultipartFile[]{new MockMultipartFile("TEST", "TEST", MediaType.TEXT_PLAIN_VALUE, "TEST".getBytes())}

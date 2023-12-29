@@ -17,13 +17,13 @@ import java.util.Objects;
 public interface CustomerClaimService {
     public CustomerClaim createNewClaim(CustomerRequest customerRequest);
 
-    public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId);
+    public CustomerClaim getCustomerClaimById(Long cuclCreqEntityId);
 
     public void deleteCustomerClaim(Long cuclCreqEntityId);
 
-    public CustomerResponseDTO claimPolis(ClaimRequestDTO claimRequestDTO);
+    public CustomerRequest claimPolis(ClaimRequestDTO claimRequestDTO);
 
-    public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO);
+    public CustomerRequest closePolis(CloseRequestDTO closeRequestDTO);
 
     public void calculateSubtotalAndEventPrice(CustomerRequest customerRequest, Double paid, Double tax);
 }

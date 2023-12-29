@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CadocResponseDTO {
+public class CustomerInscDocResponseDTO {
     private Long cadocId;
 
     private Long cadocCreqEntityid;

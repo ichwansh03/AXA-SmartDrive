@@ -1,20 +1,18 @@
 package com.app.smartdrive.api.services.customer.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityAlreadyExistException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.customer.request.CiasDTO;
+import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerInscExtend;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.master.*;
 import com.app.smartdrive.api.repositories.customer.CustomerInscAssetsRepository;
-import com.app.smartdrive.api.repositories.master.CabrRepository;
 import com.app.smartdrive.api.repositories.master.TemiRepository;
 import com.app.smartdrive.api.services.customer.CustomerInscAssetsService;
-import com.app.smartdrive.api.services.master.CarbService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +35,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
     @Override
     public CustomerInscAssets createCustomerInscAssets(
             Long entityId,
-            CiasDTO ciasDTO,
+            CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO,
             CarSeries carSeries,
             Cities existCity,
             InsuranceType existInty,
@@ -45,19 +43,19 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
     ){
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasDTO.getCiasStartdate(), formatter);
+        LocalDateTime ciasStartdate = LocalDateTime.parse(customerInscAssetsRequestDTO.getCiasStartdate(), formatter);
 
         // new cias
 
         CustomerInscAssets customerInscAssets = CustomerInscAssets.builder()
-                .ciasCreqEntityid(entityId).ciasPoliceNumber(ciasDTO.getCiasPoliceNumber())
-                .ciasYear(ciasDTO.getCiasYear())
+                .ciasCreqEntityid(entityId).ciasPoliceNumber(customerInscAssetsRequestDTO.getCiasPoliceNumber())
+                .ciasYear(customerInscAssetsRequestDTO.getCiasYear())
                 .ciasStartdate(ciasStartdate)
                 .ciasEnddate(ciasStartdate.plusYears(1))
-                .ciasCurrentPrice(ciasDTO.getCurrentPrice())
-                .ciasInsurancePrice(ciasDTO.getCurrentPrice())
-                .ciasPaidType(EnumCustomer.CreqPaidType.valueOf(ciasDTO.getCiasPaidType()))
-                .ciasIsNewChar(ciasDTO.getCiasIsNewChar())
+                .ciasCurrentPrice(customerInscAssetsRequestDTO.getCurrentPrice())
+                .ciasInsurancePrice(customerInscAssetsRequestDTO.getCurrentPrice())
+                .ciasPaidType(EnumCustomer.CreqPaidType.valueOf(customerInscAssetsRequestDTO.getCiasPaidType()))
+                .ciasIsNewChar(customerInscAssetsRequestDTO.getCiasIsNewChar())
                 .carSeries(carSeries)
                 .city(existCity)
                 .insuranceType(existInty)
@@ -71,7 +69,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
     @Override
     public void updateCustomerInscAssets(
             CustomerInscAssets cias,
-            CiasDTO ciasUpdateDTO,
+            CustomerInscAssetsRequestDTO ciasUpdateDTO,
             Cities existCity,
             CarSeries carSeries,
             InsuranceType existInty
@@ -80,6 +78,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
         LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
 
         if(!Objects.equals(cias.getCiasPoliceNumber(), ciasUpdateDTO.getCiasPoliceNumber())){
+            this.validatePoliceNumber(cias.getCiasPoliceNumber());
             cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
         }
 
@@ -148,10 +147,13 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
     }
 
     @Override
-    public boolean isCiasAlreadyExist(String ciasPoliceNumber) {
-        Optional<CustomerInscAssets> customerInscAssets = this.customerInscAssetsRepository.findByCiasPoliceNumber(ciasPoliceNumber);
-
-        return customerInscAssets.isPresent();
+    public void validatePoliceNumber(String policeNumber){
+        this.customerInscAssetsRepository.findByCiasPoliceNumber(policeNumber)
+                .ifPresent(
+                        customerInscAssets -> {
+                            throw new EntityAlreadyExistException("Customer Request with police number " + policeNumber + " is already exist");
+                        }
+                );
     }
 
 }

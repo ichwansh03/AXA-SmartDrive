@@ -1,7 +1,7 @@
 
 package com.app.smartdrive.api.controllers.service_order.claim;
 
-import com.app.smartdrive.api.dto.customer.request.CiasDTO;
+import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
@@ -51,7 +51,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -137,22 +136,22 @@ class ClaimAssetControllerTest {
     }
 
     CustomerRequest createCustomerRequest(String test, User user) throws Exception {
-        CiasDTO ciasDTO = new CiasDTO();
-        ciasDTO.setCiasPoliceNumber(test);
-        ciasDTO.setCiasYear("2010");
-        ciasDTO.setCiasIsNewChar('Y');
-        ciasDTO.setCiasPaidType("CASH");
-        ciasDTO.setCiasCarsId(1L);
-        ciasDTO.setCiasCityId(1L);
-        ciasDTO.setCiasIntyName("Comprehensive");
-        ciasDTO.setCiasStartdate("2023-01-01 15:02:00");
-        ciasDTO.setCurrentPrice(new BigDecimal("120000000"));
-        ciasDTO.setCuexIds(new Long[]{7L,8L,9L});
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = new CustomerInscAssetsRequestDTO();
+        customerInscAssetsRequestDTO.setCiasPoliceNumber(test);
+        customerInscAssetsRequestDTO.setCiasYear("2010");
+        customerInscAssetsRequestDTO.setCiasIsNewChar('Y');
+        customerInscAssetsRequestDTO.setCiasPaidType("CASH");
+        customerInscAssetsRequestDTO.setCiasCarsId(1L);
+        customerInscAssetsRequestDTO.setCiasCityId(1L);
+        customerInscAssetsRequestDTO.setCiasIntyName("Comprehensive");
+        customerInscAssetsRequestDTO.setCiasStartdate("2023-01-01 15:02:00");
+        customerInscAssetsRequestDTO.setCurrentPrice(new BigDecimal("120000000"));
+        customerInscAssetsRequestDTO.setCuexIds(new Long[]{7L,8L,9L});
         CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();
         customerRequestDTO.setCustomerId(user.getUserEntityId());
         customerRequestDTO.setAgenId(1L);
         customerRequestDTO.setEmployeeId(1L);
-        customerRequestDTO.setCiasDTO(ciasDTO);
+        customerRequestDTO.setCustomerInscAssetsRequestDTO(customerInscAssetsRequestDTO);
 
         return TransactionMapper.mapDtoToEntity(customerRequestService.create(customerRequestDTO,
                 new MultipartFile[]{new MockMultipartFile("TEST", "TEST", MediaType.TEXT_PLAIN_VALUE, "TEST".getBytes())}

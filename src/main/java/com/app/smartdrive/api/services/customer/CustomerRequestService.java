@@ -17,33 +17,31 @@ import java.util.List;
 public interface CustomerRequestService {
     public List<CustomerResponseDTO> get();
 
-    public Page<CustomerResponseDTO> getPaging(Pageable pageable);
+    Page<CustomerRequest> getAllPaging(Pageable paging, String type, String status);
+
+    public Page<CustomerRequest> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status);
+
+    public Page<CustomerRequest> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable pageable, String type, String status);
 
     public CustomerRequest getById(Long creqEntityId);
 
-    public CustomerResponseDTO getCustomerRequestById(Long creqEntityId);
+    public CustomerRequest create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
-    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
-
-    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
-
-    public Page<CustomerResponseDTO> getPagingUserCustomerRequests(Long custId, Pageable paging, String type, String status);
-
-    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long empId, String arwgCode, Pageable pageable, String type, String status);
-
-    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
-
-    public void delete(Long creqEntityId);
+    public CustomerRequest createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
     public CustomerRequest createCustomerRequest(BusinessEntity newEntity, User customer, Long entityId);
 
+    public CustomerRequest createCustomerRequestByAgen(BusinessEntity newEntity, User customer, Long entityId);
+
     public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive);
+
+    public CustomerRequest updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
+
+    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);
 
     public void changeRequestType(CustomerRequest customerRequest, EnumCustomer.CreqType creqType);
 
     public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus);
 
-    Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status);
-
-    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);
+    public void delete(Long creqEntityId);
 }

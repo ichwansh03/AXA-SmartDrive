@@ -3,36 +3,25 @@ package com.app.smartdrive.api.controllers.customerService.customer;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
-import com.app.smartdrive.api.dto.customer.response.CiasResponseDTO;
+import com.app.smartdrive.api.dto.customer.response.CustomerInscAssetsResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
-import com.app.smartdrive.api.dto.user.request.CreateUserDto;
-import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.customer.CustomerClaim;
+import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
+import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
-import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
-import com.app.smartdrive.api.services.customer.impl.CustomerRequestServiceImpl;
-import com.app.smartdrive.api.services.master.CarsService;
-import com.app.smartdrive.api.services.master.CityService;
-import com.app.smartdrive.api.services.master.IntyService;
-import com.app.smartdrive.api.services.users.BusinessEntityService;
-import com.app.smartdrive.api.services.users.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
@@ -52,7 +41,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
@@ -81,7 +69,7 @@ public class CustomerServiceControllerTest {
     public CustomerRequestDTO getCustomerRequestDTO(){
         Long[] cuexIds = {7L,8L,9L};
 
-        CiasDTO ciasDTO = CiasDTO.builder()
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
                 .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
@@ -98,7 +86,7 @@ public class CustomerServiceControllerTest {
                 .customerId(2L)
                 .agenId(1L)
                 .employeeId(1L)
-                .ciasDTO(ciasDTO)
+                .customerInscAssetsRequestDTO(customerInscAssetsRequestDTO)
                 .build();
 
         return customerRequestDTO;
@@ -106,7 +94,7 @@ public class CustomerServiceControllerTest {
     public UpdateCustomerRequestDTO getUpdateCustomerRequestDTO(Long creqEntityId){
         Long[] cuexIds = {7L,8L,9L};
 
-        CiasDTO ciasDTO = CiasDTO.builder()
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
                 .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
@@ -124,7 +112,7 @@ public class CustomerServiceControllerTest {
                 .customerId(2L)
                 .agenId(1L)
                 .employeeId(1L)
-                .ciasDTO(ciasDTO)
+                .customerInscAssetsRequestDTO(customerInscAssetsRequestDTO)
                 .build();
 
         return customerRequestDTO;
@@ -132,7 +120,7 @@ public class CustomerServiceControllerTest {
     public CreateCustomerRequestByAgenDTO getCustomerRequestByAgenDTO(){
         Long[] cuexIds = {7L,8L,9L};
 
-        CiasDTO ciasDTO = CiasDTO.builder()
+        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
                 .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
@@ -149,7 +137,7 @@ public class CustomerServiceControllerTest {
                 .employeeId(2L)
                 .agenId(1L)
                 .employeeId(1L)
-                .ciasDTO(ciasDTO)
+                .customerInscAssetsRequestDTO(customerInscAssetsRequestDTO)
                 .build();
 
         return customerRequestDTO;
@@ -160,62 +148,71 @@ public class CustomerServiceControllerTest {
                 .creqEntityId(creqEntityId)
                 .build();
     }
-    public ClaimResponseDTO getClaimResponseDTO(Long creqEntity){
-        return ClaimResponseDTO.builder()
-                .cuclCreqEntityId(creqEntity)
-                .cuclEventPrice(BigDecimal.valueOf(100_000_000))
-                .cuclSubtotal(BigDecimal.valueOf(150_000_000))
-                .cuclEvents(1)
-                .cuclCreateDate(LocalDateTime.of(2001, Month.OCTOBER, 23, 12, 12, 0))
+
+
+    public CustomerRequest getCustomerRequest(Long creqEntityId){
+        CustomerInscAssets customerInscAssets = CustomerInscAssets.builder()
+                .ciasCreqEntityid(creqEntityId)
+                .ciasPoliceNumber("B 123"+creqEntityId + " CBD")
+                .build();
+
+        return CustomerRequest.builder()
+                .creqEntityId(creqEntityId)
+                .customerInscAssets(customerInscAssets)
                 .build();
     }
-    public CustomerResponseDTO getCustomerResponseDTO(Long id, String type, String status){
-        LocalDateTime ciasStartDate = LocalDateTime.of(2001, Month.OCTOBER, Math.toIntExact(id), 12, 10, 0);
+    public EmployeeAreaWorkgroup getEmployeeAreaworkgroup(String arwgCode, Long employeeId){
+        AreaWorkGroup areaWorkGroup = new AreaWorkGroup();
+        areaWorkGroup.setArwgCode(arwgCode);
 
-        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
-                .ciasCreqEntityid(id)
-                .ciasCurrentPrice(BigDecimal.valueOf(200_000_000))
-                .ciasStartdate(ciasStartDate)
-                .ciasEnddate(ciasStartDate.plusYears(1))
-                .ciasYear("200" + id)
-                .ciasInsurancePrice(BigDecimal.valueOf(200_000_000))
-                .ciasPoliceNumber("B 123" + id + " CBD")
-                .build();
+        User employeeEntity = new User();
+        employeeEntity.setUserEntityId(employeeId);
 
-        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
-                .creqEntityId(id)
-                .creqStatus(EnumCustomer.CreqStatus.valueOf(status))
-                .creqType(EnumCustomer.CreqType.valueOf(type))
-                .customerInscAssets(ciasResponseDTO)
-                .build();
+        Employees employee = new Employees();
+        employee.setUser(employeeEntity);
 
-        return customerResponseDTO;
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = new EmployeeAreaWorkgroup();
+        employeeAreaWorkgroup.setAreaWorkGroup(areaWorkGroup);
+        employeeAreaWorkgroup.setEmployees(employee);
+
+        return employeeAreaWorkgroup;
     }
+    public CustomerClaim getCustomerClaim(){
+        return CustomerClaim.builder()
+                .cuclSubtotal(BigDecimal.valueOf(10_000))
+                .cuclEventPrice(BigDecimal.valueOf(20_000))
+                .cuclEvents(2)
+                .cuclReason("Budget Problem")
+                .build();
+    }
+
 
 
     @Test
     @WithMockUser(authorities = "Customer")
     void getAllCustomersRequest_willSuccess() throws Exception {
-        List<CustomerResponseDTO> creqDTOList = List.of(
-                getCustomerResponseDTO(1L, "POLIS", "OPEN"),
-                getCustomerResponseDTO(2L, "CLAIM", "OPEN")
+        List<CustomerRequest> customerRequestList = List.of(
+                getCustomerRequest(1L),
+                getCustomerRequest(2L)
         );
 
-        Page<CustomerResponseDTO> pagedResponse = new PageImpl(creqDTOList);
+        Page<CustomerRequest> pagedCustomerRequest = new PageImpl(customerRequestList);
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
-        when(this.customerRequestService.getAllPaging(paging, "ALL", "OPEN")).thenReturn(pagedResponse);
-        when(this.customerRequestService.getAllPaging(paging, "POLIS", "OPEN")).thenReturn(pagedResponse);
+        when(this.customerRequestService.getAllPaging(paging, "ALL", "OPEN")).thenReturn(pagedCustomerRequest);
+        when(this.customerRequestService.getAllPaging(paging, "POLIS", "OPEN")).thenReturn(pagedCustomerRequest);
 
         mockMvc.perform(
                 get("/customer/service/request")
                         .param("type", "POLIS")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(creqDTOList.size()))
-                .andExpect(jsonPath("$.content[0].creqEntityId").value(creqDTOList.get(0).getCreqEntityId()))
-                .andExpect(jsonPath("$.content[1].creqEntityId").value(creqDTOList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
+                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerRequestList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
                 .andDo(print());
 
     }
@@ -240,32 +237,36 @@ public class CustomerServiceControllerTest {
     @Test
     @WithMockUser(authorities = "Customer")
     void getAllUserCustomersRequest_willSuccess() throws Exception {
-        UserDto user = new UserDto();
-        user.setUserEntityId(1L);
+        User user = new User();
+        user.setUserEntityId(23L);
 
-        List<CustomerResponseDTO> customerResponseDTOList = List.of(
-                getCustomerResponseDTO(1L, "POLIS", "OPEN"),
-                getCustomerResponseDTO(2L, "CLAIM", "OPEN")
+        List<CustomerRequest> customerRequestList = List.of(
+                getCustomerRequest(1L),
+                getCustomerRequest(2L)
         );
 
-        for (CustomerResponseDTO response : customerResponseDTOList) {
-            response.setCustomer(user);
+        for (CustomerRequest customerRequest : customerRequestList) {
+            customerRequest.setCustomer(user);
         }
 
 
-        Page<CustomerResponseDTO> pagedResponse = new PageImpl(customerResponseDTOList);
+        Page<CustomerRequest> pagedResponse = new PageImpl(customerRequestList);
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
-        when(this.customerRequestService.getPagingUserCustomerRequests(user.getUserEntityId(), paging, "ALL", "OPEN")).thenReturn(pagedResponse);
+        when(this.customerRequestService.getPagingUserCustomerRequest(user.getUserEntityId(), paging, "ALL", "OPEN")).thenReturn(pagedResponse);
 
         mockMvc.perform(
                 get("/customer/service/request/customer")
                         .param("customerId", user.getUserEntityId().toString())
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(customerResponseDTOList.size()))
-                .andExpect(jsonPath("$.content[0].customer.userEntityId").value(customerResponseDTOList.get(0).getCustomer().getUserEntityId()))
-                .andExpect(jsonPath("$.content[1].customer.userEntityId").value(customerResponseDTOList.get(1).getCustomer().getUserEntityId()))
+                .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
+                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerRequestList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[0].customer.userEntityId").value(customerRequestList.get(0).getCustomer().getUserEntityId()))
+                .andExpect(jsonPath("$.content[1].customer.userEntityId").value(customerRequestList.get(1).getCustomer().getUserEntityId()))
                 .andDo(print());
 
     }
@@ -277,7 +278,7 @@ public class CustomerServiceControllerTest {
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
-        when(this.customerRequestService.getPagingUserCustomerRequests(customerId, paging, "ALL", "OPEN"))
+        when(this.customerRequestService.getPagingUserCustomerRequest(customerId, paging, "ALL", "OPEN"))
                 .thenThrow(new EntityNotFoundException("User with id "+ customerId + " is not found"));
 
         mockMvc.perform(
@@ -295,27 +296,22 @@ public class CustomerServiceControllerTest {
         String arwgCode = "BCI-0001";
         Long employeeId = 3L;
 
-        ArwgRes arwgRes = ArwgRes.builder()
-                .arwgCode(arwgCode)
-                .build();
+        EmployeeAreaWorkgroup employeeAreaworkgroup = getEmployeeAreaworkgroup(arwgCode, employeeId);
 
-        EmployeesAreaWorkgroupResponseDto eawg = EmployeesAreaWorkgroupResponseDto.builder()
-                .areaWorkGroup(arwgRes)
-                .build();
 
-        List<CustomerResponseDTO> customerResponseDTOList = List.of(
-                getCustomerResponseDTO(1L, "POLIS", "OPEN"),
-                getCustomerResponseDTO(2L, "CLAIM", "OPEN")
+        List<CustomerRequest> customerRequestList = List.of(
+                getCustomerRequest(1L),
+                getCustomerRequest(2L)
         );
 
         List<String> arwgCodeList = new ArrayList<>();
 
-        for (CustomerResponseDTO response : customerResponseDTOList) {
-            response.setEmployeeAreaWorkgroup(eawg);
-            arwgCodeList.add(response.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode());
+        for (CustomerRequest customerRequest : customerRequestList) {
+            customerRequest.setEmployeeAreaWorkgroup(employeeAreaworkgroup);
+            arwgCodeList.add(customerRequest.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode());
         }
 
-        Page<CustomerResponseDTO> pagedResponse = new PageImpl(customerResponseDTOList);
+        Page<CustomerRequest> pagedResponse = new PageImpl(customerRequestList);
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
@@ -327,7 +323,13 @@ public class CustomerServiceControllerTest {
                                 .param("arwgCode", arwgCode)
 
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(customerResponseDTOList.size()))
+                .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
+                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerRequestList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[0].employeeAreaWorkgroup.employees.user.userEntityId").value(customerRequestList.get(0).getEmployeeAreaWorkgroup().getEmployees().getUser().getUserEntityId()))
+                .andExpect(jsonPath("$.content[1].employeeAreaWorkgroup.employees.user.userEntityId").value(customerRequestList.get(1).getEmployeeAreaWorkgroup().getEmployees().getUser().getUserEntityId()))
                 .andExpect(jsonPath("$.content[*].employeeAreaWorkgroup.areaWorkGroup.arwgCode").value(arwgCodeList))
                 .andDo(print());
 
@@ -360,12 +362,10 @@ public class CustomerServiceControllerTest {
     @WithMockUser(authorities = "Customer")
     void getById_willSuccess() throws Exception {
         Long creqEntityId = 1L;
-        String type = "POLIS";
-        String status = "OPEN";
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+        CustomerRequest customerRequest = getCustomerRequest(creqEntityId);
 
-        when(this.customerRequestService.getCustomerRequestById(creqEntityId)).thenReturn(customerResponseDTO);
+        when(this.customerRequestService.getById(creqEntityId)).thenReturn(customerRequest);
 
         mockMvc.perform(
                 get("/customer/service/request/search")
@@ -379,9 +379,7 @@ public class CustomerServiceControllerTest {
 
             assertNotNull(response);
             assertEquals(creqEntityId, response.getCreqEntityId());
-            assertEquals(type, response.getCreqType().toString());
-            assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
     }
 
@@ -391,7 +389,7 @@ public class CustomerServiceControllerTest {
 
         Long creqEntityId = 2L;
 
-        when(this.customerRequestService.getCustomerRequestById(creqEntityId))
+        when(this.customerRequestService.getById(creqEntityId))
                 .thenThrow(new EntityNotFoundException("Customer Request with id " + creqEntityId + " is not found"));
 
         mockMvc.perform(
@@ -409,8 +407,6 @@ public class CustomerServiceControllerTest {
     @WithMockUser(authorities = "Potential Customer")
     void create_willSuccess() throws Exception {
         Long creqEntityId = 1L;
-        String type = "POLIS";
-        String status = "OPEN";
 
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -423,10 +419,10 @@ public class CustomerServiceControllerTest {
 
         CustomerRequestDTO customerRequestDTO = getCustomerRequestDTO();
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+        CustomerRequest customerRequest = getCustomerRequest(creqEntityId);
 
         when(this.customerRequestService.create(customerRequestDTO, multipartFiles))
-                .thenReturn(customerResponseDTO);
+                .thenReturn(customerRequest);
 
         mockMvc.perform(multipart("/customer/service/request")
                 .file(file)
@@ -437,10 +433,8 @@ public class CustomerServiceControllerTest {
             });
 
             assertNotNull(response);
-            assertEquals(creqEntityId, response.getCreqEntityId());
-            assertEquals(type, response.getCreqType().toString());
-            assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCreqEntityId(), response.getCreqEntityId());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
     }
 
@@ -473,9 +467,12 @@ public class CustomerServiceControllerTest {
     @Test
     @WithMockUser(authorities = "Employee")
     void createByAgen_willSuccess() throws Exception {
-        Long creqEntityId = 1L;
-        String type = "CLAIM";
-        String status = "OPEN";
+        Long creqEntityId = 10L;
+
+        String arwgCode = "BCI-0001";
+        Long employeeId = 3L;
+
+        EmployeeAreaWorkgroup employeeAreaworkgroup = getEmployeeAreaworkgroup(arwgCode, employeeId);
 
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -488,10 +485,11 @@ public class CustomerServiceControllerTest {
 
         CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = getCustomerRequestByAgenDTO();
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+        CustomerRequest customerRequest = getCustomerRequest(creqEntityId);
+        customerRequest.setEmployeeAreaWorkgroup(employeeAreaworkgroup);
 
         when(this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, multipartFiles))
-                .thenReturn(customerResponseDTO);
+                .thenReturn(customerRequest);
 
         mockMvc.perform(multipart("/customer/service/request/agen")
                 .file(file)
@@ -502,10 +500,10 @@ public class CustomerServiceControllerTest {
             });
 
             assertNotNull(response);
-            assertEquals(creqEntityId, response.getCreqEntityId());
-            assertEquals(type, response.getCreqType().toString());
-            assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCreqEntityId(), response.getCreqEntityId());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getEmployeeAreaWorkgroup().getEmployees().getUser().getUserEntityId(), response.getEmployeeAreaWorkgroup().getEmployees().getUser().getUserEntityId());
+            assertEquals(customerRequest.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode(), response.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode());
         });
     }
 
@@ -524,7 +522,7 @@ public class CustomerServiceControllerTest {
         CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = getCustomerRequestByAgenDTO();
 
         when(this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, multipartFiles))
-                .thenThrow(new Exception("CustomerRequest with police number " + createCustomerRequestByAgenDTO.getCiasDTO().getCiasPoliceNumber() + " is already exist"));
+                .thenThrow(new Exception("CustomerRequest with police number " + createCustomerRequestByAgenDTO.getCustomerInscAssetsRequestDTO().getCiasPoliceNumber() + " is already exist"));
 
         mockMvc.perform(multipart("/customer/service/request/agen")
                 .file(file)
@@ -532,7 +530,7 @@ public class CustomerServiceControllerTest {
         ).andExpect(status().isInternalServerError()
         ).andExpect(result -> assertTrue(result.getResolvedException() instanceof Exception)
         ).andExpect(result -> assertEquals(
-                "CustomerRequest with police number " + createCustomerRequestByAgenDTO.getCiasDTO().getCiasPoliceNumber() + " is already exist",
+                "CustomerRequest with police number " + createCustomerRequestByAgenDTO.getCustomerInscAssetsRequestDTO().getCiasPoliceNumber() + " is already exist",
                 result.getResolvedException().getMessage())
         ).andDo(print());
     }
@@ -541,8 +539,6 @@ public class CustomerServiceControllerTest {
     @WithMockUser(authorities = "Customer")
     void update_willSuccess() throws Exception {
         Long creqEntityId = 1L;
-        String type = "CLAIM";
-        String status = "OPEN";
 
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -555,7 +551,7 @@ public class CustomerServiceControllerTest {
 
         UpdateCustomerRequestDTO customerRequestDTO = getUpdateCustomerRequestDTO(creqEntityId);
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+        CustomerRequest customerRequest = getCustomerRequest(creqEntityId);
 
         // custom http method for multipart
         MockMultipartHttpServletRequestBuilder builder =
@@ -569,7 +565,7 @@ public class CustomerServiceControllerTest {
         });
 
         when(this.customerRequestService.updateCustomerRequest(customerRequestDTO, multipartFiles))
-                .thenReturn(customerResponseDTO);
+                .thenReturn(customerRequest);
 
         mockMvc.perform(builder
                 .file(file)
@@ -580,10 +576,8 @@ public class CustomerServiceControllerTest {
             });
 
             assertNotNull(response);
-            assertEquals(creqEntityId, response.getCreqEntityId());
-            assertEquals(type, response.getCreqType().toString());
-            assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCreqEntityId(), response.getCreqEntityId());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
     }
 
@@ -635,15 +629,16 @@ public class CustomerServiceControllerTest {
     @WithMockUser(authorities = "Customer")
     void updateCustomerClaim_willSuccess() throws Exception {
         Long cuclCreqEntityId = 1L;
-        String type = "CLAIM";
-        String status = "OPEN";
 
         ClaimRequestDTO claimRequestDTO = getClaimRequestDTO(cuclCreqEntityId);
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(cuclCreqEntityId, type, status);
+        CustomerClaim customerClaim = getCustomerClaim();
+
+        CustomerRequest customerRequest = getCustomerRequest(cuclCreqEntityId);
+        customerRequest.setCustomerClaim(customerClaim);
 
         when(this.customerClaimService.claimPolis(claimRequestDTO))
-                .thenReturn(customerResponseDTO);
+                .thenReturn(customerRequest);
 
         mockMvc.perform(put("/customer/service/request/claim")
                 .accept(MediaType.APPLICATION_JSON)
@@ -655,10 +650,11 @@ public class CustomerServiceControllerTest {
             });
 
             assertNotNull(response);
-            assertEquals(cuclCreqEntityId, response.getCreqEntityId());
-            assertEquals(type, response.getCreqType().toString());
-            assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCreqEntityId(), response.getCreqEntityId());
+            assertEquals(customerClaim.getCuclSubtotal(), response.getCustomerClaim().getCuclSubtotal());
+            assertEquals(customerClaim.getCuclEventPrice(), response.getCustomerClaim().getCuclEventPrice());
+            assertEquals(customerClaim.getCuclEvents(), response.getCustomerClaim().getCuclEvents());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
 
 
@@ -694,9 +690,9 @@ public class CustomerServiceControllerTest {
     void getCustomerClaimById_willSuccess() throws Exception {
         Long cuclCreqEntityId = 1L;
 
-        ClaimResponseDTO customerClaim = getClaimResponseDTO(cuclCreqEntityId);
+        CustomerClaim customerClaim = getCustomerClaim();
 
-        when(this.customerClaimService.getCustomerClaimById(customerClaim.getCuclCreqEntityId()))
+        when(this.customerClaimService.getCustomerClaimById(cuclCreqEntityId))
                 .thenReturn(customerClaim);
 
         mockMvc.perform(get("/customer/service/request/claim")
@@ -720,19 +716,17 @@ public class CustomerServiceControllerTest {
     @Test
     @WithMockUser(authorities = "Customer")
     void getCustomerClaimById_willFailed() throws Exception {
-        Long creqEntityId = 1L;
+        Long cuclCreqEntityId = 1L;
 
-        ClaimResponseDTO customerClaim = getClaimResponseDTO(creqEntityId);
-
-        when(this.customerClaimService.getCustomerClaimById(customerClaim.getCuclCreqEntityId()))
-                .thenThrow(new EntityNotFoundException("Customer Claim with id " + customerClaim.getCuclCreqEntityId() + " is not found"));
+        when(this.customerClaimService.getCustomerClaimById(cuclCreqEntityId))
+                .thenThrow(new EntityNotFoundException("Customer Claim with id " + cuclCreqEntityId + " is not found"));
 
         mockMvc.perform(get("/customer/service/request/claim")
-                .param("cuclCreqEntityId", creqEntityId.toString())
+                .param("cuclCreqEntityId", cuclCreqEntityId.toString())
         ).andExpect(status().isNotFound()
         ).andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException)
         ).andExpect(result -> assertEquals(
-                "Customer Claim with id " + customerClaim.getCuclCreqEntityId() + " is not found",
+                "Customer Claim with id " + cuclCreqEntityId + " is not found",
                 result.getResolvedException().getMessage())
         ).andDo(print());
 
@@ -742,18 +736,20 @@ public class CustomerServiceControllerTest {
     @WithMockUser(authorities = "Customer")
     void requestClosePolis_willSuccess() throws Exception{
         Long creqEntityId = 1L;
-        String type = "CLOSE";
-        String status = "CLOSED";
+
 
         CloseRequestDTO closeRequestDTO = CloseRequestDTO.builder()
                 .creqEntityId(creqEntityId)
                 .cuclReason("G ada duit")
                 .build();
 
-        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, type, status);
+        CustomerClaim customerClaim = getCustomerClaim();
+
+        CustomerRequest customerRequest = getCustomerRequest(creqEntityId);
+        customerRequest.setCustomerClaim(customerClaim);
 
         when(this.customerClaimService.closePolis(closeRequestDTO))
-                .thenReturn(customerResponseDTO);
+                .thenReturn(customerRequest);
 
         mockMvc.perform(put("/customer/service/request/close")
                 .accept(MediaType.APPLICATION_JSON)
@@ -765,10 +761,11 @@ public class CustomerServiceControllerTest {
             });
 
             assertNotNull(response);
-            assertEquals(creqEntityId, response.getCreqEntityId());
-            assertEquals(type, response.getCreqType().toString());
-            assertEquals(status, response.getCreqStatus().toString());
-            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerRequest.getCreqEntityId(), response.getCreqEntityId());
+            assertEquals(customerClaim.getCuclSubtotal(), response.getCustomerClaim().getCuclSubtotal());
+            assertEquals(customerClaim.getCuclEventPrice(), response.getCustomerClaim().getCuclEventPrice());
+            assertEquals(customerClaim.getCuclEvents(), response.getCustomerClaim().getCuclEvents());
+            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
 
     }

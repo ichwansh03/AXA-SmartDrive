@@ -47,18 +47,15 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
 
     @Transactional(readOnly = true)
     @Override
-    public ClaimResponseDTO getCustomerClaimById(Long cuclCreqEntityId) {
+    public CustomerClaim getCustomerClaimById(Long cuclCreqEntityId) {
 
         CustomerClaim existCustomerClaim = this.customerClaimRepository.findById(cuclCreqEntityId).orElseThrow(
                 () -> new EntityNotFoundException("Customer Claim with id " + cuclCreqEntityId + " is not found")
         );
 
 
-        ClaimResponseDTO claimResponseDTO = TransactionMapper.mapEntityToDto(existCustomerClaim, ClaimResponseDTO.class);
-
-
         log.info("CustomerClaimImpl::getCustomerClaimById, find customer claim with id: {}", cuclCreqEntityId);
-        return claimResponseDTO;
+        return existCustomerClaim;
 
     }
 
@@ -76,7 +73,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
 
     @Transactional
     @Override
-    public CustomerResponseDTO claimPolis(ClaimRequestDTO claimRequestDTO) {
+    public CustomerRequest claimPolis(ClaimRequestDTO claimRequestDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(claimRequestDTO.getCreqEntityId()).orElseThrow(
                 () -> new EntityNotFoundException("Customer Request with id " + claimRequestDTO.getCreqEntityId() + " is not found")
         );
@@ -87,12 +84,12 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerClaimServiceImpl::updateCustomerClaim by ID {}", savedCustomerRequest.getCreqEntityId());
-        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+        return savedCustomerRequest;
     }
 
     @Transactional
     @Override
-    public CustomerResponseDTO closePolis(CloseRequestDTO closeRequestDTO) {
+    public CustomerRequest closePolis(CloseRequestDTO closeRequestDTO) {
         CustomerRequest existCustomerRequest = this.customerRequestRepository.findById(closeRequestDTO.getCreqEntityId()).orElseThrow(
                 () -> new EntityNotFoundException("Customer Request with id " + closeRequestDTO.getCreqEntityId() + " is not found")
         );
@@ -106,7 +103,7 @@ public class CustomerClaimServiceImpl implements CustomerClaimService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerClaimServiceImpl::closePolis successfully close polis");
-        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+        return savedCustomerRequest;
     }
 
     @Override
