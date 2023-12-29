@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 public interface ServiceFactory {
 
-    Services generateFeasiblityType(CustomerRequest cr);
+    Services addService(Long creqId) throws Exception;
 
     Services handleServiceUpdate(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus);
 
