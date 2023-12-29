@@ -30,7 +30,7 @@ public class ServOrderWorkorderController {
     }
 
     @PutMapping("/update/{sowoId}")
-    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSoWorkorderStatus(@Valid @RequestBody SoWorkorderDto soWorkorderDto, @PathVariable("sowoId") Long sowoId) {
         int sowoStatus = servOrderWorkorderService.updateSowoStatus(soWorkorderDto.getSowoStatus(), sowoId);
 

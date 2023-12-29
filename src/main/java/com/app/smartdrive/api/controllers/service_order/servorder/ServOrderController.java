@@ -32,7 +32,7 @@ public class ServOrderController {
     private final ServiceOrderFactory serviceOrderFactory;
 
     @GetMapping("/search")
-    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId) {
         ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(seroId);
         ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
@@ -40,21 +40,21 @@ public class ServOrderController {
     }
 
     @PutMapping("/partner/{seroId}")
-    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToAddPartner(@Valid @RequestBody Partner partner, @PathVariable("seroId") String seroId){
         servOrderService.selectPartner(partner, seroId);
         return new ResponseEntity<>(partner, HttpStatus.OK);
     }
 
     @PutMapping("/close/{seroId}")
-    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToCloseOrder(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId){
         int requested = serviceOrderFactory.updateStatusRequest(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
         return new ResponseEntity<>(requested, HttpStatus.OK);
     }
 
     @GetMapping("/request")
-    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getPageServiceOrders(
             @Valid @RequestBody PagingServiceOrder pagingServiceOrder,
             @RequestParam("userId") Long userId
