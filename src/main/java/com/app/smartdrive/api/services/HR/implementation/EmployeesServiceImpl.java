@@ -70,20 +70,33 @@ public class EmployeesServiceImpl implements EmployeesService {
     
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
 
-        Employees employee = new Employees();
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).orElseThrow(() ->
                 new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
+
+        Employees employee = Employees.builder()
+                .empName(employeesDto.getEmpName())
+                .empJoinDate(empJoinDate)
+                .empStatus(EnumClassHR.status.ACTIVE)
+                .empType(emp_type.PERMANENT)
+                .empGraduate(employeesDto.getEmpGraduate())
+                .empAccountNumber(employeesDto.getEmpAccountNumber())
+                .empNetSalary(employeesDto.getEmpSalary())
+                .jobType(jobType)
+                .empJobCode(employeesDto.getJobType())
+                .empModifiedDate(LocalDateTime.now())
+                .build();
+
         
-        employee.setEmpName(employeesDto.getEmpName());
-        employee.setEmpJoinDate(empJoinDate);
-        employee.setEmpStatus(EnumClassHR.status.INACTIVE);
-        employee.setEmpType(emp_type.PERMANENT);
-        employee.setEmpGraduate(employeesDto.getEmpGraduate());
-        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
-        employee.setEmpNetSalary(employeesDto.getEmpSalary());
-        employee.setJobType(jobType);
-        employee.setEmpJobCode(employeesDto.getJobType());
-        employee.setEmpModifiedDate(LocalDateTime.now());
+//        employee.setEmpName(employeesDto.getEmpName());
+//        employee.setEmpJoinDate(empJoinDate);
+//        employee.setEmpStatus(EnumClassHR.status.INACTIVE);
+//        employee.setEmpType(emp_type.PERMANENT);
+//        employee.setEmpGraduate(employeesDto.getEmpGraduate());
+//        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
+//        employee.setEmpNetSalary(employeesDto.getEmpSalary());
+//        employee.setJobType(jobType);
+//        employee.setEmpJobCode(employeesDto.getJobType());
+//        employee.setEmpModifiedDate(LocalDateTime.now());
         
         User user = createUserFromDto(employeesDto);
         if(employeesDto.getGrantAccessUser()){
@@ -215,13 +228,10 @@ public class EmployeesServiceImpl implements EmployeesService {
         return employeesRepository.findByEmpNameOrEmpGraduate(value, pageable);
     }
 
-
-
     @Override
   public void deleteEmployeesById(Long empEntitiyid) {
     employeesRepository.deleteById(empEntitiyid);
   }
-
 
     @Override
     public Employees getById(Long id) {
@@ -233,24 +243,12 @@ public class EmployeesServiceImpl implements EmployeesService {
         return existEmployees;
     }
 
+
+
     @Override
     @Transactional
     public Page<Employees> getAll(Pageable pageable) {
         return employeesRepository.findAll(pageable);
-    }
-
-    @Override
-    public List<Employees> getAll() {
-        return null;
-    }
-
-
-
-
-    @Override
-    public Employees save(Employees entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
 
     
