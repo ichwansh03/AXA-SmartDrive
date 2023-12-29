@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @IdClass(EmployeeAreaWorkgroupId.class)
 @Table(name="employee_are_workgroup",schema="hr")
 public class EmployeeAreaWorkgroup {

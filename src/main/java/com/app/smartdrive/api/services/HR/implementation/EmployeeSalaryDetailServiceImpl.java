@@ -91,22 +91,6 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         }
         return salaryDetails;
     }
-    @Override
-    public EmployeeSalaryDetail getById(Long aLong) {
-        return null;
-    }
-
-    @Override
-    public List<EmployeeSalaryDetail> getAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
-    }
-
-    @Override
-    public EmployeeSalaryDetail save(EmployeeSalaryDetail t) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
 
     
 }
