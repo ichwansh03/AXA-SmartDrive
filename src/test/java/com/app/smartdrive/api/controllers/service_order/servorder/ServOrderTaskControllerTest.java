@@ -3,6 +3,7 @@ package com.app.smartdrive.api.controllers.service_order.servorder;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ class ServOrderTaskControllerTest {
     @MockBean
     private ServOrderTaskService servOrderTaskService;
 
+    @MockBean
+    private ServiceTasksFactory serviceTasksFactory;
+
     @DisplayName("Get Tasks by Sero Id")
     @ParameterizedTest
     @ValueSource(strings = {"CL0001-20231010", "FS0001-20231010", "PL0001-20231010"})
@@ -62,6 +66,6 @@ class ServOrderTaskControllerTest {
                 .andExpect(status().isOk())
                 .andDo(result -> objectMapper.writeValueAsString(soTasksDto));
 
-        verify(servOrderTaskService, times(1)).updateTasksStatus(soTasksDto.getSeotStatus(), soTasksDto.getSeotId());
+        verify(serviceTasksFactory, times(1)).updateTasksStatus(soTasksDto.getSeotStatus(), soTasksDto.getSeotId());
     }
 }
