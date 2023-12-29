@@ -4,6 +4,7 @@ import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
+import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -194,10 +195,12 @@ public class CustomerServiceController {
 
     @PutMapping("/request/claim")
     @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
-    public ResponseEntity<CustomerResponseDTO> updateCustomerClaim(
+    public ResponseEntity<CustomerResponseDTO> requestClaimPolis(
             @RequestBody ClaimRequestDTO claimRequestDTO
     ){
-        CustomerResponseDTO customerResponseDTO = this.customerClaimService.claimPolis(claimRequestDTO);
+        CustomerRequest claimedCustomerRequest = this.customerClaimService.claimPolis(claimRequestDTO);
+
+        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(claimedCustomerRequest, CustomerResponseDTO.class);
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
@@ -206,16 +209,19 @@ public class CustomerServiceController {
     public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
             @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
     ){
-        ClaimResponseDTO existCustomerClaim = this.customerClaimService.getCustomerClaimById(cuclCreqEntityId);
-        return ResponseEntity.status(HttpStatus.OK).body(existCustomerClaim);
+        CustomerClaim existCustomerClaim = this.customerClaimService.getCustomerClaimById(cuclCreqEntityId);
+
+        ClaimResponseDTO claimResponseDTO = TransactionMapper.mapEntityToDto(existCustomerClaim, ClaimResponseDTO.class);
+        return ResponseEntity.status(HttpStatus.OK).body(claimResponseDTO);
 
     }
 
     @PutMapping("/request/close")
     @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
-        CustomerResponseDTO customerResponseDTO = this.customerClaimService.closePolis(closeRequestDTO);
+        CustomerRequest closedCustomerRequest = this.customerClaimService.closePolis(closeRequestDTO);
 
+        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(closedCustomerRequest, CustomerResponseDTO.class);
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 
