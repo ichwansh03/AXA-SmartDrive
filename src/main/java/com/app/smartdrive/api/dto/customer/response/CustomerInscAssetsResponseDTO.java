@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CiasResponseDTO {
+public class CustomerInscAssetsResponseDTO {
 
     private Long ciasCreqEntityid;
 
@@ -39,9 +39,9 @@ public class CiasResponseDTO {
 
     private Character ciasIsNewChar;
 
-    private List<CadocResponseDTO> customerInscDoc;
+    private List<CustomerInscDocResponseDTO> customerInscDoc;
 
-    private List<CuexResponseDTO> customerInscExtend;
+    private List<CustomerInscExtendResponseDTO> customerInscExtend;
 
     private IntyRes insuranceType;
 

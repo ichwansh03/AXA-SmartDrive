@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CuexResponseDTO {
+public class CustomerInscExtendResponseDTO {
     private Long cuexId;
 
     private Long cuexCreqEntityid;

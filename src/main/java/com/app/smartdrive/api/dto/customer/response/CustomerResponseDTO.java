@@ -1,11 +1,9 @@
 package com.app.smartdrive.api.dto.customer.response;
 
-import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.dto.user.response.UserDto;
-import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +31,7 @@ public class CustomerResponseDTO {
 
     private UserDto customer;
 
-    private CiasResponseDTO customerInscAssets;
+    private CustomerInscAssetsResponseDTO customerInscAssets;
 
     private EmployeesAreaWorkgroupResponseDto employeeAreaWorkgroup;
 

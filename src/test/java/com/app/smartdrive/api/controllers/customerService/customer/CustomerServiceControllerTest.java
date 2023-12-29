@@ -3,10 +3,11 @@ package com.app.smartdrive.api.controllers.customerService.customer;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
-import com.app.smartdrive.api.dto.customer.response.CiasResponseDTO;
+import com.app.smartdrive.api.dto.customer.response.CustomerInscAssetsResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
+import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.users.User;
@@ -155,7 +156,7 @@ public class CustomerServiceControllerTest {
     public CustomerResponseDTO getCustomerResponseDTO(Long id, String type, String status){
         LocalDateTime ciasStartDate = LocalDateTime.of(2001, Month.OCTOBER, Math.toIntExact(id), 12, 10, 0);
 
-        CiasResponseDTO ciasResponseDTO = CiasResponseDTO.builder()
+        CustomerInscAssetsResponseDTO customerInscAssetsResponseDTO = CustomerInscAssetsResponseDTO.builder()
                 .ciasCreqEntityid(id)
                 .ciasCurrentPrice(BigDecimal.valueOf(200_000_000))
                 .ciasStartdate(ciasStartDate)
@@ -169,36 +170,50 @@ public class CustomerServiceControllerTest {
                 .creqEntityId(id)
                 .creqStatus(EnumCustomer.CreqStatus.valueOf(status))
                 .creqType(EnumCustomer.CreqType.valueOf(type))
-                .customerInscAssets(ciasResponseDTO)
+                .customerInscAssets(customerInscAssetsResponseDTO)
                 .build();
 
         return customerResponseDTO;
+    }
+
+    public CustomerRequest getCustomerRequest(Long creqEntityId){
+        CustomerInscAssets customerInscAssets = CustomerInscAssets.builder()
+                .ciasCreqEntityid(creqEntityId)
+                .ciasPoliceNumber("B 123"+creqEntityId + " CBD")
+                .build();
+
+        return CustomerRequest.builder()
+                .creqEntityId(creqEntityId)
+                .customerInscAssets(customerInscAssets)
+                .build();
     }
 
 
     @Test
     @WithMockUser(authorities = "Customer")
     void getAllCustomersRequest_willSuccess() throws Exception {
-        List<CustomerResponseDTO> creqDTOList = List.of(
-                getCustomerResponseDTO(1L, "POLIS", "OPEN"),
-                getCustomerResponseDTO(2L, "CLAIM", "OPEN")
+        List<CustomerRequest> customerRequestList = List.of(
+                getCustomerRequest(1L),
+                getCustomerRequest(2L)
         );
 
-        Page<CustomerRequest> pagedResponse = new PageImpl(creqDTOList);
+        Page<CustomerRequest> pagedCustomerRequest = new PageImpl(customerRequestList);
 
         Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
 
-        when(this.customerRequestService.getAllPaging(paging, "ALL", "OPEN")).thenReturn(pagedResponse);
-        when(this.customerRequestService.getAllPaging(paging, "POLIS", "OPEN")).thenReturn(pagedResponse);
+        when(this.customerRequestService.getAllPaging(paging, "ALL", "OPEN")).thenReturn(pagedCustomerRequest);
+        when(this.customerRequestService.getAllPaging(paging, "POLIS", "OPEN")).thenReturn(pagedCustomerRequest);
 
         mockMvc.perform(
                 get("/customer/service/request")
                         .param("type", "POLIS")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(creqDTOList.size()))
-                .andExpect(jsonPath("$.content[0].creqEntityId").value(creqDTOList.get(0).getCreqEntityId()))
-                .andExpect(jsonPath("$.content[1].creqEntityId").value(creqDTOList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
+                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerRequestList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerRequestList.get(1).getCreqEntityId()))
                 .andDo(print());
 
     }
