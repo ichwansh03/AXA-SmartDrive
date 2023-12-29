@@ -11,8 +11,6 @@ import java.util.List;
 
 public interface ServOrderService {
 
-    ServiceOrders addServiceOrders(Long servId) throws Exception;
-
     ServiceOrders findServiceOrdersById(String seroId);
 
     List<ServiceOrders> findAllSeroByServId(Long servId);
@@ -23,5 +21,4 @@ public interface ServOrderService {
 
     int selectPartner(Partner partner, String seroId);
 
-    int updateStatusRequest(EnumModuleServiceOrders.SeroStatus seroStatus, String seroReason, String seroId);
 }
