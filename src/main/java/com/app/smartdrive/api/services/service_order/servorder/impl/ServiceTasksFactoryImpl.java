@@ -1,14 +1,20 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.EmailReq;
+import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TestaRepository;
+import com.app.smartdrive.api.repositories.partner.PartnerRepository;
+import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
@@ -28,8 +34,10 @@ import java.util.List;
 @Slf4j
 public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
 
+    private final SoOrderRepository soOrderRepository;
     private final SoTasksRepository soTasksRepository;
     private final TestaRepository testaRepository;
+    private final PartnerRepository partnerRepository;
 
     private final ServOrderWorkorderService servOrderWorkorderService;
     private final ServOrderTaskService servOrderTaskService;
@@ -137,4 +145,43 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
         return soTasksRepository.saveAll(serviceOrderTasks);
     }
 
+    @Transactional
+    @Override
+    public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
+        int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, seotId);
+
+        if (updateSeot == 0) {
+            throw new ValidasiRequestException("Failed to update data",400);
+        }
+        log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
+        return updateSeot;
+    }
+
+    @Transactional
+    @Override
+    public SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId) {
+        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("::updateSeotPartner() ID "+seotId+" is not found"));
+        SeotPartnerDto seotPartner = SeotPartnerDto.builder()
+                .partnerId(seotPartnerDto.getPartnerId())
+                .repair(seotPartnerDto.getRepair())
+                .sparepart(seotPartnerDto.getSparepart())
+                .seotStatus(seotPartnerDto.getSeotStatus()).build();
+
+        if (seotPartnerDto.getRepair()) {
+            servOrderWorkorderService.createWorkorderTask("REPAIR", seotId);
+            log.info("SoOrderServiceImpl::updateSeotPartner add REPAIR to workorder");
+        }
+
+        if (seotPartnerDto.getSparepart()) {
+            servOrderWorkorderService.createWorkorderTask("GANTI SUKU CADANG", seotId);
+            log.info("SoOrderServiceImpl::updateSeotPartner add GANTI SUKU CADANG to workorder");
+        }
+
+        Partner partner = partnerRepository.findById(seotPartner.getPartnerId())
+                .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID "+seotPartner.getPartnerId()+" is not found"));
+        soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
+
+        return seotPartner;
+    }
 }
