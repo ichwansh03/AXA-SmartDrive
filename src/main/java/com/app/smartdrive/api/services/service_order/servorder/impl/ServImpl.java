@@ -3,6 +3,7 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.*;
+import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.*;
@@ -34,7 +35,6 @@ public class ServImpl implements ServService {
     private final ServPremiCreditService servPremiCreditService;
 
     private final CustomerRequestService customerRequestService;
-    private final ServiceFactory serviceFactory;
 
     @Transactional(readOnly = true)
     @Override

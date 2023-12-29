@@ -32,7 +32,7 @@ public class ServOrderTaskController {
     }
 
     @PutMapping("/update/{seotId}")
-    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SoTasksDto soTasksDto, @PathVariable("seotId") Long seotId) {
         int updated = serviceTasksFactory.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
 
@@ -40,7 +40,7 @@ public class ServOrderTaskController {
     }
 
     @PutMapping("/update/claim/{seotId}")
-    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SeotPartnerDto soTasksDto, @PathVariable("seotId") Long seotId) {
 
         SeotPartnerDto seotPartnerDto = new SeotPartnerDto();
