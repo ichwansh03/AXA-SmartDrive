@@ -1,16 +1,17 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceOrderFactory;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,6 @@ import java.time.LocalDateTime;
 public class ServiceFactoryImpl implements ServiceFactory {
 
     private final SoRepository soRepository;
-    private final ServOrderService servOrderService;
     private final ServiceOrderFactory serviceOrderFactory;
     private final ServPremiService servPremiService;
     private final CustomerRequestRepository customerRequestRepository;
@@ -35,7 +35,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
 
     @Transactional
     @Override
-    public Services addService(Long creqId) throws Exception {
+    public ServiceRespDto addService(Long creqId) throws Exception {
 
         CustomerRequest cr = customerRequestRepository.findById(creqId)
                 .orElseThrow(() -> new EntityNotFoundException("creqId "+creqId+" is not found"));
@@ -68,7 +68,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
         soRepository.flush();
         log.info("ServOrderServiceImpl::addService sync data to db");
 
-        return saved;
+        return TransactionMapper.mapEntityToDto(saved, ServiceRespDto.class);
     }
 
     @Override

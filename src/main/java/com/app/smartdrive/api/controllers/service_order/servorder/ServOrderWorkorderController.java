@@ -3,6 +3,7 @@ package com.app.smartdrive.api.controllers.service_order.servorder;
 import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceWorkorderFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ServOrderWorkorderController {
 
     private final ServOrderWorkorderService servOrderWorkorderService;
+    private final ServiceWorkorderFactory serviceWorkorderFactory;
 
     @GetMapping
     public ResponseEntity<?> getServiceOrderWorkorderById(@RequestParam("sowoid") Long sowoId) {
@@ -32,7 +34,7 @@ public class ServOrderWorkorderController {
     @PutMapping("/update/{sowoId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSoWorkorderStatus(@Valid @RequestBody SoWorkorderDto soWorkorderDto, @PathVariable("sowoId") Long sowoId) {
-        int sowoStatus = servOrderWorkorderService.updateSowoStatus(soWorkorderDto.getSowoStatus(), sowoId);
+        int sowoStatus = serviceWorkorderFactory.updateSowoStatus(soWorkorderDto.getSowoStatus(), sowoId);
 
         return new ResponseEntity<>(sowoStatus, HttpStatus.OK);
     }

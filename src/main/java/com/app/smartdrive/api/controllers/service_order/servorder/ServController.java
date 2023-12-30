@@ -1,8 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.service_order.response.*;
-import com.app.smartdrive.api.entities.service_order.*;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +36,8 @@ public class ServController {
     @GetMapping("/addserv")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> generateService(@RequestParam("creqId") Long creqId) throws Exception {
-        Services services = serviceFactory.addService(creqId);
 
-        ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
+        ServiceRespDto serviceRespDto = serviceFactory.addService(creqId);
 
         log.info("ServiceOrdersController::generateService successfully viewed");
         return new ResponseEntity<>(serviceRespDto, HttpStatus.OK);
