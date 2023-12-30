@@ -115,20 +115,20 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
                 && LocalDateTime.now().isAfter(servicePremiCredit.getSecrDuedate());
     }
 
-    @Async
-    @Scheduled(fixedRate = PERIOD_IN_MILLIS)
-    public void sendNotify(){
-        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
-        if (existSecr != null){
-            Services services = soRepository.findById(existSecr.getSecrServId())
-                    .orElseThrow(() -> new EntityNotFoundException("Service not found"));
-            if (existSecr.getSecrDuedate().minusDays(2).isBefore(LocalDateTime.now())){
-                EmailReq emailReq = new EmailReq();
-                emailReq.setTo(services.getUsers().getUserEmail());
-                emailReq.setSubject("Due Date Premi Payment");
-                emailReq.setBody("Pay your bill immediately before it closes");
-                emailService.sendMail(emailReq);
-            }
-        }
-    }
+//    @Async
+//    @Scheduled(fixedRate = PERIOD_IN_MILLIS)
+//    public void sendNotify(){
+//        ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+//        if (existSecr != null){
+//            Services services = soRepository.findById(existSecr.getSecrServId())
+//                    .orElseThrow(() -> new EntityNotFoundException("Service not found"));
+//            if (existSecr.getSecrDuedate().minusDays(2).isBefore(LocalDateTime.now())){
+//                EmailReq emailReq = new EmailReq();
+//                emailReq.setTo(services.getUsers().getUserEmail());
+//                emailReq.setSubject("Due Date Premi Payment");
+//                emailReq.setBody("Pay your bill immediately before it closes");
+//                emailService.sendMail(emailReq);
+//            }
+//        }
+//    }
 }
