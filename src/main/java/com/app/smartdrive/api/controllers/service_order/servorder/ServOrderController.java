@@ -42,7 +42,7 @@ public class ServOrderController {
     @PutMapping("/partner/{seroId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToAddPartner(@Valid @RequestBody Partner partner, @PathVariable("seroId") String seroId){
-        servOrderService.selectPartner(partner, seroId);
+        serviceOrderFactory.selectPartner(partner, seroId);
         return new ResponseEntity<>(partner, HttpStatus.OK);
     }
 
