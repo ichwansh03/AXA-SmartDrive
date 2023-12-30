@@ -56,8 +56,7 @@ public class ServOrderController {
     @GetMapping("/request")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getPageServiceOrders(
-            @Valid @RequestBody PagingServiceOrder pagingServiceOrder,
-            @RequestParam("userId") Long userId
+            @Valid @RequestBody PagingServiceOrder pagingServiceOrder
     ){
 
         Pageable paging;

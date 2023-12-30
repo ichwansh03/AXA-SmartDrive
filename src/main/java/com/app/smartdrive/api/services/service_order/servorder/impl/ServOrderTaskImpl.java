@@ -44,8 +44,9 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     }
 
     @Override
-    public void notifyTask(EmailReq emailReq, ServiceOrders serviceOrders, String subject, String message){
-        emailReq.setTo(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail());
+    public void notifyTask(String mailTo, String subject, String message){
+        EmailReq emailReq = new EmailReq();
+        emailReq.setTo(mailTo);
         emailReq.setSubject(subject);
         emailReq.setBody(message);
         log.info("Email has been send");

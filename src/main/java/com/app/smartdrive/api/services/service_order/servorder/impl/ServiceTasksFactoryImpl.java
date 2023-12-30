@@ -2,7 +2,6 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
-import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -70,7 +69,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
     public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) throws Exception {
 
         List<ServiceTaskReqDto> seotList = new ArrayList<>();
-        EmailReq emailReq = new EmailReq();
+
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(2L);
 
         Method generatePolisNumber = SoAdapter.class.getMethod("generatePolis", CustomerRequest.class);
@@ -83,10 +82,10 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                     serviceOrders, generatePolisNumber));
 
             switch (templateServiceTask.getTestaName()){
-                case "NOTIFY TO AGENT" -> servOrderTaskService.notifyTask(emailReq, serviceOrders,
+                case "NOTIFY TO AGENT" -> servOrderTaskService.notifyTask(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail(),
                         "Request new POLIS",
                         "Request new POLIS from "+serviceOrders.getServices().getUsers().getUserFullName());
-                case "NOTIFY TO CUSTOMER" -> servOrderTaskService.notifyTask(emailReq, serviceOrders,
+                case "NOTIFY TO CUSTOMER" -> servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
                         "POLIS has been created",
                         "Your request POLIS has been created, check your dashboard page");
             }
@@ -103,7 +102,6 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
     public List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders) {
 
         List<ServiceTaskReqDto> seot = new ArrayList<>();
-        EmailReq emailReq = new EmailReq();
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(3L);
 
         for (int i = 0; i < templateServiceTasks.size(); i++) {
@@ -116,7 +114,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
             switch (templateServiceTasks.get(i).getTestaName()){
                 case "CLAIM DOCUMENT APPROVED" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
-                        servOrderTaskService.notifyTask(emailReq, serviceOrders,
+                        servOrderTaskService.notifyTask(serviceOrders.getPartner().getPartnerContacts().get(i).getUser().getUserEmail(),
                                 "Repair Sparepart from Customer",
                                 "Repair from "+serviceOrders.getServices().getUsers().getUserFullName());
                     }
@@ -124,7 +122,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
 
                 case "CALCULATE SPARE PART" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
-                        servOrderTaskService.notifyTask(emailReq, serviceOrders,
+                        servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
                                 "Your car is finish to repair",
                                 "Car Repaired is finish");
                     }
@@ -132,7 +130,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
 
                 case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> {
                     if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
-                        servOrderTaskService.notifyTask(emailReq, serviceOrders,
+                        servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
                                 "Claim for "+serviceOrders.getServices().getUsers().getUserFullName(),
                                 "Repaired is finish, pay claim to user");
                     }
