@@ -1,9 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
-import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -76,18 +74,6 @@ public class ServOrderImpl implements ServOrderService {
         }
 
         return serviceOrdersPage.map(serviceOrders -> TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class));
-    }
-
-    @Transactional
-    @Override
-    public int selectPartner(Partner partner, String seroId) {
-        int selected = soOrderRepository.selectPartner(partner, seroId);
-
-        if (selected == 0) {
-            throw new ValidasiRequestException("Failed to update data", 400);
-        }
-
-        return selected;
     }
 
 }

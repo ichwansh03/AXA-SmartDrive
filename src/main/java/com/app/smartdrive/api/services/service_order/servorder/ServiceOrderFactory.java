@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder;
 
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
@@ -19,4 +20,7 @@ public interface ServiceOrderFactory {
     void requestCloseAllSero(Services services);
 
     int updateStatusRequest(EnumModuleServiceOrders.SeroStatus seroStatus, String seroReason, String seroId);
+
+    int selectPartner(Partner partner, String seroId);
+
 }
