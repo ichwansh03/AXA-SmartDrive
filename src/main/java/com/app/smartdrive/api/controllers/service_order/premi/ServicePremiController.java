@@ -18,7 +18,7 @@ public class ServicePremiController {
     private final ServPremiCreditService servPremiCreditService;
 
     @PutMapping("/credit/update/{secrServId}/{secrId}")
-    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updatePremiByDuedate(@Valid @RequestBody SecrReqDto secrReqDto,
                                                   @PathVariable("secrId") Long secrId,
                                                   @PathVariable("secrServId") Long secrServId){

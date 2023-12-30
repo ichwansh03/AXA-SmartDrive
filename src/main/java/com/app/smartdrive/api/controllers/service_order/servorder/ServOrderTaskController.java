@@ -43,14 +43,10 @@ public class ServOrderTaskController {
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SeotPartnerDto soTasksDto, @PathVariable("seotId") Long seotId) {
 
-        SeotPartnerDto seotPartnerDto = new SeotPartnerDto();
-        seotPartnerDto.setPartnerId(soTasksDto.getPartnerId());
-        seotPartnerDto.setRepair(soTasksDto.getRepair());
-        seotPartnerDto.setSparepart(soTasksDto.getSparepart());
-        serviceTasksFactory.updateSeotPartner(seotPartnerDto, seotId);
+        serviceTasksFactory.updateSeotPartner(soTasksDto, seotId);
 
         serviceTasksFactory.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
 
-        return new ResponseEntity<>(seotPartnerDto, HttpStatus.OK);
+        return new ResponseEntity<>(soTasksDto, HttpStatus.OK);
     }
 }
