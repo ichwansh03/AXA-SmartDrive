@@ -15,11 +15,11 @@ import java.time.format.DateTimeFormatter;
 public class SoAdapter {
 
     private int seroSequence = 0;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     public String formatServiceOrderId(Services services){
 
         String servTypes = services.getServType().toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         log.info("Format ID for ServiceOrders has been created");
 
@@ -45,10 +45,11 @@ public class SoAdapter {
 
     public String generatePolis(CustomerRequest cr){
         String servTypes = cr.getCreqType().toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
         String createdDate = cr.getCreqCreateDate().format(formatter);
 
         return switch (servTypes) {
-            case "POLIS", "CLAIM" -> getNextSequenceNumber()+"-"+createdDate;
+            case "POLIS", "CLAIM" -> cr.getCustomer().getUserEntityId()+"-"+createdDate;
             default -> "0";
         };
 
