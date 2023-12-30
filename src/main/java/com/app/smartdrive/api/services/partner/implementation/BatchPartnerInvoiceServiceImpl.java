@@ -50,11 +50,6 @@ public class BatchPartnerInvoiceServiceImpl implements BatchPartnerInvoiceServic
     }
 
     @Override
-    public List<BatchPartnerInvoice> generateBpin() {
-        return null;
-    }
-
-    @Override
     public BatchPartnerInvoice createOne(String seroId) {
         ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(seroId);
         double paid = calculatePaidFromCaev(serviceOrders.getClaimAssetEvidence()) + calculatePaidFromCasp(serviceOrders.getClaimAssetSparepart());
