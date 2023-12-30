@@ -85,7 +85,7 @@ public class ServControllerTest {
     void itShouldAddServiceFromCustomer() throws Exception {
 
         Long creqId = 2L;
-        Services services = new Services();
+        ServiceRespDto services = new ServiceRespDto();
         services.setServStatus(EnumModuleServiceOrders.ServStatus.ACTIVE);
         services.setServType(EnumCustomer.CreqType.POLIS);
 

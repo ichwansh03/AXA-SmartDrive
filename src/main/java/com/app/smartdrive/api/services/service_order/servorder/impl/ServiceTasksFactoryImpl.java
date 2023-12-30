@@ -19,7 +19,7 @@ import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceWorkorderFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
     private final TestaRepository testaRepository;
     private final PartnerRepository partnerRepository;
 
-    private final ServOrderWorkorderService servOrderWorkorderService;
+    private final ServiceWorkorderFactory serviceWorkorderFactory;
     private final ServOrderTaskService servOrderTaskService;
 
     @Transactional
@@ -61,7 +61,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
         List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
         List<ServiceOrderTasks> serviceOrderTasks = soTasksRepository.saveAll(mapperTaskList);
 
-        servOrderWorkorderService.addSowoList(serviceOrderTasks);
+        serviceWorkorderFactory.addSowoList(serviceOrderTasks);
 
         return serviceOrderTasks;
     }
@@ -169,12 +169,12 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                 .seotStatus(seotPartnerDto.getSeotStatus()).build();
 
         if (seotPartnerDto.getRepair()) {
-            servOrderWorkorderService.createWorkorderTask("REPAIR", seotId);
+            serviceWorkorderFactory.createWorkorderTask("REPAIR", seotId);
             log.info("SoOrderServiceImpl::updateSeotPartner add REPAIR to workorder");
         }
 
         if (seotPartnerDto.getSparepart()) {
-            servOrderWorkorderService.createWorkorderTask("GANTI SUKU CADANG", seotId);
+            serviceWorkorderFactory.createWorkorderTask("GANTI SUKU CADANG", seotId);
             log.info("SoOrderServiceImpl::updateSeotPartner add GANTI SUKU CADANG to workorder");
         }
 
