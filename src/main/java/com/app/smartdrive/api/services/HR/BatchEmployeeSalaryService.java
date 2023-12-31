@@ -10,7 +10,7 @@ import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
 import com.app.smartdrive.api.services.BaseService;
 
 public interface BatchEmployeeSalaryService{
-    public BatchEmployeeSalary createOne(Long id);
-    public List<EmployeeSalaryDetail> getAllCommission(Long besaEmpEntityId, LocalDate besaCreateDate);
-    public List<BatchEmployeeSalary> getAllTransNull();
+     BatchEmployeeSalary createOne(Long id);
+     List<EmployeeSalaryDetail> getAllCommission(Long besaEmpEntityId, LocalDate besaCreateDate);
+     List<BatchEmployeeSalary> getAllTransNull();
 }   

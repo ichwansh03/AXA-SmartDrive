@@ -3,10 +3,8 @@ package com.app.smartdrive.api.services.HR.implementation;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.user.response.UserRoleDto;
 import com.app.smartdrive.api.entities.users.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,9 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
-import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
-import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.dto.user.UserUserAccountDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
@@ -30,7 +26,6 @@ import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.hr.EnumClassHR.emp_type;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.HR.JobTypeRepository;
@@ -73,6 +68,8 @@ public class EmployeesServiceImpl implements EmployeesService {
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).orElseThrow(() ->
                 new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
 
+        User user = createUserFromDto(employeesDto);
+
         Employees employee = Employees.builder()
                 .empName(employeesDto.getEmpName())
                 .empJoinDate(empJoinDate)
@@ -83,36 +80,20 @@ public class EmployeesServiceImpl implements EmployeesService {
                 .empNetSalary(employeesDto.getEmpSalary())
                 .jobType(jobType)
                 .empJobCode(employeesDto.getJobType())
+                .user(user)
+                .empEntityid(user.getUserEntityId())
                 .empModifiedDate(LocalDateTime.now())
                 .build();
 
-        
-//        employee.setEmpName(employeesDto.getEmpName());
-//        employee.setEmpJoinDate(empJoinDate);
-//        employee.setEmpStatus(EnumClassHR.status.INACTIVE);
-//        employee.setEmpType(emp_type.PERMANENT);
-//        employee.setEmpGraduate(employeesDto.getEmpGraduate());
-//        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
-//        employee.setEmpNetSalary(employeesDto.getEmpSalary());
-//        employee.setJobType(jobType);
-//        employee.setEmpJobCode(employeesDto.getJobType());
-//        employee.setEmpModifiedDate(LocalDateTime.now());
-        
-        User user = createUserFromDto(employeesDto);
         if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
-
-
         }
 
         userRolesService.createUserRole(RoleName.EM,user,employeesDto.getGrantAccessUser());
         createUserPhonefromDto(user, employeesDto.getEmpPhone());
         createUserAccountFromDto(user, employeesDto.getEmpAccountNumber());
-        createUserAddressFromDto(user, employeesDto.getEmpAddress());    
-        
-        employee.setEmpEntityid(user.getUserEntityId());
-        employee.setUser(user);           
+        createUserAddressFromDto(user, employeesDto.getEmpAddress());
 
         return employeesRepository.save(employee);
     }
@@ -150,7 +131,6 @@ public class EmployeesServiceImpl implements EmployeesService {
         listPhone.add(newUserPhoneDto);
         userPhoneService.createUserPhone(user, listPhone);
     }
-
 
     private void createUserAddressFromDto(User user, UserAddressRequestDto userAddressDto) {
         UserAddressDto newUserAddressDto = new UserAddressDto();
@@ -242,18 +222,9 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         return existEmployees;
     }
-
-
-
     @Override
     @Transactional
     public Page<Employees> getAll(Pageable pageable) {
         return employeesRepository.findAll(pageable);
     }
-
-    
-
-    
-
-    
 }
