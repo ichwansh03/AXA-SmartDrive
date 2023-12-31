@@ -137,9 +137,15 @@ public class GlobalExceptions {
 
     @ExceptionHandler(TasksNotCompletedException.class)
     public ResponseEntity<?> httpRequestTasksNotCompletedException(TasksNotCompletedException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(CheckPaymentException.class)
+    public ResponseEntity<?> httpRequestCheckPaymentException(TasksNotCompletedException ex) {
+        Error error = ErrorUtils.createError(ex.getMessage(), ex.getLocalizedMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 
     public ResponseEntity<?> methodArgumentConversionNotSupportedException(
             MethodArgumentConversionNotSupportedException ex) {
