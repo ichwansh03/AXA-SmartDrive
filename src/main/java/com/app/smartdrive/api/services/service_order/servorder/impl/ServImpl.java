@@ -43,8 +43,6 @@ public class ServImpl implements ServService {
                 .orElseThrow(() -> new EntityNotFoundException("Service with ID " + servId + " not found"));
         log.info("SoOrderServiceImpl::findServicesById in ID {} ",services.getServId());
 
-        CustomerRequest existCustomerRequest = customerRequestService.getById(services.getCustomer().getCreqEntityId());
-        CustomerResponseDTO customerRequestById = TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
         List<ServiceOrders> allSeroByServId = servOrderService.findAllSeroByServId(services.getServId());
 
         List<ServiceOrderRespDto> serviceOrderRespDtos = allSeroByServId.stream()
@@ -71,6 +69,10 @@ public class ServImpl implements ServService {
         semiDto.setSecrDtoList(secrDtoList);
 
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
+
+        CustomerRequest existCustomerRequest = customerRequestService.getById(serviceRespDto.getServId());
+        CustomerResponseDTO customerRequestById = TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
+
         serviceRespDto.setCustomerResponseDTO(customerRequestById);
         serviceRespDto.setServiceOrdersList(serviceOrderRespDtos);
         serviceRespDto.setSemiDto(semiDto);

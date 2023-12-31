@@ -1,17 +1,16 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
+import com.app.smartdrive.api.dto.customer.request.ClaimRequestDTO;
 import com.app.smartdrive.api.dto.service_order.response.*;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -33,11 +32,11 @@ public class ServController {
         return new ResponseEntity<>(servicesById, HttpStatus.OK);
     }
 
-    @GetMapping("/addserv")
+    @PostMapping
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
-    public ResponseEntity<?> generateService(@RequestParam("creqId") Long creqId) throws Exception {
+    public ResponseEntity<?> generateService(@Valid @RequestBody ClaimRequestDTO requestDTO) throws Exception {
 
-        ServiceRespDto serviceRespDto = serviceFactory.addService(creqId);
+        ServiceRespDto serviceRespDto = serviceFactory.addService(requestDTO.getCreqEntityId());
 
         log.info("ServiceOrdersController::generateService successfully viewed");
         return new ResponseEntity<>(serviceRespDto, HttpStatus.OK);
