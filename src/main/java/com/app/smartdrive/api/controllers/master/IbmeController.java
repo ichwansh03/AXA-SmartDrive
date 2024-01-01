@@ -1,90 +1,48 @@
 package com.app.smartdrive.api.controllers.master;
 
-import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.EmailReq;
-import com.app.smartdrive.api.dto.master.request.NotificationReq;
-import com.app.smartdrive.api.dto.master.response.IbmeRes;
 import com.app.smartdrive.api.dto.master.request.IbmeReq;
-import com.app.smartdrive.api.entities.master.InboxMessaging;
-import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.services.master.EmailService;
-import com.app.smartdrive.api.services.master.IbmeService;
+import com.app.smartdrive.api.services.master.MasterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/ibme")
 @Tag(name = "Master Module")
-public class IbmeController implements BaseController<IbmeReq, Long> {
-    private final IbmeService service;
-    private final EmailService emailService;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class IbmeController implements MasterController<IbmeReq, Long> {
+    private final MasterService ibmeServiceImpl;
 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        List<IbmeRes> result = TransactionMapper.mapEntityListToDtoList(service.getAll(), IbmeRes.class);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(ibmeServiceImpl.getAll());
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), IbmeRes.class));
-    }
-
-    @Override
-    public ResponseEntity<?> saveData(@Valid @RequestBody IbmeReq request) {
-        return ResponseEntity.ok("OK");
+        return ResponseEntity.ok(ibmeServiceImpl.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<?> saveAndSendMail(@Valid @RequestBody NotificationReq request) {
-        IbmeReq ibmeReq = new IbmeReq();
-        ibmeReq.setIbmeDate(request.getIbmeDate());
-        ibmeReq.setIbme_type(request.getIbme_type());
-        ibmeReq.setIbme_entityid_target(request.getIbme_entityid_target());
-        ibmeReq.setIbme_entityid_source(request.getIbme_entityid_source());
-        ibmeReq.setIbme_count(request.getIbme_count());
-        getResponseEntity(ibmeReq, new InboxMessaging());
-
-        EmailReq emailReq = new EmailReq();
-        emailReq.setTo(request.getTargetMail());
-        emailReq.setSubject(request.getSubjectMail());
-        emailReq.setBody(request.getBodyMail());
-        emailService.sendMail(emailReq);
-
-        return ResponseEntity.ok("Email Has Been Sent");
+    public ResponseEntity<?> saveData(@Valid @RequestBody IbmeReq request) {
+        return new ResponseEntity<>(ibmeServiceImpl.save(request), HttpStatus.CREATED);
     }
 
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody IbmeReq request) {
-        InboxMessaging result = getResponseEntity(request, service.getById(id));
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(result, IbmeRes.class));
+        ibmeServiceImpl.getById(id);
+        return ResponseEntity.ok(ibmeServiceImpl.save(request));
     }
 
-    private InboxMessaging getResponseEntity(@RequestBody @Valid IbmeReq request, InboxMessaging result) {
-        if(request.getIbmeDate() != null) {
-            LocalDate localDate = LocalDate.parse(request.getIbmeDate().toString(), formatter);
-            result.setIbmeDate(localDate);
-        }
-
-        return service.save(TransactionMapper.mapDtoToEntity(request, result));
-    }
-
-    @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> destroyData(@PathVariable Long id) {
-        service.deleteById(id);
+    public ResponseEntity<String> destroyData(@PathVariable Long id) {
+        ibmeServiceImpl.deleteById(id);
         return ResponseEntity.ok("Inbox Messaging Was Deleted !");
     }
 }

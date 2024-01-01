@@ -43,24 +43,21 @@ public class PartnerContactServiceImpl implements PartnerContactService {
     private final UserRolesService userRolesService;
     private final UserPhoneService userPhoneService;
 
-
-    @Override
     public PartnerContact getById(PartnerContactEntityId partnerContactEntityId) {
         return partnerContactRepository.findById(partnerContactEntityId).orElseThrow(()->new EntityNotFoundException("Partner Contact Not Found"));
     }
 
-    @Override
+
     public List<PartnerContact> getAll() {
         return partnerContactRepository.findAll();
     }
 
-    @Override
+
     @Transactional
     public PartnerContact save(PartnerContact entity) {
         return partnerContactRepository.save(entity);
     }
 
-    @Override
     public void deleteById(PartnerContactEntityId partnerContactEntityId) {
         partnerContactRepository.deleteById(partnerContactEntityId);
 

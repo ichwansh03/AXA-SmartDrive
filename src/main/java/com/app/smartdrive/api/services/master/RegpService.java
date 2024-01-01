@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.services.master;
 
-import com.app.smartdrive.api.entities.master.RegionPlat;
-import com.app.smartdrive.api.services.BaseService;
+import com.app.smartdrive.api.dto.master.request.RegpReq;
+import com.app.smartdrive.api.dto.master.response.RegpRes;
 
-public interface RegpService extends BaseService<RegionPlat, String> {
+public interface RegpService extends MasterService<RegpRes, RegpReq, String> {
 }

@@ -42,23 +42,17 @@ public class CustomerServiceController {
     @GetMapping("/request")
     @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllCustomersRequest(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "3") int size,
-            @RequestParam(value = "type", defaultValue = "ALL") String type,
-            @RequestParam(value = "status", defaultValue = "OPEN") String status,
-            @RequestParam(value = "sortBy", defaultValue = "creqEntityId") String sortBy,
-            @RequestParam(value = "sort", defaultValue = "ascending") String sort
-
+            @Valid @RequestBody BasePagingCustomerRequestDTO basePagingCustomerRequestDTO
     ){
         Pageable paging;
 
-        if(Objects.equals(sort, "descending")){
-            paging = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        if(Objects.equals(basePagingCustomerRequestDTO.getSort(), "descending")){
+            paging = PageRequest.of(basePagingCustomerRequestDTO.getPage(), basePagingCustomerRequestDTO.getSize(), Sort.by(basePagingCustomerRequestDTO.getSortBy()).descending());
         }else {
-            paging = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+            paging = PageRequest.of(basePagingCustomerRequestDTO.getPage(), basePagingCustomerRequestDTO.getSize(), Sort.by(basePagingCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingCustomerRequest = this.customerRequestService.getAllPaging(paging, type, status);
+        Page<CustomerRequest> pagingCustomerRequest = this.customerRequestService.getAllPaging(paging, basePagingCustomerRequestDTO.getType(), basePagingCustomerRequestDTO.getStatus());
 
         Page<CustomerResponseDTO> pagingCustomerResponseDTO = pagingCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
             @Override
@@ -73,22 +67,17 @@ public class CustomerServiceController {
     @GetMapping("/request/customer")
     @PreAuthorize("hasAuthority('Customer')")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllUserCustomersRequest(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "3") int size,
-            @RequestParam(value = "type", defaultValue = "ALL") String type,
-            @RequestParam(value = "status", defaultValue = "OPEN") String status,
-            @RequestParam(value = "sort", defaultValue = "ascending") String sort,
-            @RequestParam(value = "customerId") Long customerId
+            @Valid @RequestBody PagingUserCustomerRequestDTO pagingUserCustomerRequestDTO
     ){
         Pageable paging;
 
-        if(Objects.equals(sort, "descending")){
-            paging = PageRequest.of(page, size, Sort.by("creqEntityId").descending());
+        if(Objects.equals(pagingUserCustomerRequestDTO.getSort(), "descending")){
+            paging = PageRequest.of(pagingUserCustomerRequestDTO.getPage(), pagingUserCustomerRequestDTO.getSize(), Sort.by(pagingUserCustomerRequestDTO.getSortBy()).descending());
         }else {
-            paging = PageRequest.of(page, size, Sort.by("creqEntityId").ascending());
+            paging = PageRequest.of(pagingUserCustomerRequestDTO.getPage(), pagingUserCustomerRequestDTO.getSize(), Sort.by(pagingUserCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingUserCustomerRequest = this.customerRequestService.getPagingUserCustomerRequest(customerId, paging, type, status);
+        Page<CustomerRequest> pagingUserCustomerRequest = this.customerRequestService.getPagingUserCustomerRequest(pagingUserCustomerRequestDTO.getCustomerId(), paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus());
 
         Page<CustomerResponseDTO> pagingUserCustomerResponseDTO = pagingUserCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
             @Override
@@ -103,24 +92,18 @@ public class CustomerServiceController {
     @GetMapping("/request/agen")
     @PreAuthorize("hasAuthority('Employee')")
     public ResponseEntity<Page<CustomerResponseDTO>> getAllAgenCustomersRequest(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "3") int size,
-            @RequestParam(value = "type", defaultValue = "ALL") String type,
-            @RequestParam(value = "status", defaultValue = "OPEN") String status,
-            @RequestParam(value = "sort", defaultValue = "ascending") String sort,
-            @RequestParam(value = "employeeId") Long employeeId,
-            @RequestParam(value = "arwgCode") String arwgCode
+            @Valid @RequestBody PagingAgenCustomerRequestDTO pagingAgenCustomerRequestDTO
 
     ){
         Pageable paging;
 
-        if(Objects.equals(sort, "descending")){
-            paging = PageRequest.of(page, size, Sort.by("creqEntityId").descending());
+        if(Objects.equals(pagingAgenCustomerRequestDTO.getSort(), "descending")){
+            paging = PageRequest.of(pagingAgenCustomerRequestDTO.getPage(), pagingAgenCustomerRequestDTO.getSize(), Sort.by(pagingAgenCustomerRequestDTO.getSortBy()).descending());
         }else {
-            paging = PageRequest.of(page, size, Sort.by("creqEntityId").ascending());
+            paging = PageRequest.of(pagingAgenCustomerRequestDTO.getPage(), pagingAgenCustomerRequestDTO.getSize(), Sort.by(pagingAgenCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingAgenCustomerRequest = this.customerRequestService.getPagingAgenCustomerRequest(employeeId, arwgCode, paging, type, status);
+        Page<CustomerRequest> pagingAgenCustomerRequest = this.customerRequestService.getPagingAgenCustomerRequest(pagingAgenCustomerRequestDTO.getEmployeeId(), pagingAgenCustomerRequestDTO.getArwgCode(), paging, pagingAgenCustomerRequestDTO.getType(), pagingAgenCustomerRequestDTO.getStatus());
 
         Page<CustomerResponseDTO> pagingAgenCustomerResponseDTO = pagingAgenCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
             @Override

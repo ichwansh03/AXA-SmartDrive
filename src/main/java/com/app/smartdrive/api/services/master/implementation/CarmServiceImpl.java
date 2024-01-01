@@ -1,10 +1,14 @@
 package com.app.smartdrive.api.services.master.implementation;
 
+import com.app.smartdrive.api.dto.master.request.CarmReq;
+import com.app.smartdrive.api.dto.master.response.CarmRes;
 import com.app.smartdrive.api.entities.master.CarModel;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.CarmRepository;
-import com.app.smartdrive.api.services.master.CarmService;
+import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,22 +16,24 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CarmServiceImpl implements CarmService {
+@Qualifier("carmServiceImpl")
+public class CarmServiceImpl implements MasterService<CarmRes, CarmReq, Long> {
     private final CarmRepository repository;
 
     @Override
-    public CarModel getById(Long aLong) {
-        return repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Model ID : " + aLong + " Not Found"));
+    public CarmRes getById(Long aLong) {
+        return TransactionMapper.mapEntityToDto(repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Model ID : " + aLong + " Not Found")), CarmRes.class);
     }
 
     @Override
-    public List<CarModel> getAll() {
-        return repository.findAll();
+    public List<CarmRes> getAll() {
+        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), CarmRes.class);
     }
 
     @Override
     @Transactional
-    public CarModel save(CarModel entity) {
-        return repository.save(entity);
+    public CarmRes save(CarmReq entity) {
+        CarModel carModel = repository.save(TransactionMapper.mapDtoToEntity(entity, new CarModel()));
+        return TransactionMapper.mapEntityToDto(carModel, CarmRes.class);
     }
 }

@@ -1,6 +1,5 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
-import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
@@ -30,10 +29,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     @Override
     public List<ServiceOrderTasks> findSeotBySeroId(String seroId) {
         List<ServiceOrderTasks> orderTasks = soTasksRepository.findByServiceOrders_SeroId(seroId);
-
-        if (orderTasks.isEmpty()) {
-            throw new EntityNotFoundException("ID "+seroId+" is not found");
-        }
 
         log.info("SoOrderServiceImpl::findSeotBySeroId in ID {} ",seroId);
 
