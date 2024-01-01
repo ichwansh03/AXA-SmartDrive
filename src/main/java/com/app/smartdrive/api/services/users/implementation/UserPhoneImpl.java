@@ -29,24 +29,6 @@ public class UserPhoneImpl implements UserPhoneService {
   @Override
   @Transactional
   public UserPhone updateUserPhone(Long userId, String phoneNumber, UserPhoneRequestDto userPost) {
-    // TODO Auto-generated method stub
-    // User user = userRepository.findById(userId).get();
-    // List<UserPhone> listUserPhones = user.getUserPhone();
-    // UserPhone userPhone = userPhoneRepository.findByUsphPhoneNumber(phoneNumber).get();
-    // int indexPhone = listUserPhones.indexOf(userPhone);
-    // if(userPhone!=null){
-    // entityManager.persist(userPhone);
-    // UserPhoneId userPhoneId = userPhone.getUserPhoneId();
-    // NullUtils.updateIfChanged(userPhoneId::setUsphPhoneNumber, userPost.getUserPhoneNumber(),
-    // userPhoneId::getUsphPhoneNumber);
-    // userPhoneId.setUsphEntityId(userId);
-    // userPhone.setUserPhoneId(userPhoneId);
-    // userPhone.setUser(user);
-    // entityManager.flush();
-    // listUserPhones.set(indexPhone, userPhone);
-    // user.setUserPhone(listUserPhones);
-
-    // User user = userRepository.findById(userId).get();
     Optional<UserPhone> userPhone = userPhoneRepository.findByUsphPhoneNumberAndUserId(phoneNumber, userId);
     if(userPhone.isPresent()){
       userPhone.get().setUsphModifiedDate(LocalDateTime.now());
