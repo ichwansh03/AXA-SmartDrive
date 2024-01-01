@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +29,11 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     private final PartnerRepository partnerRepository;
     private final ArwgRepository arwgRepository;
 
-    @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderWorkorder> findSowoBySeotId(Long seotId) {
         return soWorkorderRepository.findSowoBySeotId(seotId);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public boolean checkAllWorkComplete(List<ServiceOrderWorkorder> sowoList) {
         boolean checkedAll = false;

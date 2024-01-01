@@ -4,6 +4,7 @@ package com.app.smartdrive.api.controllers.service_order.claim;
 import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
+import com.app.smartdrive.api.dto.service_order.response.ServiceDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -116,7 +117,7 @@ class ClaimAssetControllerTest {
         partner = create();
         user = userService.save(createUser("TEST405"));
         CustomerRequest customerRequest = createCustomerRequest("CREQTEST123", user);
-        ServiceRespDto services = servService.addService(customerRequest.getCreqEntityId());
+        ServiceDto services = servService.addService(customerRequest.getCreqEntityId());
         serviceOrders = servOrderService.addServiceOrders(services.getServId());
         serviceOrders.setPartner(partner);
         soOrderRepository.save(serviceOrders);

@@ -1,8 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
-import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceWorkorderFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,26 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/sowo")
+@RequestMapping("/service")
 @RequiredArgsConstructor
 @Slf4j
 public class ServOrderWorkorderController {
 
-    private final ServOrderWorkorderService servOrderWorkorderService;
     private final ServiceWorkorderFactory serviceWorkorderFactory;
 
-    @GetMapping
-    public ResponseEntity<?> getServiceOrderWorkorderById(@RequestParam("sowoid") Long sowoId) {
-        List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(sowoId);
-
-        log.info("ServiceOrdersController::getServiceOrderTasksById successfully viewed");
-        return new ResponseEntity<>(sowoBySeotId, HttpStatus.OK);
-    }
-
-    @PutMapping("/update/{sowoId}")
+    @PutMapping("/workorder/update/{sowoId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSoWorkorderStatus(@Valid @RequestBody SoWorkorderDto soWorkorderDto, @PathVariable("sowoId") Long sowoId) {
         int sowoStatus = serviceWorkorderFactory.updateSowoStatus(soWorkorderDto.getSowoStatus(), sowoId);

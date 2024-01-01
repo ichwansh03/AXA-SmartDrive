@@ -37,7 +37,6 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
 
     SoAdapter soAdapter = new SoAdapter();
 
-    @Transactional
     @Override
     public ServiceOrders addServiceOrders(Long servId) throws Exception {
 
@@ -111,7 +110,6 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
     @Override
     public void closeExistingSero(ServiceOrders existingSero){
         if (servOrderTaskService.checkAllTaskComplete(existingSero.getSeroId())){
-            existingSero.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
             existingSero.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
             soOrderRepository.save(existingSero);
             log.info("ServOrderImpl::addServiceOrders create new POLIS tasks");
