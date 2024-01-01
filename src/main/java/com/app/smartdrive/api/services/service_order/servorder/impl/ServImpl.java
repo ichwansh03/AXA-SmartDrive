@@ -14,7 +14,6 @@ import com.app.smartdrive.api.services.service_order.servorder.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,15 +35,12 @@ public class ServImpl implements ServService {
 
     private final CustomerRequestService customerRequestService;
 
-    @Transactional(readOnly = true)
     @Override
     public ServiceRespDto findServicesById(Long servId) {
         Services services = soRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("Service with ID " + servId + " not found"));
         log.info("SoOrderServiceImpl::findServicesById in ID {} ",services.getServId());
 
-        CustomerRequest existCustomerRequest = customerRequestService.getById(services.getCustomer().getCreqEntityId());
-        CustomerResponseDTO customerRequestById = TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
         List<ServiceOrders> allSeroByServId = servOrderService.findAllSeroByServId(services.getServId());
 
         List<ServiceOrderRespDto> serviceOrderRespDtos = allSeroByServId.stream()
@@ -71,6 +67,10 @@ public class ServImpl implements ServService {
         semiDto.setSecrDtoList(secrDtoList);
 
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
+
+        CustomerRequest existCustomerRequest = customerRequestService.getById(services.getCustomer().getCreqEntityId());
+        CustomerResponseDTO customerRequestById = TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
+
         serviceRespDto.setCustomerResponseDTO(customerRequestById);
         serviceRespDto.setServiceOrdersList(serviceOrderRespDtos);
         serviceRespDto.setSemiDto(semiDto);

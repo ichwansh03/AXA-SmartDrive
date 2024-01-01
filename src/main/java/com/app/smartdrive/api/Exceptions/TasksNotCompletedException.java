@@ -6,4 +6,7 @@ public class TasksNotCompletedException extends RuntimeException {
         super(message);
     }
 
+    public TasksNotCompletedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

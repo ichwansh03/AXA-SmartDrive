@@ -2,11 +2,6 @@ package com.app.smartdrive.api.services.HR.implementation;
 
 import java.time.LocalDateTime;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 
 import org.springframework.data.domain.Page;
@@ -31,13 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupService {
 
-
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
 
     private final ArwgService arwgService;
 
     private final EmployeesService employeesService;
- 
 
     @Override
     @Transactional
@@ -66,9 +59,7 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     @Transactional
     public EmployeeAreaWorkgroup updateEawg(Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto) {
 
-        EmployeeAreaWorkgroup existingEawg = employeeAreaWorkgroupRepository.findByEawgId(eawgId).orElseThrow(() -> new EntityNotFoundException("EmployeeAreaWorkgroup not found with id: " + eawgId));
-
-
+        EmployeeAreaWorkgroup existingEawg = getById(eawgId);
 
         if (existingEawg.getEawgArwgCode() != null) {
             AreaWorkGroup areaWorkGroup = arwgService.getById(employeeAreaWorkgroupDto.getArwgCode());
@@ -87,19 +78,12 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         return employeeAreaWorkgroupRepository.save(existingEawg);
     }   
 
-   
-
     @Override
     public Page<EmployeeAreaWorkgroup> searchEawg(String value, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<EmployeeAreaWorkgroup> resultPage = employeeAreaWorkgroupRepository.findeawg(value, value, value, pageable);
 
-//        List<EmployeesAreaWorkgroupResponseDto> dto = resultPage.getContent().stream()
-//                .map(EmployeesAreaWorkgroupMapper::convertToDto)
-//                .collect(Collectors.toList());
-
-//        return new PageImpl<>(dto, pageable, resultPage.getTotalElements());
         return resultPage;
     }
     
@@ -124,8 +108,6 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         return this.employeeAreaWorkgroupRepository.findById(new EmployeeAreaWorkgroupId(eawgId, employeeId))
                 .orElseThrow(() -> new EntityNotFoundException("Employee Areaworkgroup with id " + eawgId + " is not found"));
     }
-
-
 
     @Override
     public void deleteById(Long eawg_id) {

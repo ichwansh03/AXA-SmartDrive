@@ -2,7 +2,6 @@ package com.app.smartdrive.api.services.service_order.premi.impl;
 
 import com.app.smartdrive.api.Exceptions.CheckPaymentException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
@@ -12,8 +11,8 @@ import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServic
 import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
-import com.app.smartdrive.api.services.master.EmailService;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -36,10 +35,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     private final SecrRepository secrRepository;
     private final SemiRepository semiRepository;
     private final SoRepository soRepository;
-    private final EmailService emailService;
-
-    private static final long PERIOD_IN_MILLIS = 24 * 60 * 60 * 1000;
-
+    private final ServOrderTaskService servOrderTaskService;
 
     @Transactional(readOnly = true)
     @Override
@@ -78,28 +74,19 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         ServicePremi premi = semiRepository.findById(secrServId)
                 .orElseThrow(() -> new EntityNotFoundException("findById(secrServId)::secrServId is not found"));
 
-        ServicePremiCredit newSecr = ServicePremiCredit.builder()
-                .secrId(existSecr.getSecrId())
-                .secrServId(existSecr.getSecrServId())
-                .secrYear(existSecr.getSecrYear())
-                .secrPremiCredit(secrReqDto.getSecrPremiCredit())
-                .secrPremiDebet(Optional.ofNullable(secrReqDto.getSecrPremiDebet()).orElse(BigDecimal.ZERO))
-                .secrTrxDate(LocalDateTime.now())
-                .secrDuedate(existSecr.getSecrDuedate())
-                .services(premi.getServices()).build();
+        ServicePremiCredit premiCredit = buildCommonSecrData(premi, existSecr, secrReqDto);
 
-        secrRepository.save(newSecr);
+        secrRepository.save(premiCredit);
+
+        if (checkDueDatePayment()){
+            throw new CheckPaymentException("your payment has passed deadline");
+        }
 
         List<ServicePremiCredit> allCredits = secrRepository.findAll();
         BigDecimal countPremiMonthly = allCredits.stream()
                 .map(ServicePremiCredit::getSecrPremiDebet)
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        if (checkDueDatePayment(newSecr)){
-            semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), existSecr.getSecrServId());
-            throw new CheckPaymentException("your payment has passed deadline");
-        }
 
         if (premi.getSemiPremiDebet().compareTo(countPremiMonthly) >= 0){
             semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.PAID.toString(), existSecr.getSecrServId());
@@ -109,26 +96,51 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         return true;
     }
 
-    public boolean checkDueDatePayment(ServicePremiCredit servicePremiCredit) {
-        servicePremiCredit = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
-        return servicePremiCredit.getSecrPremiDebet() == null
-                && LocalDateTime.now().isAfter(servicePremiCredit.getSecrDuedate());
+    public boolean checkDueDatePayment() {
+        ServicePremiCredit servicePremiCredit = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+        boolean check = false;
+        if (servicePremiCredit.getSecrPremiDebet() == null
+                && LocalDateTime.now().isAfter(servicePremiCredit.getSecrDuedate())){
+            semiRepository.updateSemiStatus(EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), servicePremiCredit.getSecrServId());
+            check = true;
+        }
+        return check;
     }
 
     @Async
-    @Scheduled(fixedRate = PERIOD_IN_MILLIS)
+    @Scheduled(cron = "0 0 12 * * ?")
     public void sendNotify(){
         ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
         if (existSecr != null){
             Services services = soRepository.findById(existSecr.getSecrServId())
                     .orElseThrow(() -> new EntityNotFoundException("Service not found"));
-            if (existSecr.getSecrDuedate().minusDays(2).isBefore(LocalDateTime.now())){
-                EmailReq emailReq = new EmailReq();
-                emailReq.setTo(services.getUsers().getUserEmail());
-                emailReq.setSubject("Due Date Premi Payment");
-                emailReq.setBody("Pay your bill immediately before it closes");
-                emailService.sendMail(emailReq);
+            try {
+                //sent email before D-2 due date
+                LocalDateTime minusDays = existSecr.getSecrDuedate().minusDays(2);
+                if (minusDays.isBefore(LocalDateTime.now())){
+                    servOrderTaskService.notifyTask(services.getUsers().getUserEmail(), "D-2 Due Date Premi Payment", "Pay your bill immediately before it closes");
+                    log.info("Email sent successfully");
+                }
+
+                if (checkDueDatePayment()){
+                    servOrderTaskService.notifyTask(services.getUsers().getUserEmail(), "Premi is Inactive", "your premi has inactive");
+                }
+
+            } catch (Exception e){
+                log.error("Error during scheduled task exception ",e);
             }
         }
+    }
+
+    private ServicePremiCredit buildCommonSecrData(ServicePremi semi, ServicePremiCredit secr, SecrReqDto secrReqDto){
+        return ServicePremiCredit.builder()
+                .secrId(secr.getSecrId())
+                .secrServId(secr.getSecrServId())
+                .secrYear(secr.getSecrYear())
+                .secrPremiCredit(secrReqDto.getSecrPremiCredit())
+                .secrPremiDebet(Optional.ofNullable(secrReqDto.getSecrPremiDebet()).orElse(BigDecimal.ZERO))
+                .secrTrxDate(LocalDateTime.now())
+                .secrDuedate(secr.getSecrDuedate())
+                .services(semi.getServices()).build();
     }
 }

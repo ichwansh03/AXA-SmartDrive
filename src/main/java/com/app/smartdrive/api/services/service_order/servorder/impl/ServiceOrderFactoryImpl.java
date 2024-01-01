@@ -5,6 +5,7 @@ import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
+import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
@@ -36,7 +37,6 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
 
     SoAdapter soAdapter = new SoAdapter();
 
-    @Transactional
     @Override
     public ServiceOrders addServiceOrders(Long servId) throws Exception {
 
@@ -110,7 +110,6 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
     @Override
     public void closeExistingSero(ServiceOrders existingSero){
         if (servOrderTaskService.checkAllTaskComplete(existingSero.getSeroId())){
-            existingSero.setSeroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CLOSE);
             existingSero.setSeroStatus(EnumModuleServiceOrders.SeroStatus.CLOSED);
             soOrderRepository.save(existingSero);
             log.info("ServOrderImpl::addServiceOrders create new POLIS tasks");
@@ -147,6 +146,7 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
         soOrderRepository.saveAll(updateSero);
     }
 
+    @Transactional
     @Override
     public int updateStatusRequest(EnumModuleServiceOrders.SeroStatus seroStatus, String seroReason, String seroId) {
         int requested = soOrderRepository.requestClosePolis(seroStatus, seroReason, seroId);
@@ -156,6 +156,18 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
         }
 
         return requested;
+    }
+
+    @Transactional
+    @Override
+    public int selectPartner(Partner partner, String seroId) {
+        int selected = soOrderRepository.selectPartner(partner, seroId);
+
+        if (selected == 0) {
+            throw new ValidasiRequestException("Failed to update data", 400);
+        }
+
+        return selected;
     }
 
     private ServiceOrders buildCommonSeroData(Services services, ServiceOrders parentSero, LocalDateTime startDate, LocalDateTime endDate){

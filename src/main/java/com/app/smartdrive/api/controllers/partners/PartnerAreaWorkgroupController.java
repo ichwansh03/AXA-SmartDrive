@@ -35,7 +35,7 @@ public class PartnerAreaWorkgroupController {
 
     @DeleteMapping
     public ResponseEntity<?> deleteById(@Valid @RequestBody PartnerAreaWorkGroupId id){
-        //pawoService.deleteById(1L);
+        pawoService.deleteById(id);
         return ResponseEntity.status(204).build();
     }
 

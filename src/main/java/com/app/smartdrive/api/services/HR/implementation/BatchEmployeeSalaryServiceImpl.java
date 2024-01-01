@@ -3,17 +3,12 @@ package com.app.smartdrive.api.services.HR.implementation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
-
 import com.app.smartdrive.api.entities.hr.BatchEmployeeSalary;
-import com.app.smartdrive.api.entities.hr.BatchEmployeeSalaryId;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.repositories.HR.BatchEmployeeSalaryRepository;
@@ -25,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryService {
-    
+
     private final BatchEmployeeSalaryRepository batchEmployeeSalaryRepository;
 
     private final EmployeesRepository employeesRepository;
@@ -64,7 +59,6 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
     public List<EmployeeSalaryDetail> getAllCommission(Long besaEmpEntityId, LocalDate besaCreateDate) {
         List<EmployeeSalaryDetail> result = new ArrayList<>();
 
-
         // Mendapatkan BatchEmployeeSalary berdasarkan besa_emp_entityid dan besa_create_date
         Optional<BatchEmployeeSalary> optionalBatchEmployeeSalary = batchEmployeeSalaryRepository
                 .findByBesaEmpEntityidAndBesaCreatedDate(besaEmpEntityId, besaCreateDate);
@@ -97,12 +91,9 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
                 netSalaryDetail.setEmsaSubtotal(batchEmployeeSalary.getEmployees().getEmpNetSalary());
                 netSalaryDetail.setEmployees(employees);
                 result.add(netSalaryDetail);
-
         }
 
         return result;
     }
-
-
 
 }

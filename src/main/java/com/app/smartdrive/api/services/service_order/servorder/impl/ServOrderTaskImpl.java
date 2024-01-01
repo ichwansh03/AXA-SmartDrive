@@ -4,7 +4,6 @@ import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
-import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
@@ -13,7 +12,6 @@ import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorde
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,7 +27,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     private final EmailService emailService;
     private final ServOrderWorkorderService servOrderWorkorderService;
 
-    @Transactional(readOnly = true)
     @Override
     public List<ServiceOrderTasks> findSeotBySeroId(String seroId) {
         List<ServiceOrderTasks> orderTasks = soTasksRepository.findByServiceOrders_SeroId(seroId);
@@ -44,8 +41,9 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     }
 
     @Override
-    public void notifyTask(EmailReq emailReq, ServiceOrders serviceOrders, String subject, String message){
-        emailReq.setTo(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail());
+    public void notifyTask(String mailTo, String subject, String message){
+        EmailReq emailReq = new EmailReq();
+        emailReq.setTo(mailTo);
         emailReq.setSubject(subject);
         emailReq.setBody(message);
         log.info("Email has been send");
