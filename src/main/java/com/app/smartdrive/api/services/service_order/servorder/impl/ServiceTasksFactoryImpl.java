@@ -4,6 +4,7 @@ import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
+import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
@@ -94,19 +95,8 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                 .orElseThrow(() -> new EntityNotFoundException("::updateTasksStatus ID " + seotId + " is not found"));
         int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
 
-        switch (orderTasks.getSeotName()) {
-            case "CLAIM DOCUMENT APPROVED" -> servOrderTaskService.notifyTask(orderTasks.getServiceOrders().getPartner().getPartnerContacts().get(0).getUser().getUserEmail(),
-                    "Repair Sparepart from Customer",
-                    "Repair from " + orderTasks.getServiceOrders().getServices().getUsers().getUserFullName());
-
-            case "CALCULATE SPARE PART" -> servOrderTaskService.notifyTask(orderTasks.getServiceOrders().getServices().getUsers().getUserEmail(),
-                    "Your car is finish to repair",
-                    "Car Repaired is finish");
-
-            case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> servOrderTaskService.notifyTask(orderTasks.getServiceOrders().getServices().getUsers().getUserEmail(),
-                    "Claim for " + orderTasks.getServiceOrders().getServices().getUsers().getUserFullName(),
-                    "Repaired is finish, pay claim to user");
-        }
+        List<ServiceOrderTasks> tasksList = servOrderTaskService.findSeotBySeroId(orderTasks.getServiceOrders().getSeroId());
+        notifyCurrentTask(tasksList);
 
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ", seotId);
         return updateSeot;
@@ -149,15 +139,54 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                     seotStatus, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, taskReflection));
 
-            switch (templateServiceTasks.get(i).getTestaName()) {
-                case "NOTIFY TO AGENT" ->
-                        servOrderTaskService.notifyTask(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail(),
-                                "Request new POLIS",
-                                "Request new POLIS from " + serviceOrders.getServices().getUsers().getUserFullName());
-                case "NOTIFY TO CUSTOMER" ->
-                        servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
-                                "POLIS has been created",
-                                "Your request POLIS has been created, check your dashboard page");
+            List<ServiceOrderTasks> orderTasks = servOrderTaskService.findSeotBySeroId(serviceOrders.getSeroId());
+            notifyCurrentTask(orderTasks);
+        }
+    }
+
+    private void notifyCurrentTask(List<ServiceOrderTasks> serviceOrderTasks) {
+
+        for (ServiceOrderTasks serviceOrderTask : serviceOrderTasks) {
+
+            ServiceOrders serviceOrders = serviceOrderTask.getServiceOrders();
+
+            if (serviceOrders.getServices().getServType() == EnumCustomer.CreqType.POLIS) {
+                switch (serviceOrderTask.getSeotName()) {
+                    case "NOTIFY TO AGENT" ->
+                            servOrderTaskService.notifyTask(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail(),
+                                    "Request new POLIS",
+                                    "Request new POLIS from " + serviceOrders.getServices().getUsers().getUserFullName());
+                    case "NOTIFY TO CUSTOMER" ->
+                            servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
+                                    "POLIS has been created",
+                                    "Your request POLIS has been created, check your dashboard page");
+                }
+            }
+
+            if (serviceOrders.getServices().getServType() == EnumCustomer.CreqType.CLAIM) {
+                switch (serviceOrderTask.getSeotName()) {
+                    case "CLAIM DOCUMENT APPROVED" -> {
+                        if (serviceOrderTask.getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
+                            servOrderTaskService.notifyTask(serviceOrders.getPartner().getPartnerContacts().get(0).getUser().getUserEmail(),
+                                    "Repair Sparepart from Customer",
+                                    "Repair from " + serviceOrders.getServices().getUsers().getUserFullName());
+                        }
+                    }
+                    case "CALCULATE SPARE PART" -> {
+                        if (serviceOrderTask.getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
+                            servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
+                                    "Your car is finish to repair",
+                                    "Car Repaired is finish");
+                        }
+                    }
+                    case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> {
+                        if (serviceOrderTask.getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
+                            servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
+                                    "Claim for " + serviceOrders.getServices().getUsers().getUserFullName(),
+                                    "Repaired is finish, pay claim to user");
+                        }
+                    }
+                }
             }
         }
     }
