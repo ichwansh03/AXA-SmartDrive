@@ -5,7 +5,7 @@ import com.app.smartdrive.api.entities.partner.PartnerAreaWorkGroupId;
 import com.app.smartdrive.api.entities.partner.PartnerAreaWorkgroup;
 import com.app.smartdrive.api.services.master.MasterService;
 
-public interface PartnerAreaWorkgroupService extends MasterService<PartnerAreaWorkgroup, PartnerAreaWorkGroupId> {
+public interface PartnerAreaWorkgroupService {
 
     PartnerAreaWorkgroup create(PartnerAreaWorkgroupRequest request);
 
