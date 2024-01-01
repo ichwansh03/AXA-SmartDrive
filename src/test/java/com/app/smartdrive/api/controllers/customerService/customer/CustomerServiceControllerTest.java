@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -223,16 +224,13 @@ public class CustomerServiceControllerTest {
     @Test
     @WithMockUser(authorities = "Customer")
     void getAllCustomersRequest_willFailed() throws Exception {
-        String typeParam = "SEMUA";
-
-        Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
-
 
         mockMvc.perform(
-                        get("/customer/service/request")
-                )
-                .andExpectAll(status().isBadRequest())
-                .andDo(print());
+                get("/customer/service/request")
+        ).andExpect(status().isBadRequest()
+        ).andExpect(result -> assertTrue(result.getResolvedException() instanceof HttpMessageNotReadableException)
+        ).andDo(print());
+
     }
 
     @Test
@@ -240,6 +238,9 @@ public class CustomerServiceControllerTest {
     void getAllUserCustomersRequest_willSuccess() throws Exception {
         User user = new User();
         user.setUserEntityId(23L);
+
+        PagingUserCustomerRequestDTO pagingUserCustomerRequestDTO = new PagingUserCustomerRequestDTO();
+        pagingUserCustomerRequestDTO.setCustomerId(user.getUserEntityId());
 
         List<CustomerRequest> customerRequestList = List.of(
                 getCustomerRequest(1L),
@@ -253,13 +254,14 @@ public class CustomerServiceControllerTest {
 
         Page<CustomerRequest> pagedResponse = new PageImpl(customerRequestList);
 
-        Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
+        Pageable paging = PageRequest.of(pagingUserCustomerRequestDTO.getPage(), pagingUserCustomerRequestDTO.getSize(), Sort.by(pagingUserCustomerRequestDTO.getSortBy()).ascending());
 
-        when(this.customerRequestService.getPagingUserCustomerRequest(user.getUserEntityId(), paging, "ALL", "OPEN")).thenReturn(pagedResponse);
+        when(this.customerRequestService.getPagingUserCustomerRequest(user.getUserEntityId(), paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus())).thenReturn(pagedResponse);
 
         mockMvc.perform(
                 get("/customer/service/request/customer")
-                        .param("customerId", user.getUserEntityId().toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(pagingUserCustomerRequestDTO))
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
                 .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
@@ -277,14 +279,18 @@ public class CustomerServiceControllerTest {
     void getAllUserCustomersRequest_willFailed() throws Exception{
        Long customerId = 1L;
 
-        Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
+        PagingUserCustomerRequestDTO pagingUserCustomerRequestDTO = new PagingUserCustomerRequestDTO();
+        pagingUserCustomerRequestDTO.setCustomerId(customerId);
 
-        when(this.customerRequestService.getPagingUserCustomerRequest(customerId, paging, "ALL", "OPEN"))
+        Pageable paging = PageRequest.of(pagingUserCustomerRequestDTO.getPage(), pagingUserCustomerRequestDTO.getSize(), Sort.by(pagingUserCustomerRequestDTO.getSortBy()).ascending());
+
+        when(this.customerRequestService.getPagingUserCustomerRequest(customerId, paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus()))
                 .thenThrow(new EntityNotFoundException("User with id "+ customerId + " is not found"));
 
         mockMvc.perform(
                         get("/customer/service/request/customer")
-                                .param("customerId", customerId.toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(pagingUserCustomerRequestDTO))
         ).andExpect(status().isNotFound()
         ).andExpect(result -> assertTrue((result.getResolvedException() instanceof EntityNotFoundException))
         ).andExpect(result -> assertEquals("User with id "+ customerId + " is not found", result.getResolvedException().getMessage())
@@ -314,14 +320,18 @@ public class CustomerServiceControllerTest {
 
         Page<CustomerRequest> pagedResponse = new PageImpl(customerRequestList);
 
-        Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
+        PagingAgenCustomerRequestDTO pagingAgenCustomerRequestDTO = new PagingAgenCustomerRequestDTO();
+        pagingAgenCustomerRequestDTO.setArwgCode(arwgCode);
+        pagingAgenCustomerRequestDTO.setEmployeeId(employeeId);
 
-        when(this.customerRequestService.getPagingAgenCustomerRequest(employeeId, arwgCode, paging, "ALL", "OPEN")).thenReturn(pagedResponse);
+        Pageable paging = PageRequest.of(pagingAgenCustomerRequestDTO.getPage(), pagingAgenCustomerRequestDTO.getSize(), Sort.by(pagingAgenCustomerRequestDTO.getSortBy()).ascending());
+
+        when(this.customerRequestService.getPagingAgenCustomerRequest(pagingAgenCustomerRequestDTO.getEmployeeId(), pagingAgenCustomerRequestDTO.getArwgCode(), paging, pagingAgenCustomerRequestDTO.getType(), pagingAgenCustomerRequestDTO.getStatus())).thenReturn(pagedResponse);
 
         mockMvc.perform(
                         get("/customer/service/request/agen")
-                                .param("employeeId", employeeId.toString())
-                                .param("arwgCode", arwgCode)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(pagingAgenCustomerRequestDTO))
 
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
@@ -342,15 +352,19 @@ public class CustomerServiceControllerTest {
         String arwgCode = "asal-asal";
         Long employeeId = 23L;
 
-        Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
+        PagingAgenCustomerRequestDTO pagingAgenCustomerRequestDTO = new PagingAgenCustomerRequestDTO();
+        pagingAgenCustomerRequestDTO.setArwgCode(arwgCode);
+        pagingAgenCustomerRequestDTO.setEmployeeId(employeeId);
 
-        when(this.customerRequestService.getPagingAgenCustomerRequest(employeeId, arwgCode, paging, "ALL", "OPEN"))
+        Pageable paging = PageRequest.of(pagingAgenCustomerRequestDTO.getPage(), pagingAgenCustomerRequestDTO.getSize(), Sort.by(pagingAgenCustomerRequestDTO.getSortBy()).ascending());
+
+        when(this.customerRequestService.getPagingAgenCustomerRequest(pagingAgenCustomerRequestDTO.getEmployeeId(), pagingAgenCustomerRequestDTO.getArwgCode(), paging, pagingAgenCustomerRequestDTO.getType(), pagingAgenCustomerRequestDTO.getStatus()))
                 .thenThrow(new EntityNotFoundException("Agen with id : " + employeeId + " is not found"));
 
         mockMvc.perform(
                         get("/customer/service/request/agen")
-                                .param("employeeId", employeeId.toString())
-                                .param("arwgCode", arwgCode)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(pagingAgenCustomerRequestDTO))
 
                 ).andExpect(status().isNotFound())
                 .andExpect(result -> assertInstanceOf(EntityNotFoundException.class, result.getResolvedException()))
