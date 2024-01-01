@@ -191,6 +191,8 @@ public class CustomerServiceControllerTest {
     @Test
     @WithMockUser(authorities = "Customer")
     void getAllCustomersRequest_willSuccess() throws Exception {
+        BasePagingCustomerRequestDTO basePagingCustomerRequestDTO = new BasePagingCustomerRequestDTO();
+
         List<CustomerRequest> customerRequestList = List.of(
                 getCustomerRequest(1L),
                 getCustomerRequest(2L)
@@ -198,14 +200,15 @@ public class CustomerServiceControllerTest {
 
         Page<CustomerRequest> pagedCustomerRequest = new PageImpl(customerRequestList);
 
-        Pageable paging = PageRequest.of(0, 3, Sort.by("creqEntityId").ascending());
+        Pageable paging = PageRequest.of(basePagingCustomerRequestDTO.getPage(), basePagingCustomerRequestDTO.getSize(), Sort.by(basePagingCustomerRequestDTO.getSortBy()).ascending());
 
-        when(this.customerRequestService.getAllPaging(paging, "ALL", "OPEN")).thenReturn(pagedCustomerRequest);
-        when(this.customerRequestService.getAllPaging(paging, "POLIS", "OPEN")).thenReturn(pagedCustomerRequest);
+        when(this.customerRequestService.getAllPaging(paging, basePagingCustomerRequestDTO.getType(), basePagingCustomerRequestDTO.getStatus())).thenReturn(pagedCustomerRequest);
+
 
         mockMvc.perform(
                 get("/customer/service/request")
-                        .param("type", "POLIS")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(basePagingCustomerRequestDTO))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
@@ -226,11 +229,9 @@ public class CustomerServiceControllerTest {
 
 
         mockMvc.perform(
-                        get("/customer/service/salah/request")
-                                .param("type", typeParam)
-
+                        get("/customer/service/request")
                 )
-                .andExpectAll(status().isNotFound())
+                .andExpectAll(status().isBadRequest())
                 .andDo(print());
     }
 
