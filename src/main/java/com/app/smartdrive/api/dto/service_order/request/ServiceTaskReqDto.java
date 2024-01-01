@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class ServiceTaskReqDto {
-
     @NotNull
     private String seotName;
     private LocalDateTime seotStartDate;
