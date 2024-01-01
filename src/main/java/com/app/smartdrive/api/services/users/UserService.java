@@ -11,14 +11,17 @@ import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.services.BaseService;
-import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.transaction.annotation.Transactional;
 
 
-public interface UserService extends BaseService<User, Long> {
+public interface UserService {
   User createAdmin(CreateUserDto userPost);
 
   User save(User user);
+
+  @Transactional
+  void deleteById(Long id);
 
   User createUserCustomer(CreateUserDto userPost, RoleName roleName);
 
@@ -31,6 +34,10 @@ public interface UserService extends BaseService<User, Long> {
   Optional<User> getUserById(Long id);
 
   UserDetailsService userDetailsService();
+
+  User getById(Long id);
+
+  List<User> getAll();
 
   void changeEmail(Long id, String newEmail);
 
