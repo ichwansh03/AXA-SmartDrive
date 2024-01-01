@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
+import com.app.smartdrive.api.dto.service_order.response.ServiceDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
@@ -35,7 +35,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
 
     @Transactional
     @Override
-    public ServiceRespDto addService(Long creqId) throws Exception {
+    public ServiceDto addService(Long creqId) throws Exception {
 
         CustomerRequest cr = customerRequestRepository.findById(creqId)
                 .orElseThrow(() -> new EntityNotFoundException("creqId "+creqId+" is not found"));
@@ -68,7 +68,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
         soRepository.flush();
         log.info("ServOrderServiceImpl::addService sync data to db");
 
-        return TransactionMapper.mapEntityToDto(saved, ServiceRespDto.class);
+        return TransactionMapper.mapEntityToDto(saved, ServiceDto.class);
     }
 
     @Override

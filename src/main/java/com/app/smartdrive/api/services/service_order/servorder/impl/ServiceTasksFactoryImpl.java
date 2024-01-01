@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -16,8 +15,8 @@ import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceWorkorderFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +48,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
 
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(1L);
 
-        for (int i = 0; i < templateServiceTasks.size(); i++) {
-            seot.add(new ServiceTaskReqDto(templateServiceTasks.get(i).getTestaName(),
-                    serviceOrders.getServices().getServStartDate().plusDays(i),
-                    serviceOrders.getServices().getServStartDate().plusDays(i+1),
-                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
-                    serviceOrders, null));
-        }
+        generateFromTemplateTasks(serviceOrders, seot, templateServiceTasks, EnumModuleServiceOrders.SeotStatus.INPROGRESS, null);
 
         List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
         List<ServiceOrderTasks> serviceOrderTasks = soTasksRepository.saveAll(mapperTaskList);
@@ -65,78 +58,29 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
         return serviceOrderTasks;
     }
 
+    @Transactional
     @Override
     public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) throws Exception {
 
         List<ServiceTaskReqDto> seotList = new ArrayList<>();
-
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(2L);
-
         Method generatePolisNumber = SoAdapter.class.getMethod("generatePolis", CustomerRequest.class);
 
-        for (TemplateServiceTask templateServiceTask : templateServiceTasks) {
-            seotList.add(new ServiceTaskReqDto(templateServiceTask.getTestaName(),
-                    serviceOrders.getServices().getServStartDate(),
-                    serviceOrders.getServices().getServStartDate().plusDays(1),
-                    EnumModuleServiceOrders.SeotStatus.COMPLETED, serviceOrders.getEmployees().getAreaWorkGroup(),
-                    serviceOrders, generatePolisNumber));
-
-            switch (templateServiceTask.getTestaName()){
-                case "NOTIFY TO AGENT" -> servOrderTaskService.notifyTask(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail(),
-                        "Request new POLIS",
-                        "Request new POLIS from "+serviceOrders.getServices().getUsers().getUserFullName());
-                case "NOTIFY TO CUSTOMER" -> servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
-                        "POLIS has been created",
-                        "Your request POLIS has been created, check your dashboard page");
-            }
-        }
-
+        generateFromTemplateTasks(serviceOrders, seotList, templateServiceTasks, EnumModuleServiceOrders.SeotStatus.COMPLETED, generatePolisNumber);
         log.info("ServOrderTaskImpl::addPolisList the result of number polis is {} ", generatePolisNumber);
 
         List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seotList, ServiceOrderTasks.class);
-
         return soTasksRepository.saveAll(mapperTaskList);
     }
 
+    @Transactional
     @Override
     public List<ServiceOrderTasks> addClaimList(ServiceOrders serviceOrders) {
 
         List<ServiceTaskReqDto> seot = new ArrayList<>();
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(3L);
 
-        for (int i = 0; i < templateServiceTasks.size(); i++) {
-            seot.add(new ServiceTaskReqDto(templateServiceTasks.get(i).getTestaName(),
-                    serviceOrders.getServices().getServStartDate().plusDays(i),
-                    serviceOrders.getServices().getServStartDate().plusDays(i+1),
-                    EnumModuleServiceOrders.SeotStatus.INPROGRESS, serviceOrders.getEmployees().getAreaWorkGroup(),
-                    serviceOrders, null));
-
-            switch (templateServiceTasks.get(i).getTestaName()){
-                case "CLAIM DOCUMENT APPROVED" -> {
-                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
-                        servOrderTaskService.notifyTask(serviceOrders.getPartner().getPartnerContacts().get(i).getUser().getUserEmail(),
-                                "Repair Sparepart from Customer",
-                                "Repair from "+serviceOrders.getServices().getUsers().getUserFullName());
-                    }
-                }
-
-                case "CALCULATE SPARE PART" -> {
-                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
-                        servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
-                                "Your car is finish to repair",
-                                "Car Repaired is finish");
-                    }
-                }
-
-                case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> {
-                    if (seot.get(i).getSeotStatus() == EnumModuleServiceOrders.SeotStatus.COMPLETED) {
-                        servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
-                                "Claim for "+serviceOrders.getServices().getUsers().getUserFullName(),
-                                "Repaired is finish, pay claim to user");
-                    }
-                }
-            }
-        }
+        generateFromTemplateTasks(serviceOrders, seot, templateServiceTasks, EnumModuleServiceOrders.SeotStatus.INPROGRESS, null);
 
         List<ServiceOrderTasks> serviceOrderTasks = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
 
@@ -146,12 +90,25 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
     @Transactional
     @Override
     public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
-        int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, seotId);
+        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("::updateTasksStatus ID " + seotId + " is not found"));
+        int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
 
-        if (updateSeot == 0) {
-            throw new ValidasiRequestException("Failed to update data",400);
+        switch (orderTasks.getSeotName()) {
+            case "CLAIM DOCUMENT APPROVED" -> servOrderTaskService.notifyTask(orderTasks.getServiceOrders().getPartner().getPartnerContacts().get(0).getUser().getUserEmail(),
+                    "Repair Sparepart from Customer",
+                    "Repair from " + orderTasks.getServiceOrders().getServices().getUsers().getUserFullName());
+
+            case "CALCULATE SPARE PART" -> servOrderTaskService.notifyTask(orderTasks.getServiceOrders().getServices().getUsers().getUserEmail(),
+                    "Your car is finish to repair",
+                    "Car Repaired is finish");
+
+            case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> servOrderTaskService.notifyTask(orderTasks.getServiceOrders().getServices().getUsers().getUserEmail(),
+                    "Claim for " + orderTasks.getServiceOrders().getServices().getUsers().getUserFullName(),
+                    "Repaired is finish, pay claim to user");
         }
-        log.info("SoOrderServiceImpl::findSeotById updated in ID {} ",seotId);
+
+        log.info("SoOrderServiceImpl::findSeotById updated in ID {} ", seotId);
         return updateSeot;
     }
 
@@ -159,7 +116,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
     @Override
     public SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId) {
         ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
-                .orElseThrow(() -> new EntityNotFoundException("::updateSeotPartner() ID "+seotId+" is not found"));
+                .orElseThrow(() -> new EntityNotFoundException("::updateSeotPartner() ID " + seotId + " is not found"));
         SeotPartnerDto seotPartner = SeotPartnerDto.builder()
                 .partnerId(seotPartnerDto.getPartnerId())
                 .repair(seotPartnerDto.getRepair())
@@ -177,9 +134,31 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
         }
 
         Partner partner = partnerRepository.findById(seotPartner.getPartnerId())
-                .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID "+seotPartner.getPartnerId()+" is not found"));
+                .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID " + seotPartner.getPartnerId() + " is not found"));
         soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
 
         return seotPartner;
+    }
+
+    private void generateFromTemplateTasks(ServiceOrders serviceOrders, List<ServiceTaskReqDto> seot, List<TemplateServiceTask> templateServiceTasks,
+                                           EnumModuleServiceOrders.SeotStatus seotStatus, Method taskReflection) {
+        for (int i = 0; i < templateServiceTasks.size(); i++) {
+            seot.add(new ServiceTaskReqDto(templateServiceTasks.get(i).getTestaName(),
+                    serviceOrders.getServices().getServStartDate().plusDays(i),
+                    serviceOrders.getServices().getServStartDate().plusDays(i + 1),
+                    seotStatus, serviceOrders.getEmployees().getAreaWorkGroup(),
+                    serviceOrders, taskReflection));
+
+            switch (templateServiceTasks.get(i).getTestaName()) {
+                case "NOTIFY TO AGENT" ->
+                        servOrderTaskService.notifyTask(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail(),
+                                "Request new POLIS",
+                                "Request new POLIS from " + serviceOrders.getServices().getUsers().getUserFullName());
+                case "NOTIFY TO CUSTOMER" ->
+                        servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
+                                "POLIS has been created",
+                                "Your request POLIS has been created, check your dashboard page");
+            }
+        }
     }
 }

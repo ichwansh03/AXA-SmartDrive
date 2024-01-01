@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.controllers.auth.AuthenticationController;
 import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
+import com.app.smartdrive.api.dto.service_order.response.ServiceDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.Services;
@@ -85,7 +86,7 @@ public class ServControllerTest {
     void itShouldAddServiceFromCustomer() throws Exception {
 
         Long creqId = 2L;
-        ServiceRespDto services = new ServiceRespDto();
+        ServiceDto services = new ServiceDto();
         services.setServStatus(EnumModuleServiceOrders.ServStatus.ACTIVE);
         services.setServType(EnumCustomer.CreqType.POLIS);
 

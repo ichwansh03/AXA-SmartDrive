@@ -36,7 +36,7 @@ public class ServController {
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> generateService(@Valid @RequestBody ClaimRequestDTO requestDTO) throws Exception {
 
-        ServiceRespDto serviceRespDto = serviceFactory.addService(requestDTO.getCreqEntityId());
+        ServiceDto serviceRespDto = serviceFactory.addService(requestDTO.getCreqEntityId());
 
         log.info("ServiceOrdersController::generateService successfully viewed");
         return new ResponseEntity<>(serviceRespDto, HttpStatus.OK);
