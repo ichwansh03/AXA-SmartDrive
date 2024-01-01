@@ -1,10 +1,14 @@
 package com.app.smartdrive.api.services.master.implementation;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.master.request.CitiesReq;
+import com.app.smartdrive.api.dto.master.response.CitiesRes;
 import com.app.smartdrive.api.entities.master.Cities;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.CityRepository;
-import com.app.smartdrive.api.services.master.CityService;
+import com.app.smartdrive.api.services.master.MasterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,22 +16,24 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CityServiceImpl implements CityService {
+@Qualifier("cityServiceImpl")
+public class CityServiceImpl implements MasterService<CitiesRes, CitiesReq, Long> {
     private final CityRepository repository;
 
     @Override
-    public Cities getById(Long aLong) {
-        return repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("City ID : " + aLong + " Not Found"));
+    public CitiesRes getById(Long aLong) {
+        return TransactionMapper.mapEntityToDto(repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("City ID : " + aLong + " Not Found")), CitiesRes.class);
     }
 
     @Override
-    public List<Cities> getAll() {
-        return repository.findAll();
+    public List<CitiesRes> getAll() {
+        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), CitiesRes.class);
     }
 
     @Override
     @Transactional
-    public Cities save(Cities entity) {
-        return repository.save(entity);
+    public CitiesRes save(CitiesReq entity) {
+        Cities cities = repository.save(TransactionMapper.mapDtoToEntity(entity, new Cities()));
+        return TransactionMapper.mapEntityToDto(cities, CitiesRes.class);
     }
 }

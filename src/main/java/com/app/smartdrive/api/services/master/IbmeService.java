@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.services.master;
 
-import com.app.smartdrive.api.entities.master.InboxMessaging;
-import com.app.smartdrive.api.services.BaseService;
+import com.app.smartdrive.api.dto.master.request.IbmeReq;
+import com.app.smartdrive.api.dto.master.response.IbmeRes;
 
-public interface IbmeService extends BaseService<InboxMessaging, Long> {
+public interface IbmeService extends MasterService<IbmeRes, IbmeReq, Long> {
 }

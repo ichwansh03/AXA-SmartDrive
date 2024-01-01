@@ -1,21 +1,17 @@
 package com.app.smartdrive.api.services.users;
 
-import java.util.List;
 import java.util.Optional;
-import com.app.smartdrive.api.dto.user.ProfileDto;
+
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
-import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
-import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
-import com.app.smartdrive.api.services.BaseService;
-import jakarta.transaction.Transactional;
+import com.app.smartdrive.api.services.master.MasterService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 
-public interface UserService extends BaseService<User, Long> {
+public interface UserService extends MasterService<User, Long> {
   User createAdmin(CreateUserDto userPost);
 
   User save(User user);

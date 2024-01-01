@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.services.master;
 
-import com.app.smartdrive.api.entities.master.Zones;
-import com.app.smartdrive.api.services.BaseService;
+import com.app.smartdrive.api.dto.master.request.ZoneReq;
+import com.app.smartdrive.api.dto.master.response.ZonesRes;
 
-public interface ZoneService extends BaseService<Zones,Long> {
+public interface ZoneService extends MasterService<ZonesRes, ZoneReq,Long> {
 }

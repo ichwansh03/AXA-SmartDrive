@@ -1,10 +1,14 @@
 package com.app.smartdrive.api.services.master.implementation;
 
+import com.app.smartdrive.api.dto.master.request.CarbReq;
+import com.app.smartdrive.api.dto.master.response.CarbRes;
 import com.app.smartdrive.api.entities.master.CarBrand;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.CabrRepository;
-import com.app.smartdrive.api.services.master.CarbService;
+import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,22 +16,24 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CarbServiceImpl implements CarbService {
+@Qualifier("carbServiceImpl")
+public class CarbServiceImpl implements MasterService<CarbRes, CarbReq, Long> {
     private final CabrRepository repository;
 
     @Override
-    public CarBrand getById(Long aLong) {
-        return repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Brand ID : " + aLong + " Not Found"));
+    public CarbRes getById(Long aLong) {
+        return TransactionMapper.mapEntityToDto(repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Brand ID : " + aLong + " Not Found")), CarbRes.class);
     }
 
     @Override
-    public List<CarBrand> getAll() {
-        return repository.findAll();
+    public List<CarbRes> getAll() {
+        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), CarbRes.class);
     }
 
     @Override
     @Transactional
-    public CarBrand save(CarBrand entity) {
-        return repository.save(entity);
+    public CarbRes save(CarbReq entity) {
+        CarBrand carBrand = repository.save(TransactionMapper.mapDtoToEntity(entity, new CarBrand()));
+        return TransactionMapper.mapEntityToDto(carBrand, CarbRes.class);
     }
 }
