@@ -115,7 +115,7 @@ public class PartnerContactServiceImpl implements PartnerContactService {
 
     @Transactional
     public PartnerContact edit(PartnerContactRequest request, Long userId) {
-        User user = userService.getUserById(userId).orElseThrow(() -> new EntityNotFoundException("Partner Contact Not Found"));
+        User user = userService.getById(userId);
         Partner partner = partnerService.getById(request.getPartnerId());
         UserPhone userPhone = user.getUserPhone().get(0);
          if(!userPhone.getUserPhoneId().getUsphPhoneNumber().equals(request.getPhone())){

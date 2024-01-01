@@ -16,6 +16,8 @@ public interface UserService {
 
   User save(User user);
 
+
+
   @Transactional
   void deleteById(Long id);
 
@@ -26,8 +28,6 @@ public interface UserService {
   User createUser(ProfileRequestDto userPost);
 
   UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id);
-
-  Optional<User> getUserById(Long id);
 
   UserDetailsService userDetailsService();
 
