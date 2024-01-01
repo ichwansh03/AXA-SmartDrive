@@ -29,8 +29,6 @@ public interface UserService {
 
   UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id);
 
-  Optional<User> getUserById(Long id);
-
   UserDetailsService userDetailsService();
 
   User getById(Long id);
