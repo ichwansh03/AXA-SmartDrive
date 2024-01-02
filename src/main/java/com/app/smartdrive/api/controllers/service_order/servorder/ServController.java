@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/service")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin
 public class ServController {
 
     private final ServService servService;
