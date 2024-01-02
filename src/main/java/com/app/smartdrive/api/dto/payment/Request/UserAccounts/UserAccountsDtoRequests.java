@@ -5,7 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class UserAccountsDtoRequests extends UserAccountsDtoRequestsFirst {
+public class UserAccountsDtoRequests  {
+    private String noRekening;
     @NotNull(message = "Tidak Boleh Kosong")
     private Double nominall;
     
