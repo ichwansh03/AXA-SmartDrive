@@ -140,7 +140,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status) {
         User user = this.userService.getById(customerId);
 
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
@@ -154,16 +154,23 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqTypeAndCreqStatus(user, paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pageUserCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
 
         log.info("CustomerRequestServiceImpl::getPagingUserCustomerRequest," +
                 " successfully get all customer request who belong to user with ID: {}", user.getUserEntityId());
 
-        return pageCustomerRequest;
+        return pageUserCustomerResponseDTO;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable paging, String type, String status) {
         AreaWorkGroup existAreaWorkgroup = this.arwgRepository.findByArwgCode(arwgCode);
         Employees existEmployee = this.employeesService.getById(employeeId);
         EmployeeAreaWorkgroup existEmployeeAreaworkgroup = this.employeeAreaWorkgroupRepository.findByAreaWorkGroupAndEmployees(existAreaWorkgroup, existEmployee).orElseThrow(
@@ -181,11 +188,18 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqTypeAndCreqStatus(existEmployeeAreaworkgroup, paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pageAgenCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
 
         log.info("CustomerRequestServiceImpl::getPagingAgenCustomerRequest," +
                 " successfully get all customer request who belong to agen with ID: {} and areaCode: {}", employeeId, arwgCode);
 
-        return pageCustomerRequest;
+        return pageAgenCustomerResponseDTO;
     }
 
     @Transactional

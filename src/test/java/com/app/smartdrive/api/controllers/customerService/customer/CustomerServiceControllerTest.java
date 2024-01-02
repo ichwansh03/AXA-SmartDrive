@@ -7,6 +7,7 @@ import com.app.smartdrive.api.dto.customer.response.CustomerInscAssetsResponseDT
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.master.response.ArwgRes;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.CustomerInscAssets;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
@@ -258,40 +259,39 @@ public class CustomerServiceControllerTest {
     @Test
     @WithMockUser(authorities = "Customer")
     void getAllUserCustomersRequest_willSuccess() throws Exception {
-        User user = new User();
+        UserDto user = new UserDto();
         user.setUserEntityId(23L);
 
         PagingUserCustomerRequestDTO pagingUserCustomerRequestDTO = new PagingUserCustomerRequestDTO();
         pagingUserCustomerRequestDTO.setCustomerId(user.getUserEntityId());
 
-        List<CustomerRequest> customerRequestList = List.of(
-                getCustomerRequest(1L),
-                getCustomerRequest(2L)
+        List<CustomerResponseDTO> customerResponseDTOList = List.of(
+                getCustomerResponseDTO(1L, "POLIS", "OPEN"),
+                getCustomerResponseDTO(2L, "CLOSE", "CLOSED")
         );
 
-        for (CustomerRequest customerRequest : customerRequestList) {
-            customerRequest.setCustomer(user);
+        for (CustomerResponseDTO customerResponseDTO : customerResponseDTOList) {
+            customerResponseDTO.setCustomer(user);
         }
 
-
-        Page<CustomerRequest> pagedResponse = new PageImpl(customerRequestList);
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = new PageImpl(customerResponseDTOList);
 
         Pageable paging = PageRequest.of(pagingUserCustomerRequestDTO.getPage(), pagingUserCustomerRequestDTO.getSize(), Sort.by(pagingUserCustomerRequestDTO.getSortBy()).ascending());
 
-        when(this.customerRequestService.getPagingUserCustomerRequest(user.getUserEntityId(), paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus())).thenReturn(pagedResponse);
+        when(this.customerRequestService.getPagingUserCustomerRequest(user.getUserEntityId(), paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus())).thenReturn(pageCustomerResponseDTO);
 
         mockMvc.perform(
                 get("/customer/service/request/customer")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(pagingUserCustomerRequestDTO))
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
-                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
-                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerRequestList.get(1).getCreqEntityId()))
-                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
-                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
-                .andExpect(jsonPath("$.content[0].customer.userEntityId").value(customerRequestList.get(0).getCustomer().getUserEntityId()))
-                .andExpect(jsonPath("$.content[1].customer.userEntityId").value(customerRequestList.get(1).getCustomer().getUserEntityId()))
+                .andExpect(jsonPath("$.totalElements").value(customerResponseDTOList.size()))
+                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerResponseDTOList.get(0).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerResponseDTOList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerResponseDTOList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerResponseDTOList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[0].customer.userEntityId").value(customerResponseDTOList.get(0).getCustomer().getUserEntityId()))
+                .andExpect(jsonPath("$.content[1].customer.userEntityId").value(customerResponseDTOList.get(1).getCustomer().getUserEntityId()))
                 .andDo(print());
 
     }
@@ -325,22 +325,28 @@ public class CustomerServiceControllerTest {
         String arwgCode = "BCI-0001";
         Long employeeId = 3L;
 
-        EmployeeAreaWorkgroup employeeAreaworkgroup = getEmployeeAreaworkgroup(arwgCode, employeeId);
+        ArwgRes arwgRes = ArwgRes.builder()
+                .arwgCode(arwgCode)
+                .build();
+
+        EmployeesAreaWorkgroupResponseDto employeesAreaWorkgroupResponseDto = EmployeesAreaWorkgroupResponseDto.builder()
+                .areaWorkGroup(arwgRes)
+                .build();
 
 
-        List<CustomerRequest> customerRequestList = List.of(
-                getCustomerRequest(1L),
-                getCustomerRequest(2L)
+        List<CustomerResponseDTO> customerResponseDTOList = List.of(
+                getCustomerResponseDTO(1L, "POLIS", "OPEN"),
+                getCustomerResponseDTO(2L, "CLOSE", "CLOSED")
         );
 
         List<String> arwgCodeList = new ArrayList<>();
 
-        for (CustomerRequest customerRequest : customerRequestList) {
-            customerRequest.setEmployeeAreaWorkgroup(employeeAreaworkgroup);
-            arwgCodeList.add(customerRequest.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode());
+        for (CustomerResponseDTO response : customerResponseDTOList) {
+            response.setEmployeeAreaWorkgroup(employeesAreaWorkgroupResponseDto);
+            arwgCodeList.add(response.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode());
         }
 
-        Page<CustomerRequest> pagedResponse = new PageImpl(customerRequestList);
+        Page<CustomerResponseDTO> pagedResponse = new PageImpl(customerResponseDTOList);
 
         PagingAgenCustomerRequestDTO pagingAgenCustomerRequestDTO = new PagingAgenCustomerRequestDTO();
         pagingAgenCustomerRequestDTO.setArwgCode(arwgCode);
@@ -356,13 +362,11 @@ public class CustomerServiceControllerTest {
                                 .content(objectMapper.writeValueAsString(pagingAgenCustomerRequestDTO))
 
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
-                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
-                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerRequestList.get(1).getCreqEntityId()))
-                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
-                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
-                .andExpect(jsonPath("$.content[0].employeeAreaWorkgroup.employees.user.userEntityId").value(customerRequestList.get(0).getEmployeeAreaWorkgroup().getEmployees().getUser().getUserEntityId()))
-                .andExpect(jsonPath("$.content[1].employeeAreaWorkgroup.employees.user.userEntityId").value(customerRequestList.get(1).getEmployeeAreaWorkgroup().getEmployees().getUser().getUserEntityId()))
+                .andExpect(jsonPath("$.totalElements").value(customerResponseDTOList.size()))
+                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerResponseDTOList.get(0).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerResponseDTOList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerResponseDTOList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerResponseDTOList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
                 .andExpect(jsonPath("$.content[*].employeeAreaWorkgroup.areaWorkGroup.arwgCode").value(arwgCodeList))
                 .andDo(print());
 

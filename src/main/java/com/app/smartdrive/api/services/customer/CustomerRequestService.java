@@ -19,9 +19,9 @@ public interface CustomerRequestService {
 
     Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status);
 
-    public Page<CustomerRequest> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status);
+    public Page<CustomerResponseDTO> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status);
 
-    public Page<CustomerRequest> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable pageable, String type, String status);
+    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable pageable, String type, String status);
 
     public CustomerRequest getById(Long creqEntityId);
 

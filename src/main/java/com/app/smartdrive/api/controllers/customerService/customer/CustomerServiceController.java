@@ -70,16 +70,11 @@ public class CustomerServiceController {
             paging = PageRequest.of(pagingUserCustomerRequestDTO.getPage(), pagingUserCustomerRequestDTO.getSize(), Sort.by(pagingUserCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingUserCustomerRequest = this.customerRequestService.getPagingUserCustomerRequest(pagingUserCustomerRequestDTO.getCustomerId(), paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus());
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = this.customerRequestService.getPagingUserCustomerRequest(pagingUserCustomerRequestDTO.getCustomerId(), paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus());
 
-        Page<CustomerResponseDTO> pagingUserCustomerResponseDTO = pagingUserCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
 
-        return ResponseEntity.status(HttpStatus.OK).body(pagingUserCustomerResponseDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(pageCustomerResponseDTO);
     }
 
     @GetMapping("/request/agen")
@@ -96,16 +91,11 @@ public class CustomerServiceController {
             paging = PageRequest.of(pagingAgenCustomerRequestDTO.getPage(), pagingAgenCustomerRequestDTO.getSize(), Sort.by(pagingAgenCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingAgenCustomerRequest = this.customerRequestService.getPagingAgenCustomerRequest(pagingAgenCustomerRequestDTO.getEmployeeId(), pagingAgenCustomerRequestDTO.getArwgCode(), paging, pagingAgenCustomerRequestDTO.getType(), pagingAgenCustomerRequestDTO.getStatus());
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = this.customerRequestService.getPagingAgenCustomerRequest(pagingAgenCustomerRequestDTO.getEmployeeId(), pagingAgenCustomerRequestDTO.getArwgCode(), paging, pagingAgenCustomerRequestDTO.getType(), pagingAgenCustomerRequestDTO.getStatus());
 
-        Page<CustomerResponseDTO> pagingAgenCustomerResponseDTO = pagingAgenCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
 
-        return ResponseEntity.status(HttpStatus.OK).body(pagingAgenCustomerResponseDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(pageCustomerResponseDTO);
     }
 
 
