@@ -12,7 +12,7 @@ import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechDtoResponse;
 import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechIdForUserDtoResponse;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.payment.Fintech;
-import com.app.smartdrive.api.services.BaseService;
+
 
 
 public interface PaymentService extends BasePaymentManagementService<PaymentDtoResponse, Long>{

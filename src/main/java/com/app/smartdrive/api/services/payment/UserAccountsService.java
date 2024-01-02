@@ -9,7 +9,7 @@ import com.app.smartdrive.api.dto.payment.Response.UserAccounts.UserAccountsList
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.services.master.MasterService;
 
-public interface UserAccountsService extends MasterService<UserAccounts, Long> {
+public interface UserAccountsService  {
     List<UserAccountsListDtoResponse> listDtoResponses();
     UserAccountsListDtoResponse getIdUser(Long usac_id);
     UserAccountsDtoResponse addDebit(UserAccountsDtoRequests userAccountsDtoRequests);

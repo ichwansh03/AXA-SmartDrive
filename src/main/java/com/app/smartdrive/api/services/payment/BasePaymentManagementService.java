@@ -10,7 +10,7 @@ import com.app.smartdrive.api.dto.payment.Request.Banks.BanksDtoRequests;
 import com.app.smartdrive.api.dto.payment.Response.Banks.BanksDtoResponse;
 import com.app.smartdrive.api.dto.payment.Response.Banks.PaymentDtoResponse;
 import com.app.smartdrive.api.entities.payment.Banks;
-import com.app.smartdrive.api.services.BaseService;
+
 
 
 public interface BasePaymentManagementService<T, ID> {

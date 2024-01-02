@@ -357,21 +357,5 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
        return dtoGenerate;
     }
 
-    @Override
-    public List<PaymentTransactions> getAll() {
-        return repository.findAll();
-    }
-
-    @Override
-    public PaymentTransactions getById(String id) {
-        // TODO Auto-generated method stub
-        return repository.findById(id).get();
-    }
-
-    @Override
-    public PaymentTransactions save(PaymentTransactions entity) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    
 }
