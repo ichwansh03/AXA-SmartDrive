@@ -10,9 +10,8 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class EmployeeSalaryDetailResponseDto {
     private String emsaName;
     private BigDecimal emsaSubtotal;
-    private EmployeesResponseDto employees;
+    private EmpDetailResponseDto employees;
 }

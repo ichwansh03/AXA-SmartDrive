@@ -10,12 +10,12 @@ import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
 import org.springframework.data.domain.Pageable;
 
 public interface EmployeeAreaWorkgroupService{
-     Page<EmployeeAreaWorkgroup> searchEawg(String value, int page, int size);
-     EmployeeAreaWorkgroup createEawg(EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
-     EmployeeAreaWorkgroup updateEawg(Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
+     Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size);
+     EmployeesAreaWorkgroupResponseDto addEawg(EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
+     EmployeesAreaWorkgroupResponseDto updateEawg (Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
      EmployeeAreaWorkgroup getById(Long id);
      void deleteById(Long eawg_id);
-     Page<EmployeeAreaWorkgroup> getAll(Pageable pageable);
+     Page<EmployeesAreaWorkgroupResponseDto> getAll(Pageable pageable);
 
      EmployeeAreaWorkgroup getById(Long eawgId, Long employeeId);
 

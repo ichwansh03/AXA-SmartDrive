@@ -10,10 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class EmployeeAreaWorkgroupRequestDto {
-    private String zoneName;
-    private String provinsi;
     private Long cityId;
     private String arwgCode;
     private Long empEntityid;

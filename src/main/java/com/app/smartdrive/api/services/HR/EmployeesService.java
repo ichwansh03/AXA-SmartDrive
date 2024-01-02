@@ -6,10 +6,10 @@ import com.app.smartdrive.api.entities.hr.Employees;
 import org.springframework.data.domain.Pageable;
 
 public interface EmployeesService {
-  Page<Employees> searchEmployees(String value, int page, int size) ;
-  Employees createEmployee(EmployeesRequestDto employeesDto);
-  Employees editEmployee(Long employeeId, EmployeesRequestDto employeesDto);
+  Page<EmployeesResponseDto> searchEmployees(String value, int page, int size) ;
+  EmployeesResponseDto createEmployee(EmployeesRequestDto employeesDto);
+  EmployeesResponseDto updateEmployee(Long employeeId, EmployeesRequestDto employeesDto);
   void deleteEmployeesById(Long empEntitiyid) ;
   Employees getById(Long id);
-  Page<Employees> getAll(Pageable pageable);
+  Page<EmployeesResponseDto> getAll(Pageable pageable);
 }
