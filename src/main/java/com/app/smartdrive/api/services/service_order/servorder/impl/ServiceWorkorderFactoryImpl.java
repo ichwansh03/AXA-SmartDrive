@@ -60,20 +60,23 @@ public class ServiceWorkorderFactoryImpl implements ServiceWorkorderFactory {
     @Transactional
     @Override
     public void createWorkorderTask(String sowoName, Long seotId){
-        TemplateTaskWorkOrder workOrder = new TemplateTaskWorkOrder();
-        workOrder.setTewoTestaId(seotId);
-        workOrder.setTewoName(sowoName);
-        tewoRepository.save(workOrder);
-
+        TemplateTaskWorkOrder templateTask = createTemplateTask(sowoName, seotId);
         ServiceOrderTasks tasks = soTasksRepository.findById(seotId)
                 .orElseThrow(() -> new EntityNotFoundException("::createWorkorderTask ID is not found"));
 
         ServiceOrderWorkorder soWorkorder = new ServiceOrderWorkorder();
-        soWorkorder.setSowoName(workOrder.getTewoName());
+        soWorkorder.setSowoName(templateTask.getTewoName());
         soWorkorder.setServiceOrderTasks(tasks);
         soWorkorder.setSowoStatus(false);
         soWorkorder.setSowoModDate(LocalDateTime.now());
 
         soWorkorderRepository.save(soWorkorder);
+    }
+
+    private TemplateTaskWorkOrder createTemplateTask(String taskName, Long taskId) {
+        TemplateTaskWorkOrder workOrder = new TemplateTaskWorkOrder();
+        workOrder.setTewoTestaId(taskId);
+        workOrder.setTewoName(taskName);
+        return tewoRepository.save(workOrder);
     }
 }
