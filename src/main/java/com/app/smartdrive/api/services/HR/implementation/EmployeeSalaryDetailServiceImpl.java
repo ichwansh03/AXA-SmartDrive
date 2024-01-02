@@ -41,7 +41,7 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         List<TemplateSalary> templateSalaries = templateSalaryRepository.findAll();
         List<EmployeeSalaryDetail> salaryDetails = new ArrayList<>();
 
-//         BigDecimal totalPremi = new BigDecimal(100000);
+         BigDecimal totalPremi = new BigDecimal(100000);
 
         ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndEmployees_EawgEntityid(entityId);
 

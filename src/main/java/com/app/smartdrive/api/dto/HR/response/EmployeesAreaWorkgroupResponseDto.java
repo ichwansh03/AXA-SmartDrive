@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class EmployeesAreaWorkgroupResponseDto {
     private ArwgRes areaWorkGroup;
     private EmployeesResponseDto employees;

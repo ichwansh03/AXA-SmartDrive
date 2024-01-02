@@ -1,8 +1,5 @@
 package com.app.smartdrive.api.dto.HR.request;
 
-
-
-import com.app.smartdrive.api.dto.HR.response.EmployeesJobTypeResponseDto;
 import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserPhoneRequestDto;
 
@@ -21,12 +18,12 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class EmployeesRequestDto {
     @Size(max = 85)
     private String empName;
     @Size(max = 25)
     private String email;
+    private String userBirthPlace;
     private UserPhoneRequestDto empPhone;
     private String empJoinDate;
     @Enumerated(EnumType.STRING)
@@ -37,7 +34,6 @@ public class EmployeesRequestDto {
     private UserAddressRequestDto empAddress;
     private String jobType;
     private Boolean grantAccessUser;
-    // private String empAddress2;
-    // private CreateUserDto createUserDto;
+
     
 }

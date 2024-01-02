@@ -19,6 +19,7 @@ public class UserDto {
   private Long userEntityId;
   private String userPhoto;
   private String userFullName;
+  private String userBirthPlace;
   private List<UserRoleDto> userRoles;
   private String userEmail;
   private List<UserPhoneDto> userPhone;
