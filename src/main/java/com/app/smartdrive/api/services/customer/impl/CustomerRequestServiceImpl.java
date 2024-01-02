@@ -52,6 +52,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -114,7 +115,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getAllPaging(Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status) {
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
 
         Page<CustomerRequest> pageCustomerRequest;
@@ -126,8 +127,15 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByCreqTypeAndCreqStatus(paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
         log.info("CustomerRequestServiceImpl::getAllPaging get paging all customer request");
-        return pageCustomerRequest;
+        return pagingCustomerResponseDTO;
     }
 
     @Transactional(readOnly = true)

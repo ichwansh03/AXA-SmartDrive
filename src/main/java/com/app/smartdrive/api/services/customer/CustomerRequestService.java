@@ -17,7 +17,7 @@ import java.util.List;
 public interface CustomerRequestService {
     public List<CustomerResponseDTO> get();
 
-    Page<CustomerRequest> getAllPaging(Pageable paging, String type, String status);
+    Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status);
 
     public Page<CustomerRequest> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status);
 

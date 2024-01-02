@@ -52,16 +52,9 @@ public class CustomerServiceController {
             paging = PageRequest.of(basePagingCustomerRequestDTO.getPage(), basePagingCustomerRequestDTO.getSize(), Sort.by(basePagingCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingCustomerRequest = this.customerRequestService.getAllPaging(paging, basePagingCustomerRequestDTO.getType(), basePagingCustomerRequestDTO.getStatus());
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = this.customerRequestService.getAllPaging(paging, basePagingCustomerRequestDTO.getType(), basePagingCustomerRequestDTO.getStatus());
 
-        Page<CustomerResponseDTO> pagingCustomerResponseDTO = pagingCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
-
-        return ResponseEntity.status(HttpStatus.OK).body(pagingCustomerResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(pageCustomerResponseDTO);
     }
 
     @GetMapping("/request/customer")

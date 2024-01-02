@@ -186,6 +186,28 @@ public class CustomerServiceControllerTest {
                 .cuclReason("Budget Problem")
                 .build();
     }
+    public CustomerResponseDTO getCustomerResponseDTO(Long id, String type, String status){
+        LocalDateTime ciasStartDate = LocalDateTime.of(2001, Month.OCTOBER, Math.toIntExact(id), 12, 10, 0);
+
+        CustomerInscAssetsResponseDTO ciasResponseDTO = CustomerInscAssetsResponseDTO.builder()
+                .ciasCreqEntityid(id)
+                .ciasCurrentPrice(BigDecimal.valueOf(200_000_000))
+                .ciasStartdate(ciasStartDate)
+                .ciasEnddate(ciasStartDate.plusYears(1))
+                .ciasYear("200" + id)
+                .ciasInsurancePrice(BigDecimal.valueOf(200_000_000))
+                .ciasPoliceNumber("B 123" + id + " CBD")
+                .build();
+
+        CustomerResponseDTO customerResponseDTO = CustomerResponseDTO.builder()
+                .creqEntityId(id)
+                .creqStatus(EnumCustomer.CreqStatus.valueOf(status))
+                .creqType(EnumCustomer.CreqType.valueOf(type))
+                .customerInscAssets(ciasResponseDTO)
+                .build();
+
+        return customerResponseDTO;
+    }
 
 
 
@@ -194,16 +216,16 @@ public class CustomerServiceControllerTest {
     void getAllCustomersRequest_willSuccess() throws Exception {
         BasePagingCustomerRequestDTO basePagingCustomerRequestDTO = new BasePagingCustomerRequestDTO();
 
-        List<CustomerRequest> customerRequestList = List.of(
-                getCustomerRequest(1L),
-                getCustomerRequest(2L)
+        List<CustomerResponseDTO> customerResponseDTOList = List.of(
+                getCustomerResponseDTO(1L, "POLIS", "OPEN"),
+                getCustomerResponseDTO(2L, "CLOSE", "CLOSED")
         );
 
-        Page<CustomerRequest> pagedCustomerRequest = new PageImpl(customerRequestList);
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = new PageImpl(customerResponseDTOList);
 
         Pageable paging = PageRequest.of(basePagingCustomerRequestDTO.getPage(), basePagingCustomerRequestDTO.getSize(), Sort.by(basePagingCustomerRequestDTO.getSortBy()).ascending());
 
-        when(this.customerRequestService.getAllPaging(paging, basePagingCustomerRequestDTO.getType(), basePagingCustomerRequestDTO.getStatus())).thenReturn(pagedCustomerRequest);
+        when(this.customerRequestService.getAllPaging(paging, basePagingCustomerRequestDTO.getType(), basePagingCustomerRequestDTO.getStatus())).thenReturn(pageCustomerResponseDTO);
 
 
         mockMvc.perform(
@@ -212,11 +234,11 @@ public class CustomerServiceControllerTest {
                         .content(objectMapper.writeValueAsString(basePagingCustomerRequestDTO))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(customerRequestList.size()))
-                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerRequestList.get(0).getCreqEntityId()))
-                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerRequestList.get(1).getCreqEntityId()))
-                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
-                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerRequestList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.totalElements").value(customerResponseDTOList.size()))
+                .andExpect(jsonPath("$.content[0].creqEntityId").value(customerResponseDTOList.get(0).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[1].creqEntityId").value(customerResponseDTOList.get(1).getCreqEntityId()))
+                .andExpect(jsonPath("$.content[0].customerInscAssets.ciasPoliceNumber").value(customerResponseDTOList.get(0).getCustomerInscAssets().getCiasPoliceNumber()))
+                .andExpect(jsonPath("$.content[1].customerInscAssets.ciasPoliceNumber").value(customerResponseDTOList.get(1).getCustomerInscAssets().getCiasPoliceNumber()))
                 .andDo(print());
 
     }
