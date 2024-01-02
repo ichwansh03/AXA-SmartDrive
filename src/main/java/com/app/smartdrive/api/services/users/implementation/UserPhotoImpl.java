@@ -26,7 +26,7 @@ public class UserPhotoImpl implements UserPhotoService {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
     String rootPath = new File("").getAbsolutePath();
-    String path = "\\src\\main\\resources\\image\\";
+    String path = "\\src\\main\\resources\\image\\userPhoto\\";
     Path pathPhotoUser = Paths.get(rootPath+path+user.getUserPhoto());
     Files.deleteIfExists(pathPhotoUser);
     String uniqueFile = UUID.randomUUID().toString()+"_"+photo.getOriginalFilename();

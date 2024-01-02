@@ -72,7 +72,7 @@ public class JwtService {
                     .getUserRolesId()
                     .getUsroRoleName()
                     .getValue()).toList())
-            .withSubject(userDetails.getUsername())
+            .withSubject(userDetails.getUserName())
             .sign(JWT_ALGORITHM);
   }
 
