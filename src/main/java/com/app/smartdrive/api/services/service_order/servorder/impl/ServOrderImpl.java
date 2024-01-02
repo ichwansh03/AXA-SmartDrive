@@ -34,11 +34,6 @@ public class ServOrderImpl implements ServOrderService {
     @Override
     public List<ServiceOrders> findAllSeroByServId(Long servId) {
         List<ServiceOrders> allSeroByServId = soOrderRepository.findByServices_ServId(servId);
-
-        if (allSeroByServId.isEmpty()){
-            throw new EntityNotFoundException("findAllSeroByServId(Long servId)::Service ID is not found");
-        }
-
         log.info("SoOrderServiceImpl::findAllSeroByServId from service ID {} ",servId);
 
         return allSeroByServId;
@@ -47,10 +42,6 @@ public class ServOrderImpl implements ServOrderService {
     @Override
     public List<ServiceOrders> findAllSeroByUserId(Long custId) {
         List<ServiceOrders> entityId = soOrderRepository.findByServices_Users_UserEntityId(custId);
-
-        if (entityId.isEmpty()) {
-            throw new EntityNotFoundException("findAllSeroByUserId(Long custId)::custId is not found");
-        }
 
         log.info("SoOrderServiceImpl::findAllSeroByServId from user ID {} ",custId);
 

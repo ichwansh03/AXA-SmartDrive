@@ -1,13 +1,9 @@
 package com.app.smartdrive.api.dto.service_order.request;
 
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
-import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.entities.users.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +23,7 @@ public class ServiceReqDto {
     private EnumCustomer.CreqType servType;
     @NotBlank
     private String servVehicleNumber;
+    private String servInsuranceNo;
     private LocalDateTime servStartDate;
     private LocalDateTime servEndDate;
     @NotNull
