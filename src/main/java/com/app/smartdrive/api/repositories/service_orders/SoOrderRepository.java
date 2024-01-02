@@ -26,9 +26,6 @@ public interface SoOrderRepository extends JpaRepository<ServiceOrders, String> 
 
     List<ServiceOrders> findByServices_ServId(Long servId);
 
-
-    List<ServiceOrders> findByPartner(Partner partner);
-
     ServiceOrders findBySeroIdLikeAndServices_ServId(String seroIdLike, Long servId);
 
     List<ServiceOrders> findByServices_Users_UserEntityId(Long custId);

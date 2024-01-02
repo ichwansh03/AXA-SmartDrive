@@ -2,6 +2,7 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
+import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -22,6 +23,7 @@ import java.util.Objects;
 public class ServOrderImpl implements ServOrderService {
 
     private final SoOrderRepository soOrderRepository;
+    private final ServOrderTaskService servOrderTaskService;
 
     @Override
     public ServiceOrders findServiceOrdersById(String seroId) {
@@ -32,11 +34,26 @@ public class ServOrderImpl implements ServOrderService {
     }
 
     @Override
-    public List<ServiceOrders> findAllSeroByServId(Long servId) {
-        List<ServiceOrders> allSeroByServId = soOrderRepository.findByServices_ServId(servId);
-        log.info("SoOrderServiceImpl::findAllSeroByServId from service ID {} ",servId);
+    public ServiceOrderRespDto findOrderDtoById(String seroId) {
+        ServiceOrders orders = findServiceOrdersById(seroId);
+        ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(orders, ServiceOrderRespDto.class);
+        List<SoTasksDto> taskByOrderId = servOrderTaskService.findAllTaskByOrderId(seroId);
+        serviceOrderRespDto.setSoTasksDtoList(taskByOrderId);
+        return serviceOrderRespDto;
+    }
 
-        return allSeroByServId;
+    @Override
+    public List<ServiceOrderRespDto> findAllOrderByServId(Long servId) {
+        List<ServiceOrders> ordersList = soOrderRepository.findByServices_ServId(servId);
+
+        return ordersList.stream()
+                .map(serviceOrders -> {
+                    ServiceOrderRespDto dto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
+                    List<SoTasksDto> soTasksDtoList = servOrderTaskService.findAllTaskByOrderId(dto.getSeroId());
+                    dto.setSoTasksDtoList(soTasksDtoList);
+                    return dto;
+                })
+                .toList();
     }
 
     @Override

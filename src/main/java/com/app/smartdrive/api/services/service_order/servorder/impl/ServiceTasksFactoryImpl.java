@@ -95,8 +95,8 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                 .orElseThrow(() -> new EntityNotFoundException("::updateTasksStatus ID " + seotId + " is not found"));
         int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
 
-        List<ServiceOrderTasks> tasksList = servOrderTaskService.findSeotBySeroId(orderTasks.getServiceOrders().getSeroId());
-        notifyCurrentTask(tasksList);
+        List<ServiceOrderTasks> tasks = soTasksRepository.findByServiceOrders_SeroId(orderTasks.getServiceOrders().getSeroId());
+        notifyCurrentTask(tasks);
 
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ", seotId);
         return updateSeot;
@@ -139,7 +139,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                     seotStatus, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, taskReflection));
 
-            List<ServiceOrderTasks> orderTasks = servOrderTaskService.findSeotBySeroId(serviceOrders.getSeroId());
+            List<ServiceOrderTasks> orderTasks = soTasksRepository.findByServiceOrders_SeroId(serviceOrders.getSeroId());
             notifyCurrentTask(orderTasks);
         }
     }
