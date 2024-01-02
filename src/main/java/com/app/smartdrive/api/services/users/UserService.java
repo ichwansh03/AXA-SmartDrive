@@ -16,8 +16,6 @@ public interface UserService {
 
   User save(User user);
 
-
-
   @Transactional
   void deleteById(Long id);
 
@@ -29,14 +27,11 @@ public interface UserService {
 
   UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id);
 
-  UserDetailsService userDetailsService();
+//  UserDetailsService userDetailsService();
 
   User getById(Long id);
 
   List<User> getAll();
 
   void changeEmail(Long id, String newEmail);
-
-
-
 }
