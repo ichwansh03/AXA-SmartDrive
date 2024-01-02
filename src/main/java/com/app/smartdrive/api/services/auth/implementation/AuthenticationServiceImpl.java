@@ -65,7 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Transactional
   public String changePassword(Long id, PasswordRequestDto passwordRequestDto) {
     User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
-    if(passwordEncoder.matches(passwordRequestDto.getCurrentPassword(), user.getPassword())){
+    if(passwordEncoder.matches(passwordRequestDto.getCurrentPassword(), user.getUserPassword())){
       if(passwordRequestDto.getNewPassword().equals(passwordRequestDto.getConfirmPassword())){
         user.setUserPassword(passwordEncoder.encode(passwordRequestDto.getNewPassword()));
         userRepository.save(user);
