@@ -124,15 +124,15 @@ public class UserServiceImpl implements UserService {
     return TransactionMapper.mapEntityToDto(user, UpdateUserRequestDto.class);
   }
 
-  @Override
-  public UserDetailsService userDetailsService() {
-    return new UserDetailsService() {
-      @Override
-      public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepo.findUserByIden(username).orElseThrow(() -> new UsernameNotFoundException("Could not find user"));
-      }
-    };
-  }
+//  @Override
+//  public UserDetailsService userDetailsService() {
+//    return new UserDetailsService() {
+//      @Override
+//      public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        return userRepo.findUserByIden(username).orElseThrow(() -> new UsernameNotFoundException("Could not find user"));
+//      }
+//    };
+//  }
 
   @Override
   public User getById(Long id) {

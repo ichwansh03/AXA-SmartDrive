@@ -12,22 +12,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
-// @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userBusinessEntity")
 @Entity
 @Getter
 @Setter
 @Table(name = "users", schema = "users")
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements UserDetails {
+public class User {
 
   @Id
   @Column(name = "user_entityid")
@@ -63,42 +58,6 @@ public class User implements UserDetails {
   @Column(name = "user_modified_date")
   private LocalDateTime userModifiedDate;
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    List<String> listRole = this.userRoles.stream().map(role -> role.getUserRolesId().getUsroRoleName().getValue()).toList();
-    return listRole.stream().map(SimpleGrantedAuthority::new).toList();
-  }
-
-  @Override
-  public String getPassword() {
-    return userPassword;
-  }
-
-  @Override
-  public String getUsername() {
-    return userName;
-  }
-
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
-
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
-
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @MapsId
   @JoinColumn(name = "user_entityid")
@@ -130,7 +89,6 @@ public class User implements UserDetails {
   @JsonManagedReference
   private List<UserAccounts> userAccounts;
 
-//  @JsonIgnore
   @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
   List<CustomerRequest> customerRequest;
 
