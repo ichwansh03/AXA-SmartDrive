@@ -35,10 +35,6 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
         return partnerAreaWorkGroupRepository.findAll();
     }
 
-    public PartnerAreaWorkgroup save(PartnerAreaWorkgroup pawo) {
-        return null;
-    }
-
     public void deleteById(PartnerAreaWorkGroupId id) {
         partnerAreaWorkGroupRepository.deleteById(id);
     }

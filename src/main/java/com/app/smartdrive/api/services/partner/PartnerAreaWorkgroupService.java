@@ -8,5 +8,8 @@ import com.app.smartdrive.api.services.master.MasterService;
 public interface PartnerAreaWorkgroupService {
 
     PartnerAreaWorkgroup create(PartnerAreaWorkgroupRequest request);
+    PartnerAreaWorkgroup getById(PartnerAreaWorkGroupId id);
+
+    void deleteById(PartnerAreaWorkGroupId id);
 
 }
