@@ -161,10 +161,9 @@ public class CustomerServiceController {
     public ResponseEntity<CustomerResponseDTO> requestClaimPolis(
             @RequestBody ClaimRequestDTO claimRequestDTO
     ){
-        CustomerRequest claimedCustomerRequest = this.customerClaimService.claimPolis(claimRequestDTO);
+        CustomerResponseDTO claimedCustomerResponseDTO = this.customerClaimService.claimPolis(claimRequestDTO);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(claimedCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(claimedCustomerResponseDTO);
     }
 
     @GetMapping("/request/claim")
@@ -172,9 +171,8 @@ public class CustomerServiceController {
     public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
             @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
     ){
-        CustomerClaim existCustomerClaim = this.customerClaimService.getCustomerClaimById(cuclCreqEntityId);
+        ClaimResponseDTO claimResponseDTO = this.customerClaimService.getCustomerClaimById(cuclCreqEntityId);
 
-        ClaimResponseDTO claimResponseDTO = TransactionMapper.mapEntityToDto(existCustomerClaim, ClaimResponseDTO.class);
         return ResponseEntity.status(HttpStatus.OK).body(claimResponseDTO);
 
     }
@@ -182,10 +180,9 @@ public class CustomerServiceController {
     @PutMapping("/request/close")
     @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
-        CustomerRequest closedCustomerRequest = this.customerClaimService.closePolis(closeRequestDTO);
+        CustomerResponseDTO closedCustomerResponseDTO = this.customerClaimService.closePolis(closeRequestDTO);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(closedCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(closedCustomerResponseDTO);
     }
 
 
