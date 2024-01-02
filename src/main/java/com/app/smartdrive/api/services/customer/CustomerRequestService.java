@@ -25,9 +25,9 @@ public interface CustomerRequestService {
 
     public CustomerRequest getById(Long creqEntityId);
 
-    public CustomerRequest create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
-    public CustomerRequest createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception;
 
     public CustomerRequest createCustomerRequest(BusinessEntity newEntity, User customer, Long entityId);
 
@@ -35,7 +35,7 @@ public interface CustomerRequestService {
 
     public User createNewUserByAgen(CreateUserDto userPost, LocalDateTime birthDate, Boolean isActive);
 
-    public CustomerRequest updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
+    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
     public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);
 

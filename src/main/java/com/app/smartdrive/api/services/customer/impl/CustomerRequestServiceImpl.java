@@ -204,7 +204,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public CustomerRequest create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = customerRequestDTO.getCustomerInscAssetsRequestDTO();
         Long[] customerInscExtendIds = customerRequestDTO.getCustomerInscAssetsRequestDTO().getCuexIds();
@@ -266,12 +266,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(newCustomerRequest);
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCustomerRequest);
-        return savedCustomerRequest;
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
     @Override
-    public CustomerRequest createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
 
         // prep
         CreateUserDto createUserDto = customerRequestDTO.getUserDTO();
@@ -361,12 +361,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(newCustomerRequest);
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCustomerRequest);
-        return savedCustomerRequest;
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
     @Override
-    public CustomerRequest updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
         CustomerRequest existCustomerRequest = this.getById(updateCustomerRequestDTO.getCreqEntityId());
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = updateCustomerRequestDTO.getCustomerInscAssetsRequestDTO();
         Long[] customerInscExtendIds = customerInscAssetsRequestDTO.getCuexIds();
@@ -432,7 +432,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 //        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(existEmployeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
 //        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
 
-        return savedCustomerRequest;
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional

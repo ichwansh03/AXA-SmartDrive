@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.customerService.customer;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.CustomerInscAssetsResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
@@ -460,10 +461,10 @@ public class CustomerServiceControllerTest {
 
         CustomerRequestDTO customerRequestDTO = getCustomerRequestDTO();
 
-        CustomerRequest customerRequest = getCustomerRequest(creqEntityId);
+        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, "FEASIBLITY", "OPEN");
 
         when(this.customerRequestService.create(customerRequestDTO, multipartFiles))
-                .thenReturn(customerRequest);
+                .thenReturn(customerResponseDTO);
 
         mockMvc.perform(multipart("/customer/service/request")
                 .file(file)
@@ -474,8 +475,8 @@ public class CustomerServiceControllerTest {
             });
 
             assertNotNull(response);
-            assertEquals(customerRequest.getCreqEntityId(), response.getCreqEntityId());
-            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerResponseDTO.getCreqEntityId(), response.getCreqEntityId());
+            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
     }
 
@@ -513,7 +514,15 @@ public class CustomerServiceControllerTest {
         String arwgCode = "BCI-0001";
         Long employeeId = 3L;
 
-        EmployeeAreaWorkgroup employeeAreaworkgroup = getEmployeeAreaworkgroup(arwgCode, employeeId);
+        ArwgRes arwgRes = ArwgRes.builder()
+                .arwgCode(arwgCode)
+                .build();
+
+        EmployeesAreaWorkgroupResponseDto employeesAreaWorkgroupResponseDto = EmployeesAreaWorkgroupResponseDto.builder()
+                .areaWorkGroup(arwgRes)
+                .employees(new EmployeesResponseDto())
+                .build();
+
 
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -526,11 +535,12 @@ public class CustomerServiceControllerTest {
 
         CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = getCustomerRequestByAgenDTO();
 
-        CustomerRequest customerRequest = getCustomerRequest(creqEntityId);
-        customerRequest.setEmployeeAreaWorkgroup(employeeAreaworkgroup);
+
+        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, "POLIS", "OPEN");
+        customerResponseDTO.setEmployeeAreaWorkgroup(employeesAreaWorkgroupResponseDto);
 
         when(this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, multipartFiles))
-                .thenReturn(customerRequest);
+                .thenReturn(customerResponseDTO);
 
         mockMvc.perform(multipart("/customer/service/request/agen")
                 .file(file)
@@ -541,10 +551,10 @@ public class CustomerServiceControllerTest {
             });
 
             assertNotNull(response);
-            assertEquals(customerRequest.getCreqEntityId(), response.getCreqEntityId());
-            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
-            assertEquals(customerRequest.getEmployeeAreaWorkgroup().getEmployees().getUser().getUserEntityId(), response.getEmployeeAreaWorkgroup().getEmployees().getUser().getUserEntityId());
-            assertEquals(customerRequest.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode(), response.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode());
+            assertEquals(customerResponseDTO.getCreqEntityId(), response.getCreqEntityId());
+            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerResponseDTO.getEmployeeAreaWorkgroup().getEmployees(), response.getEmployeeAreaWorkgroup().getEmployees());
+            assertEquals(customerResponseDTO.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode(), response.getEmployeeAreaWorkgroup().getAreaWorkGroup().getArwgCode());
         });
     }
 
@@ -592,7 +602,7 @@ public class CustomerServiceControllerTest {
 
         UpdateCustomerRequestDTO customerRequestDTO = getUpdateCustomerRequestDTO(creqEntityId);
 
-        CustomerRequest customerRequest = getCustomerRequest(creqEntityId);
+        CustomerResponseDTO customerResponseDTO = getCustomerResponseDTO(creqEntityId, "CLAIM", "CLOSED");
 
         // custom http method for multipart
         MockMultipartHttpServletRequestBuilder builder =
@@ -606,7 +616,7 @@ public class CustomerServiceControllerTest {
         });
 
         when(this.customerRequestService.updateCustomerRequest(customerRequestDTO, multipartFiles))
-                .thenReturn(customerRequest);
+                .thenReturn(customerResponseDTO);
 
         mockMvc.perform(builder
                 .file(file)
@@ -617,8 +627,8 @@ public class CustomerServiceControllerTest {
             });
 
             assertNotNull(response);
-            assertEquals(customerRequest.getCreqEntityId(), response.getCreqEntityId());
-            assertEquals(customerRequest.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
+            assertEquals(customerResponseDTO.getCreqEntityId(), response.getCreqEntityId());
+            assertEquals(customerResponseDTO.getCustomerInscAssets().getCiasPoliceNumber(), response.getCustomerInscAssets().getCiasPoliceNumber());
         });
     }
 

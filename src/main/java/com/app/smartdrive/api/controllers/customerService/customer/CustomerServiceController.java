@@ -121,10 +121,9 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         CustomerRequestDTO customerRequestDTO = mapper.readValue(client, CustomerRequestDTO.class);
 
-        CustomerRequest createdCustomerRequest = this.customerRequestService.create(customerRequestDTO, files);
+        CustomerResponseDTO createdCustomerResponseDTO = this.customerRequestService.create(customerRequestDTO, files);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(createdCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomerResponseDTO);
     }
 
     @PostMapping("/request/agen")
@@ -137,10 +136,9 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = mapper.readValue(client, CreateCustomerRequestByAgenDTO.class);
 
-        CustomerRequest newCustomerRequest = this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, files);
+        CustomerResponseDTO createdByAgenCustomerResponseDTO = this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, files);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(newCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdByAgenCustomerResponseDTO);
     }
 
     @PutMapping("/request")
@@ -152,10 +150,9 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         UpdateCustomerRequestDTO updateCustomerRequestDTO = mapper.readValue(client, UpdateCustomerRequestDTO.class);
 
-        CustomerRequest updatedCustomerRequest = this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, files);
+        CustomerResponseDTO updatedCustomerResponseDTO = this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, files);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(updatedCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedCustomerResponseDTO);
     }
 
 
