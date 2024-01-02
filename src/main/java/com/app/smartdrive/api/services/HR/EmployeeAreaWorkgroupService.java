@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.HR;
 
 
+import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import org.springframework.data.domain.Page;
 
 import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
