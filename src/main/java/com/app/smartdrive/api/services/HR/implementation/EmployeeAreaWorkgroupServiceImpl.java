@@ -38,19 +38,19 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
 
     private final EmployeeAreaWorkgroupRepository employeeAreaWorkgroupRepository;
 
-    private final ArwgService arwgService;
+    private final ArwgRepository arwgRepository;
 
-    private final CityService cityService;
+    private final CityRepository cityRepository;
 
     private final EmployeesService employeesService;
 
     @Override
     @Transactional
     public EmployeesAreaWorkgroupResponseDto addEawg(EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto) {
-        AreaWorkGroup areaWorkGroup = arwgService.getById(employeeAreaWorkgroupDto.getArwgCode());
+        AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode(employeeAreaWorkgroupDto.getArwgCode());
         Employees employees = employeesService.getById(employeeAreaWorkgroupDto.getEmpEntityid());
 
-        Cities cities = cityService.getById(employeeAreaWorkgroupDto.getCityId());
+        Cities cities = cityRepository.findById(employeeAreaWorkgroupDto.getCityId()).get();
 
         validateNotExist(employees, areaWorkGroup, cities);
 
@@ -86,10 +86,12 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     @Transactional
     public EmployeesAreaWorkgroupResponseDto updateEawg(Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto) {
         EmployeeAreaWorkgroup existingEawg = getById(eawgId);
-        AreaWorkGroup areaWorkGroup = arwgService.getById(employeeAreaWorkgroupDto.getArwgCode());
+
+        AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode(employeeAreaWorkgroupDto.getArwgCode());
+
         Employees employees = employeesService.getById(employeeAreaWorkgroupDto.getEmpEntityid());
 
-        Cities cities = cityService.getById(employeeAreaWorkgroupDto.getCityId());
+        Cities cities = cityRepository.findById(employeeAreaWorkgroupDto.getCityId()).get();
 
         validateUpdate(existingEawg,areaWorkGroup,employees,cities);
         setEawg(existingEawg,areaWorkGroup,employees);
