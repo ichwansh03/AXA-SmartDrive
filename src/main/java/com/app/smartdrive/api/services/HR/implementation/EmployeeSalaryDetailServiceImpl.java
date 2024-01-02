@@ -3,7 +3,6 @@ package com.app.smartdrive.api.services.HR.implementation;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
@@ -42,14 +41,7 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         List<TemplateSalary> templateSalaries = templateSalaryRepository.findAll();
         List<EmployeeSalaryDetail> salaryDetails = new ArrayList<>();
 
-//         BigDecimal totalPremi = new BigDecimal(100000);
-
-        // List<ServiceOrders> listServiceOrders = soOrderRepository.findByServices_Users_UserEntityId(entityId);
-        
-        // List<Long> listEntityId = listServiceOrders.stream().map(so -> so.getEmployees().getEawgEntityid()).toList();
-
-        // List<Double> listPremi = services.getServicePremiSet().stream().map(prem -> prem.getSemiPremiDebet()).toList();
-        // List<ServicePremi> listServicePremi = semiRepository.findAllBySemiServId(pl.getServices().getServId());
+         BigDecimal totalPremi = new BigDecimal(100000);
 
         ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndEmployees_EawgEntityid(entityId);
 
@@ -71,16 +63,12 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
 
             BigDecimal calculatedSubtotal ;
 
-
-
-            if(Objects.isNull(rateMin)){
+            if (Objects.isNull(rateMin)) {
                 calculatedSubtotal = servicePremi;
-            }else {
-                if ("FAM".equals(employees.getEmpJobCode()) && Objects.nonNull(rateMax)) {
-                    calculatedSubtotal = servicePremi.multiply(rateMax);
-                } else {
-                    calculatedSubtotal = servicePremi.multiply(rateMin);
-                }
+            } else if ("FAM".equals(employees.getEmpJobCode()) && Objects.nonNull(rateMax)) {
+                calculatedSubtotal = servicePremi.multiply(rateMax);
+            } else {
+                calculatedSubtotal = servicePremi.multiply(rateMin);
             }
 
             salaryDetail.setEmsaSubtotal(calculatedSubtotal);

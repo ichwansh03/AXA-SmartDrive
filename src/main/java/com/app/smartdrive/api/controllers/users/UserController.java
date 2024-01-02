@@ -37,7 +37,7 @@ public class UserController {
     return TransactionMapper.mapEntityToDto(user, UserDto.class);
   }
 
-  @PatchMapping("/{id}")
+  @PutMapping("/{id}")
   public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequestDto userPost,
       @PathVariable("id") Long id) {
     UpdateUserRequestDto userUpdated = userService.updateUser(userPost, id);
@@ -46,15 +46,12 @@ public class UserController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
-    Optional<User> user = userService.getUserById(id);
-      if(user.isPresent()){
-        userService.deleteById(id);
-        return ResponseEntity.status(HttpStatus.OK).body("User sudah dihapus");
-      }
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User Not found");
+    userService.getById(id);
+    userService.deleteById(id);
+    return ResponseEntity.status(HttpStatus.OK).body("User sudah dihapus");
   }
 
-  @PatchMapping("/{id}/changeEmail")
+  @PutMapping("/{id}/changeEmail")
   public ResponseEntity<?> changeEmail(@PathVariable("id") Long id, @RequestBody String email){
     userService.changeEmail(id, email);
     return ResponseEntity.ok(new MessageResponse("email has changed: " + email));

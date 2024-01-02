@@ -29,29 +29,13 @@ public class BatchPartnerInvoiceServiceImpl implements BatchPartnerInvoiceServic
 
     private final CustomerClaimService customerClaimService;
 
-    @Override
-    public BatchPartnerInvoice getById(String s) {
-        return null;
-    }
-
-    @Override
-    public List<BatchPartnerInvoice> getAll() {
-        return null;
-    }
-
-    @Override
     public BatchPartnerInvoice save(BatchPartnerInvoice entity) {
         return null;
     }
 
-    @Override
+
     public void deleteById(String s) {
         bpinRepository.deleteById(s);
-    }
-
-    @Override
-    public List<BatchPartnerInvoice> generateBpin() {
-        return null;
     }
 
     @Override

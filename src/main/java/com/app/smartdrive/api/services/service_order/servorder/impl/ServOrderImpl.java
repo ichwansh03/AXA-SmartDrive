@@ -1,9 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
-import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -14,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +23,6 @@ public class ServOrderImpl implements ServOrderService {
 
     private final SoOrderRepository soOrderRepository;
 
-    @Transactional(readOnly = true)
     @Override
     public ServiceOrders findServiceOrdersById(String seroId) {
         ServiceOrders serviceOrdersById = soOrderRepository.findById(seroId)
@@ -35,15 +31,9 @@ public class ServOrderImpl implements ServOrderService {
         return serviceOrdersById;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<ServiceOrders> findAllSeroByServId(Long servId) {
         List<ServiceOrders> allSeroByServId = soOrderRepository.findByServices_ServId(servId);
-
-        if (allSeroByServId.isEmpty()){
-            throw new EntityNotFoundException("findAllSeroByServId(Long servId)::Service ID is not found");
-        }
-
         log.info("SoOrderServiceImpl::findAllSeroByServId from service ID {} ",servId);
 
         return allSeroByServId;
@@ -52,10 +42,6 @@ public class ServOrderImpl implements ServOrderService {
     @Override
     public List<ServiceOrders> findAllSeroByUserId(Long custId) {
         List<ServiceOrders> entityId = soOrderRepository.findByServices_Users_UserEntityId(custId);
-
-        if (entityId.isEmpty()) {
-            throw new EntityNotFoundException("findAllSeroByUserId(Long custId)::custId is not found");
-        }
 
         log.info("SoOrderServiceImpl::findAllSeroByServId from user ID {} ",custId);
 
@@ -76,18 +62,6 @@ public class ServOrderImpl implements ServOrderService {
         }
 
         return serviceOrdersPage.map(serviceOrders -> TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class));
-    }
-
-    @Transactional
-    @Override
-    public int selectPartner(Partner partner, String seroId) {
-        int selected = soOrderRepository.selectPartner(partner, seroId);
-
-        if (selected == 0) {
-            throw new ValidasiRequestException("Failed to update data", 400);
-        }
-
-        return selected;
     }
 
 }

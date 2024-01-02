@@ -6,6 +6,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,17 +20,28 @@ import java.util.Optional;
 @Service
 public class JwtService {
 
-  private final String jwtSigningKey = "F54D1DC2E823404A9D4CD0B6613839E1DB997175F26A66EB747A9573A4F72AD9";
-  private String COOKIE_NAME = "jwtcookie";
-  private String REFRESH_COOKIE = "refreshjwt";
+  @Value("${jwt.token.signing-key}")
+  private String jwtSigningKey;
+  @Value("${jwt.cookie.name}")
+  private String COOKIE_NAME;
 
-  private final Algorithm JWT_ALGORITHM = Algorithm.HMAC256(jwtSigningKey);
-  private final JWTVerifier JWT_VERIFIER = JWT.require(JWT_ALGORITHM).build();
+  @Value("${jwt.refresh.cookie}")
+  private String REFRESH_COOKIE;
+
+  private Algorithm JWT_ALGORITHM;
+  private JWTVerifier JWT_VERIFIER;
   @Value("${jwt.expired}")
   private int MAX_AGE_SECONDS;
 
   @Value("${jwt.refreshExpired}")
   private int MAX_AGE_REFRESH;
+
+  @PostConstruct
+  public void init() {
+    this.JWT_ALGORITHM = Algorithm.HMAC256(jwtSigningKey);
+    this.JWT_VERIFIER = JWT.require(JWT_ALGORITHM).build();
+  }
+
   public Optional<DecodedJWT> getValidatedToken(String token){
     try{
       return Optional.of(JWT_VERIFIER.verify(token));

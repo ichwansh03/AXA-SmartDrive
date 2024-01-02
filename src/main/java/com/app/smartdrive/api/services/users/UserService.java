@@ -2,23 +2,22 @@ package com.app.smartdrive.api.services.users;
 
 import java.util.List;
 import java.util.Optional;
-import com.app.smartdrive.api.dto.user.ProfileDto;
+
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
-import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
-import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
-import com.app.smartdrive.api.services.BaseService;
-import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.transaction.annotation.Transactional;
 
-
-public interface UserService extends BaseService<User, Long> {
+public interface UserService {
   User createAdmin(CreateUserDto userPost);
 
   User save(User user);
+
+  @Transactional
+  void deleteById(Long id);
 
   User createUserCustomer(CreateUserDto userPost, RoleName roleName);
 
@@ -28,12 +27,11 @@ public interface UserService extends BaseService<User, Long> {
 
   UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id);
 
-  Optional<User> getUserById(Long id);
+//  UserDetailsService userDetailsService();
 
-  UserDetailsService userDetailsService();
+  User getById(Long id);
+
+  List<User> getAll();
 
   void changeEmail(Long id, String newEmail);
-
-
-
 }

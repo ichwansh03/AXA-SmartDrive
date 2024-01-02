@@ -1,10 +1,14 @@
 package com.app.smartdrive.api.services.master.implementation;
 
+import com.app.smartdrive.api.dto.master.request.TestaReq;
+import com.app.smartdrive.api.dto.master.response.TestaRes;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TestaRepository;
-import com.app.smartdrive.api.services.master.TestaService;
+import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,22 +16,24 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TestaServiceImpl implements TestaService {
+@Qualifier("testaServiceImpl")
+public class TestaServiceImpl implements MasterService<TestaRes, TestaReq, Long> {
     private final TestaRepository repository;
 
     @Override
-    public TemplateServiceTask getById(Long aLong) {
-        return repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Service Task : " + aLong + " Not Found"));
+    public TestaRes getById(Long aLong) {
+        return TransactionMapper.mapEntityToDto(repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Service Task : " + aLong + " Not Found")), TestaRes.class);
     }
 
     @Override
-    public List<TemplateServiceTask> getAll() {
-        return repository.findAll();
+    public List<TestaRes> getAll() {
+        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), TestaRes.class);
     }
 
     @Override
     @Transactional
-    public TemplateServiceTask save(TemplateServiceTask entity) {
-        return repository.save(entity);
+    public TestaRes save(TestaReq entity) {
+        TemplateServiceTask templateInsurancePremi = repository.save(TransactionMapper.mapDtoToEntity(entity, new TemplateServiceTask()));
+        return TransactionMapper.mapEntityToDto(templateInsurancePremi, TestaRes.class);
     }
 }

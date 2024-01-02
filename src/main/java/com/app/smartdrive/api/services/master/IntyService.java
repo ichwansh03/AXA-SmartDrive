@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.services.master;
 
-import com.app.smartdrive.api.entities.master.InsuranceType;
-import com.app.smartdrive.api.services.BaseService;
+import com.app.smartdrive.api.dto.master.request.IntyReq;
+import com.app.smartdrive.api.dto.master.response.IntyRes;
 
-public interface IntyService extends BaseService<InsuranceType, String> {
+public interface IntyService extends MasterService<IntyRes, IntyReq, String> {
 }

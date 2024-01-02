@@ -129,9 +129,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional(readOnly = true)
     @Override
     public Page<CustomerRequest> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status) {
-        User user = this.userService.getUserById(customerId).orElseThrow(
-                () -> new EntityNotFoundException("User with id " + customerId + " is not found")
-        );
+        User user = this.userService.getById(customerId);
 
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
 
@@ -396,9 +394,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional
     @Override
     public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess) {
-        User customer = this.userService.getUserById(userEntityId).orElseThrow(
-                () -> new EntityNotFoundException("User with id " + userEntityId + " is not found")
-        );
+        User customer = this.userService.getById(userEntityId);
 
         this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, grantUserAccess? "ACTIVE":"INACTIVE");
 
@@ -414,8 +410,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     ){
 
         this.userRolesService.updateRoleFromPcToCu(customer.getUserEntityId());
-        User updatedCustomer = userService.getUserById(customer.getUserEntityId())
-                .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
+        User updatedCustomer = userService.getById(customer.getUserEntityId());
 
         CustomerRequest customerRequest = CustomerRequest.builder()
                 .businessEntity(newEntity)

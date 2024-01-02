@@ -3,21 +3,20 @@ package com.app.smartdrive.api.services.HR.implementation;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.user.response.UserRoleDto;
+import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.entities.users.*;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.Exceptions.EmployeesNotFoundException;
-import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
-import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.dto.user.UserUserAccountDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UserAddressRequestDto;
@@ -30,7 +29,6 @@ import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.app.smartdrive.api.entities.hr.JobType;
 import com.app.smartdrive.api.entities.hr.EnumClassHR.emp_type;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.HR.JobTypeRepository;
@@ -66,12 +64,15 @@ public class EmployeesServiceImpl implements EmployeesService {
 
 
     @Override
-    public Employees createEmployee(EmployeesRequestDto employeesDto) {
+    @Transactional
+    public EmployeesResponseDto createEmployee(EmployeesRequestDto employeesDto) {
     
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
 
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).orElseThrow(() ->
                 new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
+
+        User user = createUserFromDto(employeesDto);
 
         Employees employee = Employees.builder()
                 .empName(employeesDto.getEmpName())
@@ -83,44 +84,31 @@ public class EmployeesServiceImpl implements EmployeesService {
                 .empNetSalary(employeesDto.getEmpSalary())
                 .jobType(jobType)
                 .empJobCode(employeesDto.getJobType())
+                .user(user)
+                .empEntityid(user.getUserEntityId())
                 .empModifiedDate(LocalDateTime.now())
                 .build();
 
-        
-//        employee.setEmpName(employeesDto.getEmpName());
-//        employee.setEmpJoinDate(empJoinDate);
-//        employee.setEmpStatus(EnumClassHR.status.INACTIVE);
-//        employee.setEmpType(emp_type.PERMANENT);
-//        employee.setEmpGraduate(employeesDto.getEmpGraduate());
-//        employee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
-//        employee.setEmpNetSalary(employeesDto.getEmpSalary());
-//        employee.setJobType(jobType);
-//        employee.setEmpJobCode(employeesDto.getJobType());
-//        employee.setEmpModifiedDate(LocalDateTime.now());
-        
-        User user = createUserFromDto(employeesDto);
         if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
             user.setUserPassword(passwordEncoder.encode(employeesDto.getEmpPhone().getUsphPhoneNumber()));
-
-
         }
 
         userRolesService.createUserRole(RoleName.EM,user,employeesDto.getGrantAccessUser());
         createUserPhonefromDto(user, employeesDto.getEmpPhone());
         createUserAccountFromDto(user, employeesDto.getEmpAccountNumber());
-        createUserAddressFromDto(user, employeesDto.getEmpAddress());    
-        
-        employee.setEmpEntityid(user.getUserEntityId());
-        employee.setUser(user);           
+        createUserAddressFromDto(user, employeesDto.getEmpAddress());
 
-        return employeesRepository.save(employee);
+        Employees saveEmp = employeesRepository.save(employee);
+
+        return TransactionMapper.mapEntityToDto(saveEmp,EmployeesResponseDto.class);
     }
 
     private User createUserFromDto(EmployeesRequestDto employeesDto) {
         ProfileRequestDto profileRequestDto = new ProfileRequestDto();
         profileRequestDto.setUserEmail(employeesDto.getEmail());
         profileRequestDto.setUserFullName(employeesDto.getEmpName());
+        profileRequestDto.setUserBirthPlace(employeesDto.getUserBirthPlace());
         profileRequestDto.setUserNationalId("idn" + employeesDto.getEmail());
         profileRequestDto.setUserNpwp("npwp" + employeesDto.getEmail());
         User user = userService.createUser(profileRequestDto);
@@ -137,7 +125,6 @@ public class EmployeesServiceImpl implements EmployeesService {
         userAccountService.createUserAccounts(listUserAccount, user, 1L);
     }
 
-
     private void createUserPhonefromDto(User user, UserPhoneRequestDto userPhoneDto) {
         UserPhoneIdDto userPhoneIdDto = new UserPhoneIdDto();
         userPhoneIdDto.setUsphPhoneNumber(userPhoneDto.getUsphPhoneNumber());
@@ -150,7 +137,6 @@ public class EmployeesServiceImpl implements EmployeesService {
         listPhone.add(newUserPhoneDto);
         userPhoneService.createUserPhone(user, listPhone);
     }
-
 
     private void createUserAddressFromDto(User user, UserAddressRequestDto userAddressDto) {
         UserAddressDto newUserAddressDto = new UserAddressDto();
@@ -165,10 +151,9 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     @Override
     @Transactional
-    public Employees editEmployee(Long employeeId, EmployeesRequestDto employeesDto) {
+    public EmployeesResponseDto updateEmployee(Long employeeId, EmployeesRequestDto employeesDto) {
     
-        Employees existingEmployee = employeesRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeesNotFoundException("Employee not found with id: " + employeeId));
+        Employees existingEmployee = getById(employeeId);
 
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).get();
@@ -196,14 +181,16 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         updateAddressEmployees(user, employeesDto.getEmpAddress());
         updateEmployeePhone(user, employeesDto.getEmpPhone());
-        
-        return employeesRepository.save(existingEmployee);
+
+        Employees saveEmp = employeesRepository.save(existingEmployee);
+
+        return TransactionMapper.mapEntityToDto(saveEmp,EmployeesResponseDto.class);
     }
 
     private void updateUserFromDto(User user, EmployeesRequestDto employeesDto) {
         user.setUserEmail(employeesDto.getEmail());
         user.setUserFullName(employeesDto.getEmpName());
-
+        user.setUserBirthPlace(employeesDto.getUserBirthPlace());
     }
 
     private void updateEmployeePhone(User user, UserPhoneRequestDto userPhoneDto) {
@@ -223,9 +210,13 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
 
     @Override
-    public Page<Employees> searchEmployees(String value, int page, int size) {
+    public Page<EmployeesResponseDto> searchEmployees(String value, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return employeesRepository.findByEmpNameOrEmpGraduate(value, pageable);
+        Page<Employees> employeesPage = employeesRepository.findByEmpNameOrEmpGraduate(value, pageable);
+        List<EmployeesResponseDto> employeesResponseList = employeesPage.getContent().stream()
+                .map(emp -> TransactionMapper.mapEntityToDto(emp, EmployeesResponseDto.class))
+                .toList();
+        return new PageImpl<>(employeesResponseList, pageable, employeesPage.getTotalElements());
     }
 
     @Override
@@ -242,18 +233,15 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         return existEmployees;
     }
-
-
-
     @Override
     @Transactional
-    public Page<Employees> getAll(Pageable pageable) {
-        return employeesRepository.findAll(pageable);
+    public Page<EmployeesResponseDto> getAll(Pageable pageable) {
+
+        Page<Employees> employeesPage = employeesRepository.findAll(pageable);
+
+        List<EmployeesResponseDto> employeesResponseList = employeesPage.getContent().stream()
+                .map(emp -> TransactionMapper.mapEntityToDto(emp, EmployeesResponseDto.class))
+                .toList();
+        return new PageImpl<>(employeesResponseList, pageable, employeesPage.getTotalElements());
     }
-
-    
-
-    
-
-    
 }

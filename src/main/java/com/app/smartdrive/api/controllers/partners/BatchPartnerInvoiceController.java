@@ -15,8 +15,8 @@ public class BatchPartnerInvoiceController {
 
     private final BatchPartnerInvoiceService bpinService;
 
-    @PostMapping
-    public ResponseEntity<BatchPartnerInvoice> createOne(@RequestParam(name = " ") String seroId){
+    @GetMapping("{seroId}")
+    public ResponseEntity<BatchPartnerInvoice> createOne(@PathVariable("seroId")String seroId){
         BatchPartnerInvoice batchPartnerInvoice = bpinService.createOne(seroId);
         return ResponseEntity.ok(batchPartnerInvoice);
     }

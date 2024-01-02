@@ -18,6 +18,7 @@ import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.users.BusinessEntityService;
 import com.app.smartdrive.api.services.users.UserRolesService;
 import com.app.smartdrive.api.services.users.UserService;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,10 +38,10 @@ import java.util.Objects;
 public class PartnerServiceImpl implements PartnerService {
 
     private final PartnerRepository partnerRepository;
-    private final CityService cityService;
+    private final CityRepository cityRepository;
     private final UserService userService;
     private final UserRolesService userRolesService;
-    @Override
+
     @Transactional
     public Partner getById(Long entityId) {
         return partnerRepository.findById(entityId).orElseThrow(() -> {
@@ -48,13 +49,11 @@ public class PartnerServiceImpl implements PartnerService {
         });
     }
 
-    @Override
     @Transactional
     public List<Partner> getAll() {
         return partnerRepository.findAll();
     }
 
-    @Override
     public Partner save(Partner partner) {
         partner.getBusinessEntity().setEntityModifiedDate(LocalDateTime.now());
         return partnerRepository.save(partner);
@@ -90,7 +89,6 @@ public class PartnerServiceImpl implements PartnerService {
         return partner;
     }
 
-    @Override
     @Transactional
     public void deleteById(Long id) {
         partnerRepository.delete(getById(id));
@@ -98,7 +96,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     public Partner create(PartnerRequest request) {
-        Cities city = cityService.getById(request.getCityId());
+        Cities city = cityRepository.findById(request.getCityId()).orElseThrow(()-> new EntityNotFoundException("City not found"));
         Partner partner = new Partner();
         partner = TransactionMapper.mapDtoToEntity(request, partner);
         partner.setPartAccountNo(request.getPartAccountNo());

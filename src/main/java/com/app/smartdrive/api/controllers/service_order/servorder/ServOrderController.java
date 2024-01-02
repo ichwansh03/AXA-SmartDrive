@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/sero")
+@RequestMapping("/service")
 @RequiredArgsConstructor
 @Slf4j
 public class ServOrderController {
@@ -42,7 +42,7 @@ public class ServOrderController {
     @PutMapping("/partner/{seroId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToAddPartner(@Valid @RequestBody Partner partner, @PathVariable("seroId") String seroId){
-        servOrderService.selectPartner(partner, seroId);
+        serviceOrderFactory.selectPartner(partner, seroId);
         return new ResponseEntity<>(partner, HttpStatus.OK);
     }
 
@@ -56,8 +56,7 @@ public class ServOrderController {
     @GetMapping("/request")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getPageServiceOrders(
-            @Valid @RequestBody PagingServiceOrder pagingServiceOrder,
-            @RequestParam("userId") Long userId
+            @Valid @RequestBody PagingServiceOrder pagingServiceOrder
     ){
 
         Pageable paging;

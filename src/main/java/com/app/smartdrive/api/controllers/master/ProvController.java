@@ -1,11 +1,7 @@
 package com.app.smartdrive.api.controllers.master;
 
-import com.app.smartdrive.api.controllers.BaseController;
-import com.app.smartdrive.api.dto.master.response.ProvRes;
 import com.app.smartdrive.api.dto.master.request.ProvReq;
-import com.app.smartdrive.api.entities.master.Provinsi;
-import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.services.master.ProvService;
+import com.app.smartdrive.api.services.master.MasterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,30 +13,31 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/provinsi")
 @Tag(name = "Master Module")
-public class ProvController implements BaseController<ProvReq, Long> {
-    private final ProvService service;
+public class ProvController implements MasterController<ProvReq, Long> {
+    private final MasterService provServiceImpl;
 
     @Override
     @GetMapping
     public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(TransactionMapper.mapEntityListToDtoList(service.getAll(), ProvRes.class));
+        return ResponseEntity.ok(provServiceImpl.getAll());
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> findDataById(@PathVariable Long id) {
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(service.getById(id), ProvRes.class));
+        return ResponseEntity.ok(provServiceImpl.getById(id));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<?> saveData(@Valid @RequestBody ProvReq request) {
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, new Provinsi())), HttpStatus.CREATED);
+        return new ResponseEntity<>(provServiceImpl.save(request), HttpStatus.CREATED);
     }
 
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody ProvReq request) {
-        return new ResponseEntity<>(service.save(TransactionMapper.mapDtoToEntity(request, service.getById(id))), HttpStatus.CREATED);
+        provServiceImpl.getById(id);
+        return new ResponseEntity<>(provServiceImpl.save(request), HttpStatus.CREATED);
     }
 }

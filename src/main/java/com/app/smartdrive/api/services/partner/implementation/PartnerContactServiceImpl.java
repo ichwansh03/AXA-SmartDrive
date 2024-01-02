@@ -43,24 +43,21 @@ public class PartnerContactServiceImpl implements PartnerContactService {
     private final UserRolesService userRolesService;
     private final UserPhoneService userPhoneService;
 
-
-    @Override
     public PartnerContact getById(PartnerContactEntityId partnerContactEntityId) {
         return partnerContactRepository.findById(partnerContactEntityId).orElseThrow(()->new EntityNotFoundException("Partner Contact Not Found"));
     }
 
-    @Override
+
     public List<PartnerContact> getAll() {
         return partnerContactRepository.findAll();
     }
 
-    @Override
+
     @Transactional
     public PartnerContact save(PartnerContact entity) {
         return partnerContactRepository.save(entity);
     }
 
-    @Override
     public void deleteById(PartnerContactEntityId partnerContactEntityId) {
         partnerContactRepository.deleteById(partnerContactEntityId);
 
@@ -118,7 +115,7 @@ public class PartnerContactServiceImpl implements PartnerContactService {
 
     @Transactional
     public PartnerContact edit(PartnerContactRequest request, Long userId) {
-        User user = userService.getUserById(userId).orElseThrow(() -> new EntityNotFoundException("Partner Contact Not Found"));
+        User user = userService.getById(userId);
         Partner partner = partnerService.getById(request.getPartnerId());
         UserPhone userPhone = user.getUserPhone().get(0);
          if(!userPhone.getUserPhoneId().getUsphPhoneNumber().equals(request.getPhone())){

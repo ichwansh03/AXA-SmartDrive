@@ -19,4 +19,6 @@ public interface BatchEmployeeSalaryRepository extends JpaRepository<BatchEmploy
     List<BatchEmployeeSalary> findAllByBesaPatrTrxno(String besaPatrTrxno);
 
     Optional<BatchEmployeeSalary> findByBesaEmpEntityidAndBesaCreatedDate(Long besaEmpEntityId, LocalDate besaCreateDate);
+
+    Boolean existsByBesaEmpEntityidAndBesaCreatedDate(Long besaEmpEntityId, LocalDate besaCreateDate);
 }

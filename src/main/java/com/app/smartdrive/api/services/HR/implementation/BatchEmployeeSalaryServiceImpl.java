@@ -3,17 +3,16 @@ package com.app.smartdrive.api.services.HR.implementation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.app.smartdrive.api.dto.HR.response.EmployeeSalaryDetailResponseDto;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.HR.EmployeesService;
 import org.springframework.stereotype.Service;
-
 import com.app.smartdrive.api.entities.hr.BatchEmployeeSalary;
-import com.app.smartdrive.api.entities.hr.BatchEmployeeSalaryId;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.repositories.HR.BatchEmployeeSalaryRepository;
@@ -21,22 +20,29 @@ import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.services.HR.BatchEmployeeSalaryService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryService {
-    
+
     private final BatchEmployeeSalaryRepository batchEmployeeSalaryRepository;
 
-    private final EmployeesRepository employeesRepository;
+    private final EmployeesService employeesService;
     
     @Override
     public BatchEmployeeSalary createOne(Long id) {
-        Employees employees = employeesRepository.findById(id).get();
+        Employees employees = employeesService.getById(id);
         BigDecimal salary = calculateTotalCommission(employees.getEmployeeSalaryDetails()).add(employees.getEmpNetSalary());
+
+        LocalDate currentDate = LocalDate.of(2023,10,10);
+        if (batchEmployeeSalaryRepository.existsByBesaEmpEntityidAndBesaCreatedDate(id, currentDate)) {
+            throw new IllegalStateException("EmployeeSalary already exists for the current date");
+        }
+
         BatchEmployeeSalary batchEmployeeSalary = BatchEmployeeSalary.builder()
                 .besaEmpEntityid(id)
-                .besaCreatedDate(LocalDate.now())
+                .besaCreatedDate(currentDate)
                 .employees(employees)
                 .besaStatus(employees.getEmpStatus())
                 .besaAccountNumber(employees.getEmpAccountNumber())
@@ -48,6 +54,7 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
     }
 
     @Override
+    @Transactional
     public List<BatchEmployeeSalary> getAllTransNull() {
         return batchEmployeeSalaryRepository.findAllByBesaPatrTrxno(null);
     }
@@ -61,9 +68,8 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
     }
 
     @Override
-    public List<EmployeeSalaryDetail> getAllCommission(Long besaEmpEntityId, LocalDate besaCreateDate) {
+    public List<EmployeeSalaryDetailResponseDto> getAllCommission(Long besaEmpEntityId, LocalDate besaCreateDate) {
         List<EmployeeSalaryDetail> result = new ArrayList<>();
-
 
         // Mendapatkan BatchEmployeeSalary berdasarkan besa_emp_entityid dan besa_create_date
         Optional<BatchEmployeeSalary> optionalBatchEmployeeSalary = batchEmployeeSalaryRepository
@@ -97,12 +103,9 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
                 netSalaryDetail.setEmsaSubtotal(batchEmployeeSalary.getEmployees().getEmpNetSalary());
                 netSalaryDetail.setEmployees(employees);
                 result.add(netSalaryDetail);
-
         }
 
-        return result;
+        return TransactionMapper.mapEntityListToDtoList(result,EmployeeSalaryDetailResponseDto.class);
     }
-
-
 
 }

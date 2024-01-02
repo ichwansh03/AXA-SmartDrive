@@ -23,26 +23,18 @@ import java.util.List;
 public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupService {
 
     private final PartnerAreaWorkGroupRepository partnerAreaWorkGroupRepository;
-    private final ArwgService arwgService;
+    private final ArwgRepository arwgRepository;
     private final PartnerContactService partnerContactService;
 
 
-    @Override
     public PartnerAreaWorkgroup getById(PartnerAreaWorkGroupId id) {
         return partnerAreaWorkGroupRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Partner Area WorkGroup Not Found"));
     }
 
-    @Override
     public List<PartnerAreaWorkgroup> getAll() {
         return partnerAreaWorkGroupRepository.findAll();
     }
 
-    @Override
-    public PartnerAreaWorkgroup save(PartnerAreaWorkgroup pawo) {
-        return null;
-    }
-
-    @Override
     public void deleteById(PartnerAreaWorkGroupId id) {
         partnerAreaWorkGroupRepository.deleteById(id);
     }
@@ -52,8 +44,8 @@ public class PartnerAreaWorkgroupServiceImpl implements PartnerAreaWorkgroupServ
     public PartnerAreaWorkgroup create(PartnerAreaWorkgroupRequest request) {
         PartnerAreaWorkgroup pawo = new PartnerAreaWorkgroup();
 
-        AreaWorkGroup areaWorkGroup = arwgService.getById(request.getAreaWorkgroupId());
-        PartnerContact partnerContact = partnerContactService.getById(request.getPartnerContactId());
+        AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode(request.getAreaWorkgroupId());
+        PartnerContact partnerContact = partnerContactService.getById(pawo.getPartnerContact().getId());
 
         pawo.setPartnerContact(partnerContact);
         pawo.setAreaWorkGroup(areaWorkGroup);

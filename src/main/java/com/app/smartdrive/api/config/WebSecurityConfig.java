@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,10 +26,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-//    private final OldJwtFilter oldJwtFilter;
     private final AuthEntryPointJwt authEntryPointJwt;
     private final AccessDeniedHandler accessDeniedHandler;
-    private final UserService userService;
+    private final UserDetailsService userDetailServiceImpl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -55,7 +55,7 @@ public class WebSecurityConfig {
     @Autowired
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userService.userDetailsService());
+        authenticationProvider.setUserDetailsService(userDetailServiceImpl);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }

@@ -24,13 +24,6 @@ public class BatchEmployeeSalary {
 
     @Id
     @Column(name = "besa_emp_entity_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.TABLE,
-            generator = "besaEmpEntityid-generator")
-    @SequenceGenerator(
-            name = "besaEmpEntityid-generator",
-            sequenceName = "besa_emp_entity_id",
-            allocationSize = 1, schema = "hr"
-    )
     private Long besaEmpEntityid;
 
     @Id

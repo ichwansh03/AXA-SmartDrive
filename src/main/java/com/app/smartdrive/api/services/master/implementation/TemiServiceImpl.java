@@ -1,10 +1,14 @@
 package com.app.smartdrive.api.services.master.implementation;
 
+import com.app.smartdrive.api.dto.master.request.TemiReq;
+import com.app.smartdrive.api.dto.master.response.TemiRes;
 import com.app.smartdrive.api.entities.master.TemplateInsurancePremi;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TemiRepository;
-import com.app.smartdrive.api.services.master.TemiService;
+import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,23 +16,24 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TemiServiceImpl implements TemiService {
+@Qualifier("temiServiceImpl")
+public class TemiServiceImpl implements MasterService<TemiRes, TemiReq, Long> {
     private final TemiRepository repository;
 
     @Override
-    public TemplateInsurancePremi getById(Long aLong) {
-        return repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Template Insurance Premi ID : " + aLong + " Not Found"));
+    public TemiRes getById(Long aLong) {
+        return TransactionMapper.mapEntityToDto(repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Template Insurance Premi ID : " + aLong + " Not Found")), TemiRes.class);
     }
 
     @Override
-    public List<TemplateInsurancePremi> getAll() {
-        return repository.findAll();
+    public List<TemiRes> getAll() {
+        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), TemiRes.class);
     }
 
     @Override
     @Transactional
-
-    public TemplateInsurancePremi save(TemplateInsurancePremi entity) {
-        return repository.save(entity);
+    public TemiRes save(TemiReq entity) {
+        TemplateInsurancePremi templateInsurancePremi = repository.save(TransactionMapper.mapDtoToEntity(entity, new TemplateInsurancePremi()));
+        return TransactionMapper.mapEntityToDto(templateInsurancePremi, TemiRes.class);
     }
 }

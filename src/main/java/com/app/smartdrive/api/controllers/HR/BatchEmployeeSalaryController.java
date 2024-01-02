@@ -1,15 +1,9 @@
 package com.app.smartdrive.api.controllers.HR;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.app.smartdrive.api.dto.HR.request.EmployeeSalaryDetailRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeeSalaryDetailResponseDto;
-import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
-import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
-import com.app.smartdrive.api.mapper.TransactionMapper;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +25,7 @@ public class BatchEmployeeSalaryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BatchEmployeeSalary>> getAllTransNull(){
+    public ResponseEntity<?> getAllTransNull(){
         return ResponseEntity.ok(batchEmployeeSalaryService.getAllTransNull());
     }
 
@@ -39,16 +33,7 @@ public class BatchEmployeeSalaryController {
     public ResponseEntity<List<EmployeeSalaryDetailResponseDto>> getAllCommission(
             @RequestBody EmployeeSalaryDetailRequestDto employeeSalaryDetailRequestDto
     ) {
-        Long besaEmpEntityId = employeeSalaryDetailRequestDto.getBesaEmpEntityId();
-        LocalDate besaCreateDate = employeeSalaryDetailRequestDto.getBesaCreateDate();
-
-        List<EmployeeSalaryDetail> commissionDetails =
-                batchEmployeeSalaryService.getAllCommission(besaEmpEntityId, besaCreateDate);
-
-        List<EmployeeSalaryDetailResponseDto> commissionResponseDtoList =
-                TransactionMapper.mapEntityListToDtoList(commissionDetails, EmployeeSalaryDetailResponseDto.class);
-
-        return ResponseEntity.status(HttpStatus.OK).body(commissionResponseDtoList);
+        return ResponseEntity.status(HttpStatus.OK).body(batchEmployeeSalaryService.getAllCommission(employeeSalaryDetailRequestDto.getBesaEmpEntityId(),employeeSalaryDetailRequestDto.getBesaCreateDate()));
     }
 
 }

@@ -50,26 +50,16 @@ class PartnerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private CustomerRequestService customerRequestService;
+
     @Autowired
     PartnerService partnerService;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    UserService userService;
-    @Autowired
-    SoOrderRepository soOrderRepository;
-    @Autowired
     UserRepository userRepository;
-    @Autowired
-    ServService service;
-    @Autowired
-    ServOrderService servOrderService;
+
     @Autowired
     PartnerRepository partnerRepository;
-    @Autowired
-    CustomerRequestRepository customerRequestRepository;
 
     Partner partner;
 
@@ -84,43 +74,6 @@ class PartnerControllerTest {
     void tearDown() {
         partnerRepository.delete(partner);
     }
-
-    User createUser(String test){
-        ProfileRequestDto profil = new ProfileRequestDto();
-        profil.setUserName(test);
-        profil.setUserPassword(test);
-        profil.setUserEmail(test);
-        profil.setUserNpwp(test);
-        profil.setUserBirthDate(LocalDateTime.now().minusYears(36));
-        profil.setUserNationalId(test);
-        profil.setUserFullName(test);
-
-        return userService.createUser(profil);
-    }
-
-    CustomerRequest createCustomerRequest(String test, User user) throws Exception {
-        CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = new CustomerInscAssetsRequestDTO();
-        customerInscAssetsRequestDTO.setCiasPoliceNumber(test);
-        customerInscAssetsRequestDTO.setCiasYear("2010");
-        customerInscAssetsRequestDTO.setCiasIsNewChar('Y');
-        customerInscAssetsRequestDTO.setCiasPaidType("CASH");
-        customerInscAssetsRequestDTO.setCiasCarsId(1L);
-        customerInscAssetsRequestDTO.setCiasCityId(1L);
-        customerInscAssetsRequestDTO.setCiasIntyName("Comprehensive");
-        customerInscAssetsRequestDTO.setCiasStartdate("2023-01-01 15:02:00");
-        customerInscAssetsRequestDTO.setCurrentPrice(new BigDecimal(120000000));
-        customerInscAssetsRequestDTO.setCuexIds(new Long[]{7L,8L,9L});
-        CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();
-        customerRequestDTO.setCustomerId(user.getUserEntityId());
-        customerRequestDTO.setAgenId(1L);
-        customerRequestDTO.setEmployeeId(1L);
-        customerRequestDTO.setCustomerInscAssetsRequestDTO(customerInscAssetsRequestDTO);
-
-        return TransactionMapper.mapDtoToEntity(customerRequestService.create(customerRequestDTO,
-                new MultipartFile[]{new MockMultipartFile("TEST", "TEST", MediaType.TEXT_PLAIN_VALUE, "TEST".getBytes())}
-        ), new CustomerRequest());
-    }
-
 
     @Test
     void whenGetAllServiceByPartner() throws Exception {

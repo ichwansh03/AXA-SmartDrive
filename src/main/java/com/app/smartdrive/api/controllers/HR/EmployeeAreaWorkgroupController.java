@@ -1,10 +1,8 @@
 package com.app.smartdrive.api.controllers.HR;
 
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,13 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
-import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
-import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroup;
-import com.app.smartdrive.api.entities.hr.Employees;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -37,8 +30,20 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/eawg")
 public class EmployeeAreaWorkgroupController {
         private final EmployeeAreaWorkgroupService employeeAreaWorkgroupService;
-    
 
+    @PostMapping("/create")
+    @PreAuthorize("hasAuthority('Admin')")
+    public ResponseEntity<EmployeesAreaWorkgroupResponseDto> addEawg(@Valid @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupRequestDto){
+        return ResponseEntity.status(201).body(employeeAreaWorkgroupService.addEawg(employeeAreaWorkgroupRequestDto));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('Admin')")
+    public ResponseEntity<EmployeesAreaWorkgroupResponseDto> updateEawg(
+            @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto, @PathVariable("id") Long id){
+        return ResponseEntity.status(201).body(employeeAreaWorkgroupService.updateEawg(id,employeeAreaWorkgroupDto));
+
+    }
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> deleteEmployeesById (@PathVariable("id") Long eawg_id) {
@@ -52,13 +57,7 @@ public class EmployeeAreaWorkgroupController {
             @RequestParam(name = "value") String value,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<EmployeeAreaWorkgroup> eawgPage = employeeAreaWorkgroupService.searchEawg(value, page, size);
-        List<EmployeesAreaWorkgroupResponseDto> listResponse = eawgPage.getContent().stream()
-                .map(eawg -> TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class))
-                .toList();
-        return ResponseEntity.ok(new PageImpl<>(listResponse, pageable, eawgPage.getTotalElements()));
+        return ResponseEntity.ok(employeeAreaWorkgroupService.searchEawg(value,page,size));
     }
 
     @GetMapping
@@ -67,29 +66,8 @@ public class EmployeeAreaWorkgroupController {
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<EmployeeAreaWorkgroup> eawgPage = employeeAreaWorkgroupService.getAll(pageable);
 
-        List<EmployeesAreaWorkgroupResponseDto> listResponse = eawgPage.getContent().stream()
-                .map(eawg -> TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class))
-                .toList();
-
-        return ResponseEntity.ok(new PageImpl<>(listResponse, pageable, eawgPage.getTotalElements()));
+        return ResponseEntity.ok(employeeAreaWorkgroupService.getAll(pageable));
     }
 
-
-    @PostMapping("/create")
-    @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<EmployeesAreaWorkgroupResponseDto> addEawg(@Valid @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto){
-        EmployeeAreaWorkgroup eawg = employeeAreaWorkgroupService.createEawg(employeeAreaWorkgroupDto);
-        return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(eawg, EmployeesAreaWorkgroupResponseDto.class));
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<EmployeesAreaWorkgroupResponseDto> updateEawg(
-        @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto, @PathVariable("id") Long id){
-        EmployeeAreaWorkgroup employeeAreaWorkgroup = employeeAreaWorkgroupService.updateEawg(id, employeeAreaWorkgroupDto);
-        return ResponseEntity.status(201).body(TransactionMapper.mapEntityToDto(employeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class));
-        
-    }
 }
