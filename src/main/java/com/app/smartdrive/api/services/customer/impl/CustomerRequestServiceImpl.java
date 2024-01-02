@@ -22,6 +22,10 @@ import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.HR.EmployeeAreaWorkgroupRepository;
 import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
+import com.app.smartdrive.api.repositories.master.ArwgRepository;
+import com.app.smartdrive.api.repositories.master.CarsRepository;
+import com.app.smartdrive.api.repositories.master.CityRepository;
+import com.app.smartdrive.api.repositories.master.IntyRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
@@ -71,13 +75,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final CustomerClaimService customerClaimService;
 
-    private final CarsService carsService;
+    private final CarsRepository carsRepository;
 
-    private final IntyService intyService;
+    private final IntyRepository intyRepository;
 
-    private final CityService cityService;
+    private final CityRepository cityRepository;
 
-    private final ArwgService arwgService;
+    private final ArwgRepository arwgRepository;
 
     private final EmployeesService employeesService;
 
@@ -152,7 +156,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     @Transactional(readOnly = true)
     @Override
     public Page<CustomerRequest> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable paging, String type, String status) {
-        AreaWorkGroup existAreaWorkgroup = this.arwgService.getById(arwgCode);
+        AreaWorkGroup existAreaWorkgroup = this.arwgRepository.findByArwgCode(arwgCode);
         Employees existEmployee = this.employeesService.getById(employeeId);
         EmployeeAreaWorkgroup existEmployeeAreaworkgroup = this.employeeAreaWorkgroupRepository.findByAreaWorkGroupAndEmployees(existAreaWorkgroup, existEmployee).orElseThrow(
                 () -> new EntityNotFoundException("Agen with id : " + employeeId + " is not found")
@@ -186,9 +190,15 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         this.customerInscAssetsService.validatePoliceNumber(customerInscAssetsRequestDTO.getCiasPoliceNumber());
 
         User existCustomer = this.userService.getById(customerRequestDTO.getCustomerId());
-        CarSeries existCarSeries = this.carsService.getById(customerInscAssetsRequestDTO.getCiasCarsId());
-        Cities existCity = this.cityService.getById(customerInscAssetsRequestDTO.getCiasCityId());
-        InsuranceType existInsuranceType = this.intyService.getById(customerInscAssetsRequestDTO.getCiasIntyName());
+        CarSeries existCarSeries = this.carsRepository.findById(customerInscAssetsRequestDTO.getCiasCarsId()).orElseThrow(
+                () -> new EntityNotFoundException("Car Series with id "+ customerInscAssetsRequestDTO.getCiasCarsId() + " is not found")
+        );
+        Cities existCity = this.cityRepository.findById(customerInscAssetsRequestDTO.getCiasCityId()).orElseThrow(
+                () -> new EntityNotFoundException("Cities with id " + customerInscAssetsRequestDTO.getCiasCityId() + " is not found")
+        );
+        InsuranceType existInsuranceType = this.intyRepository.findById(customerInscAssetsRequestDTO.getCiasIntyName()).orElseThrow(
+                () -> new EntityNotFoundException("Insurance Type with  " + customerInscAssetsRequestDTO.getCiasIntyName() + " name is not found")
+        );
         EmployeeAreaWorkgroup existEmployeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(
                 customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()
         );
@@ -274,9 +284,15 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 }
         );
 
-        CarSeries existCarSeries = this.carsService.getById(customerInscAssetsRequestDTO.getCiasCarsId());
-        Cities existCity = this.cityService.getById(customerInscAssetsRequestDTO.getCiasCityId());
-        InsuranceType existInsuranceType = this.intyService.getById(customerInscAssetsRequestDTO.getCiasIntyName());
+        CarSeries existCarSeries = this.carsRepository.findById(customerInscAssetsRequestDTO.getCiasCarsId()).orElseThrow(
+                () -> new EntityNotFoundException("Car Series with id "+ customerInscAssetsRequestDTO.getCiasCarsId() + " is not found")
+        );
+        Cities existCity = this.cityRepository.findById(customerInscAssetsRequestDTO.getCiasCityId()).orElseThrow(
+                () -> new EntityNotFoundException("Cities with id " + customerInscAssetsRequestDTO.getCiasCityId() + " is not found")
+        );
+        InsuranceType existInsuranceType = this.intyRepository.findById(customerInscAssetsRequestDTO.getCiasIntyName()).orElseThrow(
+                () -> new EntityNotFoundException("Insurance Type with  " + customerInscAssetsRequestDTO.getCiasIntyName() + " name is not found")
+        );
         EmployeeAreaWorkgroup existEmployeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(
                 customerRequestDTO.getAgenId(), customerRequestDTO.getEmployeeId()
         );
@@ -343,9 +359,15 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
                 updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()
         );
 
-        CarSeries existCarSeries = this.carsService.getById(customerInscAssetsRequestDTO.getCiasCarsId());
-        Cities existCity = this.cityService.getById(customerInscAssetsRequestDTO.getCiasCityId());
-        InsuranceType existInsuranceType = this.intyService.getById(customerInscAssetsRequestDTO.getCiasIntyName());
+        CarSeries existCarSeries = this.carsRepository.findById(customerInscAssetsRequestDTO.getCiasCarsId()).orElseThrow(
+                () -> new EntityNotFoundException("Car Series with id "+ customerInscAssetsRequestDTO.getCiasCarsId() + " is not found")
+        );
+        Cities existCity = this.cityRepository.findById(customerInscAssetsRequestDTO.getCiasCityId()).orElseThrow(
+                () -> new EntityNotFoundException("Cities with id " + customerInscAssetsRequestDTO.getCiasCityId() + " is not found")
+        );
+        InsuranceType existInsuranceType = this.intyRepository.findById(customerInscAssetsRequestDTO.getCiasIntyName()).orElseThrow(
+                () -> new EntityNotFoundException("Insurance Type with  " + customerInscAssetsRequestDTO.getCiasIntyName() + " name is not found")
+        );
 
 
 
