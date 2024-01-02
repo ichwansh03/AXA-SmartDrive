@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class FintechDtoResponse {
-    private EnumPaymentType enumPaymentType;
-    private Long fint_entityid;
+    // private EnumPaymentType enumPaymentType;
+    // private Long fint_entityid;
     private String fint_name;
     private String fint_desc;
 }

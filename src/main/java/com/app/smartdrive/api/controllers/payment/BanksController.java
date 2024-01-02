@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +25,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.smartdrive.api.dto.payment.Request.Banks.BanksDtoRequests;
+import com.app.smartdrive.api.dto.payment.Request.Banks.PaymentRequestsDto;
 import com.app.smartdrive.api.dto.payment.Response.Banks.BanksDtoResponse;
-import com.app.smartdrive.api.dto.payment.Response.Banks.BanksIdForUserDtoResponse;
+import com.app.smartdrive.api.dto.payment.Response.Banks.PaymentDtoResponse;
 import com.app.smartdrive.api.entities.payment.Banks;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.Roles;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.entities.users.UserRolesId;
-import com.app.smartdrive.api.services.payment.BankService;
+import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.payment.PaymentService;
+
 import com.app.smartdrive.api.services.payment.implementation.BankServiceImpl;
 import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
@@ -45,58 +49,48 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequestMapping("/payment")
 public class BanksController {
-    private final BankService service;
+    private final PaymentService bankServiceImpl;
     private final BusinessEntityImpl serviceBusiness;
 
     @GetMapping("/banks/all")
     public ResponseEntity<?> getAllBanks(){
-        log.debug("Get All Bank ");
-        
-        try{
-            List<BanksDtoResponse> resultDto = service.getAll();
-            if(resultDto.isEmpty()){
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }else{
-                return new ResponseEntity<>(resultDto,HttpStatus.OK);
-            }
-        }catch (Exception e){
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        
-        
+        List<PaymentDtoResponse> response = bankServiceImpl.getAll();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping("/banks/{bank_entityid}")
     @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> getBanksById( @PathVariable("bank_entityid") Long bank_entityid){
-       BanksDtoResponse resultDto = service.getBankById(bank_entityid);
+       PaymentDtoResponse resultDto = bankServiceImpl.getById(bank_entityid);
        return new ResponseEntity<>(resultDto,HttpStatus.OK);
     }
 
     @PostMapping("/banks/add")
     @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<?> addBanks(@Valid @RequestBody BanksDtoRequests requests){
-       BanksDtoResponse resultDto = service.addBankss(requests);
-       return new ResponseEntity<>(resultDto,HttpStatus.CREATED);
+    public ResponseEntity<?> addBanks(@Valid @RequestBody PaymentRequestsDto requests){
+        
+        PaymentDtoResponse response = bankServiceImpl.addPayment(requests);
+        
+       
+       return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
     @PutMapping("/banks/update/{bank_entityid}")
     public ResponseEntity<?> updateBanks(@Valid @PathVariable("bank_entityid") Long bank_entityid, 
-    @RequestBody BanksDtoResponse banksDto){
-        Boolean newBank = service.updateBanks(bank_entityid,banksDto);
+    @RequestBody PaymentRequestsDto requests){
+        PaymentDtoResponse newBank = bankServiceImpl.updateById(bank_entityid,requests);
         return new ResponseEntity<>(newBank, HttpStatus.OK);
     }
 
     @DeleteMapping("/banks/delete/{bank_entityid}")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> deleteBanks(@Valid @PathVariable("bank_entityid") Long bank_entityid){
-        var deleteId = service.deleteBanks(bank_entityid);
-        
+        boolean deleteId = bankServiceImpl.deleteById(bank_entityid);
         return new ResponseEntity<>(deleteId, HttpStatus.OK);
     }   
-    @GetMapping("/banks/user/{bank_name}")
-    public ResponseEntity<?> getUserBanks(@Valid @PathVariable("bank_name") String bank_name){
-        BanksIdForUserDtoResponse getUser = service.getBanksUser(bank_name);
-        return new ResponseEntity<>(getUser, HttpStatus.OK);
+    // @GetMapping("/banks/user/{bank_name}")
+    // public ResponseEntity<?> getUserBanks(@Valid @PathVariable("bank_name") String bank_name){
+    //     BanksIdForUserDtoResponse getUser = service.getBanksUser(bank_name);
+    //     return new ResponseEntity<>(getUser, HttpStatus.OK);
 
-    } 
+    // } 
 }

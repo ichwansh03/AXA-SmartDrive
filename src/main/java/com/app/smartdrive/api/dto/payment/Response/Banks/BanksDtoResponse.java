@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class BanksDtoResponse  {
-    private Long bank_entityid;
     private String bank_name;
     private String bank_desc;
 }

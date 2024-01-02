@@ -5,6 +5,9 @@ import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
 
+import com.app.smartdrive.api.dto.payment.Response.Banks.BanksDtoResponse;
+import com.app.smartdrive.api.entities.payment.Banks;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,4 +52,5 @@ public class TransactionMapper {
         customMapper.map(dto, entity);
         return entity;
     }
+
 }

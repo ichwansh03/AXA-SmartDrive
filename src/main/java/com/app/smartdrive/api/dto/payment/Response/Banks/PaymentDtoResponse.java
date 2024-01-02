@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BanksIdForUserDtoResponse {
-    private EnumPaymentType enumPaymentType;
-    private Long bank_entity_id;
+public class PaymentDtoResponse {
+    private String payment_name;
+    private String payment_desc;
 }
