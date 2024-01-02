@@ -4,8 +4,6 @@ import com.app.smartdrive.api.dto.service_order.request.PagingServiceOrder;
 import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
-import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceOrderFactory;
 import jakarta.validation.Valid;
@@ -26,17 +24,16 @@ import java.util.Objects;
 @RequestMapping("/service")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin
 public class ServOrderController {
 
     private final ServOrderService servOrderService;
     private final ServiceOrderFactory serviceOrderFactory;
 
     @GetMapping("/search")
-    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId) {
-        ServiceOrders serviceOrders = servOrderService.findServiceOrdersById(seroId);
-        ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
-        return new ResponseEntity<>(serviceOrderRespDto, HttpStatus.OK);
+        ServiceOrderRespDto orderDtoById = servOrderService.findOrderDtoById(seroId);
+        return new ResponseEntity<>(orderDtoById, HttpStatus.OK);
     }
 
     @PutMapping("/partner/{seroId}")

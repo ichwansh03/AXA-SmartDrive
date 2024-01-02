@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,8 +24,6 @@ public class ServImpl implements ServService {
 
     private final SoRepository soRepository;
     private final ServOrderService servOrderService;
-    private final ServOrderTaskService servOrderTaskService;
-    private final ServOrderWorkorderService servOrderWorkorderService;
 
     private final ServPremiService servPremiService;
     private final ServPremiCreditService servPremiCreditService;
@@ -43,13 +39,11 @@ public class ServImpl implements ServService {
         CustomerRequest existCustomerRequest = customerRequestService.getById(services.getCustomer().getCreqEntityId());
         CustomerResponseDTO customerRequestById = TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
 
-        List<ServiceOrders> allSeroByServId = servOrderService.findAllSeroByServId(services.getServId());
-
-        List<ServiceOrderRespDto> serviceOrderRespDtos = getAllServiceOrderByServId(allSeroByServId);
+        List<ServiceOrderRespDto> serviceOrderRespDtos = servOrderService.findAllOrderByServId(servId);
 
         ServicePremi servicePremi = servPremiService.findByServId(services.getServId());
         SemiDto semiDto = TransactionMapper.mapEntityToDto(servicePremi, SemiDto.class);
-        List<SecrDto> secrDtoList = getServicePremiByServId(services.getServId());
+        List<SecrDto> secrDtoList = servPremiCreditService.findPremiCreditByServId(services.getServId());
         semiDto.setSecrDtoList(secrDtoList);
 
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
@@ -61,28 +55,4 @@ public class ServImpl implements ServService {
         return serviceRespDto;
     }
 
-    private List<ServiceOrderRespDto> getAllServiceOrderByServId(List<ServiceOrders> allSeroByServId){
-
-        return allSeroByServId.stream()
-                .map(serviceOrders -> {
-                    ServiceOrderRespDto dto = TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class);
-                    List<SoTasksDto> soTasksDtoList = servOrderTaskService.findSeotBySeroId(dto.getSeroId()).stream()
-                            .map(seot -> {
-                                SoTasksDto soTasksDto = TransactionMapper.mapEntityToDto(seot, SoTasksDto.class);
-                                List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(soTasksDto.getSeotId());
-                                soTasksDto.setServiceOrderWorkorders(TransactionMapper.mapEntityListToDtoList(sowoBySeotId, SoWorkorderDto.class));
-                                return soTasksDto;
-                            })
-                            .collect(toList());
-                    dto.setSoTasksDtoList(soTasksDtoList);
-                    return dto;
-                })
-                .toList();
-    }
-
-    private List<SecrDto> getServicePremiByServId(Long servId){
-        return servPremiCreditService.findByServId(servId).stream()
-                .map(secr -> TransactionMapper.mapEntityToDto(secr, SecrDto.class))
-                .toList();
-    }
 }

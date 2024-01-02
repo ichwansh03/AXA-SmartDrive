@@ -1,8 +1,11 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.dto.EmailReq;
+import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
+import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
@@ -13,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -26,13 +31,18 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
     private final EmailService emailService;
     private final ServOrderWorkorderService servOrderWorkorderService;
 
+
     @Override
-    public List<ServiceOrderTasks> findSeotBySeroId(String seroId) {
+    public List<SoTasksDto> findAllTaskByOrderId(String seroId) {
         List<ServiceOrderTasks> orderTasks = soTasksRepository.findByServiceOrders_SeroId(seroId);
-
-        log.info("SoOrderServiceImpl::findSeotBySeroId in ID {} ",seroId);
-
-        return orderTasks;
+        return orderTasks.stream()
+                .map(seot -> {
+                    SoTasksDto soTasksDto = TransactionMapper.mapEntityToDto(seot, SoTasksDto.class);
+                    List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(soTasksDto.getSeotId());
+                    soTasksDto.setServiceOrderWorkorders(TransactionMapper.mapEntityListToDtoList(sowoBySeotId, SoWorkorderDto.class));
+                    return soTasksDto;
+                })
+                .collect(toList());
     }
 
     @Override
