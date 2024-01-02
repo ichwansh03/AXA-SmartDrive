@@ -91,19 +91,5 @@ public class UserAccountsImpl implements UserAccountsService {
         return dto;
     }
 
-    @Override
-    public List<UserAccounts> getAll() {
    
-        return repositoryUA.findAll();
-    }
-
-    @Override
-    public UserAccounts getById(Long id) {
-        return repositoryUA.findById(id).get();
-    }
-
-    @Override
-    public UserAccounts save(UserAccounts entity) {
-        return repositoryUA.save(entity);
-    }
 }
