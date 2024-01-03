@@ -36,4 +36,6 @@ public interface UserService {
   void validateNPWP(String npwp);
 
   void validateNationalId(String nationalId);
+
+  void validateUserAccount(String number);
 }

@@ -285,17 +285,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         LocalDateTime birthDate = LocalDateTime.parse(createUserDto.getProfile().getUserByAgenBirthDate(), formatter);
 
         this.customerInscAssetsService.validatePoliceNumber(customerInscAssetsRequestDTO.getCiasPoliceNumber());
-
-        this.authenticationService.validateUsername(createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
-        this.authenticationService.validateEmail(createUserDto.getProfile().getUserEmail());
-
-
-        createUserDto.getUserPhone().forEach(
-                phone -> {
-                    if(userPhoneService.findByPhoneNumber(phone.getUserPhoneId().getUsphPhoneNumber()).isPresent())
-                        throw new UserPhoneExistException(phone.getUserPhoneId().getUsphPhoneNumber());
-                }
-        );
+        this.validateUser(createUserDto);
 
         CarSeries existCarSeries = this.carsRepository.findById(customerInscAssetsRequestDTO.getCiasCarsId()).orElseThrow(
                 () -> new EntityNotFoundException("Car Series with id "+ customerInscAssetsRequestDTO.getCiasCarsId() + " is not found")
@@ -432,6 +422,28 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         User customer = this.userService.getById(userEntityId);
 
         this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, grantUserAccess? "ACTIVE":"INACTIVE");
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public void validateUser(CreateUserDto createUserDto) {
+        this.authenticationService.validateUsername(createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
+        this.authenticationService.validateEmail(createUserDto.getProfile().getUserEmail());
+        this.userService.validateNPWP(createUserDto.getProfile().getUserNpwp());
+        this.userService.validateNationalId(createUserDto.getProfile().getUserNationalId());
+
+
+        createUserDto.getUserAccounts().stream().forEach(
+                userAccount -> {
+                    this.userService.validateUserAccount(userAccount.getUsac_accountno());
+                }
+        );
+
+        createUserDto.getUserPhone().stream().forEach(
+                phone -> {
+                    this.authenticationService.validateUserPhone(phone.getUserPhoneId().getUsphPhoneNumber());
+                }
+        );
     }
 
     @Transactional
