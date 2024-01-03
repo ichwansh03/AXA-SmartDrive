@@ -29,6 +29,7 @@ import com.app.smartdrive.api.repositories.master.IntyRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
+import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.customer.*;
 import com.app.smartdrive.api.services.master.ArwgService;
 import com.app.smartdrive.api.services.master.CarsService;
@@ -91,6 +92,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final UserRolesService userRolesService;
 
     private final UserPhoneService userPhoneService;
+
+    private final AuthenticationService authenticationService;
 
     // sementara
     private final UserRepository userRepository;
@@ -283,21 +286,9 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         this.customerInscAssetsService.validatePoliceNumber(customerInscAssetsRequestDTO.getCiasPoliceNumber());
 
-        if(userRepository.existsByUserName((createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber()))){
-            throw new UsernameExistException();
-        }
+        this.authenticationService.validateUsername(createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
+        this.authenticationService.validateEmail(createUserDto.getProfile().getUserEmail());
 
-        if(userRepository.existsByUserEmail(createUserDto.getProfile().getUserEmail())){
-            throw new EmailExistException();
-        };
-
-        if(userRepository.existsByUserNPWP(createUserDto.getProfile().getUserNpwp())){
-            throw new UserExistException("User with NPWP number " + createUserDto.getProfile().getUserNpwp() + " is already exist");
-        }
-
-        if(userRepository.existsByUserNationalId(createUserDto.getProfile().getUserNationalId())){
-            throw new UserExistException("User with national id " + createUserDto.getProfile().getUserNationalId() + " is already exist");
-        }
 
         createUserDto.getUserPhone().forEach(
                 phone -> {

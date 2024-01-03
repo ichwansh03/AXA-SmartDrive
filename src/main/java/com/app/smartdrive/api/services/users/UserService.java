@@ -32,4 +32,8 @@ public interface UserService {
   List<User> getAll();
 
   void changeEmail(Long id, String newEmail);
+
+  void validateNPWP(String npwp);
+
+  void validateNationalId(String nationalId);
 }

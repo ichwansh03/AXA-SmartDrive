@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.users.implementation;
 
+import com.app.smartdrive.api.Exceptions.UserExistException;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
@@ -146,4 +147,22 @@ public class UserServiceImpl implements UserService {
     user.setUserEmail(newEmail);
     save(user);
   }
+
+  @Transactional(readOnly = true)
+  @Override
+  public void validateNPWP(String npwp) {
+    if(userRepo.existsByUserNPWP(npwp)){
+      throw new UserExistException("User with NPWP number " + npwp + " is already exist");
+    }
+  }
+
+  @Override
+  public void validateNationalId(String nationalId) {
+    if(userRepo.existsByUserNationalId(nationalId)){
+      throw new UserExistException("User with national id " + nationalId + " is already exist");
+    }
+
+  }
+
+
 }
