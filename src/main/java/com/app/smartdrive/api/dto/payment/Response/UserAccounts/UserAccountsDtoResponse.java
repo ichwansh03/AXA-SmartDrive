@@ -5,18 +5,22 @@ import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumP
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class UserAccountsDtoResponse {
+public class UserAccountsDtoResponse{
     private String usac_accountno;
-    private Double usac_debet;
+    private BigDecimal usac_debet;
     @Enumerated(EnumType.STRING)
-    private EnumClassPayment.EnumPaymentType usac_type;
-
+    private EnumClassPayment.EnumPaymentType enumPaymentType;
 
 }

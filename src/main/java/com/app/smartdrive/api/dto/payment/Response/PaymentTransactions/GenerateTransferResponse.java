@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.dto.payment.Response.PaymentTransactions;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class GenerateTransferResponse {
     private String accountNo;
     private Enum status;
     private LocalDateTime paidDate;
-    private Double nominal;
+    private BigDecimal nominal;
     private String trxNo;
     
 }
