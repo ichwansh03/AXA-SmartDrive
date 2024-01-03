@@ -29,6 +29,7 @@ import com.app.smartdrive.api.repositories.master.IntyRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
+import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.customer.*;
 import com.app.smartdrive.api.services.master.ArwgService;
 import com.app.smartdrive.api.services.master.CarsService;
@@ -91,6 +92,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final UserRolesService userRolesService;
 
     private final UserPhoneService userPhoneService;
+
+    private final AuthenticationService authenticationService;
 
     // sementara
     private final UserRepository userRepository;
@@ -282,29 +285,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         LocalDateTime birthDate = LocalDateTime.parse(createUserDto.getProfile().getUserByAgenBirthDate(), formatter);
 
         this.customerInscAssetsService.validatePoliceNumber(customerInscAssetsRequestDTO.getCiasPoliceNumber());
-
-        if(userRepository.existsByUserName((createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber()))){
-            throw new UsernameExistException();
-        }
-
-        if(userRepository.existsByUserEmail(createUserDto.getProfile().getUserEmail())){
-            throw new EmailExistException();
-        };
-
-        if(userRepository.existsByUserNPWP(createUserDto.getProfile().getUserNpwp())){
-            throw new UserExistException("User with NPWP number " + createUserDto.getProfile().getUserNpwp() + " is already exist");
-        }
-
-        if(userRepository.existsByUserNationalId(createUserDto.getProfile().getUserNationalId())){
-            throw new UserExistException("User with national id " + createUserDto.getProfile().getUserNationalId() + " is already exist");
-        }
-
-        createUserDto.getUserPhone().forEach(
-                phone -> {
-                    if(userPhoneService.findByPhoneNumber(phone.getUserPhoneId().getUsphPhoneNumber()).isPresent())
-                        throw new UserPhoneExistException(phone.getUserPhoneId().getUsphPhoneNumber());
-                }
-        );
+        this.validateUser(createUserDto);
 
         CarSeries existCarSeries = this.carsRepository.findById(customerInscAssetsRequestDTO.getCiasCarsId()).orElseThrow(
                 () -> new EntityNotFoundException("Car Series with id "+ customerInscAssetsRequestDTO.getCiasCarsId() + " is not found")
@@ -441,6 +422,28 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         User customer = this.userService.getById(userEntityId);
 
         this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, grantUserAccess? "ACTIVE":"INACTIVE");
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public void validateUser(CreateUserDto createUserDto) {
+        this.authenticationService.validateUsername(createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
+        this.authenticationService.validateEmail(createUserDto.getProfile().getUserEmail());
+        this.userService.validateNPWP(createUserDto.getProfile().getUserNpwp());
+        this.userService.validateNationalId(createUserDto.getProfile().getUserNationalId());
+
+
+        createUserDto.getUserAccounts().stream().forEach(
+                userAccount -> {
+                    this.userService.validateUserAccount(userAccount.getUsac_accountno());
+                }
+        );
+
+        createUserDto.getUserPhone().stream().forEach(
+                phone -> {
+                    this.authenticationService.validateUserPhone(phone.getUserPhoneId().getUsphPhoneNumber());
+                }
+        );
     }
 
     @Transactional

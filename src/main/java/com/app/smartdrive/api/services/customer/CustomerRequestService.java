@@ -39,6 +39,8 @@ public interface CustomerRequestService {
 
     public void updatedCustomerRoleStatus(Long userEntityId, Boolean grantUserAccess);
 
+    public void validateUser(CreateUserDto createUserDto);
+
     public void changeRequestType(CustomerRequest customerRequest, EnumCustomer.CreqType creqType);
 
     public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus);

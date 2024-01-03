@@ -19,6 +19,7 @@ public class CateController implements MasterController<CateReq, Long> {
 
     @Override
     @GetMapping
+    @CrossOrigin
     public ResponseEntity<?> findAllData() {
         return ResponseEntity.ok(cateServiceImpl.getAll());
     }
@@ -31,6 +32,8 @@ public class CateController implements MasterController<CateReq, Long> {
 
     @Override
     @PostMapping
+    @CrossOrigin
+
     public ResponseEntity<?> saveData(@Valid @RequestBody CateReq request) {
         return new ResponseEntity<>(cateServiceImpl.save(request), HttpStatus.CREATED);
     }
