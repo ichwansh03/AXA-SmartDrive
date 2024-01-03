@@ -13,8 +13,6 @@ import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
-import com.app.smartdrive.api.services.jwt.JwtService;
-import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.users.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;

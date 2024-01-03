@@ -11,14 +11,12 @@ import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
-import com.app.smartdrive.api.services.users.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -28,9 +26,7 @@ import java.util.Optional;
 @RequestMapping("/auth")
 public class AuthenticationController {
   private final AuthenticationService authenticationService;
-  private final UserDetailsService userDetailServiceImpl;
   private final RefreshTokenService refreshTokenService;
-  private final UserService userService;
   private final JwtService jwtService;
 
   @Value("${jwt.refresh.cookie}")
@@ -54,7 +50,7 @@ public class AuthenticationController {
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
             .contentType(MediaType.APPLICATION_JSON)
-            .body("User authenticated");
+            .body(new MessageResponse("User authenticated"));
   }
 
   @PostMapping("/signup")
@@ -81,7 +77,7 @@ public class AuthenticationController {
   }
 
   @PatchMapping("/{id}/changePassword")
-  @PreAuthorize("principal.getUserEntityId() == #id && isAuthenticated()")
+  @PreAuthorize("principal.user.getUserEntityId() == #id && isAuthenticated()")
   public ResponseEntity<?> changePassword(@RequestBody PasswordRequestDto passwordRequestDto
           , @PathVariable("id") Long id){
     String message = authenticationService.changePassword(id, passwordRequestDto);
