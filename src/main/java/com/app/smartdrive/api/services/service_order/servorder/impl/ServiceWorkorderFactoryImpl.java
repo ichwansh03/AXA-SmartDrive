@@ -60,12 +60,11 @@ public class ServiceWorkorderFactoryImpl implements ServiceWorkorderFactory {
     @Transactional
     @Override
     public void createWorkorderTask(String sowoName, Long seotId){
-        TemplateTaskWorkOrder templateTask = createTemplateTask(sowoName, seotId);
         ServiceOrderTasks tasks = soTasksRepository.findById(seotId)
                 .orElseThrow(() -> new EntityNotFoundException("::createWorkorderTask ID is not found"));
 
         ServiceOrderWorkorder soWorkorder = new ServiceOrderWorkorder();
-        soWorkorder.setSowoName(templateTask.getTewoName());
+        soWorkorder.setSowoName(sowoName);
         soWorkorder.setServiceOrderTasks(tasks);
         soWorkorder.setSowoStatus(false);
         soWorkorder.setSowoModDate(LocalDateTime.now());
@@ -73,10 +72,4 @@ public class ServiceWorkorderFactoryImpl implements ServiceWorkorderFactory {
         soWorkorderRepository.save(soWorkorder);
     }
 
-    private TemplateTaskWorkOrder createTemplateTask(String taskName, Long taskId) {
-        TemplateTaskWorkOrder workOrder = new TemplateTaskWorkOrder();
-        workOrder.setTewoTestaId(taskId);
-        workOrder.setTewoName(taskName);
-        return tewoRepository.save(workOrder);
-    }
 }
