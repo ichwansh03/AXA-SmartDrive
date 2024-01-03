@@ -375,7 +375,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CustomerInscAssets existCustomerInscAssets = existCustomerRequest.getCustomerInscAssets();
 
 
-        User existCustomer = this.getUpdatedUser(updateCustomerRequestDTO.getCustomerId(), updateCustomerRequestDTO.getAccessGrantUser());
+        this.updatedCustomerRoleStatus(existCustomerRequest.getCustomer().getUserEntityId(), updateCustomerRequestDTO.getAccessGrantUser());
 
         EmployeeAreaWorkgroup existEmployeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(
                 updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()
@@ -423,8 +423,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         existCustomerInscAssets.setCiasTotalPremi(premiPrice);
 
         existCustomerRequest.setCreqAgenEntityid(existEmployeeAreaWorkgroup.getEawgId());
-        existCustomerRequest.setCustomer(existCustomer);
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
+
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
@@ -437,12 +437,10 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional
     @Override
-    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess) {
+    public void updatedCustomerRoleStatus(Long userEntityId, Boolean grantUserAccess) {
         User customer = this.userService.getById(userEntityId);
 
         this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, grantUserAccess? "ACTIVE":"INACTIVE");
-
-        return userService.getById(customer.getUserEntityId());
     }
 
     @Transactional

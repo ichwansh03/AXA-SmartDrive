@@ -45,7 +45,7 @@ public class CustomerRequest {
     private LocalDateTime creqModifiedDate;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "creq_cust_entityid")
     private User customer;
 
