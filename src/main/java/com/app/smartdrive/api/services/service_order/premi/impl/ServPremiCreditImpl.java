@@ -55,19 +55,16 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         List<ServicePremiCredit> servicePremiCredits = new ArrayList<>();
 
         for (int i = 1; i <= 12; i++) {
-            ServicePremiCredit servicePremiCredit = new ServicePremiCredit();
-            LocalDateTime dateTime = semiModifiedDate.plusMonths(i);
-
-            servicePremiCredit.setSecrServId(servicePremi.getSemiServId());
-            servicePremiCredit.setSecrYear(String.valueOf(dateTime.getYear()));
-            servicePremiCredit.setSecrDuedate(dateTime);
-            servicePremiCredit.setServices(servicePremi.getServices());
-
-            ServicePremiCredit save = secrRepository.save(servicePremiCredit);
+            ServicePremiCredit save = generatePremiData(servicePremi, semiModifiedDate.plusMonths(i));
             servicePremiCredits.add(save);
         }
         log.info("ServPremiImpl::addSecr successfully added service premi credit");
         return servicePremiCredits;
+    }
+
+    @Override
+    public ServicePremiCredit addSecrCash(ServicePremi servicePremi) {
+        return generatePremiData(servicePremi, LocalDateTime.now().plusYears(1));
     }
 
     @Transactional
@@ -78,7 +75,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         ServicePremi premi = semiRepository.findById(secrServId)
                 .orElseThrow(() -> new EntityNotFoundException("findById(secrServId)::secrServId is not found"));
 
-        ServicePremiCredit premiCredit = buildCommonSecrData(premi, existSecr, secrReqDto);
+        ServicePremiCredit premiCredit = updateSecrData(premi, existSecr, secrReqDto);
 
         secrRepository.save(premiCredit);
 
@@ -136,7 +133,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         }
     }
 
-    private ServicePremiCredit buildCommonSecrData(ServicePremi semi, ServicePremiCredit secr, SecrReqDto secrReqDto){
+    private ServicePremiCredit updateSecrData(ServicePremi semi, ServicePremiCredit secr, SecrReqDto secrReqDto){
         return ServicePremiCredit.builder()
                 .secrId(secr.getSecrId())
                 .secrServId(secr.getSecrServId())
@@ -146,5 +143,16 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
                 .secrTrxDate(LocalDateTime.now())
                 .secrDuedate(secr.getSecrDuedate())
                 .services(semi.getServices()).build();
+    }
+
+    private ServicePremiCredit generatePremiData(ServicePremi servicePremi, LocalDateTime dateTime){
+        ServicePremiCredit servicePremiCredit = new ServicePremiCredit();
+
+        servicePremiCredit.setSecrServId(servicePremi.getSemiServId());
+        servicePremiCredit.setSecrYear(String.valueOf(dateTime.getYear()));
+        servicePremiCredit.setSecrDuedate(dateTime);
+        servicePremiCredit.setServices(servicePremi.getServices());
+
+        return secrRepository.save(servicePremiCredit);
     }
 }
