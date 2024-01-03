@@ -31,8 +31,6 @@ import org.springframework.stereotype.Service;
 public class AuthenticationServiceImpl implements AuthenticationService {
   private final UserRepository userRepository;
   private final UserService userService;
-  private final RefreshTokenService refreshTokenService;
-  private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
   private final PasswordEncoder passwordEncoder;
   private final UserPhoneRepository userPhoneRepository;
