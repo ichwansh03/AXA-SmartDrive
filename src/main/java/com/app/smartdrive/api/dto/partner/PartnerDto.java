@@ -1,7 +1,7 @@
 package com.app.smartdrive.api.dto.partner;
 
 import com.app.smartdrive.api.dto.master.response.CitiesRes;
-import com.app.smartdrive.api.dto.user.response.BusinessEntityDto;
+import com.app.smartdrive.api.dto.user.response.BussinessEntityResponseDTO;
 import com.app.smartdrive.api.entities.hr.EnumClassHR;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.validation.constraints.Size;
@@ -37,7 +37,7 @@ public class  PartnerDto {
 
     private LocalDateTime partModifiedDate;
 
-    private BusinessEntityDto businessEntity;
+    private BussinessEntityResponseDTO businessEntity;
 
     private CitiesRes city;
 
