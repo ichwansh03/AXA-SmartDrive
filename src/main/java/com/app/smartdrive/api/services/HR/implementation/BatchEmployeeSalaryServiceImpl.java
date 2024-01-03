@@ -8,15 +8,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.app.smartdrive.api.dto.HR.response.BatchEmployeeSalaryResponseDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeeSalaryDetailResponseDto;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.HR.EmployeesService;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.entities.hr.BatchEmployeeSalary;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.repositories.HR.BatchEmployeeSalaryRepository;
-import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.services.HR.BatchEmployeeSalaryService;
 
 import lombok.RequiredArgsConstructor;
@@ -107,5 +109,16 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
 
         return TransactionMapper.mapEntityListToDtoList(result,EmployeeSalaryDetailResponseDto.class);
     }
+
+    @Override
+    public List<BatchEmployeeSalaryResponseDto> getAll(){
+        Sort sort = Sort.by(
+                Sort.Order.asc("besaPatrTrxno").nullsFirst()
+        );
+        List<BatchEmployeeSalary> batchEmployeeSalaries = batchEmployeeSalaryRepository.findAll(sort);
+        return TransactionMapper.mapEntityListToDtoList(batchEmployeeSalaries, BatchEmployeeSalaryResponseDto.class);
+    }
+
+
 
 }
