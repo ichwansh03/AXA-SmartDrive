@@ -52,6 +52,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -114,7 +115,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getAllPaging(Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status) {
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
 
         Page<CustomerRequest> pageCustomerRequest;
@@ -126,13 +127,20 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByCreqTypeAndCreqStatus(paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
         log.info("CustomerRequestServiceImpl::getAllPaging get paging all customer request");
-        return pageCustomerRequest;
+        return pagingCustomerResponseDTO;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status) {
         User user = this.userService.getById(customerId);
 
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
@@ -146,16 +154,23 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqTypeAndCreqStatus(user, paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pageUserCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
 
         log.info("CustomerRequestServiceImpl::getPagingUserCustomerRequest," +
                 " successfully get all customer request who belong to user with ID: {}", user.getUserEntityId());
 
-        return pageCustomerRequest;
+        return pageUserCustomerResponseDTO;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable paging, String type, String status) {
         AreaWorkGroup existAreaWorkgroup = this.arwgRepository.findByArwgCode(arwgCode);
         Employees existEmployee = this.employeesService.getById(employeeId);
         EmployeeAreaWorkgroup existEmployeeAreaworkgroup = this.employeeAreaWorkgroupRepository.findByAreaWorkGroupAndEmployees(existAreaWorkgroup, existEmployee).orElseThrow(
@@ -173,16 +188,23 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqTypeAndCreqStatus(existEmployeeAreaworkgroup, paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pageAgenCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
 
         log.info("CustomerRequestServiceImpl::getPagingAgenCustomerRequest," +
                 " successfully get all customer request who belong to agen with ID: {} and areaCode: {}", employeeId, arwgCode);
 
-        return pageCustomerRequest;
+        return pageAgenCustomerResponseDTO;
     }
 
     @Transactional
     @Override
-    public CustomerRequest create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = customerRequestDTO.getCustomerInscAssetsRequestDTO();
         Long[] customerInscExtendIds = customerRequestDTO.getCustomerInscAssetsRequestDTO().getCuexIds();
@@ -244,12 +266,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(newCustomerRequest);
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCustomerRequest);
-        return savedCustomerRequest;
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
     @Override
-    public CustomerRequest createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
 
         // prep
         CreateUserDto createUserDto = customerRequestDTO.getUserDTO();
@@ -339,12 +361,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(newCustomerRequest);
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCustomerRequest);
-        return savedCustomerRequest;
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
     @Override
-    public CustomerRequest updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
         CustomerRequest existCustomerRequest = this.getById(updateCustomerRequestDTO.getCreqEntityId());
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = updateCustomerRequestDTO.getCustomerInscAssetsRequestDTO();
         Long[] customerInscExtendIds = customerInscAssetsRequestDTO.getCuexIds();
@@ -410,7 +432,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 //        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(existEmployeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
 //        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
 
-        return savedCustomerRequest;
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional

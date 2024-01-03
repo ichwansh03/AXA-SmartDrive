@@ -3,11 +3,13 @@ package com.app.smartdrive.api.services.service_order.premi.impl;
 import com.app.smartdrive.api.Exceptions.CheckPaymentException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
+import com.app.smartdrive.api.dto.service_order.response.SecrDto;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCreditId;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
@@ -37,10 +39,12 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     private final SoRepository soRepository;
     private final ServOrderTaskService servOrderTaskService;
 
-    @Transactional(readOnly = true)
     @Override
-    public List<ServicePremiCredit> findByServId(Long servId) {
-        return secrRepository.findByServices_ServId(servId);
+    public List<SecrDto> findPremiCreditByServId(Long servId) {
+        Optional<ServicePremi> semiById = semiRepository.findById(servId);
+        return semiById.stream()
+                .map(secr -> TransactionMapper.mapEntityToDto(secr, SecrDto.class))
+                .toList();
     }
 
     @Transactional
