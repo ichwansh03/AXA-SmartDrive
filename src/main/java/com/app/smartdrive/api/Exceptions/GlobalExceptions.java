@@ -199,12 +199,12 @@ public class GlobalExceptions {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(
+    public ResponseEntity<?> handleAccessDeniedException(
             AccessDeniedException ex, WebRequest request) {
         Error error = ErrorUtils.createError(
                 ex.getMessage(),ex.getLocalizedMessage(),HttpStatus.FORBIDDEN.value()
         );
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 error, HttpStatus.FORBIDDEN);
     }
 

@@ -13,6 +13,8 @@ import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
+import com.app.smartdrive.api.services.jwt.JwtService;
+import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.users.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -20,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +31,14 @@ import org.springframework.stereotype.Service;
 public class AuthenticationServiceImpl implements AuthenticationService {
   private final UserRepository userRepository;
   private final UserService userService;
+  private final RefreshTokenService refreshTokenService;
+  private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
   private final PasswordEncoder passwordEncoder;
   private final UserPhoneRepository userPhoneRepository;
 
   @Override
+  @Transactional
   public void signup(CreateUserDto request) {
     validateUsername(request.getProfile().getUserName());
 

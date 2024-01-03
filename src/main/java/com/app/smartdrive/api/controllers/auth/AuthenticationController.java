@@ -3,13 +3,11 @@ package com.app.smartdrive.api.controllers.auth;
 import com.app.smartdrive.api.Exceptions.TokenRefreshException;
 import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.auth.response.MessageResponse;
-import com.app.smartdrive.api.dto.user.ProfileDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.entities.auth.RefreshToken;
 import com.app.smartdrive.api.entities.users.AuthUser;
 import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
@@ -18,12 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,21 +43,18 @@ public class AuthenticationController {
   public ResponseEntity<?> loginCustomer(@Valid @RequestBody SignInRequest login){
     AuthUser authUser = authenticationService.signinCustomer(login);
     User user = authUser.getUser();
+
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserEntityId());
     ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
     ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getRetoToken());
 
-    ProfileDto userResponse = TransactionMapper.mapEntityToDto(user, ProfileDto.class);
 
-
-    userResponse.setRoles(authUser.getAuthorities());
-    userResponse.setAccessToken(jwtCookie.getValue());
-    userResponse.setTokenType("Bearer");
 
     return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-            .body(userResponse);
+            .contentType(MediaType.APPLICATION_JSON)
+            .body("User authenticated");
   }
 
   @PostMapping("/signup")
@@ -76,7 +67,6 @@ public class AuthenticationController {
   @PostMapping("/createAdmin")
   public ResponseEntity<?> createAdmin(@RequestBody CreateUserDto profileRequestDto){
     User user = authenticationService.createAdmin(profileRequestDto);
-    userService.save(user);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
