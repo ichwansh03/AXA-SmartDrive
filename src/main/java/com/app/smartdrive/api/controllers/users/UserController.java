@@ -21,7 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 @Slf4j
-@PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.getUserEntityId() == #id)")
+@PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.user.getUserEntityId() == #id)")
 public class UserController {
   private final UserService userService;
 

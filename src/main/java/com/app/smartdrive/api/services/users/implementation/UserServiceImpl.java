@@ -124,23 +124,15 @@ public class UserServiceImpl implements UserService {
     return TransactionMapper.mapEntityToDto(user, UpdateUserRequestDto.class);
   }
 
-//  @Override
-//  public UserDetailsService userDetailsService() {
-//    return new UserDetailsService() {
-//      @Override
-//      public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        return userRepo.findUserByIden(username).orElseThrow(() -> new UsernameNotFoundException("Could not find user"));
-//      }
-//    };
-//  }
-
   @Override
+  @Transactional(readOnly = true)
   public User getById(Long id) {
     return userRepo.findById(id).orElseThrow(
             () -> new com.app.smartdrive.api.Exceptions.EntityNotFoundException("User not found!"));
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<User> getAll() {
     List<User> users = userRepo.findAll();
     return users;
