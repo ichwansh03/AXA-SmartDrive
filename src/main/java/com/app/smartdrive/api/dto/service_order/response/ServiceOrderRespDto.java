@@ -4,11 +4,7 @@ import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ClaimAssetRequestDto;
 import com.app.smartdrive.api.dto.service_order.request.ClaimAssetRequestSparePartDto;
-import com.app.smartdrive.api.entities.service_order.ClaimAssetEvidence;
-import com.app.smartdrive.api.entities.service_order.ClaimAssetSparepart;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OneToMany;
 import lombok.*;
 
 import java.time.LocalDateTime;
