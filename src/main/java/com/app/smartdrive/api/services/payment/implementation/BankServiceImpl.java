@@ -48,12 +48,6 @@ public class BankServiceImpl implements PaymentService {
         return banks;
     }
 
-    
-
-   
-
-
-
     private void checkBanks(String bankName){
         List<Banks> listBanks = banksRepository.findAll();
         for (Banks banks : listBanks) {
@@ -66,22 +60,19 @@ public class BankServiceImpl implements PaymentService {
     @Override
     public Boolean deleteById(Long id) {
         Banks findId = banksRepository.findById(id).orElse(null);
-        List<BusinessEntity> businesData = repositoryBisnis.findAll();
+        Optional<BusinessEntity> dataBussines = repositoryBisnis.findById(id);
+        BusinessEntity business = dataBussines.get();
 
         if(findId == null){
             throw new UserNotFoundException(id + " Tidak terdaftar ");
         }else{
-                for (BusinessEntity bisnis: businesData) {  
-                    if(id.equals(bisnis.getEntityId())){
-                        banksRepository.deleteBanksByID(id);
-                        repositoryBisnis.deleteById(bisnis.getEntityId());
-                    }
-                }
-            return true;
+               if(checkBusinesEntity(id,repositoryBisnis)) {
+                   banksRepository.deleteBanksByID(id);
+                   repositoryBisnis.deleteById(business.getEntityId());
+               }
         }
+        return true;
     }
-
-
 
     @Override
     public PaymentDtoResponse addPayment(PaymentRequestsDto requests) {
@@ -119,7 +110,7 @@ public class BankServiceImpl implements PaymentService {
         if(banksData == null){
             throw new EntityNotFoundException("Tidak terdapat " + id + " tersebut");
         }
-            if(CommonUtils.checkBusinesEntity(id, repositoryBisnis)){
+            if(checkBusinesEntity(id, repositoryBisnis)){
                 checkBanks(requests.getPayment_name());
                 businessEntity.setEntityModifiedDate(LocalDateTime.now());
                 banksData.setBank_name(requests.getPayment_name());

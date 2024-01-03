@@ -10,10 +10,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransactionsDtoRequests {
+public class TransactionsByUserDtoRequests {
     
     @NotBlank(message = "Tidak boleh kosong")
     private String usac_accountno;
@@ -22,7 +24,7 @@ public class TransactionsDtoRequests {
     private String patr_usac_accountNo_to;
    
     @NotNull(message = "Tidak boleh kosong nominalnya")
-    private Double nominall;
+    private BigDecimal nominall;
     
     @NotBlank(message = "Tidak boleh kosong")
     private String patr_notes;
