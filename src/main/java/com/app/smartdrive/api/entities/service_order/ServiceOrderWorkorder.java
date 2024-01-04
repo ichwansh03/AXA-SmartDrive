@@ -14,14 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "service_order_workorder", schema = "so")
-@NamedQueries({
-        @NamedQuery(
-                name = "ServiceOrderWorkorder.findSowoBySeotId",
-                query = "SELECT sowo FROM ServiceOrderWorkorder sowo WHERE sowo.serviceOrderTasks.seotId = :seotId"),
-        @NamedQuery(
-                name = "ServiceOrderWorkorder.updateSowoStatus",
-                query = "UPDATE ServiceOrderWorkorder sowo SET sowo.sowoStatus = :sowoStatus, sowo.sowoModDate = :sowoModDate WHERE sowo.sowoId = :sowoId", lockMode = LockModeType.PESSIMISTIC_WRITE)
-})
+@NamedQuery(
+        name = "ServiceOrderWorkorder.updateSowoStatus",
+        query = "UPDATE ServiceOrderWorkorder sowo SET sowo.sowoStatus = :sowoStatus, sowo.sowoModDate = :sowoModDate WHERE sowo.sowoId = :sowoId", lockMode = LockModeType.PESSIMISTIC_WRITE)
+@DynamicUpdate
 @DynamicInsert
 public class ServiceOrderWorkorder {
 
