@@ -77,11 +77,6 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
 
-        if(!Objects.equals(cias.getCiasPoliceNumber(), ciasUpdateDTO.getCiasPoliceNumber())){
-            this.validatePoliceNumber(cias.getCiasPoliceNumber());
-            cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
-        }
-
         cias.setCiasYear(ciasUpdateDTO.getCiasYear());
         cias.setCiasStartdate(ciasStartdate);
         cias.setCiasEnddate(ciasStartdate.plusYears(1));
@@ -92,6 +87,21 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
         cias.setCity(existCity);
         cias.setCarSeries(carSeries);
         cias.setInsuranceType(existInty);
+
+        Optional<CustomerInscAssets> optionalCustomerInscAssets = this.customerInscAssetsRepository.findByCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+
+        if(optionalCustomerInscAssets.isPresent()){
+            if(!Objects.equals(ciasUpdateDTO.getCiasPoliceNumber(), cias.getCiasPoliceNumber())){
+                throw new EntityAlreadyExistException("Customer Request with police number " + ciasUpdateDTO.getCiasPoliceNumber() + " is already exist");
+            }else {
+                cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+            }
+        }else {
+            cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+        }
+
+
+
 
         log.info("CustomerInscAssetsServiceImpl::updateCustomerInscAssets, update customerInscAssets by ID : {}", cias.getCiasCreqEntityid());
     }

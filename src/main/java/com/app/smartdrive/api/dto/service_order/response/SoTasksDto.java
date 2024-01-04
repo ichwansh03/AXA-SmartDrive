@@ -17,8 +17,8 @@ public class SoTasksDto {
 
     private Long seotId;
     private String seotName;
-    private LocalDateTime seotStartDate;
-    private LocalDateTime seotEndDate;
+    private LocalDateTime seotActualStartdate;
+    private LocalDateTime seotActualEnddate;
     private EnumModuleServiceOrders.SeotStatus seotStatus;
     private List<SoWorkorderDto> serviceOrderWorkorders;
 }

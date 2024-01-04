@@ -20,12 +20,12 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.user.getUserEntityId() == #id)")
 @RequestMapping("/user/{id}/phone")
 public class UserPhoneController {
   private final UserPhoneService userPhoneService;
 
   @PatchMapping("/{phoneNumber}")
-  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> updateUserPhone(@PathVariable("id") Long id,
                                            @PathVariable("phoneNumber") String phoneNumber,
                                            @RequestBody @Valid UserPhoneRequestDto userPost) {
@@ -34,14 +34,12 @@ public class UserPhoneController {
   }
 
   @PostMapping
-  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> addUserPhone(@PathVariable("id") Long id, @Valid @RequestBody UserPhoneDto userPost){
     UserPhone userPhone = userPhoneService.addUserPhone(id, userPost);
     return ResponseEntity.status(HttpStatus.CREATED).body(userPhone);
   }
 
   @DeleteMapping("/{phoneNumber}")
-  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> deleteUserPhone(@PathVariable("id") Long id, @PathVariable("phoneNumber") String phoneNumber){
     userPhoneService.deleteUserPhone(id, phoneNumber);
     return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("UserPhone has been deleted"));

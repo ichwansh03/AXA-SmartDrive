@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
+import com.app.smartdrive.api.services.HR.EmployeesService;
 import org.springframework.stereotype.Service;
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
 import com.app.smartdrive.api.entities.hr.Employees;
@@ -32,7 +33,7 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
 
     private final EmployeeSalaryDetailRepository employeeSalaryDetailRepository;
 
-    private final EmployeesRepository employeesRepository;
+    private final EmployeesService employeesService;
 
 
     @Override
@@ -50,7 +51,7 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         
         BigDecimal servicePremi = semiID.get().getSemiPremiDebet();
 
-        Employees employees = employeesRepository.findById(entityId).get();
+        Employees employees = employeesService.getById(entityId);
 
         for (TemplateSalary templateSalary : templateSalaries) {
             EmployeeSalaryDetail salaryDetail = new EmployeeSalaryDetail();

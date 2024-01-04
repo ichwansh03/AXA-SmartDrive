@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/service")
+@RequestMapping("/service/task")
 @RequiredArgsConstructor
 @Slf4j
 public class ServOrderTaskController {
 
     private final ServiceTasksFactory serviceTasksFactory;
 
-    @PutMapping("/task/update/{seotId}")
+    @PutMapping("/update/{seotId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SoTasksDto soTasksDto, @PathVariable("seotId") Long seotId) {
         int updated = serviceTasksFactory.updateTasksStatus(soTasksDto.getSeotStatus(), seotId);
@@ -28,7 +28,7 @@ public class ServOrderTaskController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
-    @PutMapping("/task/update/claim/{seotId}")
+    @PutMapping("/update/claim/{seotId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSeotStatus(@Valid @RequestBody SeotPartnerDto soTasksDto, @PathVariable("seotId") Long seotId) {
 
