@@ -3,6 +3,8 @@ package com.app.smartdrive.api.services.service_order.servorder.impl;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
+import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.master.TemplateServiceTask;
 import com.app.smartdrive.api.entities.partner.Partner;
@@ -15,9 +17,7 @@ import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceWorkorderFactory;
+import com.app.smartdrive.api.services.service_order.servorder.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,8 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
     private final PartnerRepository partnerRepository;
 
     private final ServiceWorkorderFactory serviceWorkorderFactory;
+    private final ServService servService;
+    private final ServOrderService servOrderService;
     private final ServOrderTaskService servOrderTaskService;
 
     @Transactional
@@ -91,9 +93,6 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                 .orElseThrow(() -> new EntityNotFoundException("::updateTasksStatus ID " + seotId + " is not found"));
         int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
 
-        ServiceTaskReqDto serviceTaskReqDto = TransactionMapper.mapEntityToDto(orderTasks, ServiceTaskReqDto.class);
-        notifyCurrentTask(serviceTaskReqDto, orderTasks.getSeotName());
-
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ", seotId);
         return updateSeot;
     }
@@ -114,6 +113,9 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
         Partner partner = partnerRepository.findById(seotPartner.getPartnerId())
                 .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID " + seotPartner.getPartnerId() + " is not found"));
         soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
+
+        ServiceTaskReqDto serviceTaskReqDto = TransactionMapper.mapEntityToDto(orderTasks, ServiceTaskReqDto.class);
+        notifyCurrentTask(serviceTaskReqDto);
 
         return seotPartner;
     }
@@ -142,33 +144,33 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                     seotStatus, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, taskReflection));
 
-
-            notifyCurrentTask(seot.get(i), seot.get(i).getSeotName());
+            notifyCurrentTask(seot.get(i));
         }
         return seot;
     }
 
-    private void notifyCurrentTask(ServiceTaskReqDto serviceOrderTask, String taskName) {
+    private void notifyCurrentTask(ServiceTaskReqDto serviceOrderTask) {
 
-        ServiceOrders serviceOrders = serviceOrderTask.getServiceOrders();
+        ServiceOrderRespDto orderDtoById = servOrderService.findOrderDtoById(serviceOrderTask.getServiceOrders().getSeroId());
+        ServiceRespDto services = servService.findServicesById(serviceOrderTask.getServiceOrders().getServices().getServId());
 
-        switch (taskName) {
+        switch (serviceOrderTask.getSeotName()) {
             case "NOTIFY TO AGENT" ->
-                    servOrderTaskService.notifyTask(serviceOrders.getEmployees().getEmployees().getUser().getUserEmail(),
+                    servOrderTaskService.notifyTask(orderDtoById.getEmployees().getEmployees().getUser().getUserEmail(),
                             "Request new POLIS",
-                            "Request new POLIS from " + serviceOrders.getServices().getUsers().getUserFullName());
+                            "Request new POLIS from " + services.getUserDto().getUserFullName());
             case "NOTIFY TO CUSTOMER" ->
-                    servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
+                    servOrderTaskService.notifyTask(services.getUserDto().getUserEmail(),
                             "POLIS has been created",
                             "Your request POLIS has been created, check your dashboard page");
-            case "CLAIM DOCUMENT APPROVED" -> servOrderTaskService.notifyTask(serviceOrders.getPartner().getPartnerContacts().get(0).getUser().getUserEmail(),
+            case "CLAIM DOCUMENT APPROVED" -> servOrderTaskService.notifyTask(services.getServiceOrdersList().get(0).getPartner().getPartnerContacts().get(0).getUser().getUserEmail(),
                     "Repair Sparepart from Customer",
-                    "Repair from " + serviceOrders.getServices().getUsers().getUserFullName());
-            case "CALCULATE SPARE PART" -> servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
+                    "Repair from " + services.getUserDto().getUserFullName());
+            case "CALCULATE SPARE PART" -> servOrderTaskService.notifyTask(services.getUserDto().getUserEmail(),
                     "Your car is finish to repair",
                     "Car Repaired is finish");
-            case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> servOrderTaskService.notifyTask(serviceOrders.getServices().getUsers().getUserEmail(),
-                    "Claim for " + serviceOrders.getServices().getUsers().getUserFullName(),
+            case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> servOrderTaskService.notifyTask(services.getUserDto().getUserEmail(),
+                    "Claim for " + services.getUserDto().getUserFullName(),
                     "Repaired is finish, pay claim to user");
         }
     }
