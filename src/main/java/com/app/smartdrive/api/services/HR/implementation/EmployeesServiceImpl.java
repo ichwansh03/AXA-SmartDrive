@@ -76,6 +76,8 @@ public class EmployeesServiceImpl implements EmployeesService {
                 new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
 
         authenticationService.validateUsername(employeesDto.getEmail());
+        authenticationService.validateEmail(employeesDto.getEmail());
+        authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
 
         User user = createUserFromDto(employeesDto);
 
@@ -163,6 +165,10 @@ public class EmployeesServiceImpl implements EmployeesService {
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).get();
 
+        authenticationService.validateUsername(employeesDto.getEmail());
+        authenticationService.validateEmail(employeesDto.getEmail());
+        authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
+
         existingEmployee.setEmpName(employeesDto.getEmpName());
         existingEmployee.setEmpJoinDate(empJoinDate);
         existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
@@ -174,8 +180,6 @@ public class EmployeesServiceImpl implements EmployeesService {
         User user = existingEmployee.getUser();
 
         updateUserFromDto(user, employeesDto);
-
-
 
         if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());
