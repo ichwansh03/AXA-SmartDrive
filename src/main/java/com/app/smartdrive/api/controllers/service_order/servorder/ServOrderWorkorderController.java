@@ -11,14 +11,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/service")
+@RequestMapping("/service/workorder")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin
 public class ServOrderWorkorderController {
 
     private final ServiceWorkorderFactory serviceWorkorderFactory;
 
-    @PutMapping("/workorder/update/{sowoId}")
+    @PutMapping("/update/{sowoId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateSoWorkorderStatus(@Valid @RequestBody SoWorkorderDto soWorkorderDto, @PathVariable("sowoId") Long sowoId) {
         int sowoStatus = serviceWorkorderFactory.updateSowoStatus(soWorkorderDto.getSowoStatus(), sowoId);
