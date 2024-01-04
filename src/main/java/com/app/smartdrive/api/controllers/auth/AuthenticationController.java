@@ -48,16 +48,10 @@ public class AuthenticationController {
     ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
     ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getRetoToken());
 
-    ProfileDto userResponse = TransactionMapper.mapEntityToDto(user, ProfileDto.class);
-
-//    userResponse.setRoles(user.getAuthorities());
-    userResponse.setAccessToken(jwtCookie.getValue());
-    userResponse.setTokenType("Bearer");
-
     return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-            .body(userResponse);
+            .body(new MessageResponse("User authenticated"));
   }
 
   @PostMapping("/signup")
