@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/arwg")
+@CrossOrigin
 @Tag(name = "Master Module", description = "This Tab Contains All Operation for Master Module")
 public class ArwgController implements MasterController<ArwgReq, String> {
     private final MasterService arwgServiceImpl;
@@ -38,7 +39,6 @@ public class ArwgController implements MasterController<ArwgReq, String> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable String id,@Valid @RequestBody ArwgReq request) {
-        arwgServiceImpl.getById(id);
-        return new ResponseEntity<>(arwgServiceImpl.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(arwgServiceImpl.update(id,request), HttpStatus.CREATED);
     }
 }

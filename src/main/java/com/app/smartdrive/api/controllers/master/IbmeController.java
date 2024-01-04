@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/ibme")
+@CrossOrigin
 @Tag(name = "Master Module")
 public class IbmeController implements MasterController<IbmeReq, Long> {
     private final MasterService ibmeServiceImpl;
@@ -37,7 +38,7 @@ public class IbmeController implements MasterController<IbmeReq, Long> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody IbmeReq request) {
         ibmeServiceImpl.getById(id);
-        return ResponseEntity.ok(ibmeServiceImpl.save(request));
+        return ResponseEntity.ok(ibmeServiceImpl.update(id, request));
     }
 
     @DeleteMapping("/{id}")

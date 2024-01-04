@@ -1,6 +1,8 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.dto.master.request.CateReq;
+import com.app.smartdrive.api.dto.master.response.CateRes;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.MasterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
+@CrossOrigin
 @Tag(name = "Master Module")
 public class CateController implements MasterController<CateReq, Long> {
     private final MasterService cateServiceImpl;
@@ -38,7 +41,6 @@ public class CateController implements MasterController<CateReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CateReq request) {
-        cateServiceImpl.getById(id);
-        return new ResponseEntity<>(cateServiceImpl.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(cateServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

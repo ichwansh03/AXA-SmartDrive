@@ -50,7 +50,7 @@ public class AuthenticationController {
 
     ProfileDto userResponse = TransactionMapper.mapEntityToDto(user, ProfileDto.class);
 
-    userResponse.setRoles(user.getAuthorities());
+//    userResponse.setRoles(user.getAuthorities());
     userResponse.setAccessToken(jwtCookie.getValue());
     userResponse.setTokenType("Bearer");
 

@@ -46,8 +46,8 @@ public class PaymentTransactionsController {
     
     @GetMapping("/transactions/{patrTrxno}")
     public ResponseEntity<?> getIdPayment(@Valid @PathVariable("patrTrxno") String patrTrxno){
-        PaymentTransactions pt = service.getById(patrTrxno);
-        return new ResponseEntity<>(pt, HttpStatus.OK);
+//        PaymentTransactions pt = service.getById(patrTrxno);
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
     @PostMapping("/transactions/transaksi")

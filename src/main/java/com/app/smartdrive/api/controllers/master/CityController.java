@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/cities")
+@CrossOrigin
 @Tag(name = "Master Module")
 public class CityController implements MasterController<CitiesReq, Long> {
     private final MasterService cityServiceImpl;
@@ -39,6 +40,6 @@ public class CityController implements MasterController<CitiesReq, Long> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CitiesReq request) {
         cityServiceImpl.getById(id);
-        return new ResponseEntity<>(cityServiceImpl.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(cityServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }
