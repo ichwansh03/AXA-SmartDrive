@@ -31,7 +31,7 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
 
     @Override
     public List<ServiceOrderWorkorder> findSowoBySeotId(Long seotId) {
-        return soWorkorderRepository.findSowoBySeotId(seotId);
+        return soWorkorderRepository.findByServiceOrderTasks_SeotId(seotId);
     }
 
     @Override

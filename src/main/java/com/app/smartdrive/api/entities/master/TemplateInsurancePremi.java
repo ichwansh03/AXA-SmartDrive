@@ -29,7 +29,7 @@ public class TemplateInsurancePremi {
     private Double temiRateMax;
 
     @Column(name = "temi_nominal")
-    private BigDecimal temiNominal;
+    private Double temiNominal;
 
     @Column(name = "temi_type")
     private String temiType;

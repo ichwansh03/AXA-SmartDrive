@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/regp")
+@CrossOrigin
 @Tag(name = "Master Module")
 public class RegpController implements MasterController<RegpReq, String> {
     private final MasterService regpServiceImpl;
@@ -38,6 +39,6 @@ public class RegpController implements MasterController<RegpReq, String> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable String id, @Valid @RequestBody RegpReq request) {
         regpServiceImpl.getById(id);
-        return new ResponseEntity<>(regpServiceImpl.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(regpServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

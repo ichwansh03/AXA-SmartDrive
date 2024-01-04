@@ -37,7 +37,9 @@ public interface CustomerRequestService {
 
     public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception;
 
-    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess);
+    public void updatedCustomerRoleStatus(Long userEntityId, Boolean grantUserAccess);
+
+    public void validateUser(CreateUserDto createUserDto);
 
     public void changeRequestType(CustomerRequest customerRequest, EnumCustomer.CreqType creqType);
 

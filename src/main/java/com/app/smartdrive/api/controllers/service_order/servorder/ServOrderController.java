@@ -24,13 +24,13 @@ import java.util.Objects;
 @RequestMapping("/service")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin
 public class ServOrderController {
 
     private final ServOrderService servOrderService;
     private final ServiceOrderFactory serviceOrderFactory;
 
     @GetMapping("/search")
+    @CrossOrigin
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId) {
         ServiceOrderRespDto orderDtoById = servOrderService.findOrderDtoById(seroId);
         return new ResponseEntity<>(orderDtoById, HttpStatus.OK);

@@ -1,8 +1,11 @@
 package com.app.smartdrive.api.services.users.implementation;
 
+import com.app.smartdrive.api.Exceptions.EntityAlreadyExistException;
+import com.app.smartdrive.api.Exceptions.UserExistException;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
+import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.User;
@@ -146,4 +149,31 @@ public class UserServiceImpl implements UserService {
     user.setUserEmail(newEmail);
     save(user);
   }
+
+  @Transactional(readOnly = true)
+  @Override
+  public void validateNPWP(String npwp) {
+    if(userRepo.existsByUserNPWP(npwp)){
+      throw new UserExistException("User with NPWP number " + npwp + " is already exist");
+    }
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public void validateNationalId(String nationalId) {
+    if(userRepo.existsByUserNationalId(nationalId)){
+      throw new UserExistException("User with national id " + nationalId + " is already exist");
+    }
+
+  }
+
+  @Override
+  public void validateUserAccount(String number) {
+    if(this.userAccountService.getOptionalByUserAccountNo(number).isPresent()){
+      throw new EntityAlreadyExistException("User account with number " + number + " is already exist");
+    }
+
+  }
+
+
 }
