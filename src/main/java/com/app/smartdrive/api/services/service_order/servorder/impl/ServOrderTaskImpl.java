@@ -26,7 +26,6 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
 
     private final SoTasksRepository soTasksRepository;
-    private final SoWorkorderRepository soWorkorderRepository;
 
     private final EmailService emailService;
     private final ServOrderWorkorderService servOrderWorkorderService;
@@ -60,7 +59,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
         List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
 
-        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
+        List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
         boolean allWorkComplete = servOrderWorkorderService.checkAllWorkComplete(sowoBySeotId);
 
         boolean checkedAll = false;
