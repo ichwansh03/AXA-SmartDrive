@@ -44,12 +44,9 @@ public class AuthenticationController {
     ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
     ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getRetoToken());
 
-
-
     return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-            .contentType(MediaType.APPLICATION_JSON)
             .body(new MessageResponse("User authenticated"));
   }
 
