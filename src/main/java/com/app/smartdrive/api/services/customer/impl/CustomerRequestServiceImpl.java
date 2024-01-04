@@ -409,11 +409,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
-//        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
-//        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(existEmployeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
-//        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
+        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(existEmployeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
+        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
 
-        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+        return customerResponseDTO;
+//        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional

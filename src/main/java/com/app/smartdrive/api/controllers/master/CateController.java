@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
 @Tag(name = "Master Module")
+@CrossOrigin
 public class CateController implements MasterController<CateReq, Long> {
     private final MasterService cateServiceImpl;
 
@@ -33,7 +35,6 @@ public class CateController implements MasterController<CateReq, Long> {
     @Override
     @PostMapping
     @CrossOrigin
-
     public ResponseEntity<?> saveData(@Valid @RequestBody CateReq request) {
         return new ResponseEntity<>(cateServiceImpl.save(request), HttpStatus.CREATED);
     }
@@ -43,5 +44,12 @@ public class CateController implements MasterController<CateReq, Long> {
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CateReq request) {
         cateServiceImpl.getById(id);
         return new ResponseEntity<>(cateServiceImpl.save(request), HttpStatus.CREATED);
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteData(@PathVariable Long id) {
+        cateServiceImpl.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
