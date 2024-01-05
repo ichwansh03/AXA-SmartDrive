@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UserRepository extends JpaRepository<User, Long> {
   @Query(
       value = "SELECT * FROM USERS.USERS U JOIN USERS.USER_PHONE P ON U.USER_ENTITYID = P.USPH_ENTITYID WHERE USER_NAME = ?1 OR USER_EMAIL = ?1 OR USPH_PHONE_NUMBER = ?1", nativeQuery = true)
-  Optional<User> findUserByIden(String iden);
+  Optional<User> findUserByIdentity(String iden);
 
   Boolean existsByUserName(String username);
 
