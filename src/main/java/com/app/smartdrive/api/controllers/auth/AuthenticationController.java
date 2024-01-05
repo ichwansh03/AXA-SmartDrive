@@ -13,11 +13,15 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.jwt.JwtService;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
+import com.app.smartdrive.api.services.users.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +34,7 @@ import java.util.Optional;
 public class AuthenticationController {
   private final AuthenticationService authenticationService;
   private final RefreshTokenService refreshTokenService;
+  private final UserService userService;
   private final JwtService jwtService;
 
   @Value("${jwt.refresh.cookie}")
@@ -40,6 +45,7 @@ public class AuthenticationController {
 
   @PostMapping("/signin")
   public ResponseEntity<?> loginCustomer(@Valid @RequestBody SignInRequest login){
+
     AuthUser authUser = authenticationService.signinCustomer(login);
     User user = authUser.getUser();
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserEntityId());
@@ -49,6 +55,7 @@ public class AuthenticationController {
     SignInResponse response = TransactionMapper.mapEntityToDto(user, SignInResponse.class);
 
     response.setAccessToken(jwtCookie.getValue());
+
     return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
@@ -65,6 +72,7 @@ public class AuthenticationController {
   @PostMapping("/createAdmin")
   public ResponseEntity<?> createAdmin(@RequestBody CreateUserDto profileRequestDto){
     User user = authenticationService.createAdmin(profileRequestDto);
+    userService.save(user);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
@@ -79,7 +87,7 @@ public class AuthenticationController {
   }
 
   @PatchMapping("/{id}/changePassword")
-  @PreAuthorize("principal.user.getUserEntityId() == #id && isAuthenticated()")
+  @PreAuthorize("principal.getUserEntityId() == #id && isAuthenticated()")
   public ResponseEntity<?> changePassword(@RequestBody PasswordRequestDto passwordRequestDto
           , @PathVariable("id") Long id){
     String message = authenticationService.changePassword(id, passwordRequestDto);
