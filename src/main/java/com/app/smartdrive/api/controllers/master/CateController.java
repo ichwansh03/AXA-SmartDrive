@@ -58,4 +58,17 @@ public class CateController implements MasterController<CateReq, Long> {
         cateServiceImpl.deleteById(id);
         return ResponseEntity.ok("deleted");
     }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteData(@PathVariable Long id) {
+        cateServiceImpl.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteData(@PathVariable Long id){
+        cateServiceImpl.deleteById(id);
+        return ResponseEntity.ok("deleted");
+    }
 }
