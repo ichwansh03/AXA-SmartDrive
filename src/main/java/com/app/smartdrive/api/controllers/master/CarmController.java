@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/carm")
+@CrossOrigin
 @Tag(name = "Master Module")
 public class CarmController implements MasterController<CarmReq, Long> {
     private final MasterService carmServiceImpl;
@@ -38,7 +39,6 @@ public class CarmController implements MasterController<CarmReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CarmReq request) {
-        carmServiceImpl.getById(id);
-        return new ResponseEntity<>(carmServiceImpl.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(carmServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

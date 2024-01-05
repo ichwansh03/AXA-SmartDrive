@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/carb")
+@CrossOrigin
 @Tag(name = "Master Module")
 public class CarbController implements MasterController<CarbReq, Long> {
     private final MasterService carbServiceImpl;
@@ -38,7 +39,6 @@ public class CarbController implements MasterController<CarbReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?>updateData(@PathVariable Long id, @Valid @RequestBody CarbReq request) {
-        carbServiceImpl.getById(id);
-        return new ResponseEntity<>(carbServiceImpl.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(carbServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

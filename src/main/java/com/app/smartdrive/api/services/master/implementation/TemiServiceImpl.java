@@ -31,6 +31,13 @@ public class TemiServiceImpl implements MasterService<TemiRes, TemiReq, Long> {
     }
 
     @Override
+    public TemiRes update(Long aLong, TemiReq temiReq) {
+        TemplateInsurancePremi templateInsurancePremi = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Template Insurance Premi ID : " + aLong + " Not Found"));
+        templateInsurancePremi = repository.save(TransactionMapper.mapDtoToEntity(temiReq, templateInsurancePremi));
+        return TransactionMapper.mapEntityToDto(templateInsurancePremi, TemiRes.class);
+    }
+
+    @Override
     @Transactional
     public TemiRes save(TemiReq entity) {
         TemplateInsurancePremi templateInsurancePremi = repository.save(TransactionMapper.mapDtoToEntity(entity, new TemplateInsurancePremi()));

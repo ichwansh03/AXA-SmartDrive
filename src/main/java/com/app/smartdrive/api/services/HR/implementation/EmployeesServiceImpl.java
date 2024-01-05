@@ -86,6 +86,9 @@ public class EmployeesServiceImpl implements EmployeesService {
         authenticationService.validateEmail(employeesDto.getEmail());
         authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
 
+        authenticationService.validateEmail(employeesDto.getEmail());
+        authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
+
         User user = createUserFromDto(employeesDto);
 
         Employees employee = Employees.builder()
