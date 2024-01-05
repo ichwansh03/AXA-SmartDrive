@@ -57,7 +57,7 @@ public class BankServiceImpl implements PaymentService {
         }
     }
 
-    @Override
+
     public Boolean deleteById(Long id) {
         Banks findId = banksRepository.findById(id).orElse(null);
         Optional<BusinessEntity> dataBussines = repositoryBisnis.findById(id);

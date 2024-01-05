@@ -115,7 +115,7 @@ public class FintechServiceImpl implements PaymentService {
         return response;
     }
 
-    @Override
+
     public Boolean deleteById(Long id) {
         Fintech findId = fintechRepository.findById(id).orElse(null);
         List<BusinessEntity> businesData = repositoryBisnis.findAll();
