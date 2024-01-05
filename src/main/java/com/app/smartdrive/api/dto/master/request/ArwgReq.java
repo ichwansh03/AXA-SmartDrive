@@ -6,6 +6,10 @@ import lombok.Data;
 
 @Data
 public class ArwgReq {
+    @Size(max = 15, message = "Area Work Group Code Length Exceeded !")
+    @NotNull(message = "Area Work Group Code Cannot Be Null !")
+    private String arwgCode;
+
     @Size(max = 55, message = "Area Work Group Description Length Exceeded !")
     private String arwgDesc;
 

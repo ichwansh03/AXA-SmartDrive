@@ -1,8 +1,6 @@
 package com.app.smartdrive.api.controllers.master;
 
 import com.app.smartdrive.api.dto.master.request.CateReq;
-import com.app.smartdrive.api.dto.master.response.CateRes;
-import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.master.MasterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -45,6 +43,7 @@ public class CateController implements MasterController<CateReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CateReq request) {
+        cateServiceImpl.getById(id);
         return new ResponseEntity<>(cateServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 
@@ -53,11 +52,5 @@ public class CateController implements MasterController<CateReq, Long> {
     public ResponseEntity<?> deleteData(@PathVariable Long id) {
         cateServiceImpl.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteData(@PathVariable Long id){
-        cateServiceImpl.deleteById(id);
-        return ResponseEntity.ok("deleted");
     }
 }

@@ -39,7 +39,6 @@ public class CityController implements MasterController<CitiesReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CitiesReq request) {
-        cityServiceImpl.getById(id);
         return new ResponseEntity<>(cityServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

@@ -33,7 +33,7 @@ public class TestaServiceImpl implements MasterService<TestaRes, TestaReq, Long>
     @Override
     public TestaRes update(Long aLong, TestaReq testaReq) {
         TemplateServiceTask templateServiceTask = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Service Task : " + aLong + " Not Found"));
-        repository.save(TransactionMapper.mapDtoToEntity(testaReq,templateServiceTask));
+        templateServiceTask = repository.save(TransactionMapper.mapDtoToEntity(testaReq, templateServiceTask));
         return TransactionMapper.mapEntityToDto(templateServiceTask, TestaRes.class);
     }
 

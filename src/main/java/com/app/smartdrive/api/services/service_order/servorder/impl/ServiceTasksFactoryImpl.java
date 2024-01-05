@@ -93,6 +93,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                 .orElseThrow(() -> new EntityNotFoundException("::updateTasksStatus ID " + seotId + " is not found"));
         int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
 
+
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ", seotId);
         return updateSeot;
     }
@@ -113,6 +114,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
         Partner partner = partnerRepository.findById(seotPartner.getPartnerId())
                 .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID " + seotPartner.getPartnerId() + " is not found"));
         soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
+
 
         ServiceTaskReqDto serviceTaskReqDto = TransactionMapper.mapEntityToDto(orderTasks, ServiceTaskReqDto.class);
         notifyCurrentTask(serviceTaskReqDto);
@@ -144,10 +146,13 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                     seotStatus, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, taskReflection));
 
+
             notifyCurrentTask(seot.get(i));
+
         }
         return seot;
     }
+
 
     private void notifyCurrentTask(ServiceTaskReqDto serviceOrderTask) {
 
@@ -171,6 +176,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                     "Car Repaired is finish");
             case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> servOrderTaskService.notifyTask(services.getUserDto().getUserEmail(),
                     "Claim for " + services.getUserDto().getUserFullName(),
+
                     "Repaired is finish, pay claim to user");
         }
     }

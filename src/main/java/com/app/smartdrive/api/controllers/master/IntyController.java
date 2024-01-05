@@ -38,7 +38,6 @@ public class IntyController implements MasterController<IntyReq, String> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable String id, @Valid @RequestBody IntyReq request) {
-        intyServiceImpl.getById(id);
         return new ResponseEntity<>(intyServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

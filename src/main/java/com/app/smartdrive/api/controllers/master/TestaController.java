@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/testa")
@@ -39,7 +38,6 @@ public class TestaController implements MasterController<TestaReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TestaReq request) {
-        testaServiceImpl.getById(id);
         return new ResponseEntity<>(testaServiceImpl.update(id, request), HttpStatus.OK);
     }
 }

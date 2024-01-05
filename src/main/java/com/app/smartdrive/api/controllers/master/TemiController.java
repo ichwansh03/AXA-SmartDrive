@@ -38,7 +38,6 @@ public class TemiController implements MasterController<TemiReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TemiReq request) {
-        temiServiceImpl.getById(id);
         return new ResponseEntity<>(temiServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

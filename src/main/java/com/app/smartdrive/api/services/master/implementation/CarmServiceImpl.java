@@ -33,7 +33,7 @@ public class CarmServiceImpl implements MasterService<CarmRes, CarmReq, Long> {
     @Override
     public CarmRes update(Long aLong, CarmReq carmReq) {
         CarModel carModel = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Model ID : " + aLong + " Not Found"));
-        repository.save(TransactionMapper.mapDtoToEntity(carmReq, carModel));
+        carModel = repository.save(TransactionMapper.mapDtoToEntity(carmReq, carModel));
         return TransactionMapper.mapEntityToDto(carModel, CarmRes.class);
     }
 

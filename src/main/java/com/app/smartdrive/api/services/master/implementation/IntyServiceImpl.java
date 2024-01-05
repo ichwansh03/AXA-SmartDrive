@@ -33,7 +33,7 @@ public class IntyServiceImpl implements MasterService<IntyRes, IntyReq, String> 
     @Override
     public IntyRes update(String s, IntyReq intyReq) {
         InsuranceType insuranceType = repository.findById(s).orElseThrow(() -> new EntityNotFoundException("Insurance Type ID : " + s + " Not Found"));
-        insuranceType = repository.save(TransactionMapper.mapDtoToEntity(intyReq, insuranceType));
+        insuranceType = repository.save(TransactionMapper.mapDtoToEntity(intyReq,insuranceType));
         return TransactionMapper.mapEntityToDto(insuranceType, IntyRes.class);
     }
 

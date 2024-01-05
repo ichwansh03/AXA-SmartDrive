@@ -33,7 +33,7 @@ public class RegpServiceImpl implements MasterService<RegpRes, RegpReq, String> 
     @Override
     public RegpRes update(String s, RegpReq regpReq) {
         RegionPlat regionPlat = repository.findById(s).orElseThrow(() -> new EntityNotFoundException("Region Plat : " + s + " Not Found"));
-        repository.save(TransactionMapper.mapDtoToEntity(regpReq, regionPlat));
+        regionPlat = repository.save(TransactionMapper.mapDtoToEntity(regpReq, regionPlat));
         return TransactionMapper.mapEntityToDto(regionPlat, RegpRes.class);
     }
 

@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
+import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceWorkorderFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,12 @@ import org.springframework.web.bind.annotation.*;
 public class ServOrderWorkorderController {
 
     private final ServiceWorkorderFactory serviceWorkorderFactory;
+    private final ServOrderWorkorderService servOrderWorkorderService;
+
+    @GetMapping
+    public ResponseEntity<?> getWorkorderByTaskId(@RequestParam("seotId") Long seotId){
+        return new ResponseEntity<>(servOrderWorkorderService.findSowoBySeotId(seotId), HttpStatus.OK);
+    }
 
     @PutMapping("/update/{sowoId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
