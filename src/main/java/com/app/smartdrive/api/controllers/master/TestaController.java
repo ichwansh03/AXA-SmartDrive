@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/testa")
-@CrossOrigin
 @Tag(name = "Master Module")
 public class TestaController implements MasterController<TestaReq, Long> {
     private final MasterService testaServiceImpl;
@@ -40,6 +39,6 @@ public class TestaController implements MasterController<TestaReq, Long> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TestaReq request) {
         testaServiceImpl.getById(id);
-        return new ResponseEntity<>(testaServiceImpl.update(id, request), HttpStatus.OK);
+        return new ResponseEntity<>(testaServiceImpl.save(request), HttpStatus.OK);
     }
 }

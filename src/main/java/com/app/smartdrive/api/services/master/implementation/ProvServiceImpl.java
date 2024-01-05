@@ -31,13 +31,6 @@ public class ProvServiceImpl implements MasterService<ProvRes, ProvReq, Long> {
     }
 
     @Override
-    public ProvRes update(Long aLong, ProvReq provReq) {
-        Provinsi provinsi = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Provinsi ID : " + aLong + " Not Found"));
-        provinsi = repository.save(TransactionMapper.mapDtoToEntity(provReq, provinsi));
-        return TransactionMapper.mapEntityToDto(provinsi, ProvRes.class);
-    }
-
-    @Override
     @Transactional
     public ProvRes save(ProvReq entity) {
         Provinsi provinsi = repository.save(TransactionMapper.mapDtoToEntity(entity, new Provinsi()));

@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +34,6 @@ public class CateServiceImpl implements MasterService<CateRes, CateReq, Long> {
     @Override
     public CateRes save(CateReq entity) {
         Category category = repository.save(TransactionMapper.mapDtoToEntity(entity, new Category()));
-        return TransactionMapper.mapEntityToDto(category, CateRes.class);
-    }
-
-    @Transactional
-    @Override
-    public CateRes update(Long aLong, CateReq cateReq) {
-        Category category = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Category ID : " + aLong + " Not Found !"));
-        category = repository.save(TransactionMapper.mapDtoToEntity(cateReq, category));
         return TransactionMapper.mapEntityToDto(category, CateRes.class);
     }
 

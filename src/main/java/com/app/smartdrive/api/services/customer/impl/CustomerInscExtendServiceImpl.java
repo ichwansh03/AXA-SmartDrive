@@ -47,12 +47,12 @@ public class CustomerInscExtendServiceImpl implements CustomerInscExtendService 
                 BigDecimal rateBig = BigDecimal.valueOf(rate);
                 nominal = currentPrice.multiply(rateBig);
             }else{
-//                nominal = temi.getTemiNominal();
+                nominal = temi.getTemiNominal();
             }
 
             CustomerInscExtend cuex = CustomerInscExtend.builder()
                     .cuexName(temi.getTemiName())
-//                    .cuexNominal(nominal)
+                    .cuexNominal(nominal)
                     .cuexTotalItem(1)
                     .customerInscAssets(cias)
                     .cuexCreqEntityid(entityId)

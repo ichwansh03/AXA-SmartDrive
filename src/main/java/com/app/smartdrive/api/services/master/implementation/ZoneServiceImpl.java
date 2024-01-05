@@ -31,13 +31,6 @@ public class ZoneServiceImpl implements MasterService<ZonesRes, ZoneReq, Long> {
     }
 
     @Override
-    public ZonesRes update(Long aLong, ZoneReq zoneReq) {
-        Zones zones = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Zone ID : " + aLong + " Not Found !"));
-        repository.save(TransactionMapper.mapDtoToEntity(zoneReq,zones));
-        return TransactionMapper.mapEntityToDto(zones, ZonesRes.class);
-    }
-
-    @Override
     @Transactional
     public ZonesRes save(ZoneReq entity) {
         Zones zones = repository.save(TransactionMapper.mapDtoToEntity(entity, new Zones()));

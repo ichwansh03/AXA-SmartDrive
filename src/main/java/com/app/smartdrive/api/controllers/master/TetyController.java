@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/tety")
-@CrossOrigin
 @Tag(name = "Master Module")
 public class TetyController implements MasterController<TetyReq, Long> {
     private final MasterService tetyServiceImpl;
@@ -40,6 +39,6 @@ public class TetyController implements MasterController<TetyReq, Long> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TetyReq request) {
         tetyServiceImpl.getById(id);
-        return new ResponseEntity<>(tetyServiceImpl.update(id, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(tetyServiceImpl.save(request), HttpStatus.CREATED);
     }
 }

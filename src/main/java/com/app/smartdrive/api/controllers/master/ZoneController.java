@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/zones")
-@CrossOrigin
 @Tag(name = "Master Module")
 public class ZoneController implements MasterController<ZoneReq, Long> {
     private final MasterService zoneServiceImpl;
@@ -39,6 +38,6 @@ public class ZoneController implements MasterController<ZoneReq, Long> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody ZoneReq request) {
         zoneServiceImpl.getById(id);
-        return new ResponseEntity<>(zoneServiceImpl.update(id, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(zoneServiceImpl.save(request), HttpStatus.CREATED);
     }
 }

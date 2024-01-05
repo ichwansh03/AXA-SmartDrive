@@ -39,13 +39,6 @@ public class ArwgServiceImpl implements MasterService<ArwgRes, ArwgReq, String> 
     }
 
     @Override
-    public ArwgRes update(String s, ArwgReq arwgReq) {
-        AreaWorkGroup areaWorkGroup = repository.findById(s).orElseThrow(() -> new EntityNotFoundException("Area Workgroup ID : " + s + " Not Found !"));
-        repository.save(TransactionMapper.mapDtoToEntity(arwgReq, areaWorkGroup));
-        return TransactionMapper.mapEntityToDto(areaWorkGroup, ArwgRes.class);
-    }
-
-    @Override
     @Transactional
     public void deleteById(String s) {
         repository.deleteById(s);

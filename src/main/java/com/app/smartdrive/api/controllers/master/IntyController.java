@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/inty")
-@CrossOrigin
 @Tag(name = "Master Module")
 public class IntyController implements MasterController<IntyReq, String> {
     private final MasterService intyServiceImpl;
@@ -39,6 +38,6 @@ public class IntyController implements MasterController<IntyReq, String> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable String id, @Valid @RequestBody IntyReq request) {
         intyServiceImpl.getById(id);
-        return new ResponseEntity<>(intyServiceImpl.update(id, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(intyServiceImpl.save(request), HttpStatus.CREATED);
     }
 }

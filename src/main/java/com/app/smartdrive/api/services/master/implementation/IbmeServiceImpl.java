@@ -38,13 +38,6 @@ public class IbmeServiceImpl implements MasterService<IbmeRes, IbmeReq, Long> {
     }
 
     @Override
-    public IbmeRes update(Long aLong, IbmeReq ibmeReq) {
-        InboxMessaging inboxMessaging = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Inbox Messagging ID : " + aLong + " Not Found"));
-        repository.save(TransactionMapper.mapDtoToEntity(ibmeReq,inboxMessaging));
-        return TransactionMapper.mapEntityToDto(inboxMessaging, IbmeRes.class);
-    }
-
-    @Override
     @Transactional
     public void deleteById(Long aLong) {
         repository.deleteById(aLong);

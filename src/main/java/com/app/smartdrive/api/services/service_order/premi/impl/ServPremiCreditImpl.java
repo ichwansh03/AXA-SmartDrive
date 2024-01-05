@@ -3,11 +3,13 @@ package com.app.smartdrive.api.services.service_order.premi.impl;
 import com.app.smartdrive.api.Exceptions.CheckPaymentException;
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
+import com.app.smartdrive.api.dto.service_order.response.SecrDto;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCreditId;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
@@ -37,10 +39,12 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     private final SoRepository soRepository;
     private final ServOrderTaskService servOrderTaskService;
 
-    @Transactional(readOnly = true)
     @Override
-    public List<ServicePremiCredit> findByServId(Long servId) {
-        return secrRepository.findByServices_ServId(servId);
+    public List<SecrDto> findPremiCreditByServId(Long servId) {
+        Optional<ServicePremi> semiById = semiRepository.findById(servId);
+        return semiById.stream()
+                .map(secr -> TransactionMapper.mapEntityToDto(secr, SecrDto.class))
+                .toList();
     }
 
     @Transactional
@@ -51,19 +55,16 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         List<ServicePremiCredit> servicePremiCredits = new ArrayList<>();
 
         for (int i = 1; i <= 12; i++) {
-            ServicePremiCredit servicePremiCredit = new ServicePremiCredit();
-            LocalDateTime dateTime = semiModifiedDate.plusMonths(i);
-
-            servicePremiCredit.setSecrServId(servicePremi.getSemiServId());
-            servicePremiCredit.setSecrYear(String.valueOf(dateTime.getYear()));
-            servicePremiCredit.setSecrDuedate(dateTime);
-            servicePremiCredit.setServices(servicePremi.getServices());
-
-            ServicePremiCredit save = secrRepository.save(servicePremiCredit);
+            ServicePremiCredit save = generatePremiData(servicePremi, semiModifiedDate.plusMonths(i));
             servicePremiCredits.add(save);
         }
         log.info("ServPremiImpl::addSecr successfully added service premi credit");
         return servicePremiCredits;
+    }
+
+    @Override
+    public ServicePremiCredit addSecrCash(ServicePremi servicePremi) {
+        return generatePremiData(servicePremi, LocalDateTime.now().plusYears(1));
     }
 
     @Transactional
@@ -74,7 +75,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         ServicePremi premi = semiRepository.findById(secrServId)
                 .orElseThrow(() -> new EntityNotFoundException("findById(secrServId)::secrServId is not found"));
 
-        ServicePremiCredit premiCredit = buildCommonSecrData(premi, existSecr, secrReqDto);
+        ServicePremiCredit premiCredit = updateSecrData(premi, existSecr, secrReqDto);
 
         secrRepository.save(premiCredit);
 
@@ -132,7 +133,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         }
     }
 
-    private ServicePremiCredit buildCommonSecrData(ServicePremi semi, ServicePremiCredit secr, SecrReqDto secrReqDto){
+    private ServicePremiCredit updateSecrData(ServicePremi semi, ServicePremiCredit secr, SecrReqDto secrReqDto){
         return ServicePremiCredit.builder()
                 .secrId(secr.getSecrId())
                 .secrServId(secr.getSecrServId())
@@ -142,5 +143,16 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
                 .secrTrxDate(LocalDateTime.now())
                 .secrDuedate(secr.getSecrDuedate())
                 .services(semi.getServices()).build();
+    }
+
+    private ServicePremiCredit generatePremiData(ServicePremi servicePremi, LocalDateTime dateTime){
+        ServicePremiCredit servicePremiCredit = new ServicePremiCredit();
+
+        servicePremiCredit.setSecrServId(servicePremi.getSemiServId());
+        servicePremiCredit.setSecrYear(String.valueOf(dateTime.getYear()));
+        servicePremiCredit.setSecrDuedate(dateTime);
+        servicePremiCredit.setServices(servicePremi.getServices());
+
+        return secrRepository.save(servicePremiCredit);
     }
 }

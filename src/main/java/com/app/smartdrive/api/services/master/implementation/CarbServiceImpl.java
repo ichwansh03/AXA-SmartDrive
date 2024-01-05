@@ -31,13 +31,6 @@ public class CarbServiceImpl implements MasterService<CarbRes, CarbReq, Long> {
     }
 
     @Override
-    public CarbRes update(Long aLong, CarbReq carbReq) {
-        CarBrand carBrand = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Brand ID : " + aLong + " Not Found"));
-        repository.save(TransactionMapper.mapDtoToEntity(carbReq, carBrand));
-        return TransactionMapper.mapEntityToDto(carBrand, CarbRes.class);
-    }
-
-    @Override
     @Transactional
     public CarbRes save(CarbReq entity) {
         CarBrand carBrand = repository.save(TransactionMapper.mapDtoToEntity(entity, new CarBrand()));

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/tewo")
-@CrossOrigin
 @Tag(name = "Master Module")
 public class TewoController implements MasterController<TewoReq, Long> {
     private final MasterService tewoServiceImpl;
@@ -39,6 +38,6 @@ public class TewoController implements MasterController<TewoReq, Long> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TewoReq request) {
         tewoServiceImpl.getById(id);
-        return new ResponseEntity<>(tewoServiceImpl.update(id, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(tewoServiceImpl.save(request), HttpStatus.CREATED);
     }
 }

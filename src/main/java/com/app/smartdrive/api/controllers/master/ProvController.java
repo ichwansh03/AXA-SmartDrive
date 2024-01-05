@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/provinsi")
-@CrossOrigin
 @Tag(name = "Master Module")
 public class ProvController implements MasterController<ProvReq, Long> {
     private final MasterService provServiceImpl;
@@ -39,6 +38,6 @@ public class ProvController implements MasterController<ProvReq, Long> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody ProvReq request) {
         provServiceImpl.getById(id);
-        return new ResponseEntity<>(provServiceImpl.update(id, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(provServiceImpl.save(request), HttpStatus.CREATED);
     }
 }

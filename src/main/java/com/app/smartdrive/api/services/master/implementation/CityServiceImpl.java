@@ -31,13 +31,6 @@ public class CityServiceImpl implements MasterService<CitiesRes, CitiesReq, Long
     }
 
     @Override
-    public CitiesRes update(Long aLong, CitiesReq citiesReq) {
-        Cities cities = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("City ID : " + aLong + " Not Found"));
-        cities = repository.save(TransactionMapper.mapDtoToEntity(citiesReq, cities));
-        return TransactionMapper.mapEntityToDto(cities, CitiesRes.class);
-    }
-
-    @Override
     @Transactional
     public CitiesRes save(CitiesReq entity) {
         Cities cities = repository.save(TransactionMapper.mapDtoToEntity(entity, new Cities()));

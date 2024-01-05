@@ -31,13 +31,6 @@ public class TewoServiceImpl implements MasterService<TewoRes, TewoReq, Long> {
     }
 
     @Override
-    public TewoRes update(Long aLong, TewoReq tewoReq) {
-        TemplateTaskWorkOrder templateTaskWorkOrder = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Task Work Order : " + aLong + " Not Found"));
-        repository.save(TransactionMapper.mapDtoToEntity(tewoReq,templateTaskWorkOrder));
-        return TransactionMapper.mapEntityToDto(templateTaskWorkOrder, TewoRes.class);
-    }
-
-    @Override
     @Transactional
     public TewoRes save(TewoReq entity) {
         TemplateTaskWorkOrder templateWorkOrder = repository.save(TransactionMapper.mapDtoToEntity(entity, new TemplateTaskWorkOrder()));
