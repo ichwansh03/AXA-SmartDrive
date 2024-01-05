@@ -76,6 +76,7 @@ public class EmployeesServiceImpl implements EmployeesService {
                 new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
 
         authenticationService.validateUsername(employeesDto.getEmail());
+
         authenticationService.validateEmail(employeesDto.getEmail());
         authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
 
@@ -180,6 +181,8 @@ public class EmployeesServiceImpl implements EmployeesService {
         User user = existingEmployee.getUser();
 
         updateUserFromDto(user, employeesDto);
+
+
 
         if(employeesDto.getGrantAccessUser()){
             user.setUserName(employeesDto.getEmail());

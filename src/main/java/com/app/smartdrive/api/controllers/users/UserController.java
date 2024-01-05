@@ -21,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 @Slf4j
+@CrossOrigin
 @PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.user.getUserEntityId() == #id)")
 public class UserController {
   private final UserService userService;
