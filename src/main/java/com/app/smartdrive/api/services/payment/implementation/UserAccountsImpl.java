@@ -84,7 +84,7 @@ public class UserAccountsImpl implements UserAccountsService {
         UserAccounts userAcc = repositoryUA.findByNorek(requests.getNoRekening()).orElse(null);
         String noAccount = requests.getNoRekening();
 
-        if(checkUserAccounts(requests.getNoRekening(), repositoryUA)){
+        if(userAcc  != null){
             user.setEnumPaymentType(userAcc.getEnumPaymentType());
             calculationAddDebetProcess(requests.getNoRekening(),requests.getNominall(), repositoryUA);
             return UserAccountsMapperResponse

@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.PaymentTransactionsDtoResponse;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
@@ -52,17 +53,6 @@ public class PaymentTransactionsImpl implements TransactionsService {
     private final BatchPartnerInvoiceService serviceInvoicePartner;
     private final BatchEmployeeSalaryService serviceEmployeSalary;
     private final SecrRepository secrRepository;
-
-    public PaymentTransactions addaPY(PaymentTransactions paymentTransactions) {
-        entityManager.persist(paymentTransactions);
-        return paymentTransactions;
-    }
-
-    @Override
-    public List<PaymentTransactions> findAllPaymentTransactions() {
-        return repository.getAllPaymentTransactions();
-    }
-
 
 
     public String dateTimeFormatter(LocalDateTime b) {
@@ -112,12 +102,12 @@ public class PaymentTransactionsImpl implements TransactionsService {
         String trxNo = generateTrxNo(LocalDateTime.now());
         String trxNoRev = repository.findLastOptional();
 
-       if(listPayment.isEmpty()){
-           PaymentTransactions transactions = PaymentTransactions.builder()
-                   .patrTrxno(trxNo)
-                   .patrTrxnoRev(null)
-                   .build();
-       }
+        if(listPayment.isEmpty()){
+            PaymentTransactions transactions = PaymentTransactions.builder()
+                    .patrTrxno(trxNo)
+                    .patrTrxnoRev(null)
+                    .build();
+        }
         PaymentTransactions transactions = PaymentTransactions.builder()
                 .patrTrxno(trxNo)
                 .patrTrxnoRev(trxNoRev)
@@ -176,7 +166,7 @@ public class PaymentTransactionsImpl implements TransactionsService {
                     checkErrorAccount(request.getUsac_accountno(),
                             request.getPatr_usac_accountNo_to(), userAccountsRepository);
                 }
-            break;
+                break;
             default:
                 throw new TypeTransaksiNotFoundException("Harap memilih tipe transaksi yang benar!");
         }
@@ -193,15 +183,6 @@ public class PaymentTransactionsImpl implements TransactionsService {
         return dtoGenerateTransaksi;
     }
 
-
-    private void handleUpdateDebetTransactionsUserAccount(List<UserAccounts> listAcc,
-    String toRekening, BigDecimal nominal ){
-        listAcc.stream()
-            .filter(user -> toRekening.equals(user.getUsac_accountno()))
-            .forEach(user -> user.setUsac_debet(
-                Optional.ofNullable(user.getUsac_debet()).orElse(BigDecimal.ZERO).add(nominal)));
-        userAccountsRepository.saveAll(listAcc);
-    }
 
     private GenerateTransferResponse handlePaymentTypeGenerateTransactions( GenerateTransactionsRequests request) {
         UserAccounts userAcc = userAccountsRepository.findByAccounts(request.getNoRekening());
@@ -256,6 +237,7 @@ public class PaymentTransactionsImpl implements TransactionsService {
                     dtoGenerate.setInvoiceNo(List.of(partnerInvoice.getNo()));
                     dtoGenerate.setPaidDate(partnerInvoice.getPaidDate());
                     dtoGenerate.setNominal(nominalWithTax);
+                    dtoGenerate.setTotalNominal(nominalWithTax);
                     dtoGenerate.setStatus(partnerInvoice.getStatus());
                     dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
                 }else{
@@ -290,6 +272,7 @@ public class PaymentTransactionsImpl implements TransactionsService {
                     dtoGenerate.setInvoiceNo(List.of(invoiceNo));
                     dtoGenerate.setNominal(nominalPremi);
                     dtoGenerate.setStatus(EnumModuleServiceOrders.SemiStatus.PAID);
+                    dtoGenerate.setTotalNominal(nominalPremi);
                     dtoGenerate.setPaidDate(LocalDateTime.now());
                     dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
                 }else {
@@ -298,8 +281,10 @@ public class PaymentTransactionsImpl implements TransactionsService {
                 break;
             case SALARY:
                 List<String> listGt = new ArrayList<>();
-                int count = employeeSalaryRepository.countBesaPatrTrxno();
+                int count = employeeSalaryRepository.countBesaPatrTrxno(request.getToRekening());
                 int i = 0;
+                BigDecimal countSalary = BigDecimal.ZERO;
+
                 while(i<count){
                     if (checkValidationNoAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository)) {
                         BatchEmployeeSalary employeeSalary = employeeSalaryRepository.findBesaAccountNumber(request.getToRekening());
@@ -308,6 +293,7 @@ public class PaymentTransactionsImpl implements TransactionsService {
                         BigDecimal saldoSender = userAcc.getUsac_debet();
                         LocalDate createdDateSalary = employeeSalary.getBesaCreatedDate();
                         String invoiceSalary = "SAL-" + dateFormatter(createdDateSalary);
+
 
                         checkSaldoHandle(saldoSender, nominalSalary, request.getTipePayment());
 
@@ -333,37 +319,34 @@ public class PaymentTransactionsImpl implements TransactionsService {
                         dtoGenerate.setPaidDate(employeeSalary.getBesaPaidDate());
                         dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
                         listGt.add(invoiceSalary);
+
+                        countSalary = countSalary.add(nominalSalary);
                         i++;
-
-
-
-
                     }else{
                         checkErrorAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository);
                     }
-
-                }
-
-
+                }dtoGenerate.setTotalNominal(countSalary);
                 break;
             default:
                 throw new TypeTransaksiNotFoundException("Harap memilih tipe transaksi yang benar!");
         }
-      return dtoGenerate;
+        return dtoGenerate;
     }
 
     @Override
-    public PaymentTransactionsDtoResponse getById(String string) {
-        return null;
+    public PaymentTransactionsDtoResponse getById(String trxNo) {
+        Optional<PaymentTransactions> transactions = repository.findById(trxNo);
+        PaymentTransactionsDtoResponse response = TransactionMapper.mapEntityToDto(transactions,PaymentTransactionsDtoResponse.class);
+        return response;
     }
 
     @Override
     public List<PaymentTransactionsDtoResponse> getAll() {
-        return null;
+        List<PaymentTransactions> listTransactions = repository.findAll();
+        List<PaymentTransactionsDtoResponse> listResponse = TransactionMapper.mapEntityListToDtoList(
+                listTransactions, PaymentTransactionsDtoResponse.class);
+        return listResponse;
     }
 
-    @Override
-    public Boolean deleteById(String string) {
-        return null;
-    }
+
 }
