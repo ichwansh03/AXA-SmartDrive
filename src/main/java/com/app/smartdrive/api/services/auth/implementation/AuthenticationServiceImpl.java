@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,13 +54,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   @Override
   public AuthUser signinCustomer(SignInRequest request) {
-    User user = userRepository.findUserByIden(request.getUsername())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
+    User user = userRepository.findUserByIdentity(request.getIdentity())
+            .orElseThrow(() -> new BadCredentialsException("Invalid email or username or phone number"));
     AuthUser authUser = new AuthUser(user);
     if(user.getUserRoles().stream().anyMatch(usro -> usro.getUsroStatus().equals("ACTIVE"))){
-      authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-      return authUser;
+      try{
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getIdentity(), request.getPassword()));
+        return authUser;
+      } catch (BadCredentialsException ex) {
+        throw new BadCredentialsException("Invalid password"); //custom message
+      }
     }
     throw new AccountNonActiveException();
   }
