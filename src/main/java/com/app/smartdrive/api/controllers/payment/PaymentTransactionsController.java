@@ -37,9 +37,11 @@ public class PaymentTransactionsController {
 
     @GetMapping("/all")
     public ResponseEntity<?> findAllPaymentTransactions(){
-        List<PaymentTransactions> findPayment = service.findAllPaymentTransactions();
+        List<PaymentTransactionsDtoResponse> findPayment = service.getAll();
         return new ResponseEntity<>(findPayment, HttpStatus.OK);
     }
+
+
 
     @GetMapping("/all/salaryHistory")
     public ResponseEntity<?> getAllSalary(){

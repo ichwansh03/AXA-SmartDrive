@@ -19,6 +19,7 @@ public class GenerateTransferResponse {
     private Enum status;
     private LocalDateTime paidDate;
     private BigDecimal nominal;
+    private BigDecimal totalNominal;
     private String trxNo;
     
 }

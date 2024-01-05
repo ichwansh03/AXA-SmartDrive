@@ -30,8 +30,9 @@ public interface BatchEmployeeSalaryRepository extends JpaRepository<BatchEmploy
             "AND besa_paid_date IS NULL ORDER BY besa_created_date ASC", nativeQuery = true)
     BatchEmployeeSalary findBesaAccountNumber(String besa_account_number);
 
-    @Query(value = "SELECT COUNT(*) from hr.batch_employee_salary where besa_paid_date IS NULL ", nativeQuery = true)
-    int countBesaPatrTrxno();
+    @Query(value = "SELECT COUNT(*) from hr.batch_employee_salary where besa_paid_date IS NULL " +
+            "AND besa_account_number=:besa_account_number ", nativeQuery = true)
+    int countBesaPatrTrxno(String besa_account_number);
 
     @Query(value = "SELECT * from hr.batch_employee_salary where besa_paid_date IS NOT NULL", nativeQuery = true)
     List<BatchEmployeeSalary> listEmployeePaidSalary();

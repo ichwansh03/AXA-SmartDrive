@@ -11,50 +11,47 @@ import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
 public interface AccountsUserManagementService {
 
     default boolean checkValidationNoAccount(String noRekFrom, String noRekTo, UserAccountsRepository repository){
-        List<UserAccounts> listAcc = repository.findAll();
-        for (UserAccounts user: listAcc) {
-            if(!noRekFrom.equals(user.getUsac_accountno()) &&
-                    !noRekTo.equals(user.getUsac_accountno())){
-                return false;
-            }
+        UserAccounts userFrom = repository.findByAccounts(noRekFrom);
+        UserAccounts userTo = repository.findByAccounts(noRekTo);
+
+        if(userFrom == null || userTo == null){
+            return false;
         }
         return true;
+
     }
 
-    default boolean checkUserAccounts(String noRekening, UserAccountsRepository repository){
-        List<UserAccounts> listUserAccounts = repository.findAll();
-        for (UserAccounts user: listUserAccounts) {
-            if(user.getUsac_accountno().equals(noRekening)){
-                return true;
-            }
-        }
-        return false;
-    }
 
     default void checkErrorAccount(String noRekFrom, String noRekTo, UserAccountsRepository repository){
-        List<UserAccounts> listAcc = repository.findAll();
-        for (UserAccounts user: listAcc) {
-            if(!noRekFrom.equals(user.getUsac_accountno())){
-                throw new EntityNotFoundException("Rekening pengirim: "
-                        + noRekFrom + " Belum terdaftar!, Harap memasukan norekening yang sesuai ");
-            } else if (!noRekTo.equals(user.getUsac_accountno())) {
-                throw new EntityNotFoundException("Rekening penerima: "
-                        + noRekTo + " Belum terdaftar!, Harap memasukan norekening yang sesuai ");
-            }
+        UserAccounts userFrom = repository.findByAccounts(noRekFrom);
+        UserAccounts userTo = repository.findByAccounts(noRekTo);
+
+        if(userFrom == null){
+            throw new EntityNotFoundException("Rekening pengirim: "
+                    + noRekFrom + " Belum terdaftar!, Harap memasukan norekening yang sesuai ");
+        } else if (userTo == null) {
+            throw new EntityNotFoundException("Rekening penerima: "
+                    + noRekTo + " Belum terdaftar!, Harap memasukan norekening yang sesuai ");
         }
+
     }
 
     default void calculationTransaksiDebetProcess(String noRekFrom, String noRekTo, BigDecimal nominal, UserAccountsRepository repository){
-        List<UserAccounts> listAcc = repository.findAll();
+
         UserAccounts userRecipient = repository.findByAccounts(noRekTo);
         UserAccounts userSender = repository.findByAccounts(noRekFrom);
         BigDecimal saldoRecipient = userRecipient.getUsac_debet();
         BigDecimal saldoSender = userSender.getUsac_debet();
         if(checkValidationNoAccount(noRekFrom, noRekTo, repository)){
-            BigDecimal totalSaldoRecipient = saldoRecipient.add(nominal);
-            BigDecimal totalSaldoSender = saldoSender.subtract(nominal);
-            userSender.setUsac_debet(totalSaldoSender);
-            userRecipient.setUsac_debet(totalSaldoRecipient);
+            if(saldoRecipient == null){
+                userSender.setUsac_debet(saldoSender.subtract(nominal));
+                userRecipient.setUsac_debet(nominal);
+            }else{
+                BigDecimal totalSaldoRecipient = saldoRecipient.add(nominal);
+                BigDecimal totalSaldoSender = saldoSender.subtract(nominal);
+                userSender.setUsac_debet(totalSaldoSender);
+                userRecipient.setUsac_debet(totalSaldoRecipient);
+            }
             repository.save(userSender);
             repository.save(userRecipient);
         }
