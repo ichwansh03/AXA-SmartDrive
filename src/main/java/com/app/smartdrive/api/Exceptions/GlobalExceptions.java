@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -215,12 +216,24 @@ public class GlobalExceptions {
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
-  @ExceptionHandler(AccountNonActiveException.class)
-  public ResponseEntity<?> inactiveAccount(AccountNonActiveException ex){
-    Error error = ErrorUtils.createError("Inactive account, please use another account",
-            ex.getMessage(), HttpStatus.FORBIDDEN.value());
-    return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
-  }
+    @ExceptionHandler(AccountNonActiveException.class)
+    public ResponseEntity<?> inactiveAccount(AccountNonActiveException ex){
+      Error error = ErrorUtils.createError("Inactive account, please use another account",
+              ex.getMessage(), HttpStatus.FORBIDDEN.value());
+      return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> badCredentia(HttpServletRequest request, BadCredentialsException ex){
+      Error error = ErrorUtils.createError(
+              ex.getMessage(),
+              ex.getLocalizedMessage(),
+              HttpStatus.BAD_REQUEST.value())
+              .setUrl(request.getRequestURI())
+              .setReqMethod(request.getMethod())
+              .setTimestamp(LocalDateTime.now());
+      return ResponseEntity.badRequest().body(error);
+    }
 
     @ExceptionHandler(EntityAlreadyExistException.class)
     public ResponseEntity<?> handleEntityAlreadyExistException(

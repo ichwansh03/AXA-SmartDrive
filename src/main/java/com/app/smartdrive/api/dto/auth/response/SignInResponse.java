@@ -1,8 +1,12 @@
 package com.app.smartdrive.api.dto.auth.response;
 
-import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Builder
+@Setter
+@Getter
+@NoArgsConstructor
 public class SignInResponse {
   private Long userEntityId;
   private String userName;
