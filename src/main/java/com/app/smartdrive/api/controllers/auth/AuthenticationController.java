@@ -7,6 +7,7 @@ import com.app.smartdrive.api.dto.auth.response.SignInResponse;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.entities.auth.RefreshToken;
+import com.app.smartdrive.api.entities.users.AuthUser;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
