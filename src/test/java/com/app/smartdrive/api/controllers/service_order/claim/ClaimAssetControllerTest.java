@@ -98,7 +98,7 @@ class ClaimAssetControllerTest {
     Partner partner;
     ServiceOrders serviceOrders;
     void deleteUser(User user, Partner partner){
-        userRepository.deleteByUserName(user.getUsername());
+        userRepository.deleteByUserName(user.getUserName());
         userRepository.deleteById(partner.getPartEntityid());
         partnerRepository.delete(partner);
     }

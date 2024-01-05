@@ -52,6 +52,8 @@ public class ServPremiImpl implements ServPremiService {
         if (services.getCustomer().getCustomerInscAssets().getCiasPaidType() == EnumCustomer.CreqPaidType.CREDIT) {
             servPremiCreditService.addSecr(premi);
             log.info("ServPremiImpl::addSemi successfully added service premi");
+        } else {
+            servPremiCreditService.addSecrCash(premi);
         }
 
         return save;

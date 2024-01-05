@@ -31,6 +31,13 @@ public class TetyServiceImpl implements MasterService<TetyRes, TetyReq, Long> {
     }
 
     @Override
+    public TetyRes update(Long aLong, TetyReq tetyReq) {
+        TemplateType templateType = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Template Type : " + aLong + " Not Found"));
+        templateType = repository.save(TransactionMapper.mapDtoToEntity(tetyReq, templateType));
+        return TransactionMapper.mapEntityToDto(templateType, TetyRes.class);
+    }
+
+    @Override
     @Transactional
     public TetyRes save(TetyReq entity) {
         TemplateType templateType = new TemplateType();

@@ -50,6 +50,8 @@ public class PaymentTransactionsController {
     public ResponseEntity<?> getIdPayment(@Valid @PathVariable("patrTrxno") String patrTrxno){
         PaymentTransactionsDtoResponse pt = service.getById(patrTrxno);
         return new ResponseEntity<>(pt, HttpStatus.OK);
+
+
     }
 
     @PostMapping("/transactions/transaksi")

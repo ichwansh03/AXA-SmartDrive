@@ -14,9 +14,9 @@ import com.app.smartdrive.api.repositories.payment.FintechRepository;
 import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.users.UserUserAccountService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -98,5 +98,11 @@ public class UserUserAccountImpl implements UserUserAccountService {
     }
     user.setUserAccounts(userAccounts);
     return userAccounts;
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Optional<UserAccounts> getOptionalByUserAccountNo(String number) {
+    return this.userAccountsRepository.findByNorek(number);
   }
 }
