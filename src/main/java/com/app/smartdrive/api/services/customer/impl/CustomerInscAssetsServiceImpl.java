@@ -42,8 +42,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
             CustomerRequest newCustomerRequest
     ){
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ciasStartdate = LocalDateTime.parse(customerInscAssetsRequestDTO.getCiasStartdate(), formatter);
+        LocalDateTime ciasStartdate = LocalDateTime.now();
 
         // new cias
 
@@ -74,8 +73,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
             CarSeries carSeries,
             InsuranceType existInty
     ){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
+        LocalDateTime ciasStartdate = LocalDateTime.now();
 
         cias.setCiasYear(ciasUpdateDTO.getCiasYear());
         cias.setCiasStartdate(ciasStartdate);
