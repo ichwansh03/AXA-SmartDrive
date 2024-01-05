@@ -22,13 +22,13 @@ public class EmployeesController {
      private final EmployeesService employeesService;
 
     @PostMapping("/create")
-//    @PreAuthorize("hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> createEmployee(@Valid @RequestBody EmployeesRequestDto employeesRequestDto) {
         return ResponseEntity.status(201).body(employeesService.createEmployee(employeesRequestDto));
     }
 
     @PutMapping("/{id}")
-//    @PreAuthorize("hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> updateEmployee(
             @PathVariable("id") Long id,
             @RequestBody EmployeesRequestDto updatedEmployeeDto) {
@@ -36,12 +36,14 @@ public class EmployeesController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> deleteEmployeesById (@PathVariable Long id) {
         employeesService.deleteEmployeesById(id);
         return new ResponseEntity<>("Employees deleted successfully", HttpStatus.OK);
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('Admin')")
         public ResponseEntity<?> searchEmployees(
             @RequestParam(value = "value") String value,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -51,6 +53,7 @@ public class EmployeesController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> getAll(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
