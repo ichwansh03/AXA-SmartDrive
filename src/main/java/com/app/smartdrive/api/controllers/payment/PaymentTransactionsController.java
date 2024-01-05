@@ -4,19 +4,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransactionsByUserDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.EmployeeSalaryHistoryDtoResponse;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.PaymentTransactionsDtoResponse;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransaksiByUserDtoResponse;
+import com.app.smartdrive.api.services.payment.TransactionsHistoryService;
 import com.app.smartdrive.api.services.payment.TransactionsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.GenerateTransactionsRequests;
@@ -37,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/payment")
 public class PaymentTransactionsController {
     private final TransactionsService service;
+    private final TransactionsHistoryService historyService;
 
     @GetMapping("/all")
     public ResponseEntity<?> findAllPaymentTransactions(){
@@ -44,6 +41,11 @@ public class PaymentTransactionsController {
         return new ResponseEntity<>(findPayment, HttpStatus.OK);
     }
 
+    @GetMapping("/all/salaryHistory")
+    public ResponseEntity<?> getAllSalary(){
+        List<EmployeeSalaryHistoryDtoResponse> findAllSalary = historyService.getAllSuksesHistorySalary();
+        return new ResponseEntity<>(findAllSalary, HttpStatus.OK);
+    }
     @GetMapping("/transactions/{patrTrxno}")
     public ResponseEntity<?> getIdPayment(@Valid @PathVariable("patrTrxno") String patrTrxno){
         PaymentTransactionsDtoResponse pt = service.getById(patrTrxno);

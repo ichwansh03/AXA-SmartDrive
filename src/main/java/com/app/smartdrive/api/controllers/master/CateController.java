@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
+@CrossOrigin
 @Tag(name = "Master Module")
 public class CateController implements MasterController<CateReq, Long> {
     private final MasterService cateServiceImpl;
