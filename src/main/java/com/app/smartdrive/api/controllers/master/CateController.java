@@ -43,7 +43,7 @@ public class CateController implements MasterController<CateReq, Long> {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CateReq request) {
         cateServiceImpl.getById(id);
-        return new ResponseEntity<>(cateServiceImpl.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(cateServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 
 
@@ -51,11 +51,5 @@ public class CateController implements MasterController<CateReq, Long> {
     public ResponseEntity<?> deleteData(@PathVariable Long id) {
         cateServiceImpl.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteData(@PathVariable Long id){
-        cateServiceImpl.deleteById(id);
-        return ResponseEntity.ok("deleted");
     }
 }
