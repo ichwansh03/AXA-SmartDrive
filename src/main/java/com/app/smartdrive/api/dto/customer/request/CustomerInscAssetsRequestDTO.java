@@ -20,8 +20,6 @@ public class CustomerInscAssetsRequestDTO {
     @Size(max = 4, message = "test dari dto")
     private String ciasYear;
 
-    private String ciasStartdate;
-
     private Character ciasIsNewChar;
 
     private String ciasPaidType;
