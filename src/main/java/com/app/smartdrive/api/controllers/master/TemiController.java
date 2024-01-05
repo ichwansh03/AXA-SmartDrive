@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/temi")
+@CrossOrigin
 @Tag(name = "Master Module")
 public class TemiController implements MasterController<TemiReq, Long> {
     private final MasterService temiServiceImpl;
@@ -37,7 +38,6 @@ public class TemiController implements MasterController<TemiReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TemiReq request) {
-        temiServiceImpl.getById(id);
-        return new ResponseEntity<>(temiServiceImpl.save(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(temiServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }
