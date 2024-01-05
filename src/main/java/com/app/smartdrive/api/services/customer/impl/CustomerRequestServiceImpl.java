@@ -414,6 +414,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
 
 
+
         return customerResponseDTO;
 //        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }

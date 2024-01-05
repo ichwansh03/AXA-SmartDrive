@@ -16,6 +16,7 @@ public class SoTasksDto {
 
     private Long seotId;
     private String seotName;
+
     private String seotActualStartdate;
     private String seotActualEnddate;
     private EnumModuleServiceOrders.SeotStatus seotStatus;

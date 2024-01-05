@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -44,6 +45,13 @@ public class CateController implements MasterController<CateReq, Long> {
         cateServiceImpl.getById(id);
         return new ResponseEntity<>(cateServiceImpl.update(id, request), HttpStatus.CREATED);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteData(@PathVariable Long id) {
+        cateServiceImpl.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteData(@PathVariable Long id) {
