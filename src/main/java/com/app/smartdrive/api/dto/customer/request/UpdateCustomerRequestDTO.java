@@ -13,8 +13,6 @@ public class UpdateCustomerRequestDTO {
 
     private Long creqEntityId;
 
-    private Long customerId;
-
     private Long agenId;
 
     private Long employeeId;

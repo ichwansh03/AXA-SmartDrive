@@ -23,7 +23,6 @@ public class BusinessEntityImpl implements BusinessEntityService{
   private final EntityManager entityManager;
   @Override
   public List<BusinessEntity> getAll() {
-    // TODO Auto-generated method stub
     return repo.findAll();
   }
 
@@ -32,8 +31,6 @@ public class BusinessEntityImpl implements BusinessEntityService{
   @Transactional
   public BusinessEntity save(BusinessEntity businessEntity){
     BusinessEntity business = repo.save(businessEntity);
-    log.info("business entity id ini cuy "+business.getEntityId().toString());
-//    repo.flush();
     return business;
   }
 
@@ -41,7 +38,6 @@ public class BusinessEntityImpl implements BusinessEntityService{
 
   @Override
   public BusinessEntity createBusinessEntity() {
-    // TODO Auto-generated method stub
     BusinessEntity businessEntity = new BusinessEntity();
     businessEntity.setEntityModifiedDate(LocalDateTime.now());
     BusinessEntity newBusiness = save(businessEntity);

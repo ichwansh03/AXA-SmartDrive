@@ -5,14 +5,12 @@ import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.entities.users.AuthUser;
 import com.app.smartdrive.api.entities.users.User;
-import jakarta.transaction.Transactional;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthenticationService {
   void signup(CreateUserDto request);
+
   AuthUser signinCustomer(SignInRequest request);
 
-  @Transactional
   String changePassword(Long id, PasswordRequestDto passwordRequestDto);
 
   User createAdmin(CreateUserDto profileRequestDto);

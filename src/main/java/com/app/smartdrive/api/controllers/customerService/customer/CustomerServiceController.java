@@ -52,16 +52,9 @@ public class CustomerServiceController {
             paging = PageRequest.of(basePagingCustomerRequestDTO.getPage(), basePagingCustomerRequestDTO.getSize(), Sort.by(basePagingCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingCustomerRequest = this.customerRequestService.getAllPaging(paging, basePagingCustomerRequestDTO.getType(), basePagingCustomerRequestDTO.getStatus());
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = this.customerRequestService.getAllPaging(paging, basePagingCustomerRequestDTO.getType(), basePagingCustomerRequestDTO.getStatus());
 
-        Page<CustomerResponseDTO> pagingCustomerResponseDTO = pagingCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
-
-        return ResponseEntity.status(HttpStatus.OK).body(pagingCustomerResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(pageCustomerResponseDTO);
     }
 
     @GetMapping("/request/customer")
@@ -77,16 +70,11 @@ public class CustomerServiceController {
             paging = PageRequest.of(pagingUserCustomerRequestDTO.getPage(), pagingUserCustomerRequestDTO.getSize(), Sort.by(pagingUserCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingUserCustomerRequest = this.customerRequestService.getPagingUserCustomerRequest(pagingUserCustomerRequestDTO.getCustomerId(), paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus());
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = this.customerRequestService.getPagingUserCustomerRequest(pagingUserCustomerRequestDTO.getCustomerId(), paging, pagingUserCustomerRequestDTO.getType(), pagingUserCustomerRequestDTO.getStatus());
 
-        Page<CustomerResponseDTO> pagingUserCustomerResponseDTO = pagingUserCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
 
-        return ResponseEntity.status(HttpStatus.OK).body(pagingUserCustomerResponseDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(pageCustomerResponseDTO);
     }
 
     @GetMapping("/request/agen")
@@ -103,16 +91,11 @@ public class CustomerServiceController {
             paging = PageRequest.of(pagingAgenCustomerRequestDTO.getPage(), pagingAgenCustomerRequestDTO.getSize(), Sort.by(pagingAgenCustomerRequestDTO.getSortBy()).ascending());
         }
 
-        Page<CustomerRequest> pagingAgenCustomerRequest = this.customerRequestService.getPagingAgenCustomerRequest(pagingAgenCustomerRequestDTO.getEmployeeId(), pagingAgenCustomerRequestDTO.getArwgCode(), paging, pagingAgenCustomerRequestDTO.getType(), pagingAgenCustomerRequestDTO.getStatus());
+        Page<CustomerResponseDTO> pageCustomerResponseDTO = this.customerRequestService.getPagingAgenCustomerRequest(pagingAgenCustomerRequestDTO.getEmployeeId(), pagingAgenCustomerRequestDTO.getArwgCode(), paging, pagingAgenCustomerRequestDTO.getType(), pagingAgenCustomerRequestDTO.getStatus());
 
-        Page<CustomerResponseDTO> pagingAgenCustomerResponseDTO = pagingAgenCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
-            @Override
-            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
-                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
-            }
-        });
 
-        return ResponseEntity.status(HttpStatus.OK).body(pagingAgenCustomerResponseDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(pageCustomerResponseDTO);
     }
 
 
@@ -138,10 +121,9 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         CustomerRequestDTO customerRequestDTO = mapper.readValue(client, CustomerRequestDTO.class);
 
-        CustomerRequest createdCustomerRequest = this.customerRequestService.create(customerRequestDTO, files);
+        CustomerResponseDTO createdCustomerResponseDTO = this.customerRequestService.create(customerRequestDTO, files);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(createdCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomerResponseDTO);
     }
 
     @PostMapping("/request/agen")
@@ -154,10 +136,9 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         CreateCustomerRequestByAgenDTO createCustomerRequestByAgenDTO = mapper.readValue(client, CreateCustomerRequestByAgenDTO.class);
 
-        CustomerRequest newCustomerRequest = this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, files);
+        CustomerResponseDTO createdByAgenCustomerResponseDTO = this.customerRequestService.createByAgen(createCustomerRequestByAgenDTO, files);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(newCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdByAgenCustomerResponseDTO);
     }
 
     @PutMapping("/request")
@@ -169,10 +150,9 @@ public class CustomerServiceController {
         ObjectMapper mapper = new ObjectMapper();
         UpdateCustomerRequestDTO updateCustomerRequestDTO = mapper.readValue(client, UpdateCustomerRequestDTO.class);
 
-        CustomerRequest updatedCustomerRequest = this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, files);
+        CustomerResponseDTO updatedCustomerResponseDTO = this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, files);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(updatedCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedCustomerResponseDTO);
     }
 
 
@@ -181,10 +161,9 @@ public class CustomerServiceController {
     public ResponseEntity<CustomerResponseDTO> requestClaimPolis(
             @RequestBody ClaimRequestDTO claimRequestDTO
     ){
-        CustomerRequest claimedCustomerRequest = this.customerClaimService.claimPolis(claimRequestDTO);
+        CustomerResponseDTO claimedCustomerResponseDTO = this.customerClaimService.claimPolis(claimRequestDTO);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(claimedCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(claimedCustomerResponseDTO);
     }
 
     @GetMapping("/request/claim")
@@ -192,9 +171,8 @@ public class CustomerServiceController {
     public ResponseEntity<ClaimResponseDTO> getCustomerClaimById(
             @RequestParam("cuclCreqEntityId") Long cuclCreqEntityId
     ){
-        CustomerClaim existCustomerClaim = this.customerClaimService.getCustomerClaimById(cuclCreqEntityId);
+        ClaimResponseDTO claimResponseDTO = this.customerClaimService.getCustomerClaimById(cuclCreqEntityId);
 
-        ClaimResponseDTO claimResponseDTO = TransactionMapper.mapEntityToDto(existCustomerClaim, ClaimResponseDTO.class);
         return ResponseEntity.status(HttpStatus.OK).body(claimResponseDTO);
 
     }
@@ -202,10 +180,9 @@ public class CustomerServiceController {
     @PutMapping("/request/close")
     @PreAuthorize("hasAuthority('Customer') or hasAuthority('Employee')")
     public ResponseEntity<CustomerResponseDTO> requestClosePolis(@RequestBody CloseRequestDTO closeRequestDTO){
-        CustomerRequest closedCustomerRequest = this.customerClaimService.closePolis(closeRequestDTO);
+        CustomerResponseDTO closedCustomerResponseDTO = this.customerClaimService.closePolis(closeRequestDTO);
 
-        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(closedCustomerRequest, CustomerResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(closedCustomerResponseDTO);
     }
 
 

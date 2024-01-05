@@ -102,7 +102,7 @@ public class FintechServiceImpl implements PaymentService {
         if(fintechData == null){
             throw new EntityNotFoundException("Tidak terdapat " + id + " tersebut");
         }
-            if(CommonUtils.checkBusinesEntity(id, repositoryBisnis)){
+            if(checkBusinesEntity(id, repositoryBisnis)){
                 checkFintech(requests.getPayment_name());
                 businessEntity.setEntityModifiedDate(LocalDateTime.now());
                 fintechData.setFint_name(requests.getPayment_name());

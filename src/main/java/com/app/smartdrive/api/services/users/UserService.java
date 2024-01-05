@@ -27,11 +27,15 @@ public interface UserService {
 
   UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id);
 
-//  UserDetailsService userDetailsService();
-
   User getById(Long id);
 
   List<User> getAll();
 
   void changeEmail(Long id, String newEmail);
+
+  void validateNPWP(String npwp);
+
+  void validateNationalId(String nationalId);
+
+  void validateUserAccount(String number);
 }

@@ -1,6 +1,8 @@
 package com.app.smartdrive.api.services.users;
 
 import java.util.List;
+import java.util.Optional;
+
 import com.app.smartdrive.api.dto.user.UserUserAccountDto;
 import com.app.smartdrive.api.dto.user.request.UserUserAccountDtoRequest;
 import com.app.smartdrive.api.dto.user.response.UserUserAccountResponseDto;
@@ -16,4 +18,6 @@ public interface UserUserAccountService {
   UserAccounts addUserAccounts(Long id, UserUserAccountDtoRequest userPost);
 
   void deleteUserAccounts(Long id, Long ucId);
+
+  Optional<UserAccounts> getOptionalByUserAccountNo(String number);
 }

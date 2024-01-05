@@ -1,17 +1,14 @@
 package com.app.smartdrive.api.mapper.payment.PaymentTransactions;
 
-import java.time.LocalDateTime;
-
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransactionsDtoRequests;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransaksiResponse;
-import com.app.smartdrive.api.entities.payment.PaymentTransactions;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransactionsByUserDtoRequests;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransaksiByUserDtoResponse;
 
 import lombok.Data;
 
 @Data
 public class TransaksiMapper {
-    public static TransaksiResponse mapperTransactionsDto(String invoice, TransactionsDtoRequests request){
-        TransaksiResponse dto = TransaksiResponse.builder()
+    public static TransaksiByUserDtoResponse mapperTransactionsDto(String invoice, TransactionsByUserDtoRequests request){
+        TransaksiByUserDtoResponse dto = TransaksiByUserDtoResponse.builder()
         .usac_accountno(request.getUsac_accountno())
         .patr_usac_accountNo_to(request.getPatr_usac_accountNo_to())
         .nominall(request.getNominall())

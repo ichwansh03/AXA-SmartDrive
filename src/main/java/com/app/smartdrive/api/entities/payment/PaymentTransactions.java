@@ -1,9 +1,11 @@
 package com.app.smartdrive.api.entities.payment;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+import lombok.Builder;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
@@ -40,6 +42,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Data
+@Builder
 @Table(name = "payment_transactions", schema  = "payment")
 public class PaymentTransactions {
    
@@ -54,10 +57,10 @@ public class PaymentTransactions {
     private LocalDateTime patr_created_on;
 
     @Column(name = "patr_debet")
-    private Double patr_debet;
+    private BigDecimal patr_debet;
 
     @Column(name = "patr_credit")
-    private Double patr_credit;
+    private BigDecimal patr_credit;
 
     @Column(name = "patr_usac_accountno_from")
     private String patr_usac_accountNo_from;

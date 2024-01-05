@@ -8,6 +8,7 @@ import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;
 import com.app.smartdrive.api.entities.users.*;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.services.auth.AuthenticationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -62,6 +63,8 @@ public class EmployeesServiceImpl implements EmployeesService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final AuthenticationService authenticationService;
+
 
     @Override
     @Transactional
@@ -71,6 +74,10 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).orElseThrow(() ->
                 new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
+
+        authenticationService.validateUsername(employeesDto.getEmail());
+        authenticationService.validateEmail(employeesDto.getEmail());
+        authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
 
         User user = createUserFromDto(employeesDto);
 
@@ -158,6 +165,10 @@ public class EmployeesServiceImpl implements EmployeesService {
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).get();
 
+        authenticationService.validateUsername(employeesDto.getEmail());
+        authenticationService.validateEmail(employeesDto.getEmail());
+        authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
+
         existingEmployee.setEmpName(employeesDto.getEmpName());
         existingEmployee.setEmpJoinDate(empJoinDate);
         existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
@@ -167,6 +178,7 @@ public class EmployeesServiceImpl implements EmployeesService {
         existingEmployee.setEmpModifiedDate(LocalDateTime.now());
 
         User user = existingEmployee.getUser();
+
         updateUserFromDto(user, employeesDto);
 
         if(employeesDto.getGrantAccessUser()){
