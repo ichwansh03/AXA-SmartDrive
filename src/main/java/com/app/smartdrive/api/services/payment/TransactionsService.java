@@ -9,7 +9,7 @@ import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.Transaksi
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.GenerateTransferResponse;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 
-public interface TransactionsService extends BasePaymentManagementService<PaymentTransactionsDtoResponse, String>{
+public interface TransactionsService extends AccountsUserManagementService,BasePaymentManagementService<PaymentTransactionsDtoResponse, String>{
     List<PaymentTransactions> findAllPaymentTransactions();
     TransaksiByUserDtoResponse transaksiByUser(TransactionsByUserDtoRequests request);
     GenerateTransferResponse generateTransaksi(GenerateTransactionsRequests requests);

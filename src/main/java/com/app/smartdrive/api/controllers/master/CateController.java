@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
+@CrossOrigin
 @Tag(name = "Master Module")
 @CrossOrigin
 public class CateController implements MasterController<CateReq, Long> {
