@@ -1,6 +1,8 @@
 package com.app.smartdrive.api.services.HR.implementation;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,14 +68,19 @@ public class EmployeesServiceImpl implements EmployeesService {
     private final AuthenticationService authenticationService;
 
 
+    public LocalDateTime dateTimeFormatter(String date) {
+        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        return localDate.atStartOfDay();
+    }
+
     @Override
     @Transactional
     public EmployeesResponseDto createEmployee(EmployeesRequestDto employeesDto) {
-    
-        LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
 
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).orElseThrow(() ->
                 new EntityNotFoundException("JobType with id " + employeesDto.getJobType() + " not found"));
+
+        LocalDateTime joinDate = dateTimeFormatter(employeesDto.getEmpJoinDate());
 
         authenticationService.validateUsername(employeesDto.getEmail());
         authenticationService.validateEmail(employeesDto.getEmail());
@@ -83,7 +90,7 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         Employees employee = Employees.builder()
                 .empName(employeesDto.getEmpName())
-                .empJoinDate(empJoinDate)
+                .empJoinDate(joinDate)
                 .empStatus(EnumClassHR.status.ACTIVE)
                 .empType(emp_type.PERMANENT)
                 .empGraduate(employeesDto.getEmpGraduate())
