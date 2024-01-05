@@ -22,6 +22,7 @@ public class ServOrderWorkorderController {
     private final ServOrderWorkorderService servOrderWorkorderService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getWorkorderByTaskId(@RequestParam("seotId") Long seotId){
         return new ResponseEntity<>(servOrderWorkorderService.findSowoBySeotId(seotId), HttpStatus.OK);
     }
