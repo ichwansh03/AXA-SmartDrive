@@ -77,6 +77,9 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         authenticationService.validateUsername(employeesDto.getEmail());
 
+        authenticationService.validateEmail(employeesDto.getEmail());
+        authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
+
         User user = createUserFromDto(employeesDto);
 
         Employees employee = Employees.builder()
@@ -162,6 +165,10 @@ public class EmployeesServiceImpl implements EmployeesService {
 
         LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).get();
+
+        authenticationService.validateUsername(employeesDto.getEmail());
+        authenticationService.validateEmail(employeesDto.getEmail());
+        authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
 
         existingEmployee.setEmpName(employeesDto.getEmpName());
         existingEmployee.setEmpJoinDate(empJoinDate);

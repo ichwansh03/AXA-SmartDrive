@@ -13,6 +13,8 @@ public interface ServPremiCreditService {
 
     List<ServicePremiCredit> addSecr(ServicePremi servicePremi);
 
+    ServicePremiCredit addSecrCash(ServicePremi servicePremi);
+
     boolean updateSecr(SecrReqDto secrReqDto, Long secrId, Long secrServId);
 
 }

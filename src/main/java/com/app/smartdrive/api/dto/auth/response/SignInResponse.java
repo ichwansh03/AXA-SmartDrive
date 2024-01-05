@@ -1,5 +1,4 @@
 package com.app.smartdrive.api.dto.auth.response;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

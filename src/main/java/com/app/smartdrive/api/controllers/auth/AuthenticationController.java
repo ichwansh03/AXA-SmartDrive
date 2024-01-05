@@ -7,7 +7,6 @@ import com.app.smartdrive.api.dto.auth.response.SignInResponse;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
 import com.app.smartdrive.api.entities.auth.RefreshToken;
-import com.app.smartdrive.api.entities.users.AuthUser;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
@@ -42,11 +41,10 @@ public class AuthenticationController {
   public ResponseEntity<?> loginCustomer(@Valid @RequestBody SignInRequest login){
     AuthUser authUser = authenticationService.signinCustomer(login);
     User user = authUser.getUser();
-
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserEntityId());
     ResponseCookie jwtCookie = jwtService.generateJwtCookie(user);
     ResponseCookie jwtRefreshCookie = jwtService.generateRefreshJwtCookie(refreshToken.getRetoToken());
-
+   
     SignInResponse response = TransactionMapper.mapEntityToDto(user, SignInResponse.class);
 
     response.setAccessToken(jwtCookie.getValue());
