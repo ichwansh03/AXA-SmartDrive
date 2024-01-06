@@ -23,6 +23,8 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     @Query(value = "SELECT * FROM HR.EMPLOYEE_ARE_WORKGROUP WHERE eawg_id=?1", nativeQuery=true)
     Optional<EmployeeAreaWorkgroup> findByEawgId(Long eawgId);
 
+
+
 //    Page<EmployeeAreaWorkgroup> findByEawgArwgCodeOrEmployees_EmpNameContainingOrAreaWorkGroup_Cities_CityNameContaining(String value, String valueEmpName, String valueCityName, Pageable pageable);
 
     @Transactional
@@ -31,10 +33,12 @@ public interface EmployeeAreaWorkgroupRepository extends JpaRepository<EmployeeA
     void deleteEawgById(Long eawg_id);
 
     @Modifying(clearAutomatically = true)
-    @Query(value = "UPDATE HR.EMPLOYEE_ARE_WORKGROUP SET EAWG_ENTITYID =?1 WHERE EAWG_ENTITYID =?2", nativeQuery = true) 
-    int setEawgEntityid(Long eawgEntityidnow, Long eawgEntityid);
+    @Query(value = "UPDATE HR.EMPLOYEE_ARE_WORKGROUP SET EAWG_ENTITYID =?1 WHERE EAWG_ENTITYID =?2 AND EAWG_ID =?3", nativeQuery = true)
+    int setEawgEntityid(Long newEawgEntityid, Long oldEawgEntityid, Long eawgId);
 
     Optional<EmployeeAreaWorkgroup> findByAreaWorkGroupAndEmployees(AreaWorkGroup areaWorkGroup, Employees employees);
+
+
 
     boolean existsByEmployeesAndAreaWorkGroup(Employees employees, AreaWorkGroup areaWorkGroup);
 

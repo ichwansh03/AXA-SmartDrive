@@ -197,12 +197,15 @@ public class EmployeesServiceImpl implements EmployeesService {
             userRolesService.updateUserRoleStatus(existingEmployee.getEmpEntityid(),RoleName.EM,"INACTIVE");
         }
 
+        employeesRepository.save(existingEmployee);
         updateAddressEmployees(user, employeesDto.getEmpAddress());
         updateEmployeePhone(user, employeesDto.getEmpPhone());
 
-        Employees saveEmp = employeesRepository.save(existingEmployee);
+        Employees empUpdated = employeesRepository.getById(employeeId);
 
-        return TransactionMapper.mapEntityToDto(saveEmp,EmployeesResponseDto.class);
+
+
+        return TransactionMapper.mapEntityToDto(empUpdated,EmployeesResponseDto.class);
     }
 
     private void updateUserFromDto(User user, EmployeesRequestDto employeesDto) {

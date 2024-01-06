@@ -9,6 +9,7 @@ import com.app.smartdrive.api.entities.hr.EmployeeAreaWorkgroupId;
 
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import com.app.smartdrive.api.repositories.HR.EmployeesRepository;
 import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.services.master.CityService;
@@ -41,6 +42,8 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     private final ArwgRepository arwgRepository;
 
     private final CityRepository cityRepository;
+
+    private final EmployeesRepository employeesRepository;
 
     private final EmployeesService employeesService;
 
@@ -85,22 +88,27 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
     @Override
     @Transactional
     public EmployeesAreaWorkgroupResponseDto updateEawg(Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto) {
-        EmployeeAreaWorkgroup existingEawg = getById(eawgId);
+
+        EmployeeAreaWorkgroup employeeAreaWorkgroup = getById(eawgId);
 
         AreaWorkGroup areaWorkGroup = arwgRepository.findByArwgCode(employeeAreaWorkgroupDto.getArwgCode());
 
-        Employees employees = employeesService.getById(employeeAreaWorkgroupDto.getEmpEntityid());
-
         Cities cities = cityRepository.findById(employeeAreaWorkgroupDto.getCityId()).get();
 
-        validateUpdate(existingEawg,areaWorkGroup,employees,cities);
-        setEawg(existingEawg,areaWorkGroup,employees);
+        Employees employees = employeesService.getById(employeeAreaWorkgroupDto.getEmpEntityid());
 
-        existingEawg.setEawgModifiedDate(LocalDateTime.now());
 
-        EmployeeAreaWorkgroup saveEawg = employeeAreaWorkgroupRepository.save(existingEawg);
+        validateUpdate(employeeAreaWorkgroup,areaWorkGroup,employees,cities);
+        setEawg(employeeAreaWorkgroup,areaWorkGroup);
 
-        return TransactionMapper.mapEntityToDto(saveEawg, EmployeesAreaWorkgroupResponseDto.class);
+        employeeAreaWorkgroup.setEawgModifiedDate(LocalDateTime.now());
+
+         employeeAreaWorkgroupRepository.save(employeeAreaWorkgroup);
+        employeeAreaWorkgroupRepository.setEawgEntityid(employees.getEmpEntityid(), employeeAreaWorkgroup.getEawgEntityid(), eawgId);
+
+        EmployeeAreaWorkgroup newEawg=getById(eawgId);
+
+        return TransactionMapper.mapEntityToDto(newEawg, EmployeesAreaWorkgroupResponseDto.class);
     }
 
     private void validateUpdate(EmployeeAreaWorkgroup existingEawg, AreaWorkGroup newAreaWorkGroup, Employees employee, Cities newCities) {
@@ -114,11 +122,9 @@ public class EmployeeAreaWorkgroupServiceImpl implements EmployeeAreaWorkgroupSe
         }
     }
 
-    private void setEawg(EmployeeAreaWorkgroup existingEawg, AreaWorkGroup newAreaWorkGroup, Employees employee) {
-        existingEawg.setAreaWorkGroup(newAreaWorkGroup);
-        existingEawg.setEawgArwgCode(newAreaWorkGroup.getArwgCode());
-        existingEawg.setEawgEntityid(employee.getEmpEntityid());
-        existingEawg.setEawgModifiedDate(LocalDateTime.now());
+    private void setEawg(EmployeeAreaWorkgroup existingEawg, AreaWorkGroup areaWorkGroup) {
+        existingEawg.setEawgArwgCode(areaWorkGroup.getArwgCode());
+        existingEawg.setAreaWorkGroup(areaWorkGroup);
     }
 
     @Override
