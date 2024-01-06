@@ -10,6 +10,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PartnerRequest {
+
+    private Long id;
     @Size(max = 25)
     private String partName;
     @Size(max = 255)
@@ -20,6 +22,5 @@ public class PartnerRequest {
     private String partNpwp;
     @NotNull
     private String partAccountNo;
-
     private boolean grantUserAccess;
 }

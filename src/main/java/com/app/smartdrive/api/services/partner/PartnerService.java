@@ -8,10 +8,10 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface PartnerService {
-    Partner create(PartnerRequest request);
+    Partner update(PartnerRequest request);
     Page<Partner> searchByNameOrNpwp(String value, int page);
     Partner save(PartnerRequest request);
     Partner getById(Long entityId);
     Partner save(Partner partner);
-    List<Partner> getAll();
+    Page<Partner> getAll(int page);
 }
