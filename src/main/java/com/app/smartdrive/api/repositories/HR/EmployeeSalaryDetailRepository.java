@@ -6,8 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import com.app.smartdrive.api.entities.hr.EmployeeSalaryDetail;
 
+import java.time.LocalDate;
+
 
 @Repository
 public interface EmployeeSalaryDetailRepository extends JpaRepository<EmployeeSalaryDetail,Long> {
+
+    boolean existsByEmsaEmpEntityidAndEmsaCreateDate(Long emsaEmpEntityid, LocalDate emsaCreateDate);
     
 }

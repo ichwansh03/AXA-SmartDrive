@@ -20,7 +20,7 @@ public class BatchEmployeeSalaryController {
 
     @PostMapping("/create/{id}")
     public ResponseEntity<BatchEmployeeSalary> createOne(@PathVariable("id") Long id){
-        BatchEmployeeSalary batchEmployeeSalary = batchEmployeeSalaryService.createOne(id);
+        BatchEmployeeSalary batchEmployeeSalary = batchEmployeeSalaryService.createOneWithDetails(id);
         return ResponseEntity.ok(batchEmployeeSalary);
     }
 
@@ -35,5 +35,7 @@ public class BatchEmployeeSalaryController {
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(batchEmployeeSalaryService.getAllCommission(employeeSalaryDetailRequestDto.getBesaEmpEntityId(),employeeSalaryDetailRequestDto.getBesaCreateDate()));
     }
+
+
 
 }

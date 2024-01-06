@@ -17,7 +17,7 @@ public interface UserPhoneRepository extends JpaRepository<UserPhone, UserPhoneI
     @Query(value = "SELECT USPH_PHONE_NUMBER FROM USERS.USER_PHONE WHERE USPH_PHONE_NUMBER = ?1", nativeQuery = true)
     Optional<String> findPhoneNumber(String usphPhoneNumber);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE USERS.USER_PHONE SET USPH_PHONE_NUMBER =?1 WHERE USPH_PHONE_NUMBER =?2", nativeQuery = true) 
     int setPhoneNumber(String postPhone, String phoneNumber);
 

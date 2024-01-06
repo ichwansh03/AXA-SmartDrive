@@ -40,7 +40,7 @@ public class EmployeeAreaWorkgroupController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<EmployeesAreaWorkgroupResponseDto> updateEawg(
-            @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto, @PathVariable("id") Long id){
+            @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto, @PathVariable Long id){
         return ResponseEntity.status(201).body(employeeAreaWorkgroupService.updateEawg(id,employeeAreaWorkgroupDto));
 
     }

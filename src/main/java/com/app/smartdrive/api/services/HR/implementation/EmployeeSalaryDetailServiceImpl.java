@@ -42,13 +42,13 @@ public class EmployeeSalaryDetailServiceImpl implements EmployeeSalaryDetailServ
         List<TemplateSalary> templateSalaries = templateSalaryRepository.findAll();
         List<EmployeeSalaryDetail> salaryDetails = new ArrayList<>();
 
-         BigDecimal totalPremi = new BigDecimal(100000);
+//         BigDecimal totalPremi = new BigDecimal(100000);
 
         ServiceOrders pl = soOrderRepository.findBySeroIdLikeAndEmployees_EawgEntityid(entityId);
 
         Long services = pl.getServices().getServId();
         Optional<ServicePremi> semiID = semiRepository.findById(services);
-        
+
         BigDecimal servicePremi = semiID.get().getSemiPremiDebet();
 
         Employees employees = employeesService.getById(entityId);
