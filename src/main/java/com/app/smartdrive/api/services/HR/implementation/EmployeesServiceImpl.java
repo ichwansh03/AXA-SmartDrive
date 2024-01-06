@@ -172,15 +172,11 @@ public class EmployeesServiceImpl implements EmployeesService {
     
         Employees existingEmployee = getById(employeeId);
 
-        LocalDateTime empJoinDate = LocalDateTime.parse(employeesDto.getEmpJoinDate());
+        LocalDateTime joinDate = dateTimeFormatter(employeesDto.getEmpJoinDate());
         JobType jobType = jobTypeRepository.findById(employeesDto.getJobType()).get();
 
-        authenticationService.validateUsername(employeesDto.getEmail());
-        authenticationService.validateEmail(employeesDto.getEmail());
-        authenticationService.validateUserPhone(employeesDto.getEmpPhone().getUsphPhoneNumber());
-
         existingEmployee.setEmpName(employeesDto.getEmpName());
-        existingEmployee.setEmpJoinDate(empJoinDate);
+        existingEmployee.setEmpJoinDate(joinDate);
         existingEmployee.setEmpAccountNumber(employeesDto.getEmpAccountNumber());
         existingEmployee.setEmpGraduate(employeesDto.getEmpGraduate());
         existingEmployee.setEmpNetSalary(employeesDto.getEmpSalary());
@@ -216,18 +212,14 @@ public class EmployeesServiceImpl implements EmployeesService {
     }
 
     private void updateEmployeePhone(User user, UserPhoneRequestDto userPhoneDto) {
-        String empPhone = user.getUserPhone().get(0).getUserPhoneId().getUsphPhoneNumber();
-        userPhoneDto.setUsphPhoneNumber(empPhone);
-        userPhoneDto.setUsphPhoneType("HP");
-    
         userPhoneService.updateUserPhone(user.getUserEntityId(), user.getUserPhone().get(0).getUserPhoneId().getUsphPhoneNumber(), userPhoneDto);
     }
 
     private void updateAddressEmployees(User user,UserAddressRequestDto userAddressRequestDto){
         UserAddress userAddress = user.getUserAddress().get(0);
         userAddress.setUsdrAddress1(userAddressRequestDto.getUsdrAddress1());
-        userAddress.setUsdrAddress2(userAddress.getUsdrAddress2());
-        userAddress.setUsdrCityId(userAddress.getUsdrCityId());
+        userAddress.setUsdrAddress2(userAddressRequestDto.getUsdrAddress2());
+        userAddress.setUsdrCityId(userAddressRequestDto.getCityId());
         userAddressService.updateUserAddress(user.getUserEntityId(), userAddress.getUsdrId(), userAddressRequestDto);
     }
 
