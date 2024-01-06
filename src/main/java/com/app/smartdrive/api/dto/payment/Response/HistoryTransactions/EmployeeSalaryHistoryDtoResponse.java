@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.dto.payment.Response.PaymentTransactions;
+package com.app.smartdrive.api.dto.payment.Response.HistoryTransactions;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
