@@ -22,7 +22,7 @@ public class ServiceRespDto {
     private EnumCustomer.CreqType servType;
     private String servInsuranceNo;
     private String servVehicleNumber;
-    private LocalDateTime servCreatedOn;
+    private String servCreatedOn;
     private LocalDateTime servStartDate;
     private LocalDateTime servEndDate;
     private EnumModuleServiceOrders.ServStatus servStatus;
