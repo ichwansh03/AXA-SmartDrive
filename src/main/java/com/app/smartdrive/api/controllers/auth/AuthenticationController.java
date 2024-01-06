@@ -30,7 +30,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-@CrossOrigin(allowCredentials = "true",allowedHeaders = {"Authorization", "Content-Type", "Cookie", "Set-Cookie"}, origins = {"http://localhost:3000"})
+@CrossOrigin(allowCredentials = "true",allowedHeaders = {"Authorization", "Content-Type", "Cookie", "Set-Cookie", "Origin"}, origins = "http://localhost:3006", maxAge = 2592000)
 public class AuthenticationController {
   private final AuthenticationService authenticationService;
   private final RefreshTokenService refreshTokenService;
