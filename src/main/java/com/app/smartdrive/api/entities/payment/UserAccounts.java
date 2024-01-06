@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
+import lombok.Builder;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
 
@@ -25,10 +26,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "user_accounts", schema = "payment")
 public class UserAccounts {
     @Id
@@ -40,7 +44,7 @@ public class UserAccounts {
     private String usac_accountno;
 
     @Column(name = "usac_debet")
-    private Double usac_debet;
+    private BigDecimal usac_debet;
 
     @Column(name = "usac_credit")
     private Double usac_credit;

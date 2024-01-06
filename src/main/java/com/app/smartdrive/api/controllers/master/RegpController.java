@@ -38,7 +38,6 @@ public class RegpController implements MasterController<RegpReq, String> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable String id, @Valid @RequestBody RegpReq request) {
-        regpServiceImpl.getById(id);
         return new ResponseEntity<>(regpServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

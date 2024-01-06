@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController
+@PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.user.getUserEntityId() == #id)")
 @RequiredArgsConstructor
 @RequestMapping("/user/{id}/photo")
 public class UserPhotoController {
@@ -25,7 +26,6 @@ public class UserPhotoController {
   private final UserPhotoService userPhotoService;
 
   @PostMapping
-  @PreAuthorize("hasAuthority('Admin') || principal.getUserEntityId() == #id")
   public ResponseEntity<?> savePhotoUser(@RequestParam MultipartFile photo, @PathVariable("id") Long id) throws Exception{
     userPhotoService.savePhoto(photo, id);
     return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Success save photo user"));

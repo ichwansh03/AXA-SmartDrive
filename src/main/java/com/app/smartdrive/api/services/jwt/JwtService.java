@@ -78,12 +78,13 @@ public class JwtService {
 
   public ResponseCookie generateJwtCookie(User userPrincipal){
     String jwt = generateToken(userPrincipal);
-    ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, jwt).path("/api").maxAge(24*60*60).httpOnly(true).build();
+    ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, jwt).path("/api").maxAge(24*60*60).httpOnly(true).sameSite("none").secure(true).build();
     return cookie;
   }
 
   public ResponseCookie getCleanCookie(String cookieName, String path){
     ResponseCookie cookie = ResponseCookie.from(cookieName, null).path(path).httpOnly(true)
+            .sameSite("none").secure(true)
             .maxAge(0)
             .build();
     return cookie;
@@ -93,6 +94,8 @@ public class JwtService {
     ResponseCookie cookie = ResponseCookie.from(name, value)
             .path(path)
             .maxAge(MAX_AGE_REFRESH)
+            .sameSite("none")
+            .secure(true)
             .httpOnly(true)
             .build();
     return cookie;

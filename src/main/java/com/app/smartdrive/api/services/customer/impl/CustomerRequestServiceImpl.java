@@ -29,6 +29,7 @@ import com.app.smartdrive.api.repositories.master.IntyRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.HR.EmployeeAreaWorkgroupService;
 import com.app.smartdrive.api.services.HR.EmployeesService;
+import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.customer.*;
 import com.app.smartdrive.api.services.master.ArwgService;
 import com.app.smartdrive.api.services.master.CarsService;
@@ -52,6 +53,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -91,6 +93,8 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     private final UserPhoneService userPhoneService;
 
+    private final AuthenticationService authenticationService;
+
     // sementara
     private final UserRepository userRepository;
 
@@ -114,7 +118,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getAllPaging(Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getAllPaging(Pageable paging, String type, String status) {
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
 
         Page<CustomerRequest> pageCustomerRequest;
@@ -126,13 +130,20 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByCreqTypeAndCreqStatus(paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pagingCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
         log.info("CustomerRequestServiceImpl::getAllPaging get paging all customer request");
-        return pageCustomerRequest;
+        return pagingCustomerResponseDTO;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getPagingUserCustomerRequest(Long customerId, Pageable paging, String type, String status) {
         User user = this.userService.getById(customerId);
 
         EnumCustomer.CreqStatus creqStatus = EnumCustomer.CreqStatus.valueOf(status);
@@ -146,16 +157,23 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByCustomerAndCreqTypeAndCreqStatus(user, paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pageUserCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
 
         log.info("CustomerRequestServiceImpl::getPagingUserCustomerRequest," +
                 " successfully get all customer request who belong to user with ID: {}", user.getUserEntityId());
 
-        return pageCustomerRequest;
+        return pageUserCustomerResponseDTO;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CustomerRequest> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable paging, String type, String status) {
+    public Page<CustomerResponseDTO> getPagingAgenCustomerRequest(Long employeeId, String arwgCode, Pageable paging, String type, String status) {
         AreaWorkGroup existAreaWorkgroup = this.arwgRepository.findByArwgCode(arwgCode);
         Employees existEmployee = this.employeesService.getById(employeeId);
         EmployeeAreaWorkgroup existEmployeeAreaworkgroup = this.employeeAreaWorkgroupRepository.findByAreaWorkGroupAndEmployees(existAreaWorkgroup, existEmployee).orElseThrow(
@@ -173,16 +191,23 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
             pageCustomerRequest = this.customerRequestRepository.findByEmployeeAreaWorkgroupAndCreqTypeAndCreqStatus(existEmployeeAreaworkgroup, paging, creqType, creqStatus);
         }
 
+        Page<CustomerResponseDTO> pageAgenCustomerResponseDTO = pageCustomerRequest.map(new Function<CustomerRequest, CustomerResponseDTO>() {
+            @Override
+            public CustomerResponseDTO apply(CustomerRequest customerRequest) {
+                return TransactionMapper.mapEntityToDto(customerRequest, CustomerResponseDTO.class);
+            }
+        });
+
 
         log.info("CustomerRequestServiceImpl::getPagingAgenCustomerRequest," +
                 " successfully get all customer request who belong to agen with ID: {} and areaCode: {}", employeeId, arwgCode);
 
-        return pageCustomerRequest;
+        return pageAgenCustomerResponseDTO;
     }
 
     @Transactional
     @Override
-    public CustomerRequest create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO create(CustomerRequestDTO customerRequestDTO, MultipartFile[] files) throws Exception {
         // prep
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = customerRequestDTO.getCustomerInscAssetsRequestDTO();
         Long[] customerInscExtendIds = customerRequestDTO.getCustomerInscAssetsRequestDTO().getCuexIds();
@@ -244,12 +269,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(newCustomerRequest);
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCustomerRequest);
-        return savedCustomerRequest;
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
     @Override
-    public CustomerRequest createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO createByAgen(CreateCustomerRequestByAgenDTO customerRequestDTO, MultipartFile[] files) throws Exception {
 
         // prep
         CreateUserDto createUserDto = customerRequestDTO.getUserDTO();
@@ -260,29 +285,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         LocalDateTime birthDate = LocalDateTime.parse(createUserDto.getProfile().getUserByAgenBirthDate(), formatter);
 
         this.customerInscAssetsService.validatePoliceNumber(customerInscAssetsRequestDTO.getCiasPoliceNumber());
-
-        if(userRepository.existsByUserName((createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber()))){
-            throw new UsernameExistException();
-        }
-
-        if(userRepository.existsByUserEmail(createUserDto.getProfile().getUserEmail())){
-            throw new EmailExistException();
-        };
-
-        if(userRepository.existsByUserNPWP(createUserDto.getProfile().getUserNpwp())){
-            throw new UserExistException("User with NPWP number " + createUserDto.getProfile().getUserNpwp() + " is already exist");
-        }
-
-        if(userRepository.existsByUserNationalId(createUserDto.getProfile().getUserNationalId())){
-            throw new UserExistException("User with national id " + createUserDto.getProfile().getUserNationalId() + " is already exist");
-        }
-
-        createUserDto.getUserPhone().forEach(
-                phone -> {
-                    if(userPhoneService.findByPhoneNumber(phone.getUserPhoneId().getUsphPhoneNumber()).isPresent())
-                        throw new UserPhoneExistException(phone.getUserPhoneId().getUsphPhoneNumber());
-                }
-        );
+        this.validateUser(createUserDto);
 
         CarSeries existCarSeries = this.carsRepository.findById(customerInscAssetsRequestDTO.getCiasCarsId()).orElseThrow(
                 () -> new EntityNotFoundException("Car Series with id "+ customerInscAssetsRequestDTO.getCiasCarsId() + " is not found")
@@ -339,12 +342,12 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(newCustomerRequest);
         log.info("CustomerRequestServiceImpl::create, successfully create customer request {} ", savedCustomerRequest);
-        return savedCustomerRequest;
+        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
     @Override
-    public CustomerRequest updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
+    public CustomerResponseDTO updateCustomerRequest(UpdateCustomerRequestDTO updateCustomerRequestDTO, MultipartFile[] files) throws Exception {
         CustomerRequest existCustomerRequest = this.getById(updateCustomerRequestDTO.getCreqEntityId());
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = updateCustomerRequestDTO.getCustomerInscAssetsRequestDTO();
         Long[] customerInscExtendIds = customerInscAssetsRequestDTO.getCuexIds();
@@ -353,7 +356,7 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CustomerInscAssets existCustomerInscAssets = existCustomerRequest.getCustomerInscAssets();
 
 
-        User existCustomer = this.getUpdatedUser(updateCustomerRequestDTO.getCustomerId(), updateCustomerRequestDTO.getAccessGrantUser());
+        this.updatedCustomerRoleStatus(existCustomerRequest.getCustomer().getUserEntityId(), updateCustomerRequestDTO.getAccessGrantUser());
 
         EmployeeAreaWorkgroup existEmployeeAreaWorkgroup = this.employeeAreaWorkgroupService.getById(
                 updateCustomerRequestDTO.getAgenId(), updateCustomerRequestDTO.getEmployeeId()
@@ -401,26 +404,49 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         existCustomerInscAssets.setCiasTotalPremi(premiPrice);
 
         existCustomerRequest.setCreqAgenEntityid(existEmployeeAreaWorkgroup.getEawgId());
-        existCustomerRequest.setCustomer(existCustomer);
         existCustomerRequest.setCreqModifiedDate(LocalDateTime.now());
+
 
         CustomerRequest savedCustomerRequest = this.customerRequestRepository.save(existCustomerRequest);
         log.info("CustomerRequestServiceImpl::updateCustomerRequest, successfully update customer request {}", savedCustomerRequest);
-//        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
-//        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(existEmployeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
-//        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
+        CustomerResponseDTO customerResponseDTO = TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
+        EmployeesAreaWorkgroupResponseDto eawagResponse = TransactionMapper.mapEntityToDto(existEmployeeAreaWorkgroup, EmployeesAreaWorkgroupResponseDto.class);
+        customerResponseDTO.setEmployeeAreaWorkgroup(eawagResponse);
 
-        return savedCustomerRequest;
+
+
+        return customerResponseDTO;
+//        return TransactionMapper.mapEntityToDto(savedCustomerRequest, CustomerResponseDTO.class);
     }
 
     @Transactional
     @Override
-    public User getUpdatedUser(Long userEntityId, Boolean grantUserAccess) {
+    public void updatedCustomerRoleStatus(Long userEntityId, Boolean grantUserAccess) {
         User customer = this.userService.getById(userEntityId);
 
         this.userRolesService.updateUserRoleStatus(customer.getUserEntityId(), EnumUsers.RoleName.CU, grantUserAccess? "ACTIVE":"INACTIVE");
+    }
 
-        return userService.getById(customer.getUserEntityId());
+    @Transactional(readOnly = true)
+    @Override
+    public void validateUser(CreateUserDto createUserDto) {
+        this.authenticationService.validateUsername(createUserDto.getUserPhone().stream().findFirst().get().getUserPhoneId().getUsphPhoneNumber());
+        this.authenticationService.validateEmail(createUserDto.getProfile().getUserEmail());
+        this.userService.validateNPWP(createUserDto.getProfile().getUserNpwp());
+        this.userService.validateNationalId(createUserDto.getProfile().getUserNationalId());
+
+
+        createUserDto.getUserAccounts().stream().forEach(
+                userAccount -> {
+                    this.userService.validateUserAccount(userAccount.getUsac_accountno());
+                }
+        );
+
+        createUserDto.getUserPhone().stream().forEach(
+                phone -> {
+                    this.authenticationService.validateUserPhone(phone.getUserPhoneId().getUsphPhoneNumber());
+                }
+        );
     }
 
     @Transactional

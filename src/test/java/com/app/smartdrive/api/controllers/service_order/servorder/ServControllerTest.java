@@ -5,7 +5,6 @@ import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
-import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.services.service_order.servorder.ServService;
 import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
@@ -17,11 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -32,11 +30,9 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//@SpringBootTest
-//@AutoConfigureMockMvc
+@SpringBootTest
+@AutoConfigureMockMvc
 @Slf4j
-@WebMvcTest({ServController.class, AuthenticationController.class})
-@ImportAutoConfiguration(classes = {SecurityConfig.class})
 public class ServControllerTest {
 
     @Autowired
@@ -46,7 +42,7 @@ public class ServControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private ServiceFactory serviceFactory;
+    private ServiceFactory serviceTransaction;
 
     @MockBean
     private ServService servService;
@@ -63,7 +59,7 @@ public class ServControllerTest {
         ServiceRespDto services = ServiceRespDto.builder()
                 .servId(servId)
                 .servType(EnumCustomer.CreqType.FEASIBLITY)
-                .servCreatedOn(LocalDateTime.now())
+                .servCreatedOn("12/13/2023")
                 .servStartDate(LocalDateTime.now())
                 .servEndDate(LocalDateTime.now().plusDays(7))
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE).build();
@@ -71,7 +67,7 @@ public class ServControllerTest {
         when(servService.findServicesById(servId)).thenReturn(services);
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/service?servid={servid}",servId))
+                        MockMvcRequestBuilders.get("/service?servId={servId}",servId))
                 .andExpect(status().is(statusCode))
                 .andExpect(jsonPath("$.servType").value(services.getServType().toString()))
                 .andExpect(jsonPath("$.servStatus").value(services.getServStatus().toString()))
@@ -83,6 +79,7 @@ public class ServControllerTest {
 
     @Test
     @DisplayName("generate service from customer")
+    @WithMockUser(authorities = {"Employee","Admin"})
     void itShouldAddServiceFromCustomer() throws Exception {
 
         Long creqId = 2L;
@@ -90,7 +87,7 @@ public class ServControllerTest {
         services.setServStatus(EnumModuleServiceOrders.ServStatus.ACTIVE);
         services.setServType(EnumCustomer.CreqType.POLIS);
 
-        when(serviceFactory.addService(creqId)).thenReturn(services);
+        when(serviceTransaction.addService(creqId)).thenReturn(services);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/service/addserv?creqId={creqId}", creqId))
@@ -102,6 +99,6 @@ public class ServControllerTest {
                     Assertions.assertEquals(serviceReqDto.getServType(), EnumCustomer.CreqType.POLIS);
                 });
 
-        verify(serviceFactory, times(1)).addService(creqId);
+        verify(serviceTransaction, times(1)).addService(creqId);
     }
 }

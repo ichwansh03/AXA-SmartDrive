@@ -7,6 +7,7 @@ import com.app.smartdrive.api.Exceptions.UsernameExistException;
 import com.app.smartdrive.api.dto.auth.request.SignInRequest;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.PasswordRequestDto;
+import com.app.smartdrive.api.entities.users.AuthUser;
 import com.app.smartdrive.api.entities.users.EnumUsers;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.repositories.users.UserPhoneRepository;
@@ -18,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final UserPhoneRepository userPhoneRepository;
 
   @Override
+  @Transactional
   public void signup(CreateUserDto request) {
     validateUsername(request.getProfile().getUserName());
 
@@ -50,13 +53,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
-  public User signinCustomer(SignInRequest request) {
-    User user = userRepository.findUserByIden(request.getUsername())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+  public AuthUser signinCustomer(SignInRequest request) {
+    User user = userRepository.findUserByIdentity(request.getIdentity())
+            .orElseThrow(() -> new BadCredentialsException("Invalid email or username or phone number"));
+    AuthUser authUser = new AuthUser(user);
     if(user.getUserRoles().stream().anyMatch(usro -> usro.getUsroStatus().equals("ACTIVE"))){
-      authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-      return user;
+      try{
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getIdentity(), request.getPassword()));
+        return authUser;
+      } catch (BadCredentialsException ex) {
+        throw new BadCredentialsException("Invalid password"); //custom message
+      }
     }
     throw new AccountNonActiveException();
   }

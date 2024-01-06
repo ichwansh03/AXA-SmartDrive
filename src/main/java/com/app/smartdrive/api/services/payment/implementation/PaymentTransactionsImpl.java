@@ -1,45 +1,31 @@
 package com.app.smartdrive.api.services.payment.implementation;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.PaymentTransactionsDtoResponse;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.SaldoIsNotEnoughException;
 import com.app.smartdrive.api.Exceptions.TypeTransaksiNotFoundException;
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransactionsDtoRequests;
+import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransactionsByUserDtoRequests;
 import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.GenerateTransactionsRequests;
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TopupFintechRequests;
-import com.app.smartdrive.api.dto.payment.Request.PaymentTransactions.TransferTransactionsRequest;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactionsDto;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransaksiResponse;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.BatchPartnerInvoiceResponse;
+import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransaksiByUserDtoResponse;
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.GenerateTransferResponse;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TopupFintechResponse;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TransferTransactionsResponse;
-import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.TypeTransactionsResponse;
 import com.app.smartdrive.api.entities.hr.BatchEmployeeSalary;
 import com.app.smartdrive.api.entities.partner.BatchPartnerInvoice;
 import com.app.smartdrive.api.entities.partner.BpinStatus;
 import com.app.smartdrive.api.entities.payment.PaymentTransactions;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPayment;
-import com.app.smartdrive.api.entities.payment.Enumerated.EnumClassPayment.EnumPaymentType;
 import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TransaksiMapper;
-import com.app.smartdrive.api.mapper.payment.PaymentTransactions.BatchPartnerInvoiceMapper;
-import com.app.smartdrive.api.mapper.payment.PaymentTransactions.PartnerDtoMapper;
-import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TopupFintechMapper;
-import com.app.smartdrive.api.mapper.payment.PaymentTransactions.TransferTransactionsMapper;
 import com.app.smartdrive.api.repositories.HR.BatchEmployeeSalaryRepository;
 import com.app.smartdrive.api.repositories.partner.BatchPartnerInvoiceRepository;
 import com.app.smartdrive.api.repositories.payment.PaymentTransactionsRepository;
@@ -47,24 +33,19 @@ import com.app.smartdrive.api.repositories.payment.UserAccountsRepository;
 import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
 import com.app.smartdrive.api.services.HR.BatchEmployeeSalaryService;
 import com.app.smartdrive.api.services.partner.BatchPartnerInvoiceService;
-import com.app.smartdrive.api.services.payment.PaymentTransactionsService;
+import com.app.smartdrive.api.services.payment.TransactionsService;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class PaymentTransactionsImpl implements PaymentTransactionsService {
+public class PaymentTransactionsImpl implements TransactionsService {
     private final EntityManager entityManager;
-
     private final PaymentTransactionsRepository repository;
     private final UserAccountsRepository userAccountsRepository;
     private final BatchEmployeeSalaryRepository employeeSalaryRepository;
@@ -73,20 +54,6 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
     private final BatchEmployeeSalaryService serviceEmployeSalary;
     private final SecrRepository secrRepository;
 
-    public PaymentTransactions addaPY(PaymentTransactions paymentTransactions) {
-        entityManager.persist(paymentTransactions);
-        return paymentTransactions;
-    }
-
-    @Override
-    public List<PaymentTransactions> findAllPaymentTransactions() {
-        return repository.getAllPaymentTransactions();
-    }
-
-    private LocalDateTime timeNow(){
-        LocalDateTime time = LocalDateTime.now();
-        return time;
-    }
 
     public String dateTimeFormatter(LocalDateTime b) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -117,101 +84,91 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
         return str1;
     }
 
-   
+
     private String uuidInvoice(){
         UUID uuid = UUID.randomUUID();
         Long uuidd = uuid.getMostSignificantBits();
         String idUnique = uuidd.toString();
-        String invoiceAutomate = "INV-" + idUnique; 
+        String invoiceAutomate = "INV-" + idUnique;
         return invoiceAutomate;
     }
 
-   
-    private void automateIdAndCreateEntities(Double nominall, String noRekening, String toRekening, String notes,
-        EnumPayment enumPayment, String invoice) {
-        PaymentTransactions transactions = new PaymentTransactions();
-        PaymentTransactions transactions2 = new PaymentTransactions();
-        
+
+    private void automateIdAndCreateEntities(BigDecimal nominall, String noRekening, String toRekening, String notes,
+                                             EnumPayment enumPayment, String invoice) {
+
         List<PaymentTransactions> listPayment = repository.findAll();
-        PaymentTransactions reversal = repository.findByPatrTrxno(transactions.getPatrTrxno());
-        String trxNo = generateTrxNo(timeNow());
+
+        String trxNo = generateTrxNo(LocalDateTime.now());
         String trxNoRev = repository.findLastOptional();
 
-       if(listPayment.isEmpty()){
-            transactions.setPatrTrxno(trxNo);
-            transactions.setPatrTrxnoRev(null);
-       }    
-        transactions.setPatrTrxno(trxNo);
-        transactions.setPatrTrxnoRev(trxNoRev);
-    
-        transactions.setPatr_created_on(timeNow());
-        transactions.setPatr_usac_accountNo_from(noRekening);
-        transactions.setPatr_usac_accountNo_to("-");
-        transactions.setPatr_debet(nominall);
-        transactions.setPatr_credit(0.0);
-        transactions.setPatr_type(enumPayment);
-        transactions.setPatr_invoice_no(invoice);
-        transactions.setPatr_notes(notes);
+        if(listPayment.isEmpty()){
+            PaymentTransactions transactions = PaymentTransactions.builder()
+                    .patrTrxno(trxNo)
+                    .patrTrxnoRev(null)
+                    .build();
+        }
+        PaymentTransactions transactions = PaymentTransactions.builder()
+                .patrTrxno(trxNo)
+                .patrTrxnoRev(trxNoRev)
+                .patr_created_on(LocalDateTime.now())
+                .patr_usac_accountNo_from(noRekening)
+                .patr_usac_accountNo_to("-")
+                .patr_debet(nominall)
+                .patr_credit(BigDecimal.ZERO)
+                .patr_type(enumPayment)
+                .patr_invoice_no(invoice)
+                .patr_notes(notes)
+                .build();
 
         repository.save(transactions);
 
-        
-        transactions2.setPatrTrxno(generateTrxNo(timeNow()));
-        transactions2.setPatr_created_on(timeNow());
-        transactions2.setPatr_usac_accountNo_from("-");
-        transactions2.setPatr_usac_accountNo_to(toRekening);
-        transactions2.setPatr_credit(nominall);
-        transactions2.setPatr_debet(0.0);
-        transactions2.setPatr_type(enumPayment);
-        transactions2.setPatr_notes(notes);
-        transactions2.setPatr_invoice_no(invoice);
-        transactions2.setPatrTrxnoRev(transactions.getPatrTrxno());
-
+        PaymentTransactions transactions2 = PaymentTransactions.builder()
+                .patrTrxno(generateTrxNo(LocalDateTime.now()))
+                .patr_created_on(LocalDateTime.now())
+                .patr_usac_accountNo_from("-")
+                .patr_usac_accountNo_to(toRekening)
+                .patr_credit(nominall)
+                .patr_debet(BigDecimal.ZERO)
+                .patr_type(enumPayment)
+                .patr_notes(notes)
+                .patr_invoice_no(invoice)
+                .patrTrxnoRev(transactions.getPatrTrxno())
+                .build();
         repository.save(transactions2);
 
-       
     }
-    private void checkSaldoHandle(Double saldoSender, Double nominal, EnumPayment enumPayment) {
-        if (saldoSender == null || saldoSender == 0.0) {
+    private void checkSaldoHandle(BigDecimal saldoSender, BigDecimal nominal, EnumPayment enumPayment) {
+        if (saldoSender == null || saldoSender.compareTo(BigDecimal.ZERO) == 0) {
             throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp." + saldoSender
                     + ", Failed: " + enumPayment + ", Harap melakukan pengisian saldo!");
-        } else if (saldoSender < nominal) {
+        } else if (saldoSender.compareTo(nominal) < 0) {
             throw new SaldoIsNotEnoughException("Saldo anda:" + " Rp." + saldoSender
                     + ", Failed: " + enumPayment + ", Saldo anda kurangg!");
         }
     }
 
-  
+
+
     @Override
-    public TransaksiResponse transaksiByUser(TransactionsDtoRequests request) {
-        List<UserAccounts> listAcc = userAccountsRepository.findAll();
-        TransaksiResponse dto = new TransaksiResponse();
-    
+    public TransaksiByUserDtoResponse transaksiByUser(TransactionsByUserDtoRequests request) {
+        TransaksiByUserDtoResponse dto = new TransaksiByUserDtoResponse();
+
         automateIdAndCreateEntities(request.getNominall(), request.getUsac_accountno(),
                 request.getPatr_usac_accountNo_to(), request.getPatr_notes(), request.getEnumPayment(), uuidInvoice());
 
-        if (request.getEnumPayment() == EnumPayment.TOPUP_BANK ||
-                request.getEnumPayment() == EnumPayment.TRANSFER ||
-                request.getEnumPayment() == EnumPayment.TOPUP_FINTECH) {
-                    
-
-            for (UserAccounts userAccounts : listAcc) {
-                if (request.getUsac_accountno().equals(userAccounts.getUsac_accountno())) {
-
-                    Double saldoSender = userAccounts.getUsac_debet();
-                    EnumPayment typeTransaksi = request.getEnumPayment();
-                    Double saldoNominal = request.getNominall();
-                    checkSaldoHandle(saldoSender, saldoNominal, typeTransaksi);
-                    Double totalSaldoSender = saldoSender - saldoNominal;
-                    userAccounts.setUsac_debet(totalSaldoSender);
-                    
-                    handleUpdateDebetTransactionsUserAccount(listAcc, request.getPatr_usac_accountNo_to(), saldoNominal);
-                userAccountsRepository.saveAll(listAcc);
+        switch (request.getEnumPayment()){
+            case TOPUP_BANK, TOPUP_FINTECH, TRANSFER:
+                if(checkValidationNoAccount(request.getUsac_accountno(),request.getPatr_usac_accountNo_to(),userAccountsRepository)){
+                    calculationTransaksiDebetProcess(request.getUsac_accountno(),
+                            request.getPatr_usac_accountNo_to(),request.getNominall(),userAccountsRepository);
+                }else{
+                    checkErrorAccount(request.getUsac_accountno(),
+                            request.getPatr_usac_accountNo_to(), userAccountsRepository);
                 }
-            }
-        }
-        else {
-            throw new EntityNotFoundException("Failed Transaksi, Harap Pilih Tipe Transaksi yang Benar");
+                break;
+            default:
+                throw new TypeTransaksiNotFoundException("Harap memilih tipe transaksi yang benar!");
         }
         dto = TransaksiMapper.mapperTransactionsDto(uuidInvoice(),request);
         return dto;
@@ -219,22 +176,13 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
 
     @Override
     public GenerateTransferResponse generateTransaksi(GenerateTransactionsRequests request) {
-        
-        GenerateTransferResponse dtoGenerate = new GenerateTransferResponse();
-        dtoGenerate = handlePaymentTypeGenerateTransactions(request);
 
-        return dtoGenerate;
+        GenerateTransferResponse dtoGenerateTransaksi = new GenerateTransferResponse();
+        dtoGenerateTransaksi = handlePaymentTypeGenerateTransactions(request);
+
+        return dtoGenerateTransaksi;
     }
 
-
-    private void handleUpdateDebetTransactionsUserAccount(List<UserAccounts> listAcc, 
-    String toRekening, Double nominal ){
-        listAcc.stream()
-            .filter(user -> toRekening.equals(user.getUsac_accountno()))
-            .forEach(user -> user.setUsac_debet(
-                Optional.ofNullable(user.getUsac_debet()).orElse(0.0) + nominal));
-        userAccountsRepository.saveAll(listAcc);
-    }
 
     private GenerateTransferResponse handlePaymentTypeGenerateTransactions( GenerateTransactionsRequests request) {
         UserAccounts userAcc = userAccountsRepository.findByAccounts(request.getNoRekening());
@@ -249,113 +197,156 @@ public class PaymentTransactionsImpl implements PaymentTransactionsService {
 
         switch (request.getTipePayment()) {
             case PAID_PARTNER:
-                for (BatchPartnerInvoice partner : listPartnerInvoice) {
-                    if (request.getToRekening().equals(partner.getAccountNo())) {
-                        Double nominalWithTax = partner.getSubTotal() - partner.getTax();
-                        Double saldoSenderPartner = userAcc.getUsac_debet();
-                        Double totalSaldoSenderPartner = saldoSenderPartner - nominalWithTax;
-                        LocalDateTime time = LocalDateTime.now();
-                        BatchPartnerInvoice partnerr = new BatchPartnerInvoice();
 
-                        checkSaldoHandle(saldoSenderPartner, nominalWithTax, request.getTipePayment());
+                if (checkValidationNoAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository)) {
+                    BatchPartnerInvoice partnerInvoice = partnerInvoiceRepository.findByBpinAccountNo(request.getToRekening());
+                    Double nominalWithTaxInDouble = partnerInvoice.getSubTotal() - (partnerInvoice.getTax());
+                    BigDecimal nominalWithTax = new BigDecimal(Double.toString(nominalWithTaxInDouble));
+                    BigDecimal saldoSenderPartner = userAcc.getUsac_debet();
+                    LocalDateTime time = LocalDateTime.now();
+                    BatchPartnerInvoice partnerr = new BatchPartnerInvoice();
 
-                        transactions.setPatrTrxno(generateTrxNo(timeNow()));
-                        transactions2.setPatrTrxno(transactions.getPatrTrxno());
-                        partnerr.setNo(partner.getNo());
-                        partnerr.setServiceOrders(partner.getServiceOrders());
-                        partnerr.setPaidDate(time);
-                        partnerr.setStatus(BpinStatus.PAID);
-                        partnerr.setPaymentTransactions(transactions2);
-                        partnerr.setCreatedOn(time);
-                        userAcc.setUsac_debet(totalSaldoSenderPartner);
-                        transactions.setPatr_debet(nominalWithTax);
-                        transactions2.setPatr_invoice_no(partner.getNo());
-                        transactions2.setPatr_credit(nominalWithTax);
+                    checkSaldoHandle(saldoSenderPartner, nominalWithTax, request.getTipePayment());
 
-                        automateIdAndCreateEntities(nominalWithTax, request.getNoRekening(),
-                        request.getToRekening(), request.getNotes(), request.getTipePayment(), partner.getNo());
+                    transactions.setPatrTrxno(generateTrxNo(LocalDateTime.now()));
+                    transactions2.setPatrTrxno(transactions.getPatrTrxno());
+                    partnerr.setAccountNo(partnerInvoice.getAccountNo());
+                    partnerr.setSubTotal(partnerInvoice.getSubTotal());
+                    partnerr.setTax(partnerInvoice.getTax());
+                    partnerr.setPartner(partnerInvoice.getPartner());
+                    partnerr.setNo(partnerInvoice.getNo());
+                    partnerr.setServiceOrders(partnerInvoice.getServiceOrders());
+                    partnerr.setPaidDate(time);
+                    partnerr.setStatus(BpinStatus.PAID);
+                    partnerr.setPaymentTransactions(transactions2);
+                    partnerr.setCreatedOn(time);
 
-                        handleUpdateDebetTransactionsUserAccount(listAcc, request.getToRekening(), nominalWithTax);
-                        
-                        partnerInvoiceRepository.saveAndFlush(partnerr);
-                            dtoGenerate.setAccountNo(partner.getAccountNo());
-                            dtoGenerate.setInvoiceNo(partner.getNo());
-                            dtoGenerate.setPaidDate(partner.getPaidDate());
-                            dtoGenerate.setNominal(nominalWithTax);
-                            dtoGenerate.setStatus(partner.getStatus());
-                            dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
+                    transactions.setPatr_debet(nominalWithTax);
+                    transactions2.setPatr_invoice_no(partnerInvoice.getNo());
+                    transactions2.setPatr_credit(nominalWithTax);
 
-                    }
+                    automateIdAndCreateEntities(nominalWithTax, request.getNoRekening(),
+                            request.getToRekening(), request.getNotes(), request.getTipePayment(), partnerInvoice.getNo());
+
+                    calculationTransaksiDebetProcess(request.getNoRekening(),
+                            request.getToRekening(), nominalWithTax, userAccountsRepository);
+
+                    partnerInvoiceRepository.saveAndFlush(partnerr);
+
+                    dtoGenerate.setAccountNo(partnerInvoice.getAccountNo());
+                    dtoGenerate.setInvoiceNo(List.of(partnerInvoice.getNo()));
+                    dtoGenerate.setPaidDate(partnerInvoice.getPaidDate());
+                    dtoGenerate.setNominal(nominalWithTax);
+                    dtoGenerate.setTotalNominal(nominalWithTax);
+                    dtoGenerate.setStatus(partnerInvoice.getStatus());
+                    dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
+                }else{
+                    checkErrorAccount(request.getNoRekening(),request.getToRekening(),userAccountsRepository);
                 }
                 break;
+
             case PREMI:
-                Double nominalPremi = premiCredit.getSecrPremiDebet().doubleValue();
-                Double saldoSenderPremi = userAcc.getUsac_debet();
-                Double totalSaldoSenderPremi = saldoSenderPremi - nominalPremi;
-                String invoiceNo = "SERV-" + premiCredit.getSecrId();
+                if(checkValidationNoAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository)){
+                    BigDecimal nominalPremi = premiCredit.getSecrPremiDebet();
+                    BigDecimal saldoSenderPremi = userAcc.getUsac_debet();
+                    String invoiceNo = "SERV-" + premiCredit.getSecrId();
 
-                checkSaldoHandle(saldoSenderPremi, nominalPremi, request.getTipePayment());
-                transactions.setPatrTrxno(generateTrxNo(timeNow()));
-                transactions2.setPatrTrxno(transactions.getPatrTrxno());
-                transactions.setPatr_debet(nominalPremi);
-                transactions2.setPatr_invoice_no(invoiceNo);
-                transactions2.setPatr_credit(nominalPremi);
+                    checkSaldoHandle(saldoSenderPremi, nominalPremi, request.getTipePayment());
 
-                automateIdAndCreateEntities(nominalPremi, request.getNoRekening(),
-                request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceNo);
-                
-                premiCredit.setPaymentTransactions(transactions2);
-                userAcc.setUsac_debet(totalSaldoSenderPremi);
+                    transactions.setPatrTrxno(generateTrxNo(LocalDateTime.now()));
+                    transactions2.setPatrTrxno(transactions.getPatrTrxno());
+                    transactions.setPatr_debet(nominalPremi);
+                    transactions2.setPatr_invoice_no(invoiceNo);
+                    transactions2.setPatr_credit(nominalPremi);
 
-                handleUpdateDebetTransactionsUserAccount(listAcc, request.getToRekening(), nominalPremi);
-               
-                    dtoGenerate.setAccountNo(request.getNoRekening());
-                    dtoGenerate.setInvoiceNo(invoiceNo);
+                    automateIdAndCreateEntities(nominalPremi, request.getNoRekening(),
+                            request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceNo);
+
+                    premiCredit.setPaymentTransactions(transactions2);
+
+
+                    calculationTransaksiDebetProcess(request.getNoRekening(),
+                            request.getToRekening(),nominalPremi, userAccountsRepository);
+
+                    dtoGenerate.setAccountNo(request.getToRekening());
+                    dtoGenerate.setInvoiceNo(List.of(invoiceNo));
                     dtoGenerate.setNominal(nominalPremi);
                     dtoGenerate.setStatus(EnumModuleServiceOrders.SemiStatus.PAID);
+                    dtoGenerate.setTotalNominal(nominalPremi);
                     dtoGenerate.setPaidDate(LocalDateTime.now());
                     dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
-                
+                }else {
+                    checkErrorAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository);
+                }
                 break;
             case SALARY:
-          
-                for (BatchEmployeeSalary employee : listEmployeSalary) {
-                    if (request.getToRekening().equals(employee.getBesaAccountNumber())) {
-                        Double nominalSalary = employee.getBesaTotalSalary().doubleValue();
-                        Double saldoSender = userAcc.getUsac_debet();
-                        Double totalSaldoSender = saldoSender - nominalSalary;
-                        LocalDate createdDateSalary = employee.getBesaCreatedDate();
+                List<String> listGt = new ArrayList<>();
+                int count = employeeSalaryRepository.countBesaPatrTrxno(request.getToRekening());
+                int i = 0;
+                BigDecimal countSalary = BigDecimal.ZERO;
+
+                while(i<count){
+                    if (checkValidationNoAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository)) {
+                        BatchEmployeeSalary employeeSalary = employeeSalaryRepository.findBesaAccountNumber(request.getToRekening());
+
+                        BigDecimal nominalSalary = employeeSalary.getBesaTotalSalary();
+                        BigDecimal saldoSender = userAcc.getUsac_debet();
+                        LocalDate createdDateSalary = employeeSalary.getBesaCreatedDate();
                         String invoiceSalary = "SAL-" + dateFormatter(createdDateSalary);
 
+
                         checkSaldoHandle(saldoSender, nominalSalary, request.getTipePayment());
-                       
-                        transactions.setPatrTrxno(generateTrxNo(timeNow()));
+
+                        transactions.setPatrTrxno(generateTrxNo(LocalDateTime.now()));
                         transactions2.setPatrTrxno(transactions.getPatrTrxno());
-                        employee.setEmsTrasferDate(LocalDateTime.now());
-                        employee.setBesaPatrTrxno(transactions2.getPatrTrxno());
-                        employee.setBesaPaidDate(LocalDateTime.now());
-                        employee.setBesaModifiedDate(LocalDateTime.now());
-                        userAcc.setUsac_debet(totalSaldoSender);
+                        employeeSalary.setEmsTrasferDate(LocalDateTime.now());
+                        employeeSalary.setBesaPatrTrxno(generateTrxNo(LocalDateTime.now()));
+                        employeeSalary.setBesaPaidDate(LocalDateTime.now());
+                        employeeSalary.setBesaModifiedDate(LocalDateTime.now());
+
 
                         automateIdAndCreateEntities(nominalSalary, request.getNoRekening(),
-                request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceSalary);
+                                request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceSalary);
 
-                        handleUpdateDebetTransactionsUserAccount(listAcc, request.getToRekening(), nominalSalary);
+                        calculationTransaksiDebetProcess(request.getNoRekening(), request.getToRekening(),nominalSalary, userAccountsRepository);
 
-                        employeeSalaryRepository.saveAndFlush(employee);
-                        dtoGenerate.setAccountNo(employee.getBesaAccountNumber());
-                        dtoGenerate.setInvoiceNo("SAL-" + createdDateSalary);
+                        employeeSalaryRepository.saveAndFlush(employeeSalary);
+                        dtoGenerate.setAccountNo(employeeSalary.getBesaAccountNumber());
+                        dtoGenerate.setInvoiceNo(listGt);
+
+                        dtoGenerate.setStatus(BpinStatus.PAID);
                         dtoGenerate.setNominal(nominalSalary);
-                        dtoGenerate.setPaidDate(employee.getBesaPaidDate());
+                        dtoGenerate.setPaidDate(employeeSalary.getBesaPaidDate());
                         dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
+                        listGt.add(invoiceSalary);
+
+                        countSalary = countSalary.add(nominalSalary);
+                        i++;
+                    }else{
+                        checkErrorAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository);
                     }
-                }
+                }dtoGenerate.setTotalNominal(countSalary);
                 break;
             default:
                 throw new TypeTransaksiNotFoundException("Harap memilih tipe transaksi yang benar!");
         }
-       return dtoGenerate;
+        return dtoGenerate;
     }
 
-    
+    @Override
+    public PaymentTransactionsDtoResponse getById(String trxNo) {
+        Optional<PaymentTransactions> transactions = repository.findById(trxNo);
+        PaymentTransactionsDtoResponse response = TransactionMapper.mapEntityToDto(transactions,PaymentTransactionsDtoResponse.class);
+        return response;
+    }
+
+    @Override
+    public List<PaymentTransactionsDtoResponse> getAll() {
+        List<PaymentTransactions> listTransactions = repository.findAll();
+        List<PaymentTransactionsDtoResponse> listResponse = TransactionMapper.mapEntityListToDtoList(
+                listTransactions, PaymentTransactionsDtoResponse.class);
+        return listResponse;
+    }
+
+
 }

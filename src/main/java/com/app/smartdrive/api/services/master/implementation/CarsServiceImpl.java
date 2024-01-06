@@ -33,7 +33,7 @@ public class CarsServiceImpl implements MasterService<CarsRes, CarsReq, Long> {
     @Override
     public CarsRes update(Long aLong, CarsReq carsReq) {
         CarSeries carSeries = repository.findById(aLong).orElseThrow(() -> new EntityNotFoundException("Car Series ID : " + aLong + " Not Found"));
-        repository.save(TransactionMapper.mapDtoToEntity(carsReq,carSeries));
+        carSeries = repository.save(TransactionMapper.mapDtoToEntity(carsReq, carSeries));
         return TransactionMapper.mapEntityToDto(carSeries, CarsRes.class);
     }
 

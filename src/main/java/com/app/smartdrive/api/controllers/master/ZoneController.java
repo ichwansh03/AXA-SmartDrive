@@ -38,7 +38,6 @@ public class ZoneController implements MasterController<ZoneReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody ZoneReq request) {
-        zoneServiceImpl.getById(id);
         return new ResponseEntity<>(zoneServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

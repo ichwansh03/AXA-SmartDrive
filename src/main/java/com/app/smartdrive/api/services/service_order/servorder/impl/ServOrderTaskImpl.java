@@ -1,10 +1,12 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.dto.EmailReq;
+import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
+import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
 import com.app.smartdrive.api.services.master.EmailService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
 import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
@@ -12,7 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -21,18 +26,27 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
 
     private final SoTasksRepository soTasksRepository;
-    private final SoWorkorderRepository soWorkorderRepository;
 
     private final EmailService emailService;
     private final ServOrderWorkorderService servOrderWorkorderService;
 
+
     @Override
-    public List<ServiceOrderTasks> findSeotBySeroId(String seroId) {
+    public List<SoTasksDto> findAllTaskByOrderId(String seroId) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
         List<ServiceOrderTasks> orderTasks = soTasksRepository.findByServiceOrders_SeroId(seroId);
-
-        log.info("SoOrderServiceImpl::findSeotBySeroId in ID {} ",seroId);
-
-        return orderTasks;
+        return orderTasks.stream()
+                .map(seot -> {
+                    SoTasksDto soTasksDto = TransactionMapper.mapEntityToDto(seot, SoTasksDto.class);
+                    List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(soTasksDto.getSeotId());
+                    soTasksDto.setSeotActualStartdate(seot.getSeotActualStartdate().format(formatter));
+                    soTasksDto.setSeotActualEnddate(seot.getSeotActualEnddate().format(formatter));
+                    soTasksDto.setServiceOrderWorkorders(TransactionMapper.mapEntityListToDtoList(sowoBySeotId, SoWorkorderDto.class));
+                    return soTasksDto;
+                })
+                .collect(toList());
     }
 
     @Override
@@ -50,7 +64,7 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
         List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
 
-        List<ServiceOrderWorkorder> sowoBySeotId = soWorkorderRepository.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
+        List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
         boolean allWorkComplete = servOrderWorkorderService.checkAllWorkComplete(sowoBySeotId);
 
         boolean checkedAll = false;

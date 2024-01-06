@@ -39,7 +39,6 @@ public class TetyController implements MasterController<TetyReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TetyReq request) {
-        tetyServiceImpl.getById(id);
         return new ResponseEntity<>(tetyServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

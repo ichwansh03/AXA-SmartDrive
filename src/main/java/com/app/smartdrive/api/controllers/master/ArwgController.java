@@ -39,6 +39,6 @@ public class ArwgController implements MasterController<ArwgReq, String> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable String id,@Valid @RequestBody ArwgReq request) {
-        return new ResponseEntity<>(arwgServiceImpl.update(id,request), HttpStatus.CREATED);
+        return new ResponseEntity<>(arwgServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }

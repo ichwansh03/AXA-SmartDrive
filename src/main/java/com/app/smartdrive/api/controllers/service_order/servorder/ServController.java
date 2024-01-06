@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/service")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin
 public class ServController {
 
     private final ServService servService;
@@ -24,9 +25,9 @@ public class ServController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
-    public ResponseEntity<?> getServiceById(@RequestParam("servid") Long servId) {
+    public ResponseEntity<?> getServiceById(@RequestParam("userEntityId") Long userId) {
 
-        ServiceRespDto servicesById = servService.findServicesById(servId);
+        ServiceRespDto servicesById = servService.findServicesById(userId);
 
         log.info("ServiceOrdersController::getServiceById successfully viewed");
         return new ResponseEntity<>(servicesById, HttpStatus.OK);

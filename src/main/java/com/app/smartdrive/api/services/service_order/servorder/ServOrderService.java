@@ -11,7 +11,9 @@ public interface ServOrderService {
 
     ServiceOrders findServiceOrdersById(String seroId);
 
-    List<ServiceOrders> findAllSeroByServId(Long servId);
+    ServiceOrderRespDto findOrderDtoById(String seroId);
+
+    List<ServiceOrderRespDto> findAllOrderByServId(Long servId);
 
     List<ServiceOrders> findAllSeroByUserId(Long custId);
 

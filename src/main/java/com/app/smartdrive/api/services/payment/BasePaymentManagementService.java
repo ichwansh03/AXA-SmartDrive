@@ -16,5 +16,7 @@ import com.app.smartdrive.api.entities.payment.Banks;
 public interface BasePaymentManagementService<T, ID> {
     T getById(ID id);
     List<T> getAll();
-    Boolean deleteById(ID id);
+    default  Boolean deleteById(ID id){
+        return true;
+    };
 } 

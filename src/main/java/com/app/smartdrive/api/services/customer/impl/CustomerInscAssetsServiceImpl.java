@@ -42,8 +42,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
             CustomerRequest newCustomerRequest
     ){
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ciasStartdate = LocalDateTime.parse(customerInscAssetsRequestDTO.getCiasStartdate(), formatter);
+        LocalDateTime ciasStartdate = LocalDateTime.now();
 
         // new cias
 
@@ -74,13 +73,7 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
             CarSeries carSeries,
             InsuranceType existInty
     ){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime ciasStartdate = LocalDateTime.parse(ciasUpdateDTO.getCiasStartdate(), formatter);
-
-        if(!Objects.equals(cias.getCiasPoliceNumber(), ciasUpdateDTO.getCiasPoliceNumber())){
-            this.validatePoliceNumber(cias.getCiasPoliceNumber());
-            cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
-        }
+        LocalDateTime ciasStartdate = LocalDateTime.now();
 
         cias.setCiasYear(ciasUpdateDTO.getCiasYear());
         cias.setCiasStartdate(ciasStartdate);
@@ -92,6 +85,21 @@ public class CustomerInscAssetsServiceImpl implements CustomerInscAssetsService 
         cias.setCity(existCity);
         cias.setCarSeries(carSeries);
         cias.setInsuranceType(existInty);
+
+        Optional<CustomerInscAssets> optionalCustomerInscAssets = this.customerInscAssetsRepository.findByCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+
+        if(optionalCustomerInscAssets.isPresent()){
+            if(!Objects.equals(ciasUpdateDTO.getCiasPoliceNumber(), cias.getCiasPoliceNumber())){
+                throw new EntityAlreadyExistException("Customer Request with police number " + ciasUpdateDTO.getCiasPoliceNumber() + " is already exist");
+            }else {
+                cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+            }
+        }else {
+            cias.setCiasPoliceNumber(ciasUpdateDTO.getCiasPoliceNumber());
+        }
+
+
+
 
         log.info("CustomerInscAssetsServiceImpl::updateCustomerInscAssets, update customerInscAssets by ID : {}", cias.getCiasCreqEntityid());
     }

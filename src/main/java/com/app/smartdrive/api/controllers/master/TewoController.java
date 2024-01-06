@@ -38,7 +38,6 @@ public class TewoController implements MasterController<TewoReq, Long> {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody TewoReq request) {
-        tewoServiceImpl.getById(id);
         return new ResponseEntity<>(tewoServiceImpl.update(id, request), HttpStatus.CREATED);
     }
 }
