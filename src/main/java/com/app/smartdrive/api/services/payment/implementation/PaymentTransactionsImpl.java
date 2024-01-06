@@ -8,6 +8,7 @@ import java.util.*;
 
 import com.app.smartdrive.api.dto.payment.Response.PaymentTransactions.PaymentTransactionsDtoResponse;
 import com.app.smartdrive.api.mapper.TransactionMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
@@ -197,52 +198,61 @@ public class PaymentTransactionsImpl implements TransactionsService {
 
         switch (request.getTipePayment()) {
             case PAID_PARTNER:
+                List<String> listInvoice = new ArrayList<>();
+                int countPartner = partnerInvoiceRepository.countBpin(request.getToRekening());
+                int tempPartner = 0;
+                BigDecimal countSubTotal = BigDecimal.ZERO;
 
-                if (checkValidationNoAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository)) {
-                    BatchPartnerInvoice partnerInvoice = partnerInvoiceRepository.findByBpinAccountNo(request.getToRekening());
-                    Double nominalWithTaxInDouble = partnerInvoice.getSubTotal() - (partnerInvoice.getTax());
-                    BigDecimal nominalWithTax = new BigDecimal(Double.toString(nominalWithTaxInDouble));
-                    BigDecimal saldoSenderPartner = userAcc.getUsac_debet();
-                    LocalDateTime time = LocalDateTime.now();
-                    BatchPartnerInvoice partnerr = new BatchPartnerInvoice();
+                while(tempPartner<countPartner){
+                    if (checkValidationNoAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository)) {
+                        BatchPartnerInvoice partnerInvoice = partnerInvoiceRepository.findByBpinAccountNo(request.getToRekening());
+                        Double nominalWithTaxInDouble = partnerInvoice.getSubTotal() - (partnerInvoice.getTax());
+                        BigDecimal nominalWithTax = new BigDecimal(Double.toString(nominalWithTaxInDouble));
+                        BigDecimal saldoSenderPartner = userAcc.getUsac_debet();
+                        LocalDateTime time = LocalDateTime.now();
+                        String invoice = partnerInvoice.getNo();
+                        BatchPartnerInvoice partnerr = new BatchPartnerInvoice();
 
-                    checkSaldoHandle(saldoSenderPartner, nominalWithTax, request.getTipePayment());
+                        checkSaldoHandle(saldoSenderPartner, nominalWithTax, request.getTipePayment());
 
-                    transactions.setPatrTrxno(generateTrxNo(LocalDateTime.now()));
-                    transactions2.setPatrTrxno(transactions.getPatrTrxno());
-                    partnerr.setAccountNo(partnerInvoice.getAccountNo());
-                    partnerr.setSubTotal(partnerInvoice.getSubTotal());
-                    partnerr.setTax(partnerInvoice.getTax());
-                    partnerr.setPartner(partnerInvoice.getPartner());
-                    partnerr.setNo(partnerInvoice.getNo());
-                    partnerr.setServiceOrders(partnerInvoice.getServiceOrders());
-                    partnerr.setPaidDate(time);
-                    partnerr.setStatus(BpinStatus.PAID);
-                    partnerr.setPaymentTransactions(transactions2);
-                    partnerr.setCreatedOn(time);
+                        transactions.setPatrTrxno(generateTrxNo(LocalDateTime.now()));
+                        transactions2.setPatrTrxno(transactions.getPatrTrxno());
+                        partnerr.setAccountNo(partnerInvoice.getAccountNo());
+                        partnerr.setSubTotal(partnerInvoice.getSubTotal());
+                        partnerr.setTax(partnerInvoice.getTax());
+                        partnerr.setPartner(partnerInvoice.getPartner());
+                        partnerr.setNo(partnerInvoice.getNo());
+                        partnerr.setServiceOrders(partnerInvoice.getServiceOrders());
+                        partnerr.setPaidDate(time);
+                        partnerr.setStatus(BpinStatus.PAID);
+                        partnerr.setPaymentTransactions(transactions2);
+                        partnerr.setCreatedOn(time);
 
-                    transactions.setPatr_debet(nominalWithTax);
-                    transactions2.setPatr_invoice_no(partnerInvoice.getNo());
-                    transactions2.setPatr_credit(nominalWithTax);
+                        transactions.setPatr_debet(nominalWithTax);
+                        transactions2.setPatr_invoice_no(partnerInvoice.getNo());
+                        transactions2.setPatr_credit(nominalWithTax);
 
-                    automateIdAndCreateEntities(nominalWithTax, request.getNoRekening(),
-                            request.getToRekening(), request.getNotes(), request.getTipePayment(), partnerInvoice.getNo());
+                        automateIdAndCreateEntities(nominalWithTax, request.getNoRekening(),
+                                request.getToRekening(), request.getNotes(), request.getTipePayment(), partnerInvoice.getNo());
 
-                    calculationTransaksiDebetProcess(request.getNoRekening(),
-                            request.getToRekening(), nominalWithTax, userAccountsRepository);
+                        calculationTransaksiDebetProcess(request.getNoRekening(),
+                                request.getToRekening(), nominalWithTax, userAccountsRepository);
 
-                    partnerInvoiceRepository.saveAndFlush(partnerr);
+                        partnerInvoiceRepository.saveAndFlush(partnerr);
 
-                    dtoGenerate.setAccountNo(partnerInvoice.getAccountNo());
-                    dtoGenerate.setInvoiceNo(List.of(partnerInvoice.getNo()));
-                    dtoGenerate.setPaidDate(partnerInvoice.getPaidDate());
-                    dtoGenerate.setNominal(nominalWithTax);
-                    dtoGenerate.setTotalNominal(nominalWithTax);
-                    dtoGenerate.setStatus(partnerInvoice.getStatus());
-                    dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
-                }else{
-                    checkErrorAccount(request.getNoRekening(),request.getToRekening(),userAccountsRepository);
-                }
+                        dtoGenerate.setAccountNo(partnerInvoice.getAccountNo());
+                        dtoGenerate.setInvoiceNo(listInvoice);
+                        dtoGenerate.setPaidDate(partnerInvoice.getPaidDate());
+                        dtoGenerate.setNominal(nominalWithTax);
+                        dtoGenerate.setStatus(partnerInvoice.getStatus());
+                        dtoGenerate.setTrxNo(transactions2.getPatrTrxno());
+                        listInvoice.add(invoice);
+                        tempPartner++;
+                        countSubTotal = countSubTotal.add(nominalWithTax);
+                    }else{
+                        checkErrorAccount(request.getNoRekening(),request.getToRekening(),userAccountsRepository);
+                    }
+                }dtoGenerate.setTotalNominal(countSubTotal);
                 break;
 
             case PREMI:
@@ -263,6 +273,8 @@ public class PaymentTransactionsImpl implements TransactionsService {
                             request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceNo);
 
                     premiCredit.setPaymentTransactions(transactions2);
+                    premiCredit.setSecrTrxDate(LocalDateTime.now());
+                    secrRepository.save(premiCredit);
 
 
                     calculationTransaksiDebetProcess(request.getNoRekening(),

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/besa")
+@CrossOrigin
 public class BatchEmployeeSalaryController {
 
     private final BatchEmployeeSalaryService batchEmployeeSalaryService;
