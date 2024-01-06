@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
-@CrossOrigin
 @Tag(name = "Master Module")
 @CrossOrigin
 public class CateController implements MasterController<CateReq, Long> {
@@ -45,12 +44,6 @@ public class CateController implements MasterController<CateReq, Long> {
     public ResponseEntity<?> updateData(@PathVariable Long id, @Valid @RequestBody CateReq request) {
         cateServiceImpl.getById(id);
         return new ResponseEntity<>(cateServiceImpl.update(id, request), HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteData(@PathVariable Long id) {
-        cateServiceImpl.deleteById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
