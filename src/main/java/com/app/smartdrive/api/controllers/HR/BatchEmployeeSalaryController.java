@@ -14,13 +14,14 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/besa")
+@CrossOrigin
 public class BatchEmployeeSalaryController {
 
     private final BatchEmployeeSalaryService batchEmployeeSalaryService;
 
     @PostMapping("/create/{id}")
     public ResponseEntity<BatchEmployeeSalary> createOne(@PathVariable("id") Long id){
-        BatchEmployeeSalary batchEmployeeSalary = batchEmployeeSalaryService.createOne(id);
+        BatchEmployeeSalary batchEmployeeSalary = batchEmployeeSalaryService.createOneWithDetails(id);
         return ResponseEntity.ok(batchEmployeeSalary);
     }
 
@@ -35,5 +36,7 @@ public class BatchEmployeeSalaryController {
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(batchEmployeeSalaryService.getAllCommission(employeeSalaryDetailRequestDto.getBesaEmpEntityId(),employeeSalaryDetailRequestDto.getBesaCreateDate()));
     }
+
+
 
 }

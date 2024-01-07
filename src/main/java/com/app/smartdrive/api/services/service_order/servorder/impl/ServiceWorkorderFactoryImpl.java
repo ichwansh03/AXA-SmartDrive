@@ -6,6 +6,7 @@ import com.app.smartdrive.api.dto.service_order.request.ServiceWorkorderReqDto;
 import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
@@ -53,8 +54,26 @@ public class ServiceWorkorderFactoryImpl implements ServiceWorkorderFactory {
             throw new ValidasiRequestException("Failed to update data ",400);
         }
 
+        ServiceOrderWorkorder workorder = soWorkorderRepository.findById(sowoId).get();
+        if (updateTaskByWorkorders(workorder)){
+            soTasksRepository.updateTasksStatus(EnumModuleServiceOrders.SeotStatus.COMPLETED, workorder.getServiceOrderTasks().getSeotId());
+        }
+
         log.info("SoOrderServiceImpl::addSoWorkorder updated in ID {} ", sowoId);
         return updatedSowoStatus;
+    }
+
+    private boolean updateTaskByWorkorders(ServiceOrderWorkorder workorder){
+        List<ServiceOrderWorkorder> orderWorkorders = soWorkorderRepository.findByServiceOrderTasks_SeotId(workorder.getServiceOrderTasks().getSeotId());
+
+        boolean completed = true;
+        for (ServiceOrderWorkorder orderWorkorder : orderWorkorders) {
+            if (!orderWorkorder.getSowoStatus()) {
+                completed = false;
+            }
+        }
+
+        return completed;
     }
 
     @Transactional
@@ -62,7 +81,6 @@ public class ServiceWorkorderFactoryImpl implements ServiceWorkorderFactory {
     public void createWorkorderTask(String sowoName, Long seotId){
         ServiceOrderTasks tasks = soTasksRepository.findById(seotId)
                 .orElseThrow(() -> new EntityNotFoundException("::createWorkorderTask ID is not found"));
-
         ServiceOrderWorkorder soWorkorder = new ServiceOrderWorkorder();
         soWorkorder.setSowoName(sowoName);
         soWorkorder.setServiceOrderTasks(tasks);

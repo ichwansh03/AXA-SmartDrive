@@ -1,11 +1,13 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
 import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
@@ -30,6 +32,13 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
     private final ArwgRepository arwgRepository;
 
     @Override
+    public SoWorkorderDto findWorkorderById(Long sowoId) {
+        ServiceOrderWorkorder workorder = soWorkorderRepository.findById(sowoId)
+                .orElseThrow(() -> new EntityNotFoundException("ServOrderWorkorderImpl::findWorkorderById ID is not found"));
+        return TransactionMapper.mapEntityToDto(workorder, SoWorkorderDto.class);
+    }
+
+    @Override
     public List<ServiceOrderWorkorder> findSowoBySeotId(Long seotId) {
         return soWorkorderRepository.findByServiceOrderTasks_SeotId(seotId);
     }
@@ -41,6 +50,20 @@ public class ServOrderWorkorderImpl implements ServOrderWorkorderService {
             checkedAll = item.getSowoStatus();
         }
         return checkedAll;
+    }
+
+    @Override
+    public boolean checkWorkorderBySeotId(Long seotId){
+        List<ServiceOrderWorkorder> workorders = findSowoBySeotId(seotId);
+
+        boolean status = true;
+        for (ServiceOrderWorkorder workorder : workorders) {
+            if (!workorder.getSowoStatus()) {
+                status = false;
+            }
+        }
+
+        return status;
     }
 
     @Override

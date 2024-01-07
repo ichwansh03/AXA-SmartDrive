@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.controllers.service_order.premi;
 
 import com.app.smartdrive.api.dto.service_order.request.SecrReqDto;
+import com.app.smartdrive.api.entities.service_order.ServicePremiCredit;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/premi")
 @RequiredArgsConstructor
+@CrossOrigin
 public class ServicePremiController {
 
     private final ServPremiCreditService servPremiCreditService;
@@ -27,4 +29,6 @@ public class ServicePremiController {
 
         return new ResponseEntity<>(secrReqDto, HttpStatus.OK);
     }
+
+
 }

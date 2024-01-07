@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCityDto {
+  private Long cityId;
   private String cityName;
 }
