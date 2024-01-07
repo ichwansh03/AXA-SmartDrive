@@ -25,7 +25,6 @@ public class EmployeesController {
      private final EmployeesService employeesService;
 
     @PostMapping("/create")
-//    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<?> createEmployee(@Valid @RequestBody EmployeesRequestDto employeesRequestDto) {
         return ResponseEntity.status(201).body(employeesService.createEmployee(employeesRequestDto));
     }
