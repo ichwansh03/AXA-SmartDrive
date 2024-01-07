@@ -1,6 +1,7 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
 import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.request.ServiceTaskReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
@@ -41,6 +42,7 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
     private final ServService servService;
     private final ServOrderService servOrderService;
     private final ServOrderTaskService servOrderTaskService;
+    private final ServOrderWorkorderService servOrderWorkorderService;
 
     @Transactional
     @Override
@@ -91,8 +93,13 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
     public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
         ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
                 .orElseThrow(() -> new EntityNotFoundException("::updateTasksStatus ID " + seotId + " is not found"));
-        int updateSeot = soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
 
+        int updateSeot;
+        if (orderTasks.getServiceOrderWorkorders().isEmpty() || servOrderWorkorderService.checkWorkorderBySeotId(orderTasks.getSeotId())) {
+            updateSeot = soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
+        } else {
+            throw new TasksNotCompletedException("Workorder tasks are not completed");
+        }
 
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ", seotId);
         return updateSeot;
