@@ -5,25 +5,28 @@ import com.app.smartdrive.api.services.master.MasterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/master/category")
-@Tag(name = "Master Module")
 @CrossOrigin
+@Tag(name = "Master Module")
 public class CateController implements MasterController<CateReq, Long> {
     private final MasterService cateServiceImpl;
 
     @Override
     @GetMapping
-    @CrossOrigin
-    public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(cateServiceImpl.getAll());
+    public ResponseEntity<?> findAllData(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page,size);
+        return ResponseEntity.ok(cateServiceImpl.getAll(pageable));
     }
 
     @Override
@@ -34,7 +37,6 @@ public class CateController implements MasterController<CateReq, Long> {
 
     @Override
     @PostMapping
-    @CrossOrigin
     public ResponseEntity<?> saveData(@Valid @RequestBody CateReq request) {
         return new ResponseEntity<>(cateServiceImpl.save(request), HttpStatus.CREATED);
     }

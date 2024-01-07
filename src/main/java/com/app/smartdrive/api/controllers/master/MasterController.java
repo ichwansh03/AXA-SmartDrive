@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 @Tag(name = "Master Module")
 public interface MasterController<T, ID> {
-    ResponseEntity<?> findAllData();
+    ResponseEntity<?> findAllData(int page, int size);
 
     ResponseEntity<?> findDataById(ID id);
 

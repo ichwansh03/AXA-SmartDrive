@@ -75,7 +75,6 @@ public class CustomerServiceControllerTest {
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
-                .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
                 .ciasIntyName("Total Loss Only")
                 .ciasCityId(2L)
                 .ciasPaidType("CREDIT")
@@ -100,7 +99,6 @@ public class CustomerServiceControllerTest {
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
-                .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
                 .ciasIntyName("Total Loss Only")
                 .ciasCityId(2L)
                 .ciasPaidType("CREDIT")
@@ -112,7 +110,6 @@ public class CustomerServiceControllerTest {
 
         UpdateCustomerRequestDTO customerRequestDTO = UpdateCustomerRequestDTO.builder()
                 .creqEntityId(creqEntityId)
-                .customerId(2L)
                 .agenId(1L)
                 .employeeId(1L)
                 .customerInscAssetsRequestDTO(customerInscAssetsRequestDTO)
@@ -126,7 +123,6 @@ public class CustomerServiceControllerTest {
         CustomerInscAssetsRequestDTO customerInscAssetsRequestDTO = CustomerInscAssetsRequestDTO.builder()
                 .ciasPoliceNumber("B 1234 CBD")
                 .cuexIds(cuexIds)
-                .ciasStartdate(String.valueOf(LocalDateTime.of(2001, Month.OCTOBER, 23, 10, 10, 10)))
                 .ciasIntyName("Total Loss Only")
                 .ciasCityId(2L)
                 .ciasPaidType("CREDIT")
@@ -662,7 +658,7 @@ public class CustomerServiceControllerTest {
         });
 
         when(this.customerRequestService.updateCustomerRequest(updateCustomerRequestDTO, multipartFiles))
-                .thenThrow(new EntityNotFoundException("User with id " + updateCustomerRequestDTO.getCustomerId() +" is not found"));
+                .thenThrow(new EntityNotFoundException("User with id " + updateCustomerRequestDTO.getEmployeeId() +" is not found"));
 
         mockMvc.perform(builder
                 .file(file)
@@ -670,7 +666,7 @@ public class CustomerServiceControllerTest {
         ).andExpect(status().isNotFound()
         ).andExpect(result -> assertTrue(result.getResolvedException() instanceof EntityNotFoundException)
         ).andExpect(result -> assertEquals(
-                "User with id " + updateCustomerRequestDTO.getCustomerId() + " is not found",
+                "User with id " + updateCustomerRequestDTO.getEmployeeId() + " is not found",
                 result.getResolvedException().getMessage())
         ).andDo(print());
 

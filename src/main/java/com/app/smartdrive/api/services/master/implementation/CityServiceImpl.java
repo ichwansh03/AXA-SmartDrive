@@ -9,6 +9,9 @@ import com.app.smartdrive.api.repositories.master.CityRepository;
 import com.app.smartdrive.api.services.master.MasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +29,12 @@ public class CityServiceImpl implements MasterService<CitiesRes, CitiesReq, Long
     }
 
     @Override
-    public List<CitiesRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), CitiesRes.class);
+    public Page<CitiesRes> getAll(Pageable pageable) {
+        Page<Cities> cities = repository.findAll(pageable);
+        List<CitiesRes> citiesRes = cities.getContent().stream().map(
+                city -> TransactionMapper.mapEntityToDto(city, CitiesRes.class)
+        ).toList();
+        return new PageImpl<>(citiesRes, pageable, cities.getTotalElements());
     }
 
     @Override

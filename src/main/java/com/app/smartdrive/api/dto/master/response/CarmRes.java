@@ -16,5 +16,7 @@ public class CarmRes {
     @Size(max = 55, message = "Car Model Name Length Exceeded !")
     private String carmName;
 
-    private List<CarbRes> carBrand;
+    private Long carmCarbId;
+
+    private CarbRes carBrand;
 }

@@ -146,7 +146,6 @@ class ClaimAssetControllerTest {
         customerInscAssetsRequestDTO.setCiasCarsId(1L);
         customerInscAssetsRequestDTO.setCiasCityId(1L);
         customerInscAssetsRequestDTO.setCiasIntyName("Comprehensive");
-        customerInscAssetsRequestDTO.setCiasStartdate("2023-01-01 15:02:00");
         customerInscAssetsRequestDTO.setCurrentPrice(new BigDecimal("120000000"));
         customerInscAssetsRequestDTO.setCuexIds(new Long[]{7L,8L,9L});
         CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();

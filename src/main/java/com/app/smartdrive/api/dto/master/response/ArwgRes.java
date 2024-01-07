@@ -17,5 +17,7 @@ public class ArwgRes {
     @Size(max = 55, message = "Area Work Group Description Length Exceeded !")
     private String arwgDesc;
 
+    private Long arwgCityId;
+
     private CitiesRes cities;
 }

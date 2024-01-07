@@ -9,6 +9,9 @@ import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +29,12 @@ public class TestaServiceImpl implements MasterService<TestaRes, TestaReq, Long>
     }
 
     @Override
-    public List<TestaRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), TestaRes.class);
+    public Page<TestaRes> getAll(Pageable pageable) {
+        Page<TemplateServiceTask> templateServiceTasks = repository.findAll(pageable);
+        List<TestaRes> testaRes = templateServiceTasks.getContent().stream().map(
+                templateServiceTask -> TransactionMapper.mapEntityToDto(templateServiceTask, TestaRes.class)
+        ).toList();
+        return new PageImpl<>(testaRes, pageable, templateServiceTasks.getTotalElements());
     }
 
     @Override
