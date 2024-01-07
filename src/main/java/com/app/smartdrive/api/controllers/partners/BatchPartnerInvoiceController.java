@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/partner-invoice")
+@CrossOrigin
 public class BatchPartnerInvoiceController {
 
     private final BatchPartnerInvoiceService bpinService;
@@ -25,4 +26,6 @@ public class BatchPartnerInvoiceController {
     public ResponseEntity<List<BatchPartnerInvoice>> getAllInvoiceNotPaid(){
         return ResponseEntity.ok(bpinService.getAllInvoiceNotPaid());
     }
+
+
 }

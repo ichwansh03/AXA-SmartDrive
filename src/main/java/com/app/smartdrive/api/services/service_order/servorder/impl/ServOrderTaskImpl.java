@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.services.service_order.servorder.impl;
 
+import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.EmailReq;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
@@ -24,12 +25,17 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class ServOrderTaskImpl implements ServOrderTaskService {
 
-
     private final SoTasksRepository soTasksRepository;
-
     private final EmailService emailService;
     private final ServOrderWorkorderService servOrderWorkorderService;
 
+
+    @Override
+    public SoTasksDto findTaskById(Long seotId) {
+        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("ServOrderTaskImpl::findTaskById ID is not found"));
+        return TransactionMapper.mapEntityToDto(orderTasks, SoTasksDto.class);
+    }
 
     @Override
     public List<SoTasksDto> findAllTaskByOrderId(String seroId) {
