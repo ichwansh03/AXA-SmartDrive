@@ -6,12 +6,11 @@ import com.app.smartdrive.api.entities.master.CarBrand;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.services.auth.AuthenticationService;
 import com.app.smartdrive.api.services.jwt.JwtService;
-import com.app.smartdrive.api.services.master.MasterService;
+import com.app.smartdrive.api.services.master.implementation.CarbServiceImpl;
 import com.app.smartdrive.api.services.refreshToken.RefreshTokenService;
 import com.app.smartdrive.api.services.users.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -20,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -50,7 +50,8 @@ class CarbControllerTest {
     private RefreshTokenService refreshTokenService;
 
     @MockBean
-    private MasterService carbServiceImpl;
+    private CarbServiceImpl carbService;
+
     @MockBean
     JwtService jwtService;
 
@@ -66,21 +67,21 @@ class CarbControllerTest {
         return carbReq;
     }
 
-//    @Test
-//    @WithMockUser(authorities = {"Admin"})
-//    void getAllCarBrands_willSuccess() throws Exception {
-//        List<CarBrand> carBrands = List.of(new CarBrand(), new CarBrand());
-//
-//        List<CarbRes> carBrandResponse = TransactionMapper.mapEntityListToDtoList(carBrands, CarbRes.class);
-//
-//        Page<CarbRes> mockCarBrandsPage = new PageImpl<>(carBrandResponse);
-//
-//        when(carbServiceImpl.getAll(any(Pageable.class))).thenReturn(mockCarBrandsPage);
-//
-//        mockMvc.perform(get("/car-brands"))
-//                .andExpect(status().isOk())
-//                .andDo(print());
-//    }
+    @Test
+    @WithMockUser(authorities = {"Admin"})
+    void getAllSuccess() throws Exception {
+        List<CarBrand> carBrands = List.of(new CarBrand(), new CarBrand());
+
+        List<CarbRes> carBrandResponse = TransactionMapper.mapEntityListToDtoList(carBrands, CarbRes.class);
+
+        Page<CarbRes> mockCarBrandsPage = new PageImpl<>(carBrandResponse);
+
+        when(carbService.getAll(any(Pageable.class))).thenReturn(mockCarBrandsPage);
+
+        mockMvc.perform(get("/master/carb"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 
     @Test
     void findDataById() throws Exception {
