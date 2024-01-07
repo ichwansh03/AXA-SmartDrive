@@ -21,23 +21,23 @@ import org.springframework.web.bind.annotation.*;
 public class ServController {
 
     private final ServService servService;
-    private final ServiceFactory serviceFactory;
+    private final ServiceFactory serviceTransaction;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
-    public ResponseEntity<?> getServiceById(@RequestParam("userEntityId") Long userId) {
+    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    public ResponseEntity<?> getServiceById(@RequestParam("servId") Long id) {
 
-        ServiceRespDto servicesById = servService.findServicesById(userId);
+        ServiceRespDto servicesById = servService.findServicesById(id);
 
         log.info("ServiceOrdersController::getServiceById successfully viewed");
         return new ResponseEntity<>(servicesById, HttpStatus.OK);
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> generateService(@Valid @RequestBody ClaimRequestDTO requestDTO) throws Exception {
 
-        ServiceDto serviceRespDto = serviceFactory.addService(requestDTO.getCreqEntityId());
+        ServiceDto serviceRespDto = serviceTransaction.addService(requestDTO.getCreqEntityId());
 
         log.info("ServiceOrdersController::generateService successfully viewed");
         return new ResponseEntity<>(serviceRespDto, HttpStatus.OK);

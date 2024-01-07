@@ -31,7 +31,7 @@ public class ServOrderController {
 
     @GetMapping("/search")
     @CrossOrigin
-    @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
+    //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId) {
         ServiceOrderRespDto orderDtoById = servOrderService.findOrderDtoById(seroId);
         return new ResponseEntity<>(orderDtoById, HttpStatus.OK);
