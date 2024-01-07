@@ -8,15 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.app.smartdrive.api.dto.HR.request.EmployeeAreaWorkgroupRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesAreaWorkgroupResponseDto;
@@ -27,32 +19,33 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin
 @RequestMapping("/eawg")
 public class EmployeeAreaWorkgroupController {
         private final EmployeeAreaWorkgroupService employeeAreaWorkgroupService;
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('Admin')")
+//    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<EmployeesAreaWorkgroupResponseDto> addEawg(@Valid @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupRequestDto){
         return ResponseEntity.status(201).body(employeeAreaWorkgroupService.addEawg(employeeAreaWorkgroupRequestDto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('Admin')")
+//    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<EmployeesAreaWorkgroupResponseDto> updateEawg(
             @RequestBody EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto, @PathVariable Long id){
         return ResponseEntity.status(201).body(employeeAreaWorkgroupService.updateEawg(id,employeeAreaWorkgroupDto));
 
     }
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<?> deleteEmployeesById (@PathVariable("id") Long eawg_id) {
-            employeeAreaWorkgroupService.deleteById(eawg_id);
+//    @PreAuthorize("hasAuthority('Admin')")
+    public ResponseEntity<?> deleteEmployeesById (@PathVariable Long id) {
+            employeeAreaWorkgroupService.deleteById(id);
             return new ResponseEntity<>("EAWG deleted successfully", HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAuthority('Admin')")
+//    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<Page<EmployeesAreaWorkgroupResponseDto>> searchEawg(
             @RequestParam(name = "value") String value,
             @RequestParam(name = "page", defaultValue = "0") int page,

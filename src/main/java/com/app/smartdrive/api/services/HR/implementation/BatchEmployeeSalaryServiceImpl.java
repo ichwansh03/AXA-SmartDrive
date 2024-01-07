@@ -3,6 +3,7 @@ package com.app.smartdrive.api.services.HR.implementation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -63,38 +64,47 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
         List<TemplateSalary> templateSalaries = templateSalaryRepository.findAll();
         List<EmployeeSalaryDetail> salaryDetails = new ArrayList<>();
 
+        // Find service and related premi
         ServiceOrders serviceOrders = soOrderRepository.findBySeroIdLikeAndEmployees_EawgEntityid(id);
-        Long services = serviceOrders.getServices().getServId();
-        Optional<ServicePremi> semiID = semiRepository.findById(services);
-        BigDecimal servicePremi = semiID.get().getSemiPremiDebet();
+        Long services = (serviceOrders != null && serviceOrders.getServices() != null) ? serviceOrders.getServices().getServId() : null;
 
-        for (TemplateSalary templateSalary : templateSalaries) {
-            EmployeeSalaryDetail salaryDetail = new EmployeeSalaryDetail();
-            salaryDetail.setEmsaEmpEntityid(employees.getEmpEntityid());
-            salaryDetail.setEmsaCreateDate(currentDate);
-            salaryDetail.setEmsaName(templateSalary.getTesalName());
+        if (services != null) {
+            Optional<ServicePremi> semiID = semiRepository.findById(services);
+            BigDecimal servicePremi = semiID.get().getSemiPremiDebet();
 
-            BigDecimal rateMin = templateSalary.getTesalRateMin();
-            BigDecimal rateMax = templateSalary.getTesalRateMax();
+            for (TemplateSalary templateSalary : templateSalaries) {
+                EmployeeSalaryDetail salaryDetail = new EmployeeSalaryDetail();
+                salaryDetail.setEmsaEmpEntityid(employees.getEmpEntityid());
+                salaryDetail.setEmsaCreateDate(currentDate);
+                salaryDetail.setEmsaName(templateSalary.getTesalName());
 
-            BigDecimal calculatedSubtotal;
+                BigDecimal rateMin = templateSalary.getTesalRateMin();
+                BigDecimal rateMax = templateSalary.getTesalRateMax();
 
-            if (Objects.isNull(rateMin)) {
-                calculatedSubtotal = servicePremi;
-            } else if ("FAM".equals(employees.getEmpJobCode()) && Objects.nonNull(rateMax)) {
-                calculatedSubtotal = servicePremi.multiply(rateMax);
-            } else {
-                calculatedSubtotal = servicePremi.multiply(rateMin);
+                BigDecimal calculatedSubtotal;
+
+                if (Objects.isNull(rateMin)) {
+                    calculatedSubtotal = servicePremi;
+                } else if ("FAM".equals(employees.getEmpJobCode()) && Objects.nonNull(rateMax)) {
+                    calculatedSubtotal = servicePremi.multiply(rateMax);
+                } else {
+                    calculatedSubtotal = servicePremi.multiply(rateMin);
+                }
+
+                salaryDetail.setEmsaSubtotal(calculatedSubtotal);
+                salaryDetail.setEmployees(employees);
+                salaryDetail = employeeSalaryDetailRepository.save(salaryDetail);
+                salaryDetails.add(salaryDetail);
             }
-
-            salaryDetail.setEmsaSubtotal(calculatedSubtotal);
-            salaryDetail.setEmployees(employees);
-            salaryDetail = employeeSalaryDetailRepository.save(salaryDetail);
-            salaryDetails.add(salaryDetail);
         }
 
         // Calculate total salary
-        BigDecimal totalSalary = calculateTotalCommission(salaryDetails).add(employees.getEmpNetSalary());
+        BigDecimal totalSalary;
+        if (services != null) {
+            totalSalary = calculateTotalCommission(salaryDetails).add(employees.getEmpNetSalary());
+        } else {
+            totalSalary = employees.getEmpNetSalary();
+        }
 
         // Create BatchEmployeeSalary
         BatchEmployeeSalary batchEmployeeSalary = BatchEmployeeSalary.builder()
@@ -104,6 +114,7 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
                 .besaStatus(employees.getEmpStatus())
                 .besaAccountNumber(employees.getEmpAccountNumber())
                 .besaTotalSalary(totalSalary)
+                .besaModifiedDate(LocalDateTime.now())
                 .build();
 
         return batchEmployeeSalaryRepository.save(batchEmployeeSalary);
@@ -115,6 +126,7 @@ public class BatchEmployeeSalaryServiceImpl implements BatchEmployeeSalaryServic
                 .mapToDouble(detail -> detail.getEmsaSubtotal().doubleValue())
                 .sum());
     }
+
 
 
 
