@@ -18,8 +18,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class UserAccountsDtoResponse{
-    private String usac_accountno;
-    private BigDecimal usac_debet;
+    private String usacAccountno;
+    private BigDecimal usacDebet;
     @Enumerated(EnumType.STRING)
     private EnumClassPayment.EnumPaymentType enumPaymentType;
 

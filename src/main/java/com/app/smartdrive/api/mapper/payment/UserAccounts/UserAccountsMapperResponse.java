@@ -11,8 +11,8 @@ import lombok.Data;
 public class UserAccountsMapperResponse {
     public static UserAccountsDtoResponse convertEnityToDto(UserAccounts userAccounts, UserAccountsDtoRequests requests) {
         UserAccountsDtoResponse dtoUserAccounts = UserAccountsDtoResponse.builder()
-                .usac_accountno(requests.getNoRekening())
-                .usac_debet(requests.getNominall())
+                .usacAccountno(requests.getNoRekening())
+                .usacDebet(requests.getNominall())
                 .enumPaymentType(userAccounts.getEnumPaymentType())
                 .build();
         return dtoUserAccounts;

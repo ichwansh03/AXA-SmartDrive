@@ -17,11 +17,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransaksiByUserDtoResponse {
-    private String usac_accountno;
-    private String patr_usac_accountNo_to;
+    private String usacAccountno;
+    private String patrUsacAccountNoTo;
     private BigDecimal nominall;
-    private String patr_notes;
+    private String patrNotes;
     @Enumerated(EnumType.STRING)
     private EnumClassPayment.EnumPayment enumPayment;
-    private String patr_invoice_no;
+    private String patrInvoiceNo;
 }

@@ -13,4 +13,6 @@ public interface TransactionsHistoryService {
 
     List<PaidPartnerHistoryDtoResponse> getAllBpinStatusPaid();
 
+    List<PremiHistoryDtoResponse> getAllPremiCreditPaid();
+
 }

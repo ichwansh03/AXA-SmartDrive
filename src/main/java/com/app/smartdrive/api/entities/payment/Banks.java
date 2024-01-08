@@ -34,13 +34,13 @@ public class Banks {
     
     @Id
     @Column(name = "bank_entityid")
-    private Long bank_entityid;
+    private Long bankEntityid;
 
     @Column(name = "bank_name",unique = true ,length = 5)
-    private String bank_name;
+    private String bankName;
 
     @Column(name = "bank_desc", length = 55)
-    private String bank_desc;
+    private String bankDesc;
 
 
     @OneToOne
@@ -51,7 +51,7 @@ public class Banks {
 
     // @JsonIgnore
     @OneToMany(mappedBy = "banks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<UserAccounts> user_accounts;   
+    List<UserAccounts> userAccounts;
 
     
 }

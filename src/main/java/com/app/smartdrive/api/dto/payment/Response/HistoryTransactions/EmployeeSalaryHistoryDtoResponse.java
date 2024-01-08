@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeSalaryHistoryDtoResponse {
-    private Long emp_id;
-    private String employee_name;
-    private LocalDate created_on;
+    private Long empId;
+    private String employeeName;
+    private LocalDate createdOn;
     private BigDecimal salary;
     private String accountno;
-    private LocalDateTime transfer_date;
-    private String transaction_no;
+    private LocalDateTime transferDate;
+    private String transactionNo;
     private String status;
 }

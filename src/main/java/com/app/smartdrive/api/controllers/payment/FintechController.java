@@ -1,35 +1,13 @@
 package com.app.smartdrive.api.controllers.payment;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.app.smartdrive.api.dto.payment.Request.Banks.PaymentRequestsDto;
-import com.app.smartdrive.api.dto.payment.Request.Fintech.FintechDtoRequests;
-import com.app.smartdrive.api.dto.payment.Response.Banks.PaymentDtoResponse;
-import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechDtoResponse;
-import com.app.smartdrive.api.dto.payment.Response.Fintech.FintechIdForUserDtoResponse;
-import com.app.smartdrive.api.entities.payment.Banks;
-import com.app.smartdrive.api.entities.payment.Fintech;
-import com.app.smartdrive.api.entities.users.BusinessEntity;
+import com.app.smartdrive.api.dto.payment.Request.PaymentOperasional.PaymentRequestsDto;
+import com.app.smartdrive.api.dto.payment.Response.Payment.PaymentDtoResponse;
 import com.app.smartdrive.api.services.payment.PaymentService;
 import com.app.smartdrive.api.services.users.implementation.BusinessEntityImpl;
 
@@ -40,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/payment")
+@CrossOrigin
 public class FintechController {
     private final PaymentService fintechServiceImpl;
     private final BusinessEntityImpl serviceBusiness;

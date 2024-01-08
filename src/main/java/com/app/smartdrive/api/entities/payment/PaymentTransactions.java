@@ -54,29 +54,29 @@ public class PaymentTransactions {
 
     @CreatedDate
     @Column(name = "patr_created_on")
-    private LocalDateTime patr_created_on;
+    private LocalDateTime patrCreatedOn;
 
     @Column(name = "patr_debet")
-    private BigDecimal patr_debet;
+    private BigDecimal patrDebet;
 
     @Column(name = "patr_credit")
-    private BigDecimal patr_credit;
+    private BigDecimal patrCredit;
 
     @Column(name = "patr_usac_accountno_from")
-    private String patr_usac_accountNo_from;
+    private String patrUsacAccountNoFrom;
 
     @Column(name = "patr_usac_accountno_to")
-    private String patr_usac_accountNo_to;
+    private String patrUsacAccountNoTo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "patr_type", length = 15)
-    private EnumClassPayment.EnumPayment patr_type;
+    private EnumClassPayment.EnumPayment patrType;
 
     @Column(name = "patr_invoice_no", length = 55)
-    private String patr_invoice_no;
+    private String patrInvoiceNo;
 
     @Column(name = "patr_notes", length = 125)
-    private String patr_notes;
+    private String patrNotes;
 
     
     @Column(name="patr_trxno_rev")

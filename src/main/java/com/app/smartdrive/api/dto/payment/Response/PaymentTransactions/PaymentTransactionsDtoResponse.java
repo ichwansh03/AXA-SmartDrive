@@ -17,15 +17,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class PaymentTransactionsDtoResponse {
-    private String patr_trxno;
-    private LocalDateTime patr_created_on;
-    private BigDecimal patr_debet;
-    private BigDecimal patr_credit;
-    private String patr_usac_accountNo_from;
-    private String patr_usac_accountNo_to;
+    private String patrTrxno;
+    private LocalDateTime patrCreatedOn;
+    private BigDecimal patrDebet;
+    private BigDecimal patrCredit;
+    private String patrUsacAccountNoFrom;
+    private String patrUsacAccountNoTo;
     @Enumerated(EnumType.STRING)
     private EnumClassPayment.EnumPayment enumPayment;
-    private String patr_invoice_no;
-    private String patr_notes;
-    private String patr_trxno_rev;
+    private String patrInvoiceNo;
+    private String patrNotes;
+    private String patrTrxnoRev;
 }
