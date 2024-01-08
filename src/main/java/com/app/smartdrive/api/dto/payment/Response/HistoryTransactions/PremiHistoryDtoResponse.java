@@ -21,5 +21,5 @@ public class PremiHistoryDtoResponse {
     private BigDecimal PremiDebet;
     private LocalDateTime TransactionDate;
     private LocalDateTime DueDate;
-    private PaymentTransactions NumberTransactions;
+    private String NumberTransactions;
 }

@@ -33,7 +33,7 @@ public class UserUserAccountImpl implements UserUserAccountService {
   public UserAccounts updateUserAccounts(Long id, Long accountId, UserUserAccountDtoRequest userPost) {
      UserAccounts userAccounts = userAccountsRepository.findById(accountId)
              .orElseThrow(() -> new EntityNotFoundException("UserAccount not found"));
-    userAccounts.setUsac_accountno(userPost.getUsac_accountno());
+    userAccounts.setUsacAccountno(userPost.getUsac_accountno());
     if (userAccounts.getEnumPaymentType() == EnumPaymentType.BANK) {
       Banks bank = banksRepository.findById(userPost.getPaymentId())
               .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
@@ -50,20 +50,20 @@ public class UserUserAccountImpl implements UserUserAccountService {
   @Override
   public UserAccounts addUserAccounts(Long id, UserUserAccountDtoRequest userPost) {
     UserAccounts userAccounts = new UserAccounts();
-     userAccounts.setUsac_accountno(userPost.getUsac_accountno());
+     userAccounts.setUsacAccountno(userPost.getUsac_accountno());
      if (userPost.getEnumPaymentType() == EnumPaymentType.BANK) {
        userAccounts.setEnumPaymentType(EnumPaymentType.BANK);
        Banks bank = banksRepository.findById(userPost.getPaymentId())
            .orElseThrow(() -> new EntityNotFoundException("Bank not found"));
        userAccounts.setBanks(bank);
-       userAccounts.setUsacBankEntityid(bank.getBank_entityid());
+       userAccounts.setUsacBankEntityid(bank.getBankEntityid());
      }
      else if (userPost.getEnumPaymentType() == EnumPaymentType.FINTECH) {
        userAccounts.setEnumPaymentType(EnumPaymentType.FINTECH);
        Fintech fintech = fintechRepository.findById(userPost.getPaymentId())
            .orElseThrow(() -> new EntityNotFoundException("Fintech not found"));
        userAccounts.setFintech(fintech);
-       userAccounts.setUsacFintEntityid(fintech.getFint_entityid());
+       userAccounts.setUsacFintEntityid(fintech.getFintEntityid());
      } else {
        throw new EntityNotFoundException("Wrong Payment type");
      }

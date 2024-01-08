@@ -35,13 +35,13 @@ public class PaymentTransactionsHistoryImpl implements TransactionsHistoryServic
 
         for (BatchEmployeeSalary user: listSalary) {
             EmployeeSalaryHistoryDtoResponse not = EmployeeSalaryHistoryDtoResponse.builder()
-                    .emp_id(user.getBesaEmpEntityid())
-                    .employee_name(user.getEmployees().getEmpName())
-                    .created_on(user.getBesaCreatedDate())
+                    .empId(user.getBesaEmpEntityid())
+                    .employeeName(user.getEmployees().getEmpName())
+                    .createdOn(user.getBesaCreatedDate())
                     .salary(user.getBesaTotalSalary())
                     .accountno(user.getBesaAccountNumber())
-                    .transfer_date(user.getEmsTrasferDate())
-                    .transaction_no(user.getBesaPatrTrxno())
+                    .transferDate(user.getEmsTrasferDate())
+                    .transactionNo(user.getBesaPatrTrxno())
                     .status("Sukses Paid")
                     .build();
             response.add(not);
@@ -61,7 +61,7 @@ public class PaymentTransactionsHistoryImpl implements TransactionsHistoryServic
                     .Year(premi.getSecrYear())
                     .DueDate(premi.getSecrDuedate())
                     .TransactionDate(premi.getSecrTrxDate())
-                    .NumberTransactions(premi.getPaymentTransactions())
+                    .NumberTransactions(null)
                     .build();
             liatAllDtoResponse.add(dtoResponse);
         }
@@ -74,18 +74,36 @@ public class PaymentTransactionsHistoryImpl implements TransactionsHistoryServic
         List<PaidPartnerHistoryDtoResponse> listResponse = new ArrayList<>();
         for (BatchPartnerInvoice partner: listPartner) {
             PaidPartnerHistoryDtoResponse dtoPartner = PaidPartnerHistoryDtoResponse.builder()
-                    .Nomor_Invoice(partner.getNo())
+                    .NomorInvoice(partner.getNo())
                     .CreatedOn(partner.getCreatedOn())
                     .Total(partner.getSubTotal())
                     .Tax(partner.getTax())
-                    .Nomor_Rekening(partner.getAccountNo())
+                    .NomorRekening(partner.getAccountNo())
                     .Status(partner.getStatus())
-                    .Tanggal_Pembayaran(partner.getPaidDate())
-                    .Partner_entityid(partner.getPartner())
-                    .Id_ServiceOrders(partner.getServiceOrders())
+                    .TanggalPembayaran(partner.getPaidDate())
+                    .NomorTransaksi(partner.getPaymentTransactions().getPatrTrxno())
                     .build();
             listResponse.add(dtoPartner);
         }
         return listResponse;
+    }
+
+    @Override
+    public List<PremiHistoryDtoResponse> getAllPremiCreditPaid() {
+        List<ServicePremiCredit> listPremiPaid = servicePremiRepository.findBySecrTrxDateNotNull();
+        List<PremiHistoryDtoResponse> listDtoResponse = new ArrayList<>();
+        for (ServicePremiCredit premi: listPremiPaid) {
+            PremiHistoryDtoResponse premiDto = PremiHistoryDtoResponse.builder()
+                    .secrId(premi.getSecrId())
+                    .secrServId(premi.getSecrServId())
+                    .Year(premi.getSecrYear())
+                    .TransactionDate(premi.getSecrTrxDate())
+                    .PremiDebet(premi.getSecrPremiDebet())
+                    .NumberTransactions(premi.getPaymentTransactions().getPatrTrxno())
+                    .DueDate(premi.getSecrDuedate())
+                    .build();
+            listDtoResponse.add(premiDto);
+        }
+        return listDtoResponse;
     }
 }

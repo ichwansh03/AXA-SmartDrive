@@ -38,16 +38,16 @@ public class UserAccounts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usac_id", updatable = false, nullable = false)
-    private Long usac_id;
+    private Long usacId;
 
     @Column(name = "usac_accountno", unique = true, length = 30)
-    private String usac_accountno;
+    private String usacAccountno;
 
     @Column(name = "usac_debet")
-    private BigDecimal usac_debet;
+    private BigDecimal usacDebet;
 
     @Column(name = "usac_credit")
-    private Double usac_credit;
+    private Double usacCredit;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "usac_type", length = 15)

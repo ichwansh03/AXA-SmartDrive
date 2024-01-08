@@ -112,28 +112,28 @@ public class PaymentTransactionsImpl implements TransactionsService {
         PaymentTransactions transactions = PaymentTransactions.builder()
                 .patrTrxno(trxNo)
                 .patrTrxnoRev(trxNoRev)
-                .patr_created_on(LocalDateTime.now())
-                .patr_usac_accountNo_from(noRekening)
-                .patr_usac_accountNo_to("-")
-                .patr_debet(nominall)
-                .patr_credit(BigDecimal.ZERO)
-                .patr_type(enumPayment)
-                .patr_invoice_no(invoice)
-                .patr_notes(notes)
+                .patrCreatedOn(LocalDateTime.now())
+                .patrUsacAccountNoFrom(noRekening)
+                .patrUsacAccountNoTo("-")
+                .patrDebet(nominall)
+                .patrCredit(BigDecimal.ZERO)
+                .patrType(enumPayment)
+                .patrInvoiceNo(invoice)
+                .patrNotes(notes)
                 .build();
 
         repository.save(transactions);
 
         PaymentTransactions transactions2 = PaymentTransactions.builder()
                 .patrTrxno(generateTrxNo(LocalDateTime.now()))
-                .patr_created_on(LocalDateTime.now())
-                .patr_usac_accountNo_from("-")
-                .patr_usac_accountNo_to(toRekening)
-                .patr_credit(nominall)
-                .patr_debet(BigDecimal.ZERO)
-                .patr_type(enumPayment)
-                .patr_notes(notes)
-                .patr_invoice_no(invoice)
+                .patrCreatedOn(LocalDateTime.now())
+                .patrUsacAccountNoFrom("-")
+                .patrUsacAccountNoTo(toRekening)
+                .patrCredit(nominall)
+                .patrDebet(BigDecimal.ZERO)
+                .patrType(enumPayment)
+                .patrNotes(notes)
+                .patrInvoiceNo(invoice)
                 .patrTrxnoRev(transactions.getPatrTrxno())
                 .build();
         repository.save(transactions2);
@@ -155,17 +155,17 @@ public class PaymentTransactionsImpl implements TransactionsService {
     public TransaksiByUserDtoResponse transaksiByUser(TransactionsByUserDtoRequests request) {
         TransaksiByUserDtoResponse dto = new TransaksiByUserDtoResponse();
 
-        automateIdAndCreateEntities(request.getNominall(), request.getUsac_accountno(),
-                request.getPatr_usac_accountNo_to(), request.getPatr_notes(), request.getEnumPayment(), uuidInvoice());
+        automateIdAndCreateEntities(request.getNominall(), request.getNoRekening(),
+                request.getToRekening(), request.getPatrNotes(), request.getEnumPayment(), uuidInvoice());
 
         switch (request.getEnumPayment()){
             case TOPUP_BANK, TOPUP_FINTECH, TRANSFER:
-                if(checkValidationNoAccount(request.getUsac_accountno(),request.getPatr_usac_accountNo_to(),userAccountsRepository)){
-                    calculationTransaksiDebetProcess(request.getUsac_accountno(),
-                            request.getPatr_usac_accountNo_to(),request.getNominall(),userAccountsRepository);
+                if(checkValidationNoAccount(request.getNoRekening(),request.getToRekening(),userAccountsRepository)){
+                    calculationTransaksiDebetProcess(request.getNoRekening(),
+                            request.getToRekening(),request.getNominall(),userAccountsRepository);
                 }else{
-                    checkErrorAccount(request.getUsac_accountno(),
-                            request.getPatr_usac_accountNo_to(), userAccountsRepository);
+                    checkErrorAccount(request.getNoRekening(),
+                            request.getToRekening(), userAccountsRepository);
                 }
                 break;
             default:
@@ -208,7 +208,7 @@ public class PaymentTransactionsImpl implements TransactionsService {
                         BatchPartnerInvoice partnerInvoice = partnerInvoiceRepository.findByBpinAccountNo(request.getToRekening());
                         Double nominalWithTaxInDouble = partnerInvoice.getSubTotal() - (partnerInvoice.getTax());
                         BigDecimal nominalWithTax = new BigDecimal(Double.toString(nominalWithTaxInDouble));
-                        BigDecimal saldoSenderPartner = userAcc.getUsac_debet();
+                        BigDecimal saldoSenderPartner = userAcc.getUsacDebet();
                         LocalDateTime time = LocalDateTime.now();
                         String invoice = partnerInvoice.getNo();
                         BatchPartnerInvoice partnerr = new BatchPartnerInvoice();
@@ -228,9 +228,9 @@ public class PaymentTransactionsImpl implements TransactionsService {
                         partnerr.setPaymentTransactions(transactions2);
                         partnerr.setCreatedOn(time);
 
-                        transactions.setPatr_debet(nominalWithTax);
-                        transactions2.setPatr_invoice_no(partnerInvoice.getNo());
-                        transactions2.setPatr_credit(nominalWithTax);
+                        transactions.setPatrDebet(nominalWithTax);
+                        transactions2.setPatrInvoiceNo(partnerInvoice.getNo());
+                        transactions2.setPatrCredit(nominalWithTax);
 
                         automateIdAndCreateEntities(nominalWithTax, request.getNoRekening(),
                                 request.getToRekening(), request.getNotes(), request.getTipePayment(), partnerInvoice.getNo());
@@ -258,16 +258,16 @@ public class PaymentTransactionsImpl implements TransactionsService {
             case PREMI:
                 if(checkValidationNoAccount(request.getNoRekening(), request.getToRekening(), userAccountsRepository)){
                     BigDecimal nominalPremi = premiCredit.getSecrPremiDebet();
-                    BigDecimal saldoSenderPremi = userAcc.getUsac_debet();
+                    BigDecimal saldoSenderPremi = userAcc.getUsacDebet();
                     String invoiceNo = "SERV-" + premiCredit.getSecrId();
 
                     checkSaldoHandle(saldoSenderPremi, nominalPremi, request.getTipePayment());
 
                     transactions.setPatrTrxno(generateTrxNo(LocalDateTime.now()));
                     transactions2.setPatrTrxno(transactions.getPatrTrxno());
-                    transactions.setPatr_debet(nominalPremi);
-                    transactions2.setPatr_invoice_no(invoiceNo);
-                    transactions2.setPatr_credit(nominalPremi);
+                    transactions.setPatrDebet(nominalPremi);
+                    transactions2.setPatrInvoiceNo(invoiceNo);
+                    transactions2.setPatrCredit(nominalPremi);
 
                     automateIdAndCreateEntities(nominalPremi, request.getNoRekening(),
                             request.getToRekening(), request.getNotes(), request.getTipePayment(), invoiceNo);
@@ -302,7 +302,7 @@ public class PaymentTransactionsImpl implements TransactionsService {
                         BatchEmployeeSalary employeeSalary = employeeSalaryRepository.findBesaAccountNumber(request.getToRekening());
 
                         BigDecimal nominalSalary = employeeSalary.getBesaTotalSalary();
-                        BigDecimal saldoSender = userAcc.getUsac_debet();
+                        BigDecimal saldoSender = userAcc.getUsacDebet();
                         LocalDate createdDateSalary = employeeSalary.getBesaCreatedDate();
                         String invoiceSalary = "SAL-" + dateFormatter(createdDateSalary);
 

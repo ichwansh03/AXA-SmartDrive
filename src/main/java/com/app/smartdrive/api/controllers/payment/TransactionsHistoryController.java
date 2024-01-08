@@ -37,4 +37,10 @@ public class TransactionsHistoryController {
         List<PaidPartnerHistoryDtoResponse> listAllBpinStatusPaid = historyService.getAllBpinStatusPaid();
         return new ResponseEntity<>(listAllBpinStatusPaid, HttpStatus.OK);
     }
+
+    @GetMapping("/all/PremiCreditPaid")
+    public ResponseEntity<?> getAllPremiCreditPaid(){
+        List<PremiHistoryDtoResponse> listAllPremiPaid = historyService.getAllPremiCreditPaid();
+        return new ResponseEntity<>(listAllPremiPaid, HttpStatus.OK);
+    }
 }

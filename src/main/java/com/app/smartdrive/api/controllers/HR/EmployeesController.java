@@ -1,14 +1,11 @@
 package com.app.smartdrive.api.controllers.HR;
 
-import com.app.smartdrive.api.dto.payment.Response.Banks.PaymentDtoResponse;
 import com.app.smartdrive.api.entities.hr.Employees;
 import com.app.smartdrive.api.mapper.TransactionMapper;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.app.smartdrive.api.dto.HR.request.EmployeesRequestDto;
 import com.app.smartdrive.api.dto.HR.response.EmployeesResponseDto;

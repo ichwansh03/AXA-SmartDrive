@@ -19,15 +19,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class PaidPartnerHistoryDtoResponse {
-    private String Nomor_Invoice;
+    private String NomorInvoice;
     private LocalDateTime CreatedOn;
     private Double Total;
     private Double Tax;
-    private String Nomor_Rekening;
+    private String NomorRekening;
     @Enumerated(EnumType.STRING)
     private BpinStatus Status;
-    private LocalDateTime Tanggal_Pembayaran;
-    private Partner Partner_entityid;
-    private PaymentTransactions Nomor_Transaksi;
-    private ServiceOrders Id_ServiceOrders;
+    private LocalDateTime TanggalPembayaran;
+    private String NomorTransaksi;
 }

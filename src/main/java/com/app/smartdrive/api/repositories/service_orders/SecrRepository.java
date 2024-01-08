@@ -25,4 +25,6 @@ public interface SecrRepository extends JpaRepository<ServicePremiCredit, Servic
 
     @Query(value = "SELECT * from so.service_premi_credit WHERE secr_patr_trxno IS NULL", nativeQuery = true)
     List<ServicePremiCredit> findAllTrxnoIsNull();
+
+    List<ServicePremiCredit> findBySecrTrxDateNotNull();
 }

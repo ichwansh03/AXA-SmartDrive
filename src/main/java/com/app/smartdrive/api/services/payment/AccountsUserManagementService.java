@@ -40,17 +40,17 @@ public interface AccountsUserManagementService {
 
         UserAccounts userRecipient = repository.findByAccounts(noRekTo);
         UserAccounts userSender = repository.findByAccounts(noRekFrom);
-        BigDecimal saldoRecipient = userRecipient.getUsac_debet();
-        BigDecimal saldoSender = userSender.getUsac_debet();
+        BigDecimal saldoRecipient = userRecipient.getUsacDebet();
+        BigDecimal saldoSender = userSender.getUsacDebet();
         if(checkValidationNoAccount(noRekFrom, noRekTo, repository)){
             if(saldoRecipient == null){
-                userSender.setUsac_debet(saldoSender.subtract(nominal));
-                userRecipient.setUsac_debet(nominal);
+                userSender.setUsacDebet(saldoSender.subtract(nominal));
+                userRecipient.setUsacDebet(nominal);
             }else{
                 BigDecimal totalSaldoRecipient = saldoRecipient.add(nominal);
                 BigDecimal totalSaldoSender = saldoSender.subtract(nominal);
-                userSender.setUsac_debet(totalSaldoSender);
-                userRecipient.setUsac_debet(totalSaldoRecipient);
+                userSender.setUsacDebet(totalSaldoSender);
+                userRecipient.setUsacDebet(totalSaldoRecipient);
             }
             repository.save(userSender);
             repository.save(userRecipient);
@@ -58,9 +58,9 @@ public interface AccountsUserManagementService {
     }
     default void calculationAddDebetProcess(String noRek, BigDecimal nominal, UserAccountsRepository repository){
         UserAccounts userRecipient = repository.findByAccounts(noRek);
-        BigDecimal saldoRecipient = userRecipient.getUsac_debet();
+        BigDecimal saldoRecipient = userRecipient.getUsacDebet();
         BigDecimal totalSaldoRecipient = saldoRecipient.add(nominal);
-        userRecipient.setUsac_debet(totalSaldoRecipient);
+        userRecipient.setUsacDebet(totalSaldoRecipient);
         repository.save(userRecipient);
     }
 }
