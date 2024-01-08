@@ -2,6 +2,7 @@ package com.app.smartdrive.api.controllers.auth;
 
 import com.app.smartdrive.api.Exceptions.TokenRefreshException;
 import com.app.smartdrive.api.dto.auth.request.SignInRequest;
+import com.app.smartdrive.api.dto.auth.response.ApiResponse;
 import com.app.smartdrive.api.dto.auth.response.MessageResponse;
 import com.app.smartdrive.api.dto.auth.response.SignInResponse;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
@@ -30,7 +31,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-@CrossOrigin(allowCredentials = "true",allowedHeaders = {"Authorization", "Content-Type", "Cookie", "Set-Cookie", "Origin"}, origins = "http://localhost:3006", maxAge = 2592000)
+@CrossOrigin(allowCredentials = "true",allowedHeaders = {"Authorization", "Content-Type", "Origin"}, origins = "http://localhost:3006", maxAge = 2592000)
 public class AuthenticationController {
   private final AuthenticationService authenticationService;
   private final RefreshTokenService refreshTokenService;
