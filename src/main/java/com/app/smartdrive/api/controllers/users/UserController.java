@@ -21,7 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 @Slf4j
-@CrossOrigin(allowCredentials = "true",allowedHeaders = {"Authorization", "Content-Type", "Cookie", "Set-Cookie", "Origin"}, origins = "http://localhost:3006", maxAge = 2592000)
+@CrossOrigin(allowCredentials = "true",allowedHeaders = {"Authorization", "Content-Type", "Origin"}, origins = "http://localhost:3006", maxAge = 2592000)
 @PreAuthorize("isAuthenticated() && (hasAuthority('Admin') || principal.user.getUserEntityId() == #id)")
 public class UserController {
   private final UserService userService;

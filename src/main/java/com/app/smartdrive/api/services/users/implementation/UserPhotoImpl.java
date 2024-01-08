@@ -8,6 +8,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
+import com.app.smartdrive.api.services.users.FileStorageService;
+import com.app.smartdrive.api.services.users.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,22 +21,18 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserPhotoImpl implements UserPhotoService {
-  private final UserRepository userRepository;
-  
+  private final UserService userService;
+  private final Path pathPhoto = Paths.get("C:\\Izhar\\AXA-SmartDrive\\assets\\UserPhotos").toAbsolutePath().normalize();
+  private final FileStorageService photoUserStorageServiceImpl = new PhotoUserStorageServiceImpl(pathPhoto);
+
   @Override
   public String savePhoto(MultipartFile photo, Long userId) throws Exception {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
-    String rootPath = new File("").getAbsolutePath();
-    String path = "\\src\\main\\resources\\image\\userPhoto\\";
-    Path pathPhotoUser = Paths.get(rootPath+path+user.getUserPhoto());
-    Files.deleteIfExists(pathPhotoUser);
-    String uniqueFile = UUID.randomUUID().toString()+"_"+photo.getOriginalFilename();
-    user.setUserPhoto(uniqueFile);
-    File file = new File(rootPath+path
-            + uniqueFile);
-    photo.transferTo(file);
-    userRepository.save(user);
-    return uniqueFile;
+
+    User user = userService.getById(userId);
+    Files.deleteIfExists(pathPhoto.resolve(user.getUserPhoto()));
+    String fileName = photoUserStorageServiceImpl.storeFile(photo);
+    user.setUserPhoto(fileName);
+    userService.save(user);
+    return fileName;
   }
 }
