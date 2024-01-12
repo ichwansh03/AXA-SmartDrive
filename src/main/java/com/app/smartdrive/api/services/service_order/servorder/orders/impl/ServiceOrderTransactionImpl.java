@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.services.service_order.servorder.impl;
+package com.app.smartdrive.api.services.service_order.servorder.orders.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
@@ -13,9 +13,9 @@ import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceOrderFactory;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.orders.ServiceOrderTransaction;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServiceTaskTransaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,27 +27,28 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
+public class ServiceOrderTransactionImpl implements ServiceOrderTransaction {
 
     private final SoRepository soRepository;
     private final SoOrderRepository soOrderRepository;
     private final ServOrderTaskService servOrderTaskService;
-    private final ServiceTasksFactory serviceTasksFactory;
+    private final ServiceTaskTransaction serviceTaskTransaction;
     private final CustomerRequestService customerRequestService;
 
     SoAdapter soAdapter = new SoAdapter();
 
     @Override
-    public ServiceOrders addServiceOrders(Long servId) throws Exception {
+    public ServiceOrders addServiceOrders(Long servId) {
 
         Services services = soRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("addServiceOrders(Long servId)::servId "+servId+ "is not found"));
         ServiceOrders orders = new ServiceOrders();
 
+        //avoid this operation, not OCP!
         switch (services.getServType().toString()){
             case "FEASIBLITY" -> {
                 orders = generateSeroFeasiblity(services);
-                serviceTasksFactory.addFeasiblityList(orders);
+                serviceTaskTransaction.addFeasiblityList(orders);
                 log.info("ServOrderImpl::addServiceOrders create FEASIBLITY tasks");
             }
             case "POLIS" -> {
@@ -56,7 +57,7 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
                 //close previous service order
                 closeExistingSero(fs);
                 orders = handlePolisAndClaim(services, null, null, "FS%");
-                serviceTasksFactory.addPolisList(orders);
+                serviceTaskTransaction.addPolisList(orders);
                 log.info("ServOrderImpl::addServiceOrders create POLIS tasks");
             }
             case "CLAIM" -> {
@@ -69,7 +70,7 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
                 }
                 //first time to request claim
                 orders = handlePolisAndClaim(services, LocalDateTime.now(), LocalDateTime.now().plusDays(10), "PL%");
-                serviceTasksFactory.addClaimList(orders);
+                serviceTaskTransaction.addClaimList(orders);
                 log.info("ServOrderImpl::addServiceOrders create CLAIM tasks");
             }
             default -> requestCloseAllSero(services);
@@ -170,7 +171,8 @@ public class ServiceOrderFactoryImpl implements ServiceOrderFactory {
         return selected;
     }
 
-    private ServiceOrders buildCommonSeroData(Services services, ServiceOrders parentSero, LocalDateTime startDate, LocalDateTime endDate){
+    @Override
+    public ServiceOrders buildCommonSeroData(Services services, ServiceOrders parentSero, LocalDateTime startDate, LocalDateTime endDate){
         String formatSeroId = soAdapter.formatServiceOrderId(services);
 
         return ServiceOrders.builder()

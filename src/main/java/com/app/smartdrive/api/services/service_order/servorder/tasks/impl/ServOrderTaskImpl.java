@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.services.service_order.servorder.impl;
+package com.app.smartdrive.api.services.service_order.servorder.tasks.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.EmailReq;
@@ -9,8 +9,8 @@ import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.services.master.EmailService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.workorders.ServOrderWorkorderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

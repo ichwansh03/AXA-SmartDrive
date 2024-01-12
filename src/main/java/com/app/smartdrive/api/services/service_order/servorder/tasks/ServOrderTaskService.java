@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.services.service_order.servorder;
+package com.app.smartdrive.api.services.service_order.servorder.tasks;
 
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 

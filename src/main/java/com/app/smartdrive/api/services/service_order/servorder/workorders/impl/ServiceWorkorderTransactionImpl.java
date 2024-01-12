@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.services.service_order.servorder.impl;
+package com.app.smartdrive.api.services.service_order.servorder.workorders.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
@@ -11,7 +11,7 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceWorkorderFactory;
+import com.app.smartdrive.api.services.service_order.servorder.workorders.ServiceWorkorderTransaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ServiceWorkorderFactoryImpl implements ServiceWorkorderFactory {
+public class ServiceWorkorderTransactionImpl implements ServiceWorkorderTransaction {
 
     private final SoTasksRepository soTasksRepository;
     private final SoWorkorderRepository soWorkorderRepository;
@@ -63,7 +63,8 @@ public class ServiceWorkorderFactoryImpl implements ServiceWorkorderFactory {
         return updatedSowoStatus;
     }
 
-    private boolean updateTaskByWorkorders(ServiceOrderWorkorder workorder){
+    @Override
+    public boolean updateTaskByWorkorders(ServiceOrderWorkorder workorder){
         List<ServiceOrderWorkorder> orderWorkorders = soWorkorderRepository.findByServiceOrderTasks_SeotId(workorder.getServiceOrderTasks().getSeotId());
 
         boolean completed = true;

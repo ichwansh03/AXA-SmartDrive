@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.services.service_order.servorder.impl;
+package com.app.smartdrive.api.services.service_order.servorder.workorders.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
@@ -11,7 +11,7 @@ import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoWorkorderRepository;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
+import com.app.smartdrive.api.services.service_order.servorder.workorders.ServOrderWorkorderService;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

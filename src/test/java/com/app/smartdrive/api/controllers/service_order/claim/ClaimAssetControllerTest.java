@@ -5,14 +5,12 @@ import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
 import com.app.smartdrive.api.dto.service_order.response.ServiceDto;
-import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.entities.service_order.ClaimAssetEvidence;
 import com.app.smartdrive.api.entities.service_order.ClaimAssetSparepart;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
@@ -23,10 +21,8 @@ import com.app.smartdrive.api.repositories.users.UserRepository;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.partner.PartnerService;
 import com.app.smartdrive.api.services.service_order.claims.ClaimAssetServiceImpl;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
-import com.app.smartdrive.api.services.service_order.servorder.ServService;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceOrderFactory;
+import com.app.smartdrive.api.services.service_order.servorder.services.ServiceTransaction;
+import com.app.smartdrive.api.services.service_order.servorder.orders.ServiceOrderTransaction;
 import com.app.smartdrive.api.services.users.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,11 +76,11 @@ class ClaimAssetControllerTest {
     @Autowired
     CustomerRequestService customerRequestService;
     @Autowired
-    ServiceFactory servService;
+    ServiceTransaction servService;
     @Autowired
     SoOrderRepository soOrderRepository;
     @Autowired
-    ServiceOrderFactory servOrderService;
+    ServiceOrderTransaction servOrderService;
     @Autowired
     CaspRepository caspRepository;
     @Autowired
@@ -146,7 +142,7 @@ class ClaimAssetControllerTest {
         customerInscAssetsRequestDTO.setCiasCarsId(1L);
         customerInscAssetsRequestDTO.setCiasCityId(1L);
         customerInscAssetsRequestDTO.setCiasIntyName("Comprehensive");
-        customerInscAssetsRequestDTO.setCiasStartdate("2023-01-01 15:02:00");
+        //customerInscAssetsRequestDTO.setCiasStartdate("2023-01-01 15:02:00");
         customerInscAssetsRequestDTO.setCurrentPrice(new BigDecimal("120000000"));
         customerInscAssetsRequestDTO.setCuexIds(new Long[]{7L,8L,9L});
         CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();

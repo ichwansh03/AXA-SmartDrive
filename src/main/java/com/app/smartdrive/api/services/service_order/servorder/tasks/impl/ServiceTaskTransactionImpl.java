@@ -1,4 +1,4 @@
-package com.app.smartdrive.api.services.service_order.servorder.impl;
+package com.app.smartdrive.api.services.service_order.servorder.tasks.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.TasksNotCompletedException;
@@ -18,7 +18,12 @@ import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoTasksRepository;
 import com.app.smartdrive.api.services.service_order.SoAdapter;
-import com.app.smartdrive.api.services.service_order.servorder.*;
+import com.app.smartdrive.api.services.service_order.servorder.orders.ServOrderService;
+import com.app.smartdrive.api.services.service_order.servorder.services.ServService;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServiceTaskTransaction;
+import com.app.smartdrive.api.services.service_order.servorder.workorders.ServOrderWorkorderService;
+import com.app.smartdrive.api.services.service_order.servorder.workorders.ServiceWorkorderTransaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,14 +36,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
+public class ServiceTaskTransactionImpl implements ServiceTaskTransaction {
 
     private final SoOrderRepository soOrderRepository;
     private final SoTasksRepository soTasksRepository;
     private final TestaRepository testaRepository;
     private final PartnerRepository partnerRepository;
 
-    private final ServiceWorkorderFactory serviceWorkorderFactory;
+    private final ServiceWorkorderTransaction serviceWorkorderTransaction;
     private final ServService servService;
     private final ServOrderService servOrderService;
     private final ServOrderTaskService servOrderTaskService;
@@ -55,19 +60,25 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
         List<ServiceOrderTasks> mapperTaskList = TransactionMapper.mapListDtoToListEntity(seot, ServiceOrderTasks.class);
         List<ServiceOrderTasks> serviceOrderTasks = soTasksRepository.saveAll(mapperTaskList);
 
-        serviceWorkorderFactory.addSowoList(serviceOrderTasks);
+        serviceWorkorderTransaction.addSowoList(serviceOrderTasks);
 
         return serviceOrderTasks;
     }
 
     @Transactional
     @Override
-    public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) throws Exception {
+    public List<ServiceOrderTasks> addPolisList(ServiceOrders serviceOrders) {
 
         List<TemplateServiceTask> templateServiceTasks = testaRepository.findByTestaTetyId(2L);
-        Method generatePolisNumber = SoAdapter.class.getMethod("generatePolis", CustomerRequest.class);
+        Method generatePolisNumber;
+        try {
+            generatePolisNumber = SoAdapter.class.getMethod("generatePolis", CustomerRequest.class);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
 
-        List<ServiceTaskReqDto> dtos = generateFromTemplateTasks(serviceOrders, templateServiceTasks, EnumModuleServiceOrders.SeotStatus.COMPLETED, generatePolisNumber);
+        List<ServiceTaskReqDto> dtos = generateFromTemplateTasks(serviceOrders, templateServiceTasks,
+                EnumModuleServiceOrders.SeotStatus.COMPLETED, generatePolisNumber);
 
         log.info("ServOrderTaskImpl::addPolisList the result of number polis is {} ", generatePolisNumber);
 
@@ -129,19 +140,21 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
         return seotPartner;
     }
 
-    private void validateWorkorderForPartner(SeotPartnerDto seotPartnerDto, Long seotId){
+    @Override
+    public void validateWorkorderForPartner(SeotPartnerDto seotPartnerDto, Long seotId){
         if (seotPartnerDto.getRepair()) {
-            serviceWorkorderFactory.createWorkorderTask("REPAIR", seotId);
+            serviceWorkorderTransaction.createWorkorderTask("REPAIR", seotId);
             log.info("SoOrderServiceImpl::updateSeotPartner add REPAIR to workorder");
         }
 
         if (seotPartnerDto.getSparepart()) {
-            serviceWorkorderFactory.createWorkorderTask("GANTI SUKU CADANG", seotId);
+            serviceWorkorderTransaction.createWorkorderTask("GANTI SUKU CADANG", seotId);
             log.info("SoOrderServiceImpl::updateSeotPartner add GANTI SUKU CADANG to workorder");
         }
     }
 
-    private List<ServiceTaskReqDto> generateFromTemplateTasks(ServiceOrders serviceOrders, List<TemplateServiceTask> templateServiceTasks,
+    @Override
+    public List<ServiceTaskReqDto> generateFromTemplateTasks(ServiceOrders serviceOrders, List<TemplateServiceTask> templateServiceTasks,
                                            EnumModuleServiceOrders.SeotStatus seotStatus, Method taskReflection) {
 
         List<ServiceTaskReqDto> seot = new ArrayList<>();
@@ -153,18 +166,17 @@ public class ServiceTasksFactoryImpl implements ServiceTasksFactory {
                     seotStatus, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, taskReflection));
 
-
-            notifyCurrentTask(seot.get(i));
+            //notifyCurrentTask(seot.get(i));
 
         }
         return seot;
     }
 
+    @Override
+    public void notifyCurrentTask(ServiceTaskReqDto serviceOrderTask) {
 
-    private void notifyCurrentTask(ServiceTaskReqDto serviceOrderTask) {
-
-        ServiceOrderRespDto orderDtoById = servOrderService.findOrderDtoById(serviceOrderTask.getServiceOrders().getSeroId());
-        ServiceRespDto services = servService.findServicesById(serviceOrderTask.getServiceOrders().getServices().getServId());
+        ServiceOrderRespDto orderDtoById = servOrderService.getById(serviceOrderTask.getServiceOrders().getSeroId());
+        ServiceRespDto services = servService.getById(serviceOrderTask.getServiceOrders().getServices().getServId());
 
         switch (serviceOrderTask.getSeotName()) {
             case "NOTIFY TO AGENT" ->

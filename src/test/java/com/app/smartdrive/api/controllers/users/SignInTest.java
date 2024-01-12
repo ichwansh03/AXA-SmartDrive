@@ -46,7 +46,7 @@ public class SignInTest {
 
   ResultActions login(String username, String password) throws Exception {
     SignInRequest loginDto = SignInRequest.builder()
-            .username(username)
+            //.username(username)
             .password(password)
             .build();
     return mockMvc.perform(post("/auth/signin").contentType(MediaType.APPLICATION_JSON)
@@ -56,7 +56,7 @@ public class SignInTest {
   @Test
   void shouldSignIn() throws Exception {
     SignInRequest loginDto = SignInRequest.builder()
-            .username("admin")
+            //.username("admin")
             .password("admin")
             .build();
     mockMvc.perform(post("/auth/signin").contentType(MediaType.APPLICATION_JSON)

@@ -13,14 +13,12 @@ import com.app.smartdrive.api.repositories.service_orders.CaevRepository;
 import com.app.smartdrive.api.repositories.service_orders.CaspRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.services.partner.PartnerService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;

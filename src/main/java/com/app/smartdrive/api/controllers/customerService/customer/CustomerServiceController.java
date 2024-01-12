@@ -4,14 +4,12 @@ import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.ClaimResponseDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
-import com.app.smartdrive.api.entities.customer.CustomerClaim;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.services.customer.CustomerClaimService;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
+import com.app.smartdrive.api.services.service_order.servorder.orders.ServOrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
 @RestController
 @RequiredArgsConstructor

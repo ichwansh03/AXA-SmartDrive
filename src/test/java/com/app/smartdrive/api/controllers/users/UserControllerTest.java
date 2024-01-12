@@ -184,7 +184,7 @@ class UserControllerTest {
     @Test
     void shouldSignIn() throws Exception {
       SignInRequest loginDto = SignInRequest.builder()
-              .username("admin")
+              //.username("admin")
               .password("admin")
               .build();
       mockMvc.perform(post("/auth/signin").contentType(MediaType.APPLICATION_JSON)

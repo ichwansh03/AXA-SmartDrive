@@ -1,7 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
-import com.app.smartdrive.api.dto.service_order.response.SoWorkorderDto;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
+import com.app.smartdrive.api.services.service_order.servorder.workorders.ServOrderWorkorderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

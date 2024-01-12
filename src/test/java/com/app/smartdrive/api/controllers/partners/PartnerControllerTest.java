@@ -1,24 +1,12 @@
 package com.app.smartdrive.api.controllers.partners;
 
 import com.app.smartdrive.api.Exceptions.Error;
-import com.app.smartdrive.api.dto.customer.request.CustomerInscAssetsRequestDTO;
-import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
-import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.partner.Partner;
-import com.app.smartdrive.api.entities.users.User;
-import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.repositories.customer.CustomerRequestRepository;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
-import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
-import com.app.smartdrive.api.services.customer.CustomerRequestService;
 import com.app.smartdrive.api.services.partner.PartnerService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
-import com.app.smartdrive.api.services.service_order.servorder.ServService;
-import com.app.smartdrive.api.services.users.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 
 import static org.junit.jupiter.api.Assertions.*;

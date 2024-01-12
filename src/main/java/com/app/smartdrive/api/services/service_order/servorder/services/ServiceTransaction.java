@@ -1,18 +1,19 @@
-package com.app.smartdrive.api.services.service_order.servorder;
+package com.app.smartdrive.api.services.service_order.servorder.services;
 
 import com.app.smartdrive.api.dto.service_order.response.ServiceDto;
-import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 
 import java.time.LocalDateTime;
 
-public interface ServiceFactory {
+public interface ServiceTransaction {
 
-    ServiceDto addService(Long creqId) throws Exception;
+    ServiceDto addService(Long creqId);
 
     Services handleServiceUpdate(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus);
 
     void generateServPremi(Services services);
+
+    Services buildCommonServiceData(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus);
 }
