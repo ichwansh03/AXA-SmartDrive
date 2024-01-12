@@ -22,7 +22,7 @@ public class UserDto {
   private String userPhoto;
   private String userFullName;
   private String userBirthPlace;
-  @JsonFormat(pattern = "dd MMMM yyyy", shape = JsonFormat.Shape.STRING)
+  @JsonFormat(pattern = "dd-MM-yyyy", shape = JsonFormat.Shape.STRING)
   private LocalDateTime userBirthDate;
   private List<UserRoleDto> userRoles;
   private String userEmail;

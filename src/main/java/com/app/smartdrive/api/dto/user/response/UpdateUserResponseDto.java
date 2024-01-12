@@ -1,22 +1,21 @@
-package com.app.smartdrive.api.dto.user.request;
-
-import java.time.LocalDateTime;
+package com.app.smartdrive.api.dto.user.response;
 
 import com.app.smartdrive.api.dto.user.UpdateUserDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.EqualsAndHashCode;
-import org.springframework.web.multipart.MultipartFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateUserRequestDto extends UpdateUserDto {
+public class UpdateUserResponseDto extends UpdateUserDto {
+  @NotNull(message = "Birth date may not be null")
+  @JsonFormat(pattern = "dd-MM-yyyy", shape = JsonFormat.Shape.STRING)
   private LocalDateTime userBirthDate;
 }
