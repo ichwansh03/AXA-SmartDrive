@@ -84,7 +84,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
     private final UserRolesService userRolesService;
 
     private final UserPhoneService userPhoneService;
-
     @Transactional(readOnly = true)
     @Override
     public List<CustomerResponseDTO> get(){
@@ -152,7 +151,6 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
         CustomerRequest newCustomerRequest = this.createCustomerRequest(newEntity, customer, entityId);
         newCustomerRequest.setCreqAgenEntityid(employeeAreaWorkgroup.getEawgId());
         newCustomerRequest.setEmployeeAreaWorkgroup(employeeAreaWorkgroup);
-
         CustomerInscAssets cias = this.customerInscAssetsService.createCustomerInscAssets(entityId, ciasDTO, existCarSeries, existCity, existInty, newCustomerRequest);
 
         List<CustomerInscDoc> ciasDocs = this.customerInscDocService.fileCheck(files, entityId);
