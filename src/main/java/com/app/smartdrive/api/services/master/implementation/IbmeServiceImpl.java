@@ -9,6 +9,9 @@ import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +29,12 @@ public class IbmeServiceImpl implements MasterService<IbmeRes, IbmeReq, Long> {
     }
 
     @Override
-    public List<IbmeRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), IbmeRes.class);
+    public Page<IbmeRes> getAll(Pageable pageable) {
+        Page<InboxMessaging> inboxMessaging = repository.findAll(pageable);
+        List<IbmeRes> ibmeRes = inboxMessaging.getContent().stream().map(
+                inbox -> TransactionMapper.mapEntityToDto(inbox, IbmeRes.class)
+        ).toList();
+        return new PageImpl<>(ibmeRes, pageable, inboxMessaging.getTotalElements());
     }
 
     @Override

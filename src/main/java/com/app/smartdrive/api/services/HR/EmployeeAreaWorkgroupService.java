@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 public interface EmployeeAreaWorkgroupService{
      Page<EmployeesAreaWorkgroupResponseDto> searchEawg(String value, int page, int size);
      EmployeesAreaWorkgroupResponseDto addEawg(EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
-     EmployeesAreaWorkgroupResponseDto updateEawg (Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
+     EmployeesAreaWorkgroupResponseDto updateEawg(Long eawgId, EmployeeAreaWorkgroupRequestDto employeeAreaWorkgroupDto);
      EmployeeAreaWorkgroup getById(Long id);
      void deleteById(Long eawg_id);
      Page<EmployeesAreaWorkgroupResponseDto> getAll(Pageable pageable);

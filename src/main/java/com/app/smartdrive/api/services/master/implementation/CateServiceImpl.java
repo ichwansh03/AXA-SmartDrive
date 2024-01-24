@@ -10,6 +10,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +29,12 @@ public class CateServiceImpl implements MasterService<CateRes, CateReq, Long> {
     }
 
     @Override
-    public List<CateRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), CateRes.class);
+    public Page<CateRes> getAll(Pageable pageable) {
+        Page<Category> categories = repository.findAll(pageable);
+        List<CateRes> cateRes = categories.getContent().stream().map(
+                category -> TransactionMapper.mapEntityToDto(category, CateRes.class)
+        ).toList();
+        return new PageImpl<>(cateRes, pageable, categories.getTotalElements());
     }
 
     @Transactional

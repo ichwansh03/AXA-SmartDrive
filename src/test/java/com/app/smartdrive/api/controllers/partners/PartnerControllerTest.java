@@ -49,22 +49,21 @@ class PartnerControllerTest {
     @BeforeEach
     @Transactional
     public void setUp() {
-        userRepository.deleteByUserName("TEST123");
+        partner = create();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     @AfterEach
     void tearDown() {
-        partnerRepository.delete(partner);
+        partnerRepository.deleteById(partner.getPartEntityid());
     }
 
     @Test
     void whenGetAllServiceByPartner() throws Exception {
-        partner = create();
 
         mockMvc.perform(
                 get("/partners/workorder")
-                        .param("entityid", "1060")
+                        .param("entityid", partner.getPartEntityid().toString())
                         .param("arwgcode", "BCY-0001")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -74,7 +73,6 @@ class PartnerControllerTest {
     }
     @Test
     void whenDelete_thenSucces() throws Exception {
-        partner = create();
 
         mockMvc.perform(
                 delete("/partners/"+partner.getPartEntityid())
@@ -88,23 +86,25 @@ class PartnerControllerTest {
                 status().isNotFound()
         );
 
+        partner = create();
+
     }
 
     Partner create(){
         PartnerRequest request = new PartnerRequest();
-        request.setPartName("PARTNER TEST");
+        request.setPartName("TEST PARTNER");
         request.setCityId(1L);
-        request.setPartNpwp("123123123");
+        request.setPartNpwp("000111222333444");
         request.setPartAddress("SENTUL");
-        request.setPartAccountNo("123123123");
+        request.setPartAccountNo("000111222333444");
 
         Partner partner = partnerService.save(request);
         return partnerService.save(partner);
     }
     @Test
     void whenUpdatePartner_thenSuccess() throws Exception {
-        partner = create();
         PartnerRequest request = new PartnerRequest();
+        request.setId(partner.getPartEntityid());
         request.setPartName("UPDATE");
         request.setCityId(1L);
         request.setPartNpwp("1234567890");
@@ -119,35 +119,30 @@ class PartnerControllerTest {
                 status().isOk()
         ).andDo(result -> {
             PartnerDto partnerDto = objectMapper.readValue(result.getResponse().getContentAsString(), PartnerDto.class);
-            assertEquals(partnerDto.getPartName(), request.getPartName());
-
-
+            User user = userRepository.findById(partner.getPartEntityid()).get();
+            assertEquals(request.getPartName(), user.getUserFullName());
+            assertEquals(request.getPartName(), partnerDto.getPartName());
         });
+
     }
 
     @Test
     void whenGetPartnerById_thenNotFound() throws Exception {
         mockMvc.perform(
-                get("/partners/999")
+                get("/partners/9999")
         ).andExpectAll(
                 status().isNotFound(),
                 content().contentType(MediaType.APPLICATION_JSON)
         ).andDo(result -> {
             Error error = objectMapper.readValue(result.getResponse().getContentAsString(), Error.class);
-            assertEquals("Partner not found by id 999", error.getMessage());
-
-
+            assertEquals("Partner not found by id 9999", error.getMessage());
             log.info(error.toString());
-
-
         });
 
     }
 
     @Test
     void whenGetPartnerById_thenSuccess() throws Exception {
-
-        partner = create();
         mockMvc.perform(
                 get("/partners/"+partner.getPartEntityid())
         ).andExpectAll(
@@ -163,13 +158,12 @@ class PartnerControllerTest {
     @Test
     void whenCreatePartner_thenBadRequest() throws Exception {
 
-
         PartnerRequest request = new PartnerRequest();
         request.setPartName("12345678901234567890123456");
         request.setCityId(null);
         request.setPartNpwp("12345678901234567890123456");
         request.setPartAddress("JL BENGKEL");
-        request.setPartAccountNo("123");
+        request.setPartAccountNo("111222333444");
 
         mockMvc.perform(
                 post("/partners")
@@ -186,13 +180,12 @@ class PartnerControllerTest {
     @Test
     void whenCreatePartner_thenSuccess() throws Exception {
 
-
         PartnerRequest request = new PartnerRequest();
-        request.setPartName("BENGKEL");
+        request.setPartName("Ketok Magic ");
         request.setCityId(1L);
-        request.setPartNpwp("1");
+        request.setPartNpwp("457");
         request.setPartAddress("JL BENGKEL");
-        request.setPartAccountNo("1");
+        request.setPartAccountNo("457");
 
         mockMvc.perform(
                 post("/partners")
@@ -205,9 +198,11 @@ class PartnerControllerTest {
             PartnerDto partnerDto = objectMapper.readValue(responseJson, PartnerDto.class);
             assertNotNull(partnerDto.getBusinessEntity());
             assertNotNull(partnerDto.getPartEntityid());
-            assertEquals("BENGKEL", partnerDto.getPartName());
+            assertEquals(request.getPartName(), partnerDto.getPartName());
             String prettyJson = objectMapper.writeValueAsString(partnerDto);
             log.info("Response {}", prettyJson);
+            partnerRepository.deleteById(partnerDto.getPartEntityid());
         });
+
      }
 }

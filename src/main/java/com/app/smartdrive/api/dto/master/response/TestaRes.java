@@ -17,5 +17,6 @@ public class TestaRes {
     private String testaGroup;
     private String testaCallMethod;
     private Integer testaSeqOrder;
+    private Integer testaTetyId;
     private TetyRes templateType;
 }

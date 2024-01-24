@@ -1,5 +1,6 @@
 package com.app.smartdrive.api.dto.user.response;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
 import com.app.smartdrive.api.entities.users.UserAddress;
@@ -17,9 +18,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDto {
   private Long userEntityId;
+  private String userName;
   private String userPhoto;
   private String userFullName;
   private String userBirthPlace;
+  @JsonFormat(pattern = "dd-MM-yyyy", shape = JsonFormat.Shape.STRING)
+  private LocalDateTime userBirthDate;
   private List<UserRoleDto> userRoles;
   private String userEmail;
   private List<UserPhoneDto> userPhone;

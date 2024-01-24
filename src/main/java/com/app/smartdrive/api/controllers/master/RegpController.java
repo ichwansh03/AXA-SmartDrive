@@ -5,6 +5,8 @@ import com.app.smartdrive.api.services.master.MasterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,12 @@ public class RegpController implements MasterController<RegpReq, String> {
 
     @Override
     @GetMapping
-    public ResponseEntity<?> findAllData() {
-        return ResponseEntity.ok(regpServiceImpl.getAll());
+    public ResponseEntity<?> findAllData(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page,size);
+        return ResponseEntity.ok(regpServiceImpl.getAll(pageable));
     }
 
     @Override

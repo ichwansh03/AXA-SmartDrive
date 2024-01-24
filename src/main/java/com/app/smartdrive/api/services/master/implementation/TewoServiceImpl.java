@@ -1,7 +1,9 @@
 package com.app.smartdrive.api.services.master.implementation;
 
 import com.app.smartdrive.api.dto.master.request.TewoReq;
+import com.app.smartdrive.api.dto.master.response.ArwgRes;
 import com.app.smartdrive.api.dto.master.response.TewoRes;
+import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.master.TemplateTaskWorkOrder;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.master.TewoRepository;
@@ -9,6 +11,9 @@ import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +31,12 @@ public class TewoServiceImpl implements MasterService<TewoRes, TewoReq, Long> {
     }
 
     @Override
-    public List<TewoRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), TewoRes.class);
+    public Page<TewoRes> getAll(Pageable pageable) {
+        Page<TemplateTaskWorkOrder> templateTaskWorkOrders = repository.findAll(pageable);
+        List<TewoRes> tewoRes = templateTaskWorkOrders.getContent().stream().map(
+                templateTaskWorkOrder -> TransactionMapper.mapEntityToDto(templateTaskWorkOrder, TewoRes.class)
+        ).toList();
+        return new PageImpl<>(tewoRes, pageable, templateTaskWorkOrders.getTotalElements());
     }
 
     @Override

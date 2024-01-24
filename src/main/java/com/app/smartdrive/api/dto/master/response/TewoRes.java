@@ -6,5 +6,6 @@ import lombok.Data;
 public class TewoRes {
     private Long tewoId;
     private String tewoName;
+    private Long tewoTestaId;
     private TestaRes templateServiceTask;
 }

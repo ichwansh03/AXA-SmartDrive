@@ -9,6 +9,9 @@ import com.app.smartdrive.api.repositories.master.ArwgRepository;
 import com.app.smartdrive.api.services.master.MasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +30,12 @@ public class ArwgServiceImpl implements MasterService<ArwgRes, ArwgReq, String> 
     }
 
     @Override
-    public List<ArwgRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), ArwgRes.class);
+    public Page<ArwgRes> getAll(Pageable pageable) {
+        Page<AreaWorkGroup> areaWorkGroups = repository.findAll(pageable);
+        List<ArwgRes> arwgRes = areaWorkGroups.getContent().stream().map(
+                arwg -> TransactionMapper.mapEntityToDto(arwg, ArwgRes.class)
+        ).toList();
+        return new PageImpl<>(arwgRes, pageable, areaWorkGroups.getTotalElements());
     }
 
 

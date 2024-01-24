@@ -9,6 +9,9 @@ import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +29,12 @@ public class TetyServiceImpl implements MasterService<TetyRes, TetyReq, Long> {
     }
 
     @Override
-    public List<TetyRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), TetyRes.class);
+    public Page<TetyRes> getAll(Pageable pageable) {
+        Page<TemplateType> templateTypes = repository.findAll(pageable);
+        List<TetyRes> tetyRes = templateTypes.getContent().stream().map(
+                templateType -> TransactionMapper.mapEntityToDto(templateType, TetyRes.class)
+        ).toList();
+        return new PageImpl<>(tetyRes, pageable, templateTypes.getTotalElements());
     }
 
     @Override
@@ -43,6 +50,7 @@ public class TetyServiceImpl implements MasterService<TetyRes, TetyReq, Long> {
         TemplateType templateType = new TemplateType();
         templateType.setTetyGroup(String.valueOf(entity.getTetyGroup()));
         templateType.setTetyName(String.valueOf(entity.getTetyName()));
+        repository.save(templateType);
         return TransactionMapper.mapEntityToDto(templateType, TetyRes.class);
     }
 }

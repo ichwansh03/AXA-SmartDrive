@@ -25,7 +25,7 @@ public interface UserService {
 
   User createUser(ProfileRequestDto userPost);
 
-  UpdateUserRequestDto updateUser(UpdateUserRequestDto userPost, Long id);
+  User updateUser(UpdateUserRequestDto userPost, Long id);
 
   User getById(Long id);
 

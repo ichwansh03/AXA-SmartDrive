@@ -29,8 +29,8 @@ public class UserAccountsImpl implements UserAccountsService {
         Optional<UserAccounts> findNorekById = repositoryUA.findById(id);
         UserAccounts user = findNorekById.get();
         UserAccounts userAcc = UserAccounts.builder()
-                .usac_accountno(user.getUsac_accountno())
-                .usac_debet(user.getUsac_debet())
+                .usacAccountno(user.getUsacAccountno())
+                .usacDebet(user.getUsacDebet())
                 .enumPaymentType(user.getEnumPaymentType())
                 .build();
         UserAccountsDtoResponse response = TransactionMapper.mapEntityToDto(userAcc,UserAccountsDtoResponse.class);
@@ -70,8 +70,8 @@ public class UserAccountsImpl implements UserAccountsService {
         UserAccounts userRekening = repositoryUA.findByNorek(requests.getNoRekening())
                 .orElseThrow( () ->  new EntityNotFoundException(requests.getNoRekening() + " Tidak terdaftar!"));
         UserAccounts userAcc = UserAccounts.builder()
-                .usac_accountno(userRekening.getUsac_accountno())
-                .usac_debet(userRekening.getUsac_debet())
+                .usacAccountno(userRekening.getUsacAccountno())
+                .usacDebet(userRekening.getUsacDebet())
                 .enumPaymentType(userRekening.getEnumPaymentType())
                 .build();
         UserAccountsDtoResponse response = TransactionMapper.mapEntityToDto(userAcc,UserAccountsDtoResponse.class);

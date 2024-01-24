@@ -14,5 +14,7 @@ public class ProvRes {
     @Size(max = 85, message = "Province Name Length Exceeded !")
     private String provName;
 
+    private Long provZonesId;
+
     private ZonesRes zones;
 }

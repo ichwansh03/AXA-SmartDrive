@@ -9,6 +9,9 @@ import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +29,16 @@ public class IntyServiceImpl implements MasterService<IntyRes, IntyReq, String> 
     }
 
     @Override
-    public List<IntyRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), IntyRes.class);
+    public Page<IntyRes> getAll(Pageable pageable) {
+        Page<InsuranceType> insuranceTypes = repository.findAll(pageable);
+        List<IntyRes> insIntyRes = insuranceTypes.getContent().stream().map(
+                insuranceType -> TransactionMapper.mapEntityToDto(insuranceType, IntyRes.class)
+        ).toList();
+        return new PageImpl<>(insIntyRes, pageable, insuranceTypes.getTotalElements());
     }
 
     @Override
+    @Transactional
     public IntyRes update(String s, IntyReq intyReq) {
         InsuranceType insuranceType = repository.findById(s).orElseThrow(() -> new EntityNotFoundException("Insurance Type ID : " + s + " Not Found"));
         insuranceType = repository.save(TransactionMapper.mapDtoToEntity(intyReq,insuranceType));

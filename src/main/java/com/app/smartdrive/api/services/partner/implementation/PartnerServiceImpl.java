@@ -50,8 +50,9 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Transactional
-    public List<Partner> getAll() {
-        return partnerRepository.findAll();
+    public Page<Partner> getAll(int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return partnerRepository.findAll(pageable);
     }
 
     public Partner save(Partner partner) {
@@ -60,30 +61,36 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Transactional
-    private User createUser(Partner partner, boolean grantUserAccess){
+    private User createUser(Partner partner){
+        ProfileRequestDto userDto = createUserDto(partner);
+        User user = userService.createUser(userDto);
+        userRolesService.createUserRole(EnumUsers.RoleName.PR, user, true);
+        return userService.save(user);
+    }
+
+    public void updateUser(Partner partner){
+        ProfileRequestDto userDto = createUserDto(partner);
+        User saveUser = userService.getById(partner.getPartEntityid());
+        TransactionMapper.mapDtoToEntity(userDto, saveUser);
+        userService.save(saveUser);
+    }
+
+    private ProfileRequestDto createUserDto(Partner partner){
         ProfileRequestDto userDto = new ProfileRequestDto();
         userDto.setUserEmail(partner.getPartName());
         userDto.setUserNpwp(partner.getPartNpwp());
         userDto.setUserFullName(partner.getPartName());
         userDto.setUserNationalId(partner.getPartNpwp());
-        userDto.setUserName(String.format("%15s", partner.getPartName().replaceAll(" ", ""))
-                .replaceAll(" ", "0"));
-        if (grantUserAccess){
-            userDto.setUserPassword(partner.getPartNpwp());
-        }
-
-        User user = userService.createUser(userDto);
-
-        userRolesService.createUserRole(EnumUsers.RoleName.PR, user, true);
-
-        return userService.save(user);
-
+        userDto.setUserName(String.format("%-15s", partner.getPartName().replaceAll(" ", ""))
+                .replaceAll(" ", "0").substring(0,15));
+        userDto.setUserPassword(partner.getPartNpwp());
+        return userDto;
     }
     @Override
     @Transactional
     public Partner save(PartnerRequest partnerRequest) {
         Partner partner = create(partnerRequest);
-        User user = createUser(partner, partnerRequest.isGrantUserAccess());
+        User user = createUser(partner);
         partner.setBusinessEntity(user.getUserBusinessEntity());
         partnerRepository.save(partner);
         return partner;
@@ -93,15 +100,21 @@ public class PartnerServiceImpl implements PartnerService {
     public void deleteById(Long id) {
         partnerRepository.delete(getById(id));
     }
-
-    @Override
     public Partner create(PartnerRequest request) {
         Cities city = cityRepository.findById(request.getCityId()).orElseThrow(()-> new EntityNotFoundException("City not found"));
         Partner partner = new Partner();
         partner = TransactionMapper.mapDtoToEntity(request, partner);
-        partner.setPartAccountNo(request.getPartAccountNo());
         partner.setCity(city);
         return partner;
+    }
+    @Override
+    public Partner update(PartnerRequest request) {
+        Partner savePartner = getById(request.getId());
+        Cities city = cityRepository.findById(request.getCityId()).orElseThrow(()-> new EntityNotFoundException("City not found"));
+        TransactionMapper.mapDtoToEntity(request, savePartner);
+        savePartner.setCity(city);
+        updateUser(savePartner);
+        return partnerRepository.save(savePartner);
     }
 
     @Override
