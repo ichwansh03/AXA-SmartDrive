@@ -1,9 +1,6 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
-import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.entities.service_order.ServiceOrders;
-import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
+import com.app.smartdrive.api.services.service_order.servorder.orders.ServOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -11,14 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
 @SpringBootTest

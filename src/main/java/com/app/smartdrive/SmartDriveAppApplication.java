@@ -22,7 +22,6 @@ import java.nio.file.Files;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableScheduling
-@EnableAsync
 public class SmartDriveAppApplication implements CommandLineRunner {
 
 	@Autowired

@@ -1,29 +1,16 @@
 package com.app.smartdrive.api.controllers.partners;
 
-import com.app.smartdrive.api.dto.partner.PartnerAreaWorkgroupDto;
-import com.app.smartdrive.api.dto.partner.PartnerContactDto;
 import com.app.smartdrive.api.dto.partner.PartnerDto;
-import com.app.smartdrive.api.dto.partner.request.PartnerContactRequest;
 import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
-import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
-import com.app.smartdrive.api.entities.partner.PartnerAreaWorkgroup;
-import com.app.smartdrive.api.entities.partner.PartnerContact;
-import com.app.smartdrive.api.entities.partner.PartnerContactEntityId;
 import com.app.smartdrive.api.entities.service_order.ServiceOrderWorkorder;
-import com.app.smartdrive.api.entities.service_order.ServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
-import com.app.smartdrive.api.repositories.service_orders.SoOrderRepository;
-import com.app.smartdrive.api.services.partner.PartnerService;
-import com.app.smartdrive.api.services.partner.implementation.PartnerContactServiceImpl;
 import com.app.smartdrive.api.services.partner.implementation.PartnerServiceImpl;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderWorkorderService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.app.smartdrive.api.services.service_order.servorder.workorders.ServOrderWorkorderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

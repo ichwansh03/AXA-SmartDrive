@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//service order workorder
 @Builder
 @Data
 @AllArgsConstructor

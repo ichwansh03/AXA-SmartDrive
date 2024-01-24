@@ -2,8 +2,8 @@ package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.service_order.request.SeotPartnerDto;
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServiceTaskTransaction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ServOrderTaskController {
 
     private final ServOrderTaskService servOrderTaskService;
-    private final ServiceTasksFactory serviceTasksTransaction;
+    private final ServiceTaskTransaction serviceTasksTransaction;
 
     @GetMapping("{seotId}")
     public ResponseEntity<?> getTaskById(@PathVariable("seotId") Long seotId) {

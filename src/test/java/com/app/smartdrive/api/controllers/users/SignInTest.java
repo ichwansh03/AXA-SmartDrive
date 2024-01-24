@@ -20,7 +20,7 @@
 //
 //@SpringBootTest
 //@AutoConfigureMockMvc
-//public class SignInTest {
+public class SignInTest {
 //  @Autowired
 //  MockMvc mockMvc;
 //  @Autowired
@@ -72,4 +72,4 @@
 //            .andExpect(status().isOk())
 //            .andDo(print());
 //  }
-//}
+}

@@ -1,3 +1,4 @@
+
 //package com.app.smartdrive.api.controllers.users;
 //
 //import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
@@ -49,7 +50,7 @@
 //@WebMvcTest({UserController.class, AuthenticationController.class})
 //@ImportAutoConfiguration({SecurityConfig.class})
 //@DisplayName("User Controller Test")
-//class UserControllerTest {
+class UserControllerTest {
 //
 //  @Autowired
 //  ObjectMapper objectMapper;
@@ -195,4 +196,4 @@
 //              .andDo(print());
 //    }
 //  }
-//}
+}

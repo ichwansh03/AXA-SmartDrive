@@ -20,11 +20,11 @@ public class ServiceRespDto {
 
     private Long servId;
     private EnumCustomer.CreqType servType;
-    private String servInsuranceNo;
-    private String servVehicleNumber;
+    private String servInsuranceno;
+    private String servVehicleno;
     private String servCreatedOn;
-    private LocalDateTime servStartDate;
-    private LocalDateTime servEndDate;
+    private LocalDateTime servStartdate;
+    private LocalDateTime servEnddate;
     private EnumModuleServiceOrders.ServStatus servStatus;
     private UserDto userDto;
     private CustomerResponseDTO customerResponseDTO;

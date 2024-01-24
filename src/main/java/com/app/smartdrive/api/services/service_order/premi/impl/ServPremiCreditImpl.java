@@ -14,7 +14,7 @@ import com.app.smartdrive.api.repositories.service_orders.SecrRepository;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServOrderTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -108,8 +108,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         return check;
     }
 
-    @Async
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "0 0 12 * * *")
     public void sendNotify(){
         ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
         if (existSecr != null){

@@ -2,8 +2,8 @@ package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.service_order.response.SoTasksDto;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderTaskService;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceTasksFactory;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServOrderTaskService;
+import com.app.smartdrive.api.services.service_order.servorder.tasks.ServiceTaskTransaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,10 +32,7 @@ class ServOrderTaskControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private ServOrderTaskService servOrderTaskService;
-
-    @MockBean
-    private ServiceTasksFactory serviceTasksFactory;
+    private ServiceTaskTransaction serviceTasksTransaction;
 
     @DisplayName("Get Tasks by Sero Id")
     @ParameterizedTest
@@ -66,6 +63,6 @@ class ServOrderTaskControllerTest {
                 .andExpect(status().isOk())
                 .andDo(result -> objectMapper.writeValueAsString(soTasksDto));
 
-        verify(serviceTasksFactory, times(1)).updateTasksStatus(soTasksDto.getSeotStatus(), soTasksDto.getSeotId());
+        verify(serviceTasksTransaction, times(1)).updateTasksStatus(soTasksDto.getSeotStatus(), soTasksDto.getSeotId());
     }
 }

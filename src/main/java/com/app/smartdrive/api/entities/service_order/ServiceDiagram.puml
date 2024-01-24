@@ -1,0 +1,52 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+entity CustomerRequest <<module customer>> #lightblue;line:green
+entity Users <<module users>> #lightblue;line:green
+entity Partners <<module partners>> #lightblue;line:green
+entity Employees <<module employees>> #lightblue;line:green
+entity PaymentTransactions <<module payments>> #lightblue;line:green
+entity TemplateTask <<module master>> #lightblue;line:green
+entity TemplateWorkorder <<module master>> #lightblue;line:green
+entity Services {
+    + requestService()
+}
+entity ServiceOrders {
+    + requestFeasiblity()
+    + requestPolis()
+    + requestClaim()
+}
+entity ServiceOrderTask {
+    + addFeasiblityTask()
+    + addClaimTask()
+}
+entity ServiceOrderWorkorder {
+    + feasiblityWorkorder()
+    + claimWorkorder()
+
+}
+entity ClaimAssetSparepart {
+    + notifyPartnerToRepair()
+}
+entity ServicePremi {
+    + addPremiPolis()
+}
+
+entity ServicesPremiCredit {
+    + addPremiPolisCredit()
+}
+
+CustomerRequest ||--|| Services
+Users ||--|{ Services
+ServicePremi ||--|{ ServicesPremiCredit
+PaymentTransactions ||-up-|{ ServicesPremiCredit
+Services ||--|{ ServiceOrders
+Employees ||-right-|{ ServiceOrders
+Partners ||-up-|{ ServiceOrders
+ServiceOrders ||-right-|{ ServiceOrderTask
+ServiceOrderTask ||-right-|{ ServiceOrderWorkorder
+ServiceOrders ||--|{ ClaimAssetSparepart
+Services ||-left-|| ServicePremi
+TemplateTask <.. ServiceOrderTask
+TemplateWorkorder <.. ServiceOrderWorkorder
+@enduml

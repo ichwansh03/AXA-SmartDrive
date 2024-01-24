@@ -1,13 +1,12 @@
 package com.app.smartdrive.api.controllers.service_order.servorder;
 
-import com.app.smartdrive.api.controllers.auth.AuthenticationController;
 import com.app.smartdrive.api.dto.service_order.request.ServiceReqDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.services.service_order.servorder.ServService;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceFactory;
+import com.app.smartdrive.api.services.service_order.servorder.services.ServService;
+import com.app.smartdrive.api.services.service_order.servorder.services.ServiceTransaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -42,7 +41,7 @@ public class ServControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private ServiceFactory serviceTransaction;
+    private ServiceTransaction serviceTransaction;
 
     @MockBean
     private ServService servService;
@@ -60,11 +59,11 @@ public class ServControllerTest {
                 .servId(servId)
                 .servType(EnumCustomer.CreqType.FEASIBLITY)
                 .servCreatedOn("12/13/2023")
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusDays(7))
+                .servStartdate(LocalDateTime.now())
+                .servEnddate(LocalDateTime.now().plusDays(7))
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE).build();
 
-        when(servService.findServicesById(servId)).thenReturn(services);
+        when(servService.getById(servId)).thenReturn(services);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/service?servId={servId}",servId))
@@ -74,7 +73,7 @@ public class ServControllerTest {
                 .andDo(print());
 
         //make sure the findServicesById() method is only called once in the servService class
-        verify(servService, times(1)).findServicesById(servId);
+        verify(servService, times(1)).getById(servId);
     }
 
     @Test
@@ -90,7 +89,7 @@ public class ServControllerTest {
         when(serviceTransaction.addService(creqId)).thenReturn(services);
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/service/addserv?creqId={creqId}", creqId))
+                        MockMvcRequestBuilders.post("/service", creqId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {

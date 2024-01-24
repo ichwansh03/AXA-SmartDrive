@@ -32,27 +32,21 @@ import java.util.List;
 public class ServiceOrders {
 
     @Id
-    @Column(name = "sero_id", unique = true)
     private String seroId;
 
-    @Column(name = "sero_ordt_type")
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroOrdtType seroOrdtType;
 
-    @Column(name = "sero_status")
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeroStatus seroStatus = EnumModuleServiceOrders.SeroStatus.OPEN;
 
-    @Column(name = "sero_reason")
     private String seroReason;
 
-    @Column(name = "serv_claim_no")
     private String servClaimNo;
 
-    @Column(name = "serv_claim_startdate")
     private LocalDateTime servClaimStartdate;
 
-    @Column(name = "serv_claim_enddate")
     private LocalDateTime servClaimEnddate;
 
     @Column(name = "sero_agent_entityid")

@@ -2,10 +2,12 @@ package com.app.smartdrive.api.controllers.service_order.servorder;
 
 import com.app.smartdrive.api.dto.service_order.request.PagingServiceOrder;
 import com.app.smartdrive.api.dto.service_order.request.ServiceOrderReqDto;
+import com.app.smartdrive.api.dto.service_order.response.FeasiblityDto;
+import com.app.smartdrive.api.dto.service_order.response.PolisDto;
 import com.app.smartdrive.api.dto.service_order.response.ServiceOrderRespDto;
 import com.app.smartdrive.api.entities.partner.Partner;
-import com.app.smartdrive.api.services.service_order.servorder.ServOrderService;
-import com.app.smartdrive.api.services.service_order.servorder.ServiceOrderFactory;
+import com.app.smartdrive.api.services.service_order.servorder.orders.ServOrderService;
+import com.app.smartdrive.api.services.service_order.servorder.orders.ServiceOrderTransaction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,36 +20,37 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
 @RequestMapping("/service")
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin
 public class ServOrderController {
 
     private final ServOrderService servOrderService;
-    private final ServiceOrderFactory serviceOrderFactory;
+    private final ServiceOrderTransaction serviceOrderTransaction;
 
     @GetMapping("/search")
-    @CrossOrigin
     //@PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> getAllBySeroId(@RequestParam("seroId") String seroId) {
-        ServiceOrderRespDto orderDtoById = servOrderService.findOrderDtoById(seroId);
+        ServiceOrderRespDto orderDtoById = servOrderService.getById(seroId);
         return new ResponseEntity<>(orderDtoById, HttpStatus.OK);
     }
 
     @PutMapping("/partner/{seroId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToAddPartner(@Valid @RequestBody Partner partner, @PathVariable("seroId") String seroId){
-        serviceOrderFactory.selectPartner(partner, seroId);
+        serviceOrderTransaction.selectPartner(partner, seroId);
         return new ResponseEntity<>(partner, HttpStatus.OK);
     }
 
     @PutMapping("/close/{seroId}")
     @PreAuthorize("hasAuthority('Employee') || hasAuthority('Admin')")
     public ResponseEntity<?> updateToCloseOrder(@Valid @RequestBody ServiceOrderReqDto serviceOrderReqDto, @PathVariable("seroId") String seroId){
-        int requested = serviceOrderFactory.updateStatusRequest(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
+        int requested = serviceOrderTransaction.updateStatusRequest(serviceOrderReqDto.getSeroStatus(), serviceOrderReqDto.getSeroReason(), seroId);
         return new ResponseEntity<>(requested, HttpStatus.OK);
     }
 
