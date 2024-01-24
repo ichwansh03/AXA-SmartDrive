@@ -108,8 +108,7 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
         return check;
     }
 
-    @Async
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "0 0 12 * * *")
     public void sendNotify(){
         ServicePremiCredit existSecr = secrRepository.findBySecrDuedateBetween(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
         if (existSecr != null){

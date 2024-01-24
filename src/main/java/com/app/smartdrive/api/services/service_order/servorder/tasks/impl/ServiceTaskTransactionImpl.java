@@ -161,8 +161,8 @@ public class ServiceTaskTransactionImpl implements ServiceTaskTransaction {
 
         for (int i = 0; i < templateServiceTasks.size(); i++) {
             seot.add(new ServiceTaskReqDto(templateServiceTasks.get(i).getTestaName(),
-                    serviceOrders.getServices().getServStartDate().plusDays(i),
-                    serviceOrders.getServices().getServStartDate().plusDays(i + 1),
+                    serviceOrders.getServices().getServStartdate().plusDays(i),
+                    serviceOrders.getServices().getServEnddate().plusDays(i + 1),
                     seotStatus, serviceOrders.getEmployees().getAreaWorkGroup(),
                     serviceOrders, taskReflection));
 

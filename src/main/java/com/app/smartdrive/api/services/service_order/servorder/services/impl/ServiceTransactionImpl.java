@@ -4,7 +4,6 @@ import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.dto.service_order.response.ServiceDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
-import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.mapper.TransactionMapper;
@@ -36,32 +35,27 @@ public class ServiceTransactionImpl implements ServiceTransaction {
     @Transactional
     @Override
     public ServiceDto addService(Long creqId) {
-
         CustomerRequest cr = customerRequestRepository.findById(creqId)
-                .orElseThrow(() -> new EntityNotFoundException("creqId "+creqId+" is not found"));
+                .orElseThrow(() -> new EntityNotFoundException("creqId " + creqId + " is not found"));
 
         Services serv;
-        //avoid this operation, not OCP!
-        switch (cr.getCreqType().toString()){
+        switch (cr.getCreqType().toString()) {
             case "FEASIBLITY" -> {
                 serv = buildCommonServiceData(cr, LocalDateTime.now().plusDays(7),
                         EnumModuleServiceOrders.ServStatus.ACTIVE);
                 customerRequestRepository.updateCreqType(EnumCustomer.CreqType.POLIS, cr.getCreqEntityId());
             }
             case "POLIS" -> {
-                serv = handleServiceUpdate(cr,
-                        LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
-                log.info("ServImpl::addService save services to db polis {} ",serv);
+                serv = handleServiceUpdate(cr, LocalDateTime.now().plusYears(1), EnumModuleServiceOrders.ServStatus.ACTIVE);
+                log.info("ServImpl::addService save services to db polis {} ", serv);
             }
-            case "CLAIM" -> serv = handleServiceUpdate(cr,
-                    LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
-            default -> serv = handleServiceUpdate(cr,
-                    LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
+            case "CLAIM" -> serv = handleServiceUpdate(cr, LocalDateTime.now().plusDays(10), EnumModuleServiceOrders.ServStatus.ACTIVE);
+            default -> serv = handleServiceUpdate(cr, LocalDateTime.now().plusDays(1), EnumModuleServiceOrders.ServStatus.INACTIVE);
         }
 
-        log.info("ServImpl::addService save services to db {} ",serv);
+        log.info("ServImpl::addService save services to db {} ", serv);
         Services saved = soRepository.save(serv);
-        log.info("ServImpl::addService service saved {} ",saved);
+        log.info("ServImpl::addService service saved {} ", saved);
 
         serviceOrderTransaction.addServiceOrders(saved.getServId());
 
@@ -80,7 +74,7 @@ public class ServiceTransactionImpl implements ServiceTransaction {
         services.setServId(existingService.getServId());
 
         switch (services.getServType()) {
-            case POLIS -> generateServPremi(services);
+            case POLIS -> servPremiService.generateServPremi(services);
             case CLOSE -> servPremiService.updateSemiStatus(
                     EnumModuleServiceOrders.SemiStatus.INACTIVE.toString(), services.getServId());
         }
@@ -89,29 +83,19 @@ public class ServiceTransactionImpl implements ServiceTransaction {
         return services;
     }
 
-    @Override
-    public void generateServPremi(Services services){
-        ServicePremi servicePremi = ServicePremi.builder()
-                .semiServId(services.getServId())
-                .semiPremiDebet(services.getCustomer().getCustomerInscAssets().getCiasTotalPremi())
-                .semiPaidType(services.getCustomer().getCustomerInscAssets().getCiasPaidType().toString())
-                .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
-        log.info("service premi {} ", services);
-        servPremiService.addSemi(servicePremi, services.getServId());
-    }
 
     @Override
     public Services buildCommonServiceData(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus){
         Services serviceParent = soRepository.getServiceParent(cr.getCustomer().getUserEntityId())
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("Service Parent is not found"));
 
         return Services.builder()
                 .servType(cr.getCreqType())
                 .servCreatedOn(cr.getCreqCreateDate())
-                .servInsuranceNo(soAdapter.generatePolis(cr))
-                .servVehicleNumber(cr.getCustomerInscAssets().getCiasPoliceNumber())
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(endDate)
+                .servInsuranceno(soAdapter.generatePolis(cr))
+                .servVehicleno(cr.getCustomerInscAssets().getCiasPoliceNumber())
+                .servStartdate(LocalDateTime.now())
+                .servEnddate(endDate)
                 .servStatus(servStatus)
                 .users(cr.getCustomer())
                 .parentServices(serviceParent)

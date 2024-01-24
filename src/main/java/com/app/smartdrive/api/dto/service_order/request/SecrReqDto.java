@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 
 @Builder
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class SecrReqDto {
 
     private Long secrId;
@@ -21,5 +19,4 @@ public class SecrReqDto {
     private BigDecimal secrPremiCredit;
     private LocalDateTime secrTrxDate;
     private LocalDateTime secrDueDate;
-    //private String secrPatrTrxno;
 }

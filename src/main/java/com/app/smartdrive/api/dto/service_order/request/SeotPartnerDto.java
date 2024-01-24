@@ -5,8 +5,6 @@ import lombok.*;
 
 @Builder
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class SeotPartnerDto {
 
     private Long partnerId;

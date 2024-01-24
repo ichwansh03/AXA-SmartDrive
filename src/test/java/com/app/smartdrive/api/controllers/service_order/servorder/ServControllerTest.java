@@ -59,8 +59,8 @@ public class ServControllerTest {
                 .servId(servId)
                 .servType(EnumCustomer.CreqType.FEASIBLITY)
                 .servCreatedOn("12/13/2023")
-                .servStartDate(LocalDateTime.now())
-                .servEndDate(LocalDateTime.now().plusDays(7))
+                .servStartdate(LocalDateTime.now())
+                .servEnddate(LocalDateTime.now().plusDays(7))
                 .servStatus(EnumModuleServiceOrders.ServStatus.ACTIVE).build();
 
         when(servService.getById(servId)).thenReturn(services);

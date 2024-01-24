@@ -22,16 +22,10 @@ public class ServiceReqDto {
     @NotNull
     private EnumCustomer.CreqType servType;
     @NotBlank
-    private String servVehicleNumber;
-    private String servInsuranceNo;
-    private LocalDateTime servStartDate;
-    private LocalDateTime servEndDate;
+    private String servVehicleno;
+    private String servInsuranceno;
+    private LocalDateTime servStartdate;
+    private LocalDateTime servEnddate;
     @NotNull
     private EnumModuleServiceOrders.ServStatus servStatus;
-//    private Services parentServices;
-//    @NotNull
-//    private User users;
-//    @NotNull
-//    private CustomerRequest customer;
-
 }

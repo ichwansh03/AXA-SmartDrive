@@ -5,6 +5,7 @@ import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
+import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
@@ -57,6 +58,18 @@ public class ServPremiImpl implements ServPremiService {
         }
 
         return save;
+    }
+
+    @Override
+    public ServicePremi generateServPremi(Services services){
+        ServicePremi servicePremi = ServicePremi.builder()
+                .semiServId(services.getServId())
+                .semiPremiDebet(services.getCustomer().getCustomerInscAssets().getCiasTotalPremi())
+                .semiPaidType(services.getCustomer().getCustomerInscAssets().getCiasPaidType().toString())
+                .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
+        log.info("service premi {} ", services);
+        addSemi(servicePremi, services.getServId());
+        return servicePremi;
     }
 
     @Transactional

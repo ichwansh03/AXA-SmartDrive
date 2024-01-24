@@ -106,11 +106,12 @@ public class ServImpl implements ServService {
                         .creqId(feasiblity.getCustomerResponseDTO().getCreqEntityId())
                         .seroId(feasiblity.getServiceOrdersList().get(0).getSeroId())
                         .customerName(feasiblity.getUserDto().getUserFullName())
-                        .polisNo(feasiblity.getServInsuranceNo())
-                        .periode(feasiblity.getServEndDate().format(formatter))
-                        .vehicleNo(feasiblity.getServVehicleNumber())
+                        .polisNo(feasiblity.getServInsuranceno())
+                        .periode(feasiblity.getServEnddate().format(formatter))
+                        .vehicleNo(feasiblity.getServVehicleno())
                         .servType(feasiblity.getServType())
                         .totalPremi(feasiblity.getCustomerResponseDTO().getCustomerInscAssets().getCiasTotalPremi()).build())
                 .toList();
     }
+
 }

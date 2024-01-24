@@ -13,7 +13,5 @@ public interface ServiceTransaction {
 
     Services handleServiceUpdate(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus);
 
-    void generateServPremi(Services services);
-
     Services buildCommonServiceData(CustomerRequest cr, LocalDateTime endDate, EnumModuleServiceOrders.ServStatus servStatus);
 }

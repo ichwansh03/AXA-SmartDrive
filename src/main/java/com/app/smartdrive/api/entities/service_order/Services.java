@@ -31,29 +31,22 @@ public class Services {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "serv_id", updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private Long servId;
 
-    @Column(name = "serv_created_on")
     private LocalDateTime servCreatedOn;
 
-    @Column(name = "serv_type")
     @Enumerated(EnumType.STRING)
     private EnumCustomer.CreqType servType;
 
-    @Column(name = "serv_insuranceno")
-    private String servInsuranceNo;
+    private String servInsuranceno;
 
-    @Column(name = "serv_vehicleno")
-    private String servVehicleNumber;
+    private String servVehicleno;
 
-    @Column(name = "serv_startdate")
-    private LocalDateTime servStartDate;
+    private LocalDateTime servStartdate;
 
-    @Column(name = "serv_enddate")
-    private LocalDateTime servEndDate;
+    private LocalDateTime servEnddate;
 
-    @Column(name = "serv_status")
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.ServStatus servStatus;
 

@@ -179,7 +179,7 @@ public class ServiceOrderTransactionImpl implements ServiceOrderTransaction {
                 .seroId(formatSeroId)
                 .seroOrdtType(EnumModuleServiceOrders.SeroOrdtType.CREATE)
                 .seroStatus(EnumModuleServiceOrders.SeroStatus.OPEN)
-                .servClaimNo(services.getServInsuranceNo())
+                .servClaimNo(services.getServInsuranceno())
                 .servClaimStartdate(startDate)
                 .servClaimEnddate(endDate)
                 .parentServiceOrders(parentSero)
