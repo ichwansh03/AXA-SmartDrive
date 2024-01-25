@@ -8,14 +8,14 @@ import lombok.Data;
 @Data
 public class TransaksiMapper {
     public static TransaksiByUserDtoResponse mapperTransactionsDto(String invoice, TransactionsByUserDtoRequests request){
-        TransaksiByUserDtoResponse dto = TransaksiByUserDtoResponse.builder()
-        .usac_accountno(request.getUsac_accountno())
-        .patr_usac_accountNo_to(request.getPatr_usac_accountNo_to())
-        .nominall(request.getNominall())
-        .patr_notes(request.getPatr_notes())
-        .enumPayment(request.getEnumPayment())
-        .patr_invoice_no(invoice)
-        .build();
+       TransaksiByUserDtoResponse dto = TransaksiByUserDtoResponse.builder()
+               .patrInvoiceNo(invoice)
+               .enumPayment(request.getEnumPayment())
+               .nominall(request.getNominall())
+               .patrNotes(request.getPatrNotes())
+               .patrUsacAccountNoTo(request.getToRekening())
+               .usacAccountno(request.getNoRekening())
+               .build();
         return dto;
     }
 }

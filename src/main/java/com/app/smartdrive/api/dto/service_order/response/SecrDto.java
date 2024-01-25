@@ -22,5 +22,5 @@ public class SecrDto {
     private BigDecimal secrPremiCredit;
     private LocalDate secrTrxDate;
     private LocalDate secrDuedate;
-    private PaymentTransactionsDto secrPatrTrxno;
+    private String secrPatrTrxno;
 }

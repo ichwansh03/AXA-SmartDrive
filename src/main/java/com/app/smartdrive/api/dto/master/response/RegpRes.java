@@ -11,5 +11,7 @@ public class RegpRes {
     @Size(max = 35, message = "Region Plat Desc Length Exceeded !")
     private String regpDesc;
 
+    private Long regpProvId;
+
     private ProvRes provinsi;
 }

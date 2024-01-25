@@ -15,10 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.function.Function;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/partners")
+@CrossOrigin
 public class PartnerController {
 
     private final PartnerServiceImpl partnerService;
@@ -31,13 +33,8 @@ public class PartnerController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<PartnerDto> updatePartnerById(@PathVariable("id") Long id, @RequestBody PartnerRequest request){
-        Partner savePartner = partnerService.getById(id);
-        Partner updatePartner = partnerService.create(request);
-        savePartner.setPartName(updatePartner.getPartName());
-        savePartner.setPartAddress(updatePartner.getPartAddress());
-        savePartner.setCity(updatePartner.getCity());
-        savePartner.setPartNpwp(updatePartner.getPartNpwp());
-        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(partnerService.save(savePartner), PartnerDto.class));
+        Partner updatePartner = partnerService.update(request);
+        return ResponseEntity.ok(TransactionMapper.mapEntityToDto(updatePartner, PartnerDto.class));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePartnerById(@PathVariable("id") Long id){
@@ -52,9 +49,10 @@ public class PartnerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PartnerDto>> getAll(){
-        List<Partner> partners = partnerService.getAll();
-        return ResponseEntity.ok(partners.stream().map(partner -> TransactionMapper.mapEntityToDto(partner, PartnerDto.class)).toList());
+    public ResponseEntity<Page<PartnerDto>> getAll(@RequestParam(defaultValue = "0") int page){
+        Page<Partner> partners = partnerService.getAll(page);
+        Page<PartnerDto> partnersDto = partners.map(partner -> TransactionMapper.mapEntityToDto(partner, PartnerDto.class));
+        return ResponseEntity.ok(partnersDto);
     }
 
     @GetMapping("/{id}")

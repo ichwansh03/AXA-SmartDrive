@@ -16,4 +16,5 @@ import lombok.NoArgsConstructor;
 public class EmployeesAreaWorkgroupResponseDto {
     private ArwgRes areaWorkGroup;
     private EmployeesResponseDto employees;
+    private Long eawgId;
 }

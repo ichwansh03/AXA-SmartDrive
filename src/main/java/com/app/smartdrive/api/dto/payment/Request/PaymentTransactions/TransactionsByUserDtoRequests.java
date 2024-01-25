@@ -18,16 +18,16 @@ import java.math.BigDecimal;
 public class TransactionsByUserDtoRequests {
     
     @NotBlank(message = "Tidak boleh kosong")
-    private String usac_accountno;
+    private String noRekening;
 
     @NotBlank(message = "Tidak boleh kosong")
-    private String patr_usac_accountNo_to;
+    private String toRekening;
    
     @NotNull(message = "Tidak boleh kosong nominalnya")
     private BigDecimal nominall;
     
     @NotBlank(message = "Tidak boleh kosong")
-    private String patr_notes;
+    private String patrNotes;
 
     @NotNull(message = "Silahkan pilih tipe transaksi terlebih dahulu: TOPUP_BANK / TOPUP_FINTECH / TRANSFER / SALARY / PREMI / CLAIM_EVENT / PAID_PARTNER")
     @Enumerated(EnumType.STRING)

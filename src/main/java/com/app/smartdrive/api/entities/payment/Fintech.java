@@ -34,13 +34,13 @@ public class Fintech {
     
     @Id
     @Column(name = "fint_entityid")
-    private Long fint_entityid;
+    private Long fintEntityid;
 
     @Column(name = "fint_name", unique = true, length = 5)
-    private String fint_name;
+    private String fintName;
 
     @Column(name = "fint_desc", length = 55)
-    private String fint_desc;
+    private String fintDesc;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fint_entityid", referencedColumnName = "entityid")
@@ -49,7 +49,7 @@ public class Fintech {
 
     // @JsonIgnore
     @OneToMany(mappedBy = "fintech", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<UserAccounts> user_accounts;
+    List<UserAccounts> userAccounts;
 
     public Optional<Fintech> stream() {
         return null;

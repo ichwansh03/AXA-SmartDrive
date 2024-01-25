@@ -9,6 +9,9 @@ import com.app.smartdrive.api.services.master.MasterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +29,12 @@ public class TemiServiceImpl implements MasterService<TemiRes, TemiReq, Long> {
     }
 
     @Override
-    public List<TemiRes> getAll() {
-        return TransactionMapper.mapEntityListToDtoList(repository.findAll(), TemiRes.class);
+    public Page<TemiRes> getAll(Pageable pageable) {
+        Page<TemplateInsurancePremi> templateInsurancePremis = repository.findAll(pageable);
+        List<TemiRes> temiRes = templateInsurancePremis.getContent().stream().map(
+                templateInsurancePremi -> TransactionMapper.mapEntityToDto(templateInsurancePremi, TemiRes.class)
+        ).toList();
+        return new PageImpl<>(temiRes, pageable, templateInsurancePremis.getTotalElements());
     }
 
     @Override

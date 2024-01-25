@@ -1,12 +1,10 @@
 package com.app.smartdrive.api.controllers.HR;
 
 import com.app.smartdrive.api.dto.HR.response.EmployeesJobTypeResponseDto;
-import com.app.smartdrive.api.dto.payment.Response.Banks.PaymentDtoResponse;
 import com.app.smartdrive.api.services.HR.JobTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

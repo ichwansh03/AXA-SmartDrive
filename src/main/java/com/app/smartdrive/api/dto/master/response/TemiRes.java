@@ -17,6 +17,9 @@ public class TemiRes {
     private Double temiRateMax;
     private Double temiNominal;
     private String temiType;
+    private Long temiZonesId;
+    private String temiIntyName;
+    private Long temiCateId;
     private ZonesRes zones;
     private IntyRes insuranceType;
     private CateRes category;

@@ -15,5 +15,6 @@ public class CarsRes {
     private String carsName;
 
     private int carsPassenger;
+    private Long carsCarmId;
     private CarmRes carModel;
 }

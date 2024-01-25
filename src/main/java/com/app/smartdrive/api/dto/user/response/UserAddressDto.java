@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserAddressDto {
+  private Long usdrId;
   private String usdrAddress1;
   private String usdrAddress2;
   private UserCityDto city;
