@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "service_orders", schema = "so")
+@Table(schema = "so")
 @NamedQueries({
         @NamedQuery(
                 name = "ServiceOrders.selectPartner",

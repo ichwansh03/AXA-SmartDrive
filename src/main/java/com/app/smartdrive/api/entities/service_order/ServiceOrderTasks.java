@@ -26,25 +26,18 @@ public class ServiceOrderTasks {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "seot_id")
     private Long seotId;
 
-    @Column(name = "seot_name")
     private String seotName;
 
-    @Column(name = "seot_startdate")
-    private LocalDateTime seotStartDate;
+    private LocalDateTime seotStartdate;
 
-    @Column(name = "seot_enddate")
-    private LocalDateTime seotEndDate;
+    private LocalDateTime seotEnddate;
 
-    @Column(name = "seot_actual_startdate")
     private LocalDateTime seotActualStartdate;
 
-    @Column(name = "seot_actual_enddate")
     private LocalDateTime seotActualEnddate;
 
-    @Column(name = "seot_status")
     @Enumerated(EnumType.STRING)
     private EnumModuleServiceOrders.SeotStatus seotStatus;
 

@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(
-        name = "services", schema = "so",
+        schema = "so",
         uniqueConstraints = @UniqueConstraint(columnNames = "serv_creq_entityid"))
 @NamedQuery(
         name = "Services.getServiceParent",
@@ -63,7 +63,7 @@ public class Services {
     private User users;
 
     @JsonIgnore
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "serv_creq_entityid")
     private CustomerRequest customer;
 

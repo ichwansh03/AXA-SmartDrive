@@ -86,7 +86,7 @@ public class ServiceWorkorderTransactionImpl implements ServiceWorkorderTransact
         soWorkorder.setSowoName(sowoName);
         soWorkorder.setServiceOrderTasks(tasks);
         soWorkorder.setSowoStatus(false);
-        soWorkorder.setSowoModDate(LocalDateTime.now());
+        soWorkorder.setSowoModifiedDate(LocalDateTime.now());
 
         soWorkorderRepository.save(soWorkorder);
     }

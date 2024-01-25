@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "service_premi", schema = "so")
+@Table(schema = "so")
 @NamedQuery(
         name = "ServicePremi.updateSemiStatus",
         query = "UPDATE ServicePremi semi SET semi.semiStatus = :semiStatus WHERE semi.semiServId = :semiServId", lockMode = LockModeType.PESSIMISTIC_WRITE)
@@ -26,22 +27,17 @@ import java.time.LocalDateTime;
 public class ServicePremi {
 
     @Id
-    @Column(name = "semi_serv_id")
     private Long semiServId;
 
-    @Column(name = "semi_premi_debet")
     private BigDecimal semiPremiDebet;
 
-    @Column(name = "semi_premi_credit")
     private BigDecimal semiPremiCredit;
 
-    @Column(name = "semi_paid_type")
     private String semiPaidType;
 
-    @Column(name = "semi_status")
     private String semiStatus;
 
-    @Column(name = "semi_modified_date")
+    @LastModifiedDate
     private LocalDateTime semiModifiedDate;
 
     @JsonIgnore

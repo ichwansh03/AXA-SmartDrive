@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,14 +21,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @IdClass(ServicePremiCreditId.class)
 @Entity
-@Table(name = "service_premi_credit", schema = "so")
+@Table(schema = "so")
 @DynamicInsert
 @DynamicUpdate
 public class ServicePremiCredit {
 
     //CREATE SEQUENCE serc_seq START WITH 1 INCREMENT BY 1;
     @Id
-    @Column(name = "secr_id")
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "idsecr-generator")
     @SequenceGenerator(name = "idsecr-generator", sequenceName = "serc_seq", allocationSize = 1)
     private Long secrId;
@@ -36,19 +36,15 @@ public class ServicePremiCredit {
     @Column(name = "secr_serv_id")
     private Long secrServId;
 
-    @Column(name = "secr_year")
     private String secrYear;
 
-    @Column(name = "secr_premi_debet")
     private BigDecimal secrPremiDebet;
 
-    @Column(name = "secr_premi_credit")
     private BigDecimal secrPremiCredit;
 
-    @Column(name = "secr_trx_date")
+    @LastModifiedDate
     private LocalDateTime secrTrxDate;
 
-    @Column(name = "secr_duedate")
     private LocalDateTime secrDuedate;
 
     @JsonIgnore
