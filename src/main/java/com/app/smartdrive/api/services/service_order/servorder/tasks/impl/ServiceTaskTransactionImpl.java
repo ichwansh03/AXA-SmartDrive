@@ -102,18 +102,25 @@ public class ServiceTaskTransactionImpl implements ServiceTaskTransaction {
     @Transactional
     @Override
     public int updateTasksStatus(EnumModuleServiceOrders.SeotStatus seotStatus, Long seotId) {
-        ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
-                .orElseThrow(() -> new EntityNotFoundException("::updateTasksStatus ID " + seotId + " is not found"));
+        ServiceOrderTasks orderTasks = findAndValidateSeotById(seotId);
 
-        int updateSeot;
-        if (orderTasks.getServiceOrderWorkorders().isEmpty() || servOrderWorkorderService.checkWorkorderBySeotId(orderTasks.getSeotId())) {
-            updateSeot = soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
-        } else {
-            throw new TasksNotCompletedException("Workorder tasks are not completed");
-        }
+        int updateSeot = updateTasksIfWorkordersAreEmpty(seotStatus, orderTasks);
 
         log.info("SoOrderServiceImpl::findSeotById updated in ID {} ", seotId);
         return updateSeot;
+    }
+
+    private ServiceOrderTasks findAndValidateSeotById(Long seotId) {
+        return soTasksRepository.findById(seotId)
+                .orElseThrow(() -> new EntityNotFoundException("::updateTasksStatus ID " + seotId + " is not found"));
+    }
+
+    private int updateTasksIfWorkordersAreEmpty(EnumModuleServiceOrders.SeotStatus seotStatus, ServiceOrderTasks orderTasks) {
+        if (orderTasks.getServiceOrderWorkorders().isEmpty() || servOrderWorkorderService.checkWorkorderBySeotId(orderTasks.getSeotId())) {
+            return soTasksRepository.updateTasksStatus(seotStatus, orderTasks.getSeotId());
+        } else {
+            throw new TasksNotCompletedException("Workorder tasks are not completed");
+        }
     }
 
     @Transactional
@@ -121,35 +128,32 @@ public class ServiceTaskTransactionImpl implements ServiceTaskTransaction {
     public SeotPartnerDto updateSeotPartner(SeotPartnerDto seotPartnerDto, Long seotId) {
         ServiceOrderTasks orderTasks = soTasksRepository.findById(seotId)
                 .orElseThrow(() -> new EntityNotFoundException("::updateSeotPartner() ID " + seotId + " is not found"));
-        SeotPartnerDto seotPartner = SeotPartnerDto.builder()
+
+        validateWorkorderForPartner(seotPartnerDto, seotId);
+
+        Partner partner = partnerRepository.findById(seotPartnerDto.getPartnerId())
+                .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID " + seotPartnerDto.getPartnerId() + " is not found"));
+        soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
+
+        notifyCurrentTask(TransactionMapper.mapEntityToDto(orderTasks, ServiceTaskReqDto.class));
+
+        return SeotPartnerDto.builder()
                 .partnerId(seotPartnerDto.getPartnerId())
                 .repair(seotPartnerDto.getRepair())
                 .sparepart(seotPartnerDto.getSparepart())
                 .seotStatus(seotPartnerDto.getSeotStatus()).build();
-
-        validateWorkorderForPartner(seotPartnerDto, seotId);
-
-        Partner partner = partnerRepository.findById(seotPartner.getPartnerId())
-                .orElseThrow(() -> new EntityNotFoundException("::partnerRepository.findById ID " + seotPartner.getPartnerId() + " is not found"));
-        soOrderRepository.selectPartner(partner, orderTasks.getServiceOrders().getSeroId());
-
-
-        ServiceTaskReqDto serviceTaskReqDto = TransactionMapper.mapEntityToDto(orderTasks, ServiceTaskReqDto.class);
-        notifyCurrentTask(serviceTaskReqDto);
-
-        return seotPartner;
     }
 
     @Override
     public void validateWorkorderForPartner(SeotPartnerDto seotPartnerDto, Long seotId){
-        if (seotPartnerDto.getRepair()) {
-            serviceWorkorderTransaction.createWorkorderTask("REPAIR", seotId);
-            log.info("SoOrderServiceImpl::updateSeotPartner add REPAIR to workorder");
-        }
+        createWorkorderTaskIfTrue(seotPartnerDto.getRepair(), "REPAIR", seotId, "REPAIR");
+        createWorkorderTaskIfTrue(seotPartnerDto.getSparepart(), "GANTI SUKU CADANG", seotId, "GANTI SUKU CADANG");
+    }
 
-        if (seotPartnerDto.getSparepart()) {
-            serviceWorkorderTransaction.createWorkorderTask("GANTI SUKU CADANG", seotId);
-            log.info("SoOrderServiceImpl::updateSeotPartner add GANTI SUKU CADANG to workorder");
+    private void createWorkorderTaskIfTrue(boolean condition, String task, Long seotId, String logMessage) {
+        if (condition) {
+            serviceWorkorderTransaction.createWorkorderTask(task, seotId);
+            log.info("SoOrderServiceImpl::updateSeotPartner add " + logMessage + " to workorder");
         }
     }
 
@@ -174,28 +178,27 @@ public class ServiceTaskTransactionImpl implements ServiceTaskTransaction {
 
     @Override
     public void notifyCurrentTask(ServiceTaskReqDto serviceOrderTask) {
-
         ServiceOrderRespDto orderDtoById = servOrderService.getById(serviceOrderTask.getServiceOrders().getSeroId());
         ServiceRespDto services = servService.getById(serviceOrderTask.getServiceOrders().getServices().getServId());
 
+        String userEmail = services.getUserDto().getUserEmail();
+        String userFullName = services.getUserDto().getUserFullName();
+
         switch (serviceOrderTask.getSeotName()) {
-            case "NOTIFY TO AGENT" ->
-                    servOrderTaskService.notifyTask(orderDtoById.getEmployees().getEmployees().getUser().getUserEmail(),
-                            "Request new POLIS",
-                            "Request new POLIS from " + services.getUserDto().getUserFullName());
-            case "NOTIFY TO CUSTOMER" ->
-                    servOrderTaskService.notifyTask(services.getUserDto().getUserEmail(),
-                            "POLIS has been created",
-                            "Your request POLIS has been created, check your dashboard page");
+            case "NOTIFY TO AGENT" -> servOrderTaskService.notifyTask(orderDtoById.getEmployees().getEmployees().getUser().getUserEmail(),
+                    "Request new POLIS",
+                    "Request new POLIS from " + userFullName);
+            case "NOTIFY TO CUSTOMER" -> servOrderTaskService.notifyTask(userEmail,
+                    "POLIS has been created",
+                    "Your request POLIS has been created, check your dashboard page");
             case "CLAIM DOCUMENT APPROVED" -> servOrderTaskService.notifyTask(services.getServiceOrdersList().get(0).getPartner().getPartnerContacts().get(0).getUser().getUserEmail(),
                     "Repair Sparepart from Customer",
-                    "Repair from " + services.getUserDto().getUserFullName());
-            case "CALCULATE SPARE PART" -> servOrderTaskService.notifyTask(services.getUserDto().getUserEmail(),
+                    "Repair from " + userFullName);
+            case "CALCULATE SPARE PART" -> servOrderTaskService.notifyTask(userEmail,
                     "Your car is finish to repair",
                     "Car Repaired is finish");
-            case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> servOrderTaskService.notifyTask(services.getUserDto().getUserEmail(),
-                    "Claim for " + services.getUserDto().getUserFullName(),
-
+            case "NOTIFY CUSTOMER VEHICLE REPAIRED" -> servOrderTaskService.notifyTask(userEmail,
+                    "Claim for " + userFullName,
                     "Repaired is finish, pay claim to user");
         }
     }

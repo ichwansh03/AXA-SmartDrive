@@ -67,20 +67,13 @@ public class ServOrderTaskImpl implements ServOrderTaskService {
 
     @Override
     public boolean checkAllTaskComplete(String seroId) {
-
         List<ServiceOrderTasks> seotBySeroId = soTasksRepository.findByServiceOrders_SeroId(seroId);
-
-        List<ServiceOrderWorkorder> sowoBySeotId = servOrderWorkorderService.findSowoBySeotId(seotBySeroId.get(0).getSeotId());
-        boolean allWorkComplete = servOrderWorkorderService.checkAllWorkComplete(sowoBySeotId);
-
-        boolean checkedAll = false;
-        for (ServiceOrderTasks item : seotBySeroId) {
-            if (item.getSeotStatus().toString().equals("COMPLETED") && allWorkComplete){
-                checkedAll = true;
-            }
-        }
-
-        log.info("ServOrderTaskImpl::checkAllTaskComplete the results is {}",checkedAll);
+        boolean allWorkComplete = servOrderWorkorderService.checkAllWorkComplete(
+                servOrderWorkorderService.findSowoBySeotId(seotBySeroId.get(0).getSeotId())
+        );
+        boolean checkedAll = seotBySeroId.stream()
+                .allMatch(item -> item.getSeotStatus().toString().equals("COMPLETED") && allWorkComplete);
+        log.info("ServOrderTaskImpl::checkAllTaskComplete the results is {}", checkedAll);
         return checkedAll;
     }
 }

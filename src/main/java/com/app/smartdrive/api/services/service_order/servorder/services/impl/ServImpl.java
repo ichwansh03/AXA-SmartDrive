@@ -54,8 +54,7 @@ public class ServImpl implements ServService {
 
         SemiDto semiDto = new SemiDto();
         if (services.getServType() == EnumCustomer.CreqType.POLIS) {
-            ServicePremi servicePremi = servPremiService.findByServId(services.getServId());
-            semiDto = TransactionMapper.mapEntityToDto(servicePremi, SemiDto.class);
+            semiDto = servPremiService.findByServId(services.getServId());
             List<SecrDto> secrDtoList = servPremiCreditService.findPremiCreditByServId(services.getServId());
             semiDto.setSecrDtoList(secrDtoList);
         }

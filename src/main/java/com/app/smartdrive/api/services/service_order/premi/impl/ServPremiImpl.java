@@ -2,10 +2,12 @@ package com.app.smartdrive.api.services.service_order.premi.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
+import com.app.smartdrive.api.dto.service_order.response.SemiDto;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
@@ -23,14 +25,15 @@ import java.time.LocalDateTime;
 public class ServPremiImpl implements ServPremiService {
 
     private final SemiRepository semiRepository;
-    private final SoRepository soRepository;
 
     private final ServPremiCreditService servPremiCreditService;
 
     @Override
-    public ServicePremi findByServId(Long servId) {
-        return semiRepository.findById(servId)
+    public SemiDto findByServId(Long servId) {
+        ServicePremi servicePremi = semiRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("findByServId(Long servId)::servId premi is not found"));
+
+        return TransactionMapper.mapEntityToDto(servicePremi, SemiDto.class);
     }
 
     @Transactional

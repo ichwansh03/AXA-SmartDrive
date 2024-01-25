@@ -5,7 +5,6 @@ import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.*;
 import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.customer.CustomerRequest;
-import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
 import com.app.smartdrive.api.entities.users.User;
@@ -60,43 +59,6 @@ public class ServOrderImpl implements ServOrderService {
                 .toList();
     }
 
-//    @Override
-//    public List<FeasiblityDto> findAllFeasiblity() {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-//
-//        List<ServiceOrders> serviceOrders = soOrderRepository.findAll();
-//        return serviceOrders.stream()
-//                .filter(type -> type.getServices().getServType().equals(EnumCustomer.CreqType.FEASIBLITY))
-//                .map(order -> new FeasiblityDto(
-//                        order.getServices().getUsers().getUserFullName(),
-//                        order.getServices().getUsers().getUserEmail(),
-//                        order.getServices().getServCreatedOn().format(formatter),
-//                        order.getSeroId(),
-//                        order.getServices().getServType(),
-//                        order.getSeroStatus()))
-//                .toList();
-//    }
-//
-//    @Override
-//    public List<PolisDto> findAllPolis() {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-//
-//        List<ServiceOrders> serviceOrders = soOrderRepository.findAll();
-//
-//        return serviceOrders.stream()
-//                .filter(type -> type.getServices().getServType().equals(EnumCustomer.CreqType.POLIS) ||
-//                        type.getServices().getServType().equals(EnumCustomer.CreqType.CLAIM))
-//                .map(polis -> new PolisDto(
-//                        polis.getSeroId(),
-//                        polis.getServices().getUsers().getUserFullName(),
-//                        polis.getServClaimNo(),
-//                        polis.getServices().getServEndDate().format(formatter),
-//                        polis.getServices().getServVehicleNumber(),
-//                        polis.getServices().getCustomer().getCustomerInscAssets().getCiasTotalPremi(),
-//                        polis.getServices().getServType()))
-//                .filter(polisDto -> !polisDto.getPolisNo().equals("0"))
-//                .toList();
-//    }
 
     @Override
     public List<ServiceOrders> findAllSeroByUserId(Long custId) {

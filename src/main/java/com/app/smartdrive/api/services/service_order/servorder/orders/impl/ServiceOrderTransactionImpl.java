@@ -37,41 +37,36 @@ public class ServiceOrderTransactionImpl implements ServiceOrderTransaction {
 
     SoAdapter soAdapter = new SoAdapter();
 
+    /**
+     * Adds a new service order based on the service ID.
+     *
+     * @param servId the ID of the services
+     * @return the newly added service orders
+     */
     @Override
     public ServiceOrders addServiceOrders(Long servId) {
-
         Services services = soRepository.findById(servId)
-                .orElseThrow(() -> new EntityNotFoundException("addServiceOrders(Long servId)::servId "+servId+ "is not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Service with ID " + servId + " not found"));
         ServiceOrders orders = new ServiceOrders();
 
-        //avoid this operation, not OCP!
         switch (services.getServType().toString()){
-            case "FEASIBLITY" -> {
+            case "FEASIBILITY" -> {
                 orders = generateSeroFeasiblity(services);
                 serviceTaskTransaction.addFeasiblityList(orders);
-                log.info("ServOrderImpl::addServiceOrders create FEASIBLITY tasks");
             }
             case "POLIS" -> {
-                //get previous service order (FS)
-                ServiceOrders fs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
-                //close previous service order
-                closeExistingSero(fs);
+                ServiceOrders previousFs = soOrderRepository.findBySeroIdLikeAndServices_ServId("FS%", services.getServId());
+                closeExistingSero(previousFs);
                 orders = handlePolisAndClaim(services, null, null, "FS%");
                 serviceTaskTransaction.addPolisList(orders);
-                log.info("ServOrderImpl::addServiceOrders create POLIS tasks");
             }
             case "CLAIM" -> {
-                //get previous service order (CL)
-                ServiceOrders cl = soOrderRepository.findBySeroIdLikeAndServices_ServId("CL%", services.getServId());
-                //if user second time request claim
-                if (cl != null){
-                    //close second claim
-                    closeExistingSero(cl);
+                ServiceOrders previousClaim = soOrderRepository.findBySeroIdLikeAndServices_ServId("CL%", services.getServId());
+                if (previousClaim != null){
+                    closeExistingSero(previousClaim);
                 }
-                //first time to request claim
                 orders = handlePolisAndClaim(services, LocalDateTime.now(), LocalDateTime.now().plusDays(10), "PL%");
                 serviceTaskTransaction.addClaimList(orders);
-                log.info("ServOrderImpl::addServiceOrders create CLAIM tasks");
             }
             default -> requestCloseAllSero(services);
         }
