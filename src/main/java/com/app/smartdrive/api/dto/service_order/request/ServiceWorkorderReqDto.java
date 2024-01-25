@@ -1,8 +1,6 @@
 package com.app.smartdrive.api.dto.service_order.request;
 
 import com.app.smartdrive.api.entities.service_order.ServiceOrderTasks;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,13 +13,13 @@ public class ServiceWorkorderReqDto {
 
     private String sowoName;
     @LastModifiedDate
-    private LocalDateTime sowoModDate;
+    private LocalDateTime sowoModifiedDate;
     private Boolean sowoStatus;
     private ServiceOrderTasks serviceOrderTasks;
 
-    public ServiceWorkorderReqDto(String sowoName, LocalDateTime sowoModDate, Boolean sowoStatus, ServiceOrderTasks serviceOrderTasks) {
+    public ServiceWorkorderReqDto(String sowoName, LocalDateTime sowoModifiedDate, Boolean sowoStatus, ServiceOrderTasks serviceOrderTasks) {
         this.sowoName = sowoName;
-        this.sowoModDate = sowoModDate;
+        this.sowoModifiedDate = sowoModifiedDate;
         this.sowoStatus = sowoStatus;
         this.serviceOrderTasks = serviceOrderTasks;
     }
