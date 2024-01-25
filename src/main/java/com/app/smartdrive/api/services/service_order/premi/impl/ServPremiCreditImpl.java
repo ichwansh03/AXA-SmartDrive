@@ -17,17 +17,17 @@ import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditServic
 import com.app.smartdrive.api.services.service_order.servorder.tasks.ServOrderTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -50,15 +50,10 @@ public class ServPremiCreditImpl implements ServPremiCreditService {
     @Transactional
     @Override
     public List<ServicePremiCredit> addSecr(ServicePremi servicePremi) {
-
-        LocalDateTime semiModifiedDate = servicePremi.getSemiModifiedDate();
-        List<ServicePremiCredit> servicePremiCredits = new ArrayList<>();
-
-        for (int i = 1; i <= 12; i++) {
-            ServicePremiCredit save = generatePremiData(servicePremi, semiModifiedDate.plusMonths(i));
-            servicePremiCredits.add(save);
-        }
-        log.info("ServPremiImpl::addSecr successfully added service premi credit");
+        List<ServicePremiCredit> servicePremiCredits = IntStream.rangeClosed(1, 12)
+                .mapToObj(i -> generatePremiData(servicePremi, servicePremi.getSemiModifiedDate().plusMonths(i)))
+                .collect(Collectors.toList());
+        log.info("Successfully added service premi credit");
         return servicePremiCredits;
     }
 

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
         query = "UPDATE ServicePremi semi SET semi.semiStatus = :semiStatus WHERE semi.semiServId = :semiServId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 @DynamicInsert
 @DynamicUpdate
+@EntityListeners({AuditingEntityListener.class})
 public class ServicePremi {
 
     @Id

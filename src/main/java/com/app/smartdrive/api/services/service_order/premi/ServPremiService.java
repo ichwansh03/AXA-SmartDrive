@@ -9,8 +9,6 @@ public interface ServPremiService {
 
     ServicePremi findByServId(Long servId);
 
-    ServicePremi addSemi(ServicePremi servicePremi, Long servId);
-
     ServicePremi generateServPremi(Services services);
 
     int updateSemiStatus(String semiStatus, Long semiServId);

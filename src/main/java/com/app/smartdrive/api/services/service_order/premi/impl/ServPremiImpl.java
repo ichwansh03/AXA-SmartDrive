@@ -35,40 +35,23 @@ public class ServPremiImpl implements ServPremiService {
 
     @Transactional
     @Override
-    public ServicePremi addSemi(ServicePremi servicePremi, Long servId) {
-        Services services = soRepository.findById(servId)
-                .orElseThrow(() -> new EntityNotFoundException("addSemi(ServicePremi servicePremi, Long servId)::servId is not found"));
-
-        ServicePremi premi = ServicePremi.builder()
-                .semiServId(services.getServId())
-                .semiPremiDebet(servicePremi.getSemiPremiDebet())
-                .semiPremiCredit(servicePremi.getSemiPremiCredit())
-                .semiStatus(servicePremi.getSemiStatus())
-                .semiPaidType(servicePremi.getSemiPaidType())
-                .semiModifiedDate(LocalDateTime.now())
-                .build();
-
-        ServicePremi save = semiRepository.save(premi);
-
-        if (services.getCustomer().getCustomerInscAssets().getCiasPaidType() == EnumCustomer.CreqPaidType.CREDIT) {
-            servPremiCreditService.addSecr(premi);
-            log.info("ServPremiImpl::addSemi successfully added service premi");
-        } else {
-            servPremiCreditService.addSecrCash(premi);
-        }
-
-        return save;
-    }
-
-    @Override
     public ServicePremi generateServPremi(Services services){
         ServicePremi servicePremi = ServicePremi.builder()
                 .semiServId(services.getServId())
                 .semiPremiDebet(services.getCustomer().getCustomerInscAssets().getCiasTotalPremi())
                 .semiPaidType(services.getCustomer().getCustomerInscAssets().getCiasPaidType().toString())
                 .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
-        log.info("service premi {} ", services);
-        addSemi(servicePremi, services.getServId());
+
+        ServicePremi save = semiRepository.save(servicePremi);
+        log.info("service premi {} ", save);
+
+        if (services.getCustomer().getCustomerInscAssets().getCiasPaidType() == EnumCustomer.CreqPaidType.CREDIT) {
+            servPremiCreditService.addSecr(save);
+            log.info("ServPremiImpl::addSemi successfully added service premi");
+        } else {
+            servPremiCreditService.addSecrCash(save);
+        }
+
         return servicePremi;
     }
 
