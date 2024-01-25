@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.List;
         query = "SELECT a FROM Services a INNER JOIN Services b ON a.servId = b.parentServices.servId WHERE a.users.userEntityId = ?1")
 @DynamicInsert
 @DynamicUpdate
+@EntityListeners({AuditingEntityListener.class})
 public class Services {
 
     @Id
@@ -34,6 +37,7 @@ public class Services {
     @Column(updatable = false, nullable = false)
     private Long servId;
 
+    @CreatedDate
     private LocalDateTime servCreatedOn;
 
     @Enumerated(EnumType.STRING)

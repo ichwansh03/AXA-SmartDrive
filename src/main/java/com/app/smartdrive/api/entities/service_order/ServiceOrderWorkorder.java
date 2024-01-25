@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
         query = "UPDATE ServiceOrderWorkorder sowo SET sowo.sowoStatus = :sowoStatus, sowo.sowoModifiedDate = :sowoModDate WHERE sowo.sowoId = :sowoId", lockMode = LockModeType.PESSIMISTIC_WRITE)
 @DynamicUpdate
 @DynamicInsert
+@EntityListeners({AuditingEntityListener.class})
 public class ServiceOrderWorkorder {
 
     @Id

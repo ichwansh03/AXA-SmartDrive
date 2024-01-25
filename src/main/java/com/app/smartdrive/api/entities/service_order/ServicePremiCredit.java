@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 @Table(schema = "so")
 @DynamicInsert
 @DynamicUpdate
+@EntityListeners({AuditingEntityListener.class})
 public class ServicePremiCredit {
 
     //CREATE SEQUENCE serc_seq START WITH 1 INCREMENT BY 1;
