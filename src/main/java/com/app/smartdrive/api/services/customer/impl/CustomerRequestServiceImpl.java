@@ -7,6 +7,7 @@ import com.app.smartdrive.api.dto.customer.request.CreateCustomerRequestByAgenDT
 import com.app.smartdrive.api.dto.customer.request.CustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.request.UpdateCustomerRequestDTO;
 import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.entities.customer.*;
@@ -16,6 +17,7 @@ import com.app.smartdrive.api.entities.master.AreaWorkGroup;
 import com.app.smartdrive.api.entities.master.CarSeries;
 import com.app.smartdrive.api.entities.master.Cities;
 import com.app.smartdrive.api.entities.master.InsuranceType;
+import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.EnumUsers;
 import com.app.smartdrive.api.entities.users.User;
@@ -532,6 +534,13 @@ public class CustomerRequestServiceImpl implements CustomerRequestService {
 
         this.customerRequestRepository.delete(existCustomerRequest);
         log.info("CustomerRequestServiceImpl:delete, successfully delete customer request");
+    }
+
+    @Override
+    public void mapCustomerRequestToDtoServices(Services services, ServiceRespDto serviceRespDto) {
+        CustomerRequest existCustomerRequest = getById(services.getCustomer().getCreqEntityId());
+        CustomerResponseDTO customerRequestById = TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
+        serviceRespDto.setCustomerResponseDTO(customerRequestById);
     }
 }
 

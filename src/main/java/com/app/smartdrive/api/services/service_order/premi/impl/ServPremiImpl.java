@@ -2,10 +2,14 @@ package com.app.smartdrive.api.services.service_order.premi.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
+import com.app.smartdrive.api.dto.service_order.response.SecrDto;
+import com.app.smartdrive.api.dto.service_order.response.SemiDto;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
+import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.SemiRepository;
 import com.app.smartdrive.api.repositories.service_orders.SoRepository;
 import com.app.smartdrive.api.services.service_order.premi.ServPremiCreditService;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,43 +28,18 @@ import java.time.LocalDateTime;
 public class ServPremiImpl implements ServPremiService {
 
     private final SemiRepository semiRepository;
-    private final SoRepository soRepository;
 
     private final ServPremiCreditService servPremiCreditService;
 
     @Override
-    public ServicePremi findByServId(Long servId) {
-        return semiRepository.findById(servId)
+    public SemiDto findByServId(Long servId) {
+        ServicePremi servicePremi = semiRepository.findById(servId)
                 .orElseThrow(() -> new EntityNotFoundException("findByServId(Long servId)::servId premi is not found"));
+
+        return TransactionMapper.mapEntityToDto(servicePremi, SemiDto.class);
     }
 
     @Transactional
-    @Override
-    public ServicePremi addSemi(ServicePremi servicePremi, Long servId) {
-        Services services = soRepository.findById(servId)
-                .orElseThrow(() -> new EntityNotFoundException("addSemi(ServicePremi servicePremi, Long servId)::servId is not found"));
-
-        ServicePremi premi = ServicePremi.builder()
-                .semiServId(services.getServId())
-                .semiPremiDebet(servicePremi.getSemiPremiDebet())
-                .semiPremiCredit(servicePremi.getSemiPremiCredit())
-                .semiStatus(servicePremi.getSemiStatus())
-                .semiPaidType(servicePremi.getSemiPaidType())
-                .semiModifiedDate(LocalDateTime.now())
-                .build();
-
-        ServicePremi save = semiRepository.save(premi);
-
-        if (services.getCustomer().getCustomerInscAssets().getCiasPaidType() == EnumCustomer.CreqPaidType.CREDIT) {
-            servPremiCreditService.addSecr(premi);
-            log.info("ServPremiImpl::addSemi successfully added service premi");
-        } else {
-            servPremiCreditService.addSecrCash(premi);
-        }
-
-        return save;
-    }
-
     @Override
     public ServicePremi generateServPremi(Services services){
         ServicePremi servicePremi = ServicePremi.builder()
@@ -67,8 +47,17 @@ public class ServPremiImpl implements ServPremiService {
                 .semiPremiDebet(services.getCustomer().getCustomerInscAssets().getCiasTotalPremi())
                 .semiPaidType(services.getCustomer().getCustomerInscAssets().getCiasPaidType().toString())
                 .semiStatus(EnumModuleServiceOrders.SemiStatus.UNPAID.toString()).build();
-        log.info("service premi {} ", services);
-        addSemi(servicePremi, services.getServId());
+
+        ServicePremi save = semiRepository.save(servicePremi);
+        log.info("service premi {} ", save);
+
+        if (services.getCustomer().getCustomerInscAssets().getCiasPaidType() == EnumCustomer.CreqPaidType.CREDIT) {
+            servPremiCreditService.addSecr(save);
+            log.info("ServPremiImpl::addSemi successfully added service premi");
+        } else {
+            servPremiCreditService.addSecrCash(save);
+        }
+
         return servicePremi;
     }
 
@@ -85,4 +74,13 @@ public class ServPremiImpl implements ServPremiService {
         return updated;
     }
 
+    @Override
+    public void mapServicePremiToDtoServices(Services services, ServiceRespDto serviceRespDto) {
+        if (services.getServType() == EnumCustomer.CreqType.POLIS) {
+            SemiDto semiDto = findByServId(services.getServId());
+            List<SecrDto> secrDtoList = servPremiCreditService.findPremiCreditByServId(services.getServId());
+            semiDto.setSecrDtoList(secrDtoList);
+            serviceRespDto.setSemiDto(semiDto);
+        }
+    }
 }
