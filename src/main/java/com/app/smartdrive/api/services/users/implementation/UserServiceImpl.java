@@ -2,10 +2,13 @@ package com.app.smartdrive.api.services.users.implementation;
 
 import com.app.smartdrive.api.Exceptions.EntityAlreadyExistException;
 import com.app.smartdrive.api.Exceptions.UserExistException;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.dto.user.request.ProfileRequestDto;
 import com.app.smartdrive.api.dto.user.request.UpdateUserRequestDto;
+import com.app.smartdrive.api.dto.user.response.UserDto;
 import com.app.smartdrive.api.entities.payment.UserAccounts;
+import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.EnumUsers.RoleName;
 import com.app.smartdrive.api.entities.users.User;
@@ -177,5 +180,11 @@ public class UserServiceImpl implements UserService {
 
   }
 
+  @Override
+  public void mapUserToDtoServices(Services services, ServiceRespDto serviceRespDto) {
+    User user = getById(services.getUsers().getUserEntityId());
+    UserDto userDto = TransactionMapper.mapEntityToDto(user, UserDto.class);
+    serviceRespDto.setUserDto(userDto);
+  }
 
 }

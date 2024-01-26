@@ -2,8 +2,10 @@ package com.app.smartdrive.api.services.customer;
 
 import com.app.smartdrive.api.dto.customer.request.*;
 import com.app.smartdrive.api.dto.customer.response.*;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.dto.user.request.CreateUserDto;
 import com.app.smartdrive.api.entities.customer.*;
+import com.app.smartdrive.api.entities.service_order.Services;
 import com.app.smartdrive.api.entities.users.BusinessEntity;
 import com.app.smartdrive.api.entities.users.User;
 import jakarta.validation.Valid;
@@ -46,4 +48,6 @@ public interface CustomerRequestService {
     public void changeRequestStatus(CustomerRequest customerRequest, EnumCustomer.CreqStatus creqStatus);
 
     public void delete(Long creqEntityId);
+
+    void mapCustomerRequestToDtoServices(Services services, ServiceRespDto serviceRespDto);
 }

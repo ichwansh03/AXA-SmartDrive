@@ -1,13 +1,9 @@
 package com.app.smartdrive.api.services.service_order.servorder.orders.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
-import com.app.smartdrive.api.dto.customer.response.CustomerResponseDTO;
 import com.app.smartdrive.api.dto.service_order.response.*;
-import com.app.smartdrive.api.dto.user.response.UserDto;
-import com.app.smartdrive.api.entities.customer.CustomerRequest;
 import com.app.smartdrive.api.entities.service_order.*;
 import com.app.smartdrive.api.entities.service_order.enumerated.EnumModuleServiceOrders;
-import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.mapper.TransactionMapper;
 import com.app.smartdrive.api.repositories.service_orders.*;
 import com.app.smartdrive.api.services.customer.CustomerRequestService;
@@ -21,9 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -85,46 +81,36 @@ public class ServOrderImpl implements ServOrderService {
         return serviceOrdersPage.map(serviceOrders -> TransactionMapper.mapEntityToDto(serviceOrders, ServiceOrderRespDto.class));
     }
 
-    //avoid this operation, not SRP!
     @Override
     public ServiceOrderRespDto getById(String seroId) {
         ServiceOrders orders = findServiceOrdersById(seroId);
+        ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(orders, ServiceOrderRespDto.class);
 
         Services services = soRepository.findById(orders.getServices().getServId()).get();
         ServiceRespDto serviceRespDto = TransactionMapper.mapEntityToDto(services, ServiceRespDto.class);
+        serviceOrderRespDto.setServices(serviceRespDto);
 
-        CustomerRequest existCustomerRequest = customerRequestService.getById(services.getCustomer().getCreqEntityId());
-        CustomerResponseDTO customerRequestById = TransactionMapper.mapEntityToDto(existCustomerRequest, CustomerResponseDTO.class);
-
-        User user = userService.getById(services.getUsers().getUserEntityId());
-        UserDto userDto = TransactionMapper.mapEntityToDto(user, UserDto.class);
+        customerRequestService.mapCustomerRequestToDtoServices(services, serviceRespDto);
+        userService.mapUserToDtoServices(services, serviceRespDto);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         serviceRespDto.setServCreatedOn(services.getServCreatedOn().format(formatter));
 
-        serviceRespDto.setServCreatedOn(services.getServCreatedOn().format(formatter));
-        serviceRespDto.setUserDto(userDto);
-        serviceRespDto.setCustomerResponseDTO(customerRequestById);
-
-        ServiceOrderRespDto serviceOrderRespDto = TransactionMapper.mapEntityToDto(orders, ServiceOrderRespDto.class);
-        List<SoTasksDto> taskByOrderId = servOrderTaskService.findAllTaskByOrderId(seroId);
-
-        serviceOrderRespDto.setServices(serviceRespDto);
-        serviceOrderRespDto.setSoTasksDtoList(taskByOrderId);
+        serviceOrderRespDto.setSoTasksDtoList(servOrderTaskService.findAllTaskByOrderId(seroId));
         return serviceOrderRespDto;
     }
 
     @Override
     public List<ServiceOrderRespDto> getAll() {
-        List<ServiceOrders> serviceOrders = soOrderRepository.findAll();
-
-        List<ServiceOrderRespDto> result = new ArrayList<>();
-
-        for (ServiceOrders order : serviceOrders) {
-            ServiceOrderRespDto orderRespDto = getById(order.getSeroId());
-            result.add(orderRespDto);
-        }
-
-        return result;
+        return soOrderRepository.findAll().stream()
+                .map(order -> getById(order.getSeroId()))
+                .collect(Collectors.toList());
     }
+
+    @Override
+    public void mapServiceOrderToDtoServices(Services services, ServiceRespDto serviceRespDto) {
+        List<ServiceOrderRespDto> serviceOrderRespDtos = findAllOrderByServId(services.getServId());
+        serviceRespDto.setServiceOrdersList(serviceOrderRespDtos);
+    }
+
 }

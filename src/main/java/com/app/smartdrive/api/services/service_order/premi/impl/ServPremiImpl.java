@@ -2,7 +2,9 @@ package com.app.smartdrive.api.services.service_order.premi.impl;
 
 import com.app.smartdrive.api.Exceptions.EntityNotFoundException;
 import com.app.smartdrive.api.Exceptions.ValidasiRequestException;
+import com.app.smartdrive.api.dto.service_order.response.SecrDto;
 import com.app.smartdrive.api.dto.service_order.response.SemiDto;
+import com.app.smartdrive.api.dto.service_order.response.ServiceRespDto;
 import com.app.smartdrive.api.entities.customer.EnumCustomer;
 import com.app.smartdrive.api.entities.service_order.ServicePremi;
 import com.app.smartdrive.api.entities.service_order.Services;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -71,4 +74,13 @@ public class ServPremiImpl implements ServPremiService {
         return updated;
     }
 
+    @Override
+    public void mapServicePremiToDtoServices(Services services, ServiceRespDto serviceRespDto) {
+        if (services.getServType() == EnumCustomer.CreqType.POLIS) {
+            SemiDto semiDto = findByServId(services.getServId());
+            List<SecrDto> secrDtoList = servPremiCreditService.findPremiCreditByServId(services.getServId());
+            semiDto.setSecrDtoList(secrDtoList);
+            serviceRespDto.setSemiDto(semiDto);
+        }
+    }
 }
