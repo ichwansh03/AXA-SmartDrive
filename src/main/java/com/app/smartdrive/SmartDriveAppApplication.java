@@ -16,12 +16,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.nio.file.Files;
 
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableScheduling
+@EnableTransactionManagement
 public class SmartDriveAppApplication implements CommandLineRunner {
 
 	@Autowired
