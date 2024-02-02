@@ -32,7 +32,35 @@
 
 **Service**
 1. Apakah anotasi transaction berjalan?
-   => Untuk mengaktifkan anotasi transactional, tambahkan anotasi @EnableTransactionManagement jika terdapat class configuration dan memerlukan operasi transactional ke database. 
+   => Untuk mengaktifkan anotasi transactional, tambahkan anotasi @EnableTransactionManagement jika terdapat class configuration dan memerlukan operasi transactional ke database.
+
+* Second Level Cache: Jika data sudah banyak, implementasikan cache untuk menyimpan data query sebelumnya ketika findByxxx untuk mempercepat proses pencarian data alih-alih melakukan query langsung ke database. https://www.youtube.com/watch?v=G6Y5wDF6h5Q
+
+* @Transactional : anotasi yang merepresentasikan rollback pada Spring https://codete.com/blog/5-common-spring-transactional-pitfalls
+
+* Ilustrasikan operasi transactional pada java dan SQL
+```java
+private void test(){
+   EntityManager entityManager = null;
+   entityManager.createNamedQuery("asasa");
+   EntityTransaction transaction = entityManager.getTransaction();
+  
+   try {
+       transaction.begin();
+      
+       //to do
+      
+       transaction.commit();
+   } catch (RuntimeException e) {
+       transaction.rollback();
+       throw e;
+   }
+}
+```
+
+* Kenapa harus menggunakan anotasi @Transactional pada setiap method?
+Anotasi tersebut digunakan untuk rollback semua operasi jika terjadi kesalahan pada salah satu method. Namun anotasi transactional hanya dapat digunakan pada method yang di define pada bean lain dan memiliki modifier public.
+
 
 **Unit test:**
 MockMVC: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/MockMvc.html#perform(org.springframework.test.web.servlet.RequestBuilder)
