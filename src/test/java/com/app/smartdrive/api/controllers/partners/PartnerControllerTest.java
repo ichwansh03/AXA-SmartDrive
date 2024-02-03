@@ -6,6 +6,7 @@ import com.app.smartdrive.api.dto.partner.request.PartnerRequest;
 import com.app.smartdrive.api.entities.partner.Partner;
 import com.app.smartdrive.api.repositories.partner.PartnerRepository;
 import com.app.smartdrive.api.repositories.users.UserRepository;
+import com.app.smartdrive.api.entities.users.User;
 import com.app.smartdrive.api.services.partner.PartnerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
